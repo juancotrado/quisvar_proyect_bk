@@ -5,6 +5,9 @@ import { UsersServices } from "../services";
 export const showUsers = async (req: Request, res: Response, next: NextFunction) =>{
     try {
         const query = await UsersServices.getUsers()
+        if (query.length == 0) {
+            return res.status(404).json({message: "no hay naa"})
+        }
         res.status(200).json(query)
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {

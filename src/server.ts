@@ -8,7 +8,7 @@ class Server {
   private PORT: string = process.env.PORT || '8080';
   private HOST: string = process.env.HOST || 'localhost';
   private path: any = {
-    users: `${process.env.ROUTE}/users`,
+    users: `/${process.env.ROUTE}/users`,
   };
 
   constructor() {
