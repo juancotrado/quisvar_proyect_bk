@@ -1,16 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
-import { UsersServices } from '../services';
+import { tasksServices } from '../services';
 
-export const showUsers = async (
+export const showTask = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const query = await UsersServices.getUsers();
+    const query = await tasksServices.getTask();
     if (query.length == 0) {
-      return res.status(404).json({ message: 'no hay naa' });
+      return res.status(200).json({ message: 'no hay tareas pendientes' });
     }
     res.status(200).json(query);
   } catch (error) {

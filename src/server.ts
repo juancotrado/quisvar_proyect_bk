@@ -1,7 +1,8 @@
 import express, { Application } from 'express';
 import * as dotenv from 'dotenv';
 import { prisma } from './utils/prisma.server';
-import { userRouter } from './routes';
+import { userRouter, taskRouter } from './routes';
+
 dotenv.config();
 class Server {
   private app!: Application;
@@ -9,6 +10,7 @@ class Server {
   private HOST: string = process.env.HOST || 'localhost';
   private path: any = {
     users: `/${process.env.ROUTE}/users`,
+    tasks: `/${process.env.ROUTE}/tasks`,
   };
 
   constructor() {
@@ -19,20 +21,22 @@ class Server {
   middlewares() {}
   routes() {
     this.app.use(this.path.users, userRouter);
+    this.app.use(this.path.tasks, taskRouter);
   }
   listen() {
     this.app.listen(this.PORT, () => {
       if (this.PORT && this.HOST) {
-        prisma
-        console.log(`Server has running in 🚀 ==> http://${this.HOST}:${this.PORT}/`);
+        prisma;
+        console.log(
+          `Server has running in 🚀 ==> http://${this.HOST}:${this.PORT}/`
+        );
       } else {
         console.log('Could not connect to server 😥');
       }
     });
   }
 }
-export default Server
+export default Server;
 
 // const PORT = process.env.PORT;
 // const HOST = process.env.HOST;
-

@@ -1,2 +1,3 @@
 import { showUsers } from './users.controllers';
-export { showUsers };
+import { showTask } from './tasks.controllers';
+export { showUsers, showTask };
