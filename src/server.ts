@@ -1,13 +1,38 @@
-import app from "./app";
-import * as dotenv from "dotenv";
-
+import express, { Application } from 'express';
+import * as dotenv from 'dotenv';
+import { prisma } from './utils/prisma.server';
+import { userRouter } from './routes';
 dotenv.config();
-const PORT = process.env.PORT;
-const HOST = process.env.HOST;
-app.listen(PORT, () => {
-  if (PORT && HOST) {
-    console.log(`Server has running in 🚀 ==> http://${HOST}:${PORT}/`);
-  } else {
-    console.log("Could not connect to server 😥");
+class Server {
+  private app!: Application;
+  private PORT: string = process.env.PORT || '8080';
+  private HOST: string = process.env.HOST || 'localhost';
+  private path: any = {
+    users: `${process.env.ROUTE}/users`,
+  };
+
+  constructor() {
+    this.app = express();
+    this.middlewares();
+    this.routes();
   }
-});
+  middlewares() {}
+  routes() {
+    this.app.use(this.path.users, userRouter);
+  }
+  listen() {
+    this.app.listen(this.PORT, () => {
+      if (this.PORT && this.HOST) {
+        prisma
+        console.log(`Server has running in 🚀 ==> http://${this.HOST}:${this.PORT}/`);
+      } else {
+        console.log('Could not connect to server 😥');
+      }
+    });
+  }
+}
+export default Server
+
+// const PORT = process.env.PORT;
+// const HOST = process.env.HOST;
+
