@@ -28,7 +28,6 @@ export const createUser = async (
 ) => {
   try {
     const body: userProfilePick = req.body;
-    const pato: string = 'pato';
     const query = await UsersServices.createUser(body);
     res.status(200).json(query);
   } catch (error) {
