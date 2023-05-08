@@ -45,6 +45,7 @@ class UsersServices {
           },
         });
       }
+      return newUser;
     } catch (error) {
       throw error;
     }

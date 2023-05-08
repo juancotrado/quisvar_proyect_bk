@@ -18,7 +18,9 @@ class Server {
     this.middlewares();
     this.routes();
   }
-  middlewares() {}
+  middlewares() {
+    this.app.use(express.json());
+  }
   routes() {
     this.app.use(this.path.users, userRouter);
     this.app.use(this.path.tasks, taskRouter);
