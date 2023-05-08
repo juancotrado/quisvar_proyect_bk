@@ -1,0 +1,18 @@
+version: "2"
+services:
+  node:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: project_backend
+    # image: node:19-alpine
+    restart: always
+    working_dir: /home/node/app
+    environment:
+      # VIRTUAL_HOST:
+      NODE_ENV: production
+    volumes:
+      - ./:/home/node/app
+    ports:
+      - ${PORT}:8081
+    command: "npm run start"
