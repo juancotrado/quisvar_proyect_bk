@@ -14,6 +14,19 @@ class WorkAreasServices {
       throw error;
     }
   }
+  static async find(id: WorkAreas['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const findWorkArea = await prisma.workAreas.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        users: { select: { profile: true } },
+      },
+    });
+    if (!findWorkArea) throw new AppError('Could not found user ', 404);
+    return findWorkArea;
+  }
   static async delete(id: WorkAreas['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const deleteWorkArea = await prisma.workAreas.delete({
