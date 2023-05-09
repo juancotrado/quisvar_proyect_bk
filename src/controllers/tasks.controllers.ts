@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
 import { tasksServices } from '../services';
 
-export const showTask = async (
+export const showTasks = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -20,6 +20,20 @@ export const showTask = async (
   }
 };
 
+export const showTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _task_id = parseInt(id);
+    const query = await tasksServices.find(_task_id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 export const deleteTasks = async (
   req: Request,
   res: Response,

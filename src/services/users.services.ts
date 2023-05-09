@@ -17,6 +17,20 @@ class UsersServices {
     }
   }
 
+  static async find(id: Users['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const findUser = await prisma.users.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        profile: true,
+      },
+    });
+    if (!findUser) throw new AppError('Could not found user ', 404);
+    return findUser;
+  }
+
   static async createUser({
     email,
     password,
