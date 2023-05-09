@@ -1,3 +1,5 @@
+import { error } from 'console';
+import AppError from '../utils/appError';
 import { userProfilePick } from '../utils/format.server';
 import { prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
@@ -22,37 +24,35 @@ class UsersServices {
     dni,
     phone,
   }: userProfilePick) {
-    try {
-      const passwordHash = await bcrypt.hash(password, 10);
-      const findUserByDNI = await prisma.profiles.findUnique({
-        where: { dni },
-      });
-      if (!findUserByDNI) return false;
-      const newUser = await prisma.users.create({
+    const passwordHash = await bcrypt.hash(password, 10);
+    const findUserByDNI = await prisma.profiles.findUnique({
+      where: { dni },
+    });
+    if (findUserByDNI)
+      throw new AppError('Oops!, DNI has been registered', 404);
+
+    const newUser = await prisma.users.create({
+      data: {
+        email,
+        password: passwordHash,
+      },
+    });
+    if (newUser) {
+      await prisma.profiles.create({
         data: {
-          email,
-          password: passwordHash,
-        },
-      });
-      if (newUser) {
-        await prisma.profiles.create({
-          data: {
-            firstName,
-            lastName,
-            dni,
-            phone,
-            user: {
-              connect: {
-                id: newUser.id,
-              },
+          firstName,
+          lastName,
+          dni,
+          phone,
+          user: {
+            connect: {
+              id: newUser.id,
             },
           },
-        });
-      }
-      return newUser;
-    } catch (error) {
-      throw error;
+        },
+      });
     }
+    return newUser;
   }
 }
 export default UsersServices;
