@@ -3,10 +3,10 @@ import {
   createUser,
   deleteUser,
   updateUser,
+  showUser,
 } from './users.controllers';
-import { showTask, deleteTasks } from './tasks.controllers';
+import { showTask, showTasks, deleteTask } from './tasks.controllers';
 import { login } from './auth.controllers';
-
-export { showUsers, createUser, deleteUser, updateUser };
-export { showTask, deleteTasks };
+export { showUsers, showUser, createUser, deleteUser, updateUser };
+export { showTasks, showTask, deleteTask };
 export { login };

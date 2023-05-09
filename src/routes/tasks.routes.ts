@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { showTask,deleteUser } from '../controllers';
+import { showTask, showTasks, deleteTask } from '../controllers';
 
 const router = Router();
 
-router.get('/', showTask);
-router.delete('/:id', deleteUser);
+router.get('/', showTasks);
+router.get('/:id', showTask);
+router.delete('/:id', deleteTask);
 export default router;
