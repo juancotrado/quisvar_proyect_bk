@@ -24,6 +24,10 @@ class UsersServices {
   }: userProfilePick) {
     try {
       const passwordHash = await bcrypt.hash(password, 10);
+      const findUserByDNI = await prisma.profiles.findUnique({
+        where: { dni },
+      });
+      if (!findUserByDNI) return false;
       const newUser = await prisma.users.create({
         data: {
           email,

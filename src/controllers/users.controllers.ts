@@ -29,9 +29,16 @@ export const createUser = async (
   try {
     const body: userProfilePick = req.body;
     const query = await UsersServices.createUser(body);
+    if (!query)
+      return next({
+        status: 400,
+        message: 'Oops!, DNI has been registered',
+        error_content: query,
+      });
     res.status(200).json(query);
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      console.log(error);
       res.status(400).json(error);
     }
   }
