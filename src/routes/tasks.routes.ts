@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import { showTask } from '../controllers';
+import { showTask, showTasks } from '../controllers';
 
 const router = Router();
 
-router.get('/', showTask);
+router.get('/', showTasks);
+router.get('/:id', showTask);
 export default router;

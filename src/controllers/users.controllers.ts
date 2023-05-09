@@ -12,8 +12,23 @@ export const showUsers = async (
   try {
     const query = await UsersServices.getUsers();
     if (query.length == 0) {
-      throw new AppError('no hay naa', 404);
+      throw new AppError('Could not get user logs ', 404);
     }
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const showUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _user_id = parseInt(id);
+    const query = await UsersServices.find(_user_id);
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -42,8 +57,8 @@ export const updateUser = async (
   try {
     const { body } = req;
     const { id } = req.params;
-    const _id = parseInt(id);
-    const query = await UsersServices.update(_id, body);
+    const _user_id = parseInt(id);
+    const query = await UsersServices.update(_user_id, body);
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -57,8 +72,8 @@ export const deleteUser = async (
 ) => {
   try {
     const { id } = req.params;
-    const _id = parseInt(id);
-    const query = await UsersServices.delete(_id);
+    const _user_id = parseInt(id);
+    const query = await UsersServices.delete(_user_id);
     res.status(204).json(query);
   } catch (error) {
     next(error);

@@ -1,4 +1,3 @@
-import { error } from 'console';
 import AppError from '../utils/appError';
 import { userProfilePick } from '../utils/format.server';
 import { Users, prisma } from '../utils/prisma.server';
@@ -15,6 +14,22 @@ class UsersServices {
     } catch (error) {
       throw error;
     }
+  }
+
+  static async find(id: Users['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const findUser = await prisma.users.findUnique({
+      where: { id },
+      include: {
+        profile: true,
+        WorkArea: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+    return findUser;
   }
 
   static async createUser({
