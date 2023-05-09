@@ -1,7 +1,7 @@
 import express, { Application } from 'express';
 import * as dotenv from 'dotenv';
 import { prisma } from './utils/prisma.server';
-import { userRouter, taskRouter, authRouter } from './routes';
+import { userRouter, taskRouter, authRouter, workareasRouter } from './routes';
 // import { handleError } from './middlewares';
 import AppError from './utils/appError';
 import globalErrorHandler from './middlewares/error.middleware';
@@ -15,6 +15,7 @@ class Server {
     users: `/${process.env.ROUTE}/users`,
     tasks: `/${process.env.ROUTE}/tasks`,
     auth: `/${process.env.ROUTE}/auth/login`,
+    workareas: `/${process.env.ROUTE}/workareas`,
   };
 
   constructor() {
@@ -29,6 +30,7 @@ class Server {
   routes() {
     this.app.use(this.path.users, userRouter);
     this.app.use(this.path.tasks, taskRouter);
+    this.app.use(this.path.workareas, workareasRouter);
     this.app.use(this.path.auth, authRouter);
     this.app.all('*', (req, res, next) => {
       return next(
