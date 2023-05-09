@@ -9,5 +9,5 @@ export interface userHash {
   password: string;
   id: number;
   role: UserRole;
-  profile: Profiles | null;
+  profile: Pick<Profiles, 'firstName' | 'lastName' | 'dni' | 'phone'> | null;
 }

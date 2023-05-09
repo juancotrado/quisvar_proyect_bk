@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import * as dotenv from 'dotenv';
 import { prisma } from './utils/prisma.server';
 import { userRouter, taskRouter, authRouter } from './routes';
+import { handleError } from './middlewares';
 
 dotenv.config();
 class Server {
@@ -18,6 +19,7 @@ class Server {
     this.app = express();
     this.middlewares();
     this.routes();
+    this.handleError();
   }
   middlewares() {
     this.app.use(express.json());
@@ -39,8 +41,8 @@ class Server {
       }
     });
   }
+  handleError() {
+    this.app.use(handleError);
+  }
 }
 export default Server;
-
-// const PORT = process.env.PORT;
-// const HOST = process.env.HOST;

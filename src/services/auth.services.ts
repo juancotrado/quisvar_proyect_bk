@@ -16,7 +16,15 @@ export class authServices {
           id: true,
           role: true,
           password: true,
-          profile: true,
+          email: true,
+          profile: {
+            select: {
+              firstName: true,
+              lastName: true,
+              dni: true,
+              phone: true,
+            },
+          },
         },
       });
       if (!user) return false;
