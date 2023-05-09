@@ -1,22 +1,25 @@
 import { WorkAreas, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-class workareasServices {
-  static async getWorkareas() {
+
+class WorkAreasServices {
+  static async getAll() {
     try {
-      const workarea = await prisma.workAreas.findMany({
+      const getWorkAreas = await prisma.workAreas.findMany({
         orderBy: { createdAt: 'asc' },
       });
-      return workarea;
+      if (getWorkAreas.length == 0)
+        throw new AppError('Could not found work areas', 404);
+      return getWorkAreas;
     } catch (error) {
       throw error;
     }
   }
   static async delete(id: WorkAreas['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
-    const deleteWorkarea = await prisma.workAreas.delete({
+    const deleteWorkArea = await prisma.workAreas.delete({
       where: { id },
     });
-    return deleteWorkarea;
+    return deleteWorkArea;
   }
 }
-export default workareasServices;
+export default WorkAreasServices;

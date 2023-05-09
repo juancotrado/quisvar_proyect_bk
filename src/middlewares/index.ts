@@ -1,3 +1,3 @@
-import { handleError } from './error.middleware';
+import globalErrorHandler from './error.middleware';
 
-export { handleError };
+export { globalErrorHandler };

@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { workareasServices } from '../services';
+import { WorkAreasServices } from '../services';
 import { Prisma } from '@prisma/client';
-
 
 export const showWorkareas = async (
   req: Request,
@@ -9,15 +8,10 @@ export const showWorkareas = async (
   next: NextFunction
 ) => {
   try {
-    const query = await workareasServices.getWorkareas();
-    if (query.length == 0) {
-      return res.status(200).json({ message: 'no existen areas de trabajo' });
-    }
+    const query = await WorkAreasServices.getAll();
     res.status(200).json(query);
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      res.status(400).json(error);
-    }
+    next(error);
   }
 };
 
@@ -28,8 +22,8 @@ export const deleteWorkarea = async (
 ) => {
   try {
     const { id } = req.params;
-    const _id = parseInt(id);
-    const query = await workareasServices.delete(_id);
+    const _work_area_id = parseInt(id);
+    const query = await WorkAreasServices.delete(_work_area_id);
     res.status(204).json(query);
   } catch (error) {
     next(error);
