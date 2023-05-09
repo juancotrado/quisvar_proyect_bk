@@ -19,3 +19,18 @@ export const showTask = async (
     }
   }
 };
+
+export const deleteTasks = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _id = parseInt(id);
+    const query = await tasksServices.delete(_id);
+    res.status(204).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
