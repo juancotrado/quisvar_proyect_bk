@@ -13,10 +13,10 @@ class tasksServices {
   }
   static async delete(id: Tasks['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
-    const deleteUser = await prisma.tasks.delete({
+    const deleteTask = await prisma.tasks.delete({
       where: { id },
     });
-    return deleteUser;
+    return deleteTask;
   }
 }
 export default tasksServices;
