@@ -1,7 +1,7 @@
 import { error } from 'console';
 import AppError from '../utils/appError';
 import { userProfilePick } from '../utils/format.server';
-import { prisma } from '../utils/prisma.server';
+import { Users, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
 
 class UsersServices {
@@ -16,6 +16,7 @@ class UsersServices {
       throw error;
     }
   }
+
   static async createUser({
     email,
     password,
@@ -30,7 +31,6 @@ class UsersServices {
     });
     if (findUserByDNI)
       throw new AppError('Oops!, DNI has been registered', 404);
-
     const newUser = await prisma.users.create({
       data: {
         email,
@@ -53,6 +53,29 @@ class UsersServices {
       });
     }
     return newUser;
+  }
+
+  static async update(
+    id: Users['id'],
+    { role, status }: Pick<Users, 'role' | 'status'>
+  ) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const updateUser = await prisma.users.update({
+      where: { id },
+      data: {
+        role,
+        status,
+      },
+    });
+    return updateUser;
+  }
+
+  static async delete(id: Users['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const deleteUser = await prisma.users.delete({
+      where: { id },
+    });
+    return deleteUser;
   }
 }
 export default UsersServices;

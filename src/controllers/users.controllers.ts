@@ -28,7 +28,38 @@ export const createUser = async (
   try {
     const body: userProfilePick = req.body;
     const query = await UsersServices.createUser(body);
+    res.status(201).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = req;
+    const { id } = req.params;
+    const _id = parseInt(id);
+    const query = await UsersServices.update(_id, body);
     res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _id = parseInt(id);
+    const query = await UsersServices.delete(_id);
+    res.status(204).json(query);
   } catch (error) {
     next(error);
   }
