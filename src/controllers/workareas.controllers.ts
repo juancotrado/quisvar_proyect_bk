@@ -15,6 +15,21 @@ export const showWorkareas = async (
   }
 };
 
+export const showWorkArea = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { id } = req.params;
+      const _work_area_id = parseInt(id);
+      const query = await WorkAreasServices.find(_work_area_id);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
 export const deleteWorkarea = async (
   req: Request,
   res: Response,
