@@ -34,6 +34,23 @@ export const showTask = async (
     next(error);
   }
 };
+
+export const updateTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = req;
+    const { id } = req.params;
+    const _task_id = parseInt(id);
+    const query = await tasksServices.update(_task_id, body);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteTasks = async (
   req: Request,
   res: Response,
