@@ -1,3 +1,4 @@
 import UsersServices from './users.services';
 import tasksServices from './tasks.services';
-export { UsersServices, tasksServices };
+import authServices from './auth.services';
+export { UsersServices, tasksServices, authServices };

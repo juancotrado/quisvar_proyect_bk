@@ -1,7 +1,7 @@
 import express, { Application } from 'express';
 import * as dotenv from 'dotenv';
 import { prisma } from './utils/prisma.server';
-import { userRouter, taskRouter } from './routes';
+import { userRouter, taskRouter, authRouter } from './routes';
 
 dotenv.config();
 class Server {
@@ -11,6 +11,7 @@ class Server {
   private path: any = {
     users: `/${process.env.ROUTE}/users`,
     tasks: `/${process.env.ROUTE}/tasks`,
+    auth: `/${process.env.ROUTE}/auth/login`,
   };
 
   constructor() {
@@ -24,6 +25,7 @@ class Server {
   routes() {
     this.app.use(this.path.users, userRouter);
     this.app.use(this.path.tasks, taskRouter);
+    this.app.use(this.path.auth, authRouter);
   }
   listen() {
     this.app.listen(this.PORT, () => {
