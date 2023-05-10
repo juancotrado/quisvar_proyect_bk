@@ -5,6 +5,7 @@ import { userRouter, taskRouter, authRouter, workareasRouter } from './routes';
 // import { handleError } from './middlewares';
 import AppError from './utils/appError';
 import globalErrorHandler from './middlewares/error.middleware';
+import morgan from 'morgan';
 
 dotenv.config();
 class Server {
@@ -26,6 +27,7 @@ class Server {
   }
   middlewares() {
     this.app.use(express.json());
+    this.app.use(morgan('dev'));
   }
   routes() {
     this.app.use(this.path.users, userRouter);

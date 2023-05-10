@@ -1,6 +1,7 @@
 import { Tasks, WorkAreas, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-class tasksServices {
+
+class TasksServices {
   static async getTask() {
     try {
       const task = await prisma.tasks.findMany({
@@ -11,6 +12,7 @@ class tasksServices {
       throw error;
     }
   }
+
   static async find(id: Tasks['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const findTask = await prisma.tasks.findUnique({
@@ -31,6 +33,26 @@ class tasksServices {
     if (!findTask) throw new AppError('Could not found task ', 404);
     return findTask;
   }
+
+  static async create({
+    name,
+    price,
+    description,
+    id_area,
+  }: Tasks & { id_area: WorkAreas['id'] }) {
+    const newTask = prisma.tasks.create({
+      data: {
+        name,
+        price,
+        description,
+        WorkArea: {
+          connect: { id: id_area },
+        },
+      },
+    });
+    return newTask;
+  }
+
   static async update(
     id: Tasks['id'],
     { name, description, price, id_area }: Tasks & { id_area: WorkAreas['id'] }
@@ -72,4 +94,4 @@ class tasksServices {
     return deleteTask;
   }
 }
-export default tasksServices;
+export default TasksServices;

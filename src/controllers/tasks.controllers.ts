@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
-import { tasksServices } from '../services';
+import { TasksServices } from '../services';
 
 export const showTasks = async (
   req: Request,
@@ -8,7 +8,7 @@ export const showTasks = async (
   next: NextFunction
 ) => {
   try {
-    const query = await tasksServices.getTask();
+    const query = await TasksServices.getTask();
     if (query.length == 0) {
       return res.status(200).json({ message: 'no hay tareas pendientes' });
     }
@@ -28,8 +28,22 @@ export const showTask = async (
   try {
     const { id } = req.params;
     const _task_id = parseInt(id);
-    const query = await tasksServices.find(_task_id);
+    const query = await TasksServices.find(_task_id);
     res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = req;
+    const query = await TasksServices.create(body);
+    res.status(201).json(query);
   } catch (error) {
     next(error);
   }
@@ -44,7 +58,7 @@ export const updateTask = async (
     const { body } = req;
     const { id } = req.params;
     const _task_id = parseInt(id);
-    const query = await tasksServices.update(_task_id, body);
+    const query = await TasksServices.update(_task_id, body);
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -59,7 +73,7 @@ export const deleteTasks = async (
   try {
     const { id } = req.params;
     const _id = parseInt(id);
-    const query = await tasksServices.delete(_id);
+    const query = await TasksServices.delete(_id);
     res.status(204).json(query);
   } catch (error) {
     next(error);
