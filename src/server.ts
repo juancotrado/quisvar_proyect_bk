@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import cors from 'cors';
 import * as dotenv from 'dotenv';
 import { prisma } from './utils/prisma.server';
 import { userRouter, taskRouter, authRouter, workareasRouter } from './routes';
@@ -26,6 +27,7 @@ class Server {
     // this.handleError();
   }
   middlewares() {
+    this.app.use(cors());
     this.app.use(express.json());
     this.app.use(morgan('dev'));
   }
