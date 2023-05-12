@@ -12,17 +12,18 @@ datasource db {
 }
 
 model Users {
-  id           Int            @id @default(autoincrement())
-  status       Boolean        @default(true)
-  role         UserRole       @default(EMPLOYEE)
-  password     String
-  email        String         @unique
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  profile      Profiles?
-  WorkArea     WorkAreas?     @relation(fields: [workAreaId], references: [id])
-  workAreaId   Int?
-  UsersOnTasks UsersOnTasks[]
+  id         Int       @id @default(autoincrement())
+  status     Boolean   @default(true)
+  role       UserRole  @default(EMPLOYEE)
+  password   String
+  email      String    @unique
+  tasksId    Int?
+  workAreaId Int?
+  tasks      Tasks?    @relation(fields: [tasksId], references: [id])
+  profile    Profiles?
+  project    Projects?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model Profiles {
@@ -37,35 +38,48 @@ model Profiles {
 }
 
 model WorkAreas {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  users     Users[]
-  tasks     Tasks[]
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  projects    Projects[]
+}
+
+model Projects {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  startDate   DateTime  @default(now())
+  untilDate   DateTime
+  price       Decimal   @default(0)
+  workAreaId  Int
+  userId      Int       @unique
+  tasks       Tasks[]
+  workAreas   WorkAreas @relation(fields: [workAreaId], references: [id])
+  user        Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Tasks {
-  id           Int            @id @default(autoincrement())
-  name         String
-  description  String?
-  price        Decimal
-  status       TaskRole       @default(UNRESOLVED)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  WorkArea     WorkAreas?     @relation(fields: [workAreaId], references: [id])
-  workAreaId   Int?
-  UsersOnTasks UsersOnTasks[]
+  id        Int        @id @default(autoincrement())
+  name      String
+  projectId Int?
+  projects  Projects?  @relation(fields: [projectId], references: [id])
+  employees  Users[]
+  subtasks  SubTasks[]
 }
 
-model UsersOnTasks {
-  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  task      Tasks    @relation(fields: [taskId], references: [id])
-  userId    Int
-  taskId    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@id([userId, taskId])
+model SubTasks {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal
+  days        Int
+  status      TaskRole @default(UNRESOLVED)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Tasks       Tasks    @relation(fields: [tasksId], references: [id])
+  tasksId     Int
 }
 
 enum UserRole {
