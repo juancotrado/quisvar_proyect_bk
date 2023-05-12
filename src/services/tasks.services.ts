@@ -1,4 +1,4 @@
-import { Tasks, WorkAreas, prisma } from '../utils/prisma.server';
+import { Tasks, Users, WorkAreas, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 
 class TasksServices {
@@ -100,3 +100,18 @@ class TasksServices {
   // }
 }
 export default TasksServices;
+
+///////////////codigo para el gozu
+
+// const newUser: Users[] = [
+//   {
+//     email: 'asdasd',
+//     role: 'EMPLOYEE',
+//   },
+// ];
+
+// const create = async () => {
+//   await prisma.users.createMany({
+//     data: newUser,
+//   });
+// };
