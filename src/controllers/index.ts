@@ -5,13 +5,15 @@ import {
   updateUser,
   showUser,
 } from './users.controllers';
-import // showTask,
+import { login } from './auth.controllers';
+import { showTasks } from './tasks.controllers';
+export { showTasks };
+// import // showTask,
 // deleteTasks,
 // showTasks,
 // updateTask,
 // createTask,
-'./tasks.controllers';
-import { login } from './auth.controllers';
+// './tasks.controllers';
 // import {
 //   showWorkareas,
 //   deleteWorkarea,

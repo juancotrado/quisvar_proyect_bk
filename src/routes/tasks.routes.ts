@@ -1,14 +1,16 @@
 import { Router } from 'express';
-import // showTask,
+import { showTasks } from '../controllers';
+// import
+// showTask,
 // deleteTasks,
-// showTasks,
+//  showTasks,
 // updateTask,
 // createTask,
-'../controllers';
+// '../controllers';
 
 const router = Router();
 
-// router.get('/', showTasks);
+router.get('/', showTasks);
 // router.get('/:id', showTask);
 // router.post('/', createTask);
 // router.put('/:id', updateTask);

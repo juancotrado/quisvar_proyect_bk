@@ -7,17 +7,11 @@ class TasksServices {
       const task = await prisma.workAreas.findMany({
         include: {
           _count: true,
-          projects: {
-            include: {
-              tasks: {
-                include: {
-                  _count: true,
-                },
-              },
-            },
-          },
+          projects: { select: { id: true } },
         },
       });
+      const url = ' http://localhost:8081/api/v1/projects';
+      const newTask = task;
       return task;
     } catch (error) {
       throw error;

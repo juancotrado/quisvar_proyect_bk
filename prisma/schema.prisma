@@ -12,18 +12,18 @@ datasource db {
 }
 
 model Users {
-  id         Int       @id @default(autoincrement())
-  status     Boolean   @default(true)
-  role       UserRole  @default(EMPLOYEE)
+  id         Int        @id @default(autoincrement())
+  status     Boolean    @default(true)
+  role       UserRole   @default(EMPLOYEE)
   password   String
-  email      String    @unique
+  email      String     @unique
   tasksId    Int?
   workAreaId Int?
-  tasks      Tasks?    @relation(fields: [tasksId], references: [id])
+  tasks      Tasks?     @relation(fields: [tasksId], references: [id])
   profile    Profiles?
-  project    Projects?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  projects   Projects[]
 }
 
 model Profiles {
@@ -52,20 +52,20 @@ model Projects {
   untilDate   DateTime
   price       Decimal   @default(0)
   workAreaId  Int
-  userId      Int       @unique
   tasks       Tasks[]
   workAreas   WorkAreas @relation(fields: [workAreaId], references: [id])
-  user        Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  Users       Users     @relation(fields: [usersId], references: [id])
+  usersId     Int
 }
 
 model Tasks {
   id        Int        @id @default(autoincrement())
   name      String
-  projectId Int?
-  projects  Projects?  @relation(fields: [projectId], references: [id])
-  employees  Users[]
+  projectId Int
+  projects  Projects   @relation(fields: [projectId], references: [id])
+  employees Users[]
   subtasks  SubTasks[]
 }
 
