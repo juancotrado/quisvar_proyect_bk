@@ -32,12 +32,6 @@ const newUser: Pick<Users, 'role' | 'password' | 'email'>[] = [
   },
 ];
 
-const createUsers = async () => {
-  await prisma.users.createMany({
-    data: newUser,
-  });
-};
-
 const newProfile: Pick<
   Profiles,
   'firstName' | 'lastName' | 'dni' | 'userId'
@@ -68,12 +62,6 @@ const newProfile: Pick<
   },
 ];
 
-const createProfile = async () => {
-  await prisma.profiles.createMany({
-    data: newProfile,
-  });
-};
-
 const newWorkAreas: Pick<WorkAreas, 'name' | 'description'>[] = [
   {
     name: 'Salud',
@@ -93,12 +81,6 @@ const newWorkAreas: Pick<WorkAreas, 'name' | 'description'>[] = [
   },
 ];
 
-const createWorkAreas = async () => {
-  await prisma.workAreas.createMany({
-    data: newWorkAreas,
-  });
-};
-
 const newProjects: Pick<
   Projects,
   | 'name'
@@ -107,43 +89,43 @@ const newProjects: Pick<
   | 'untilDate'
   | 'price'
   | 'workAreaId'
-  | 'usersId'
+  | 'userId'
 >[] = [
   {
     name: 'project1',
     description: null,
     startDate: new Date(),
     untilDate: new Date(),
-    price: Prisma.Decimal('10.99'),
+    price: 400.99,
     workAreaId: 1,
-    usersId: 1,
+    userId: 1,
   },
   {
     name: 'project2',
     description: null,
     startDate: new Date(),
     untilDate: new Date(),
-    price: Prisma.Decimal('10.99'),
+    price: 400.99,
     workAreaId: 2,
-    usersId: 2,
+    userId: 2,
   },
   {
     name: 'project3',
     description: null,
     startDate: new Date(),
     untilDate: new Date(),
-    price: Prisma.Decimal('10.99'),
+    price: 400.99,
     workAreaId: 3,
-    usersId: 3,
+    userId: 3,
   },
   {
     name: 'project4',
     description: null,
     startDate: new Date(),
     untilDate: new Date(),
-    price: Prisma.Decimal('10.99'),
+    price: 400.99,
     workAreaId: 4,
-    usersId: 4,
+    userId: 4,
   },
 ];
 
@@ -151,24 +133,77 @@ const newTask: Pick<Tasks, 'name' | 'projectId' | 'status'>[] = [
   {
     name: 'task1',
     status: 'UNRESOLVED',
-    projectId: 5,
+    projectId: 1,
   },
   {
     name: 'task2',
     status: 'DONE',
-    projectId: 5,
+    projectId: 1,
   },
   {
     name: 'task3',
     status: 'PROCESS',
-    projectId: 6,
+    projectId: 2,
   },
   {
     name: 'task4',
-    projectId: 7,
+    projectId: 3,
     status: 'UNRESOLVED',
   },
 ];
+
+const newSubtask: Pick<
+  SubTasks,
+  'name' | 'description' | 'hours' | 'price' | 'taskId'
+>[] = [
+  {
+    name: 'project1',
+    description: null,
+    price: 100.76,
+    hours: 20,
+    taskId: 1,
+  },
+  {
+    name: 'project2',
+    description: null,
+    price: 100.76,
+    hours: 20,
+    taskId: 1,
+  },
+  {
+    name: 'project3',
+    description: null,
+    price: 100.76,
+    hours: 20,
+    taskId: 2,
+  },
+  {
+    name: 'project4',
+    description: null,
+    price: 100.76,
+    hours: 20,
+    taskId: 3,
+  },
+];
+
+const createUsers = async () => {
+  await prisma.users.createMany({
+    data: newUser,
+  });
+};
+
+const createProfile = async () => {
+  await prisma.profiles.createMany({
+    data: newProfile,
+  });
+};
+
+const createWorkAreas = async () => {
+  await prisma.workAreas.createMany({
+    data: newWorkAreas,
+  });
+};
+
 const createProjects = async () => {
   await prisma.projects.createMany({
     data: newProjects,
@@ -180,40 +215,6 @@ const createTask = async () => {
     data: newTask,
   });
 };
-
-const newSubtask: Pick<
-  SubTasks,
-  'name' | 'description' | 'hours' | 'price' | 'tasksId'
->[] = [
-  {
-    name: 'project1',
-    description: null,
-    price: 100.76,
-    hours: 20,
-    tasksId: 6,
-  },
-  {
-    name: 'project2',
-    description: null,
-    price: 100.76,
-    hours: 20,
-    tasksId: 5,
-  },
-  {
-    name: 'project3',
-    description: null,
-    price: 100.76,
-    hours: 20,
-    tasksId: 5,
-  },
-  {
-    name: 'project4',
-    description: null,
-    price: 100.76,
-    hours: 20,
-    tasksId: 7,
-  },
-];
 
 const createSubTask = async () => {
   await prisma.subTasks.createMany({

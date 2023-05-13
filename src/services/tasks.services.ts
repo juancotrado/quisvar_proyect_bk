@@ -30,7 +30,7 @@ class TasksServices {
         id: true,
         name: true,
         status: true,
-        projects: {
+        project: {
           select: { id: true, name: true },
         },
         employees: {
@@ -63,7 +63,7 @@ class TasksServices {
     const newTask = prisma.tasks.create({
       data: {
         name,
-        projects: {
+        project: {
           connect: {
             id: project_id,
           },

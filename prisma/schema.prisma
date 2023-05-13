@@ -41,7 +41,7 @@ model WorkAreas {
   id          Int        @id @default(autoincrement())
   name        String
   description String?
-  projects    Projects[]
+  project     Projects[]
 }
 
 model Projects {
@@ -50,15 +50,15 @@ model Projects {
   description String?
   startDate   DateTime  @default(now())
   untilDate   DateTime
-  price       Decimal   @default(0)
+  price       Float     @default(0)
   workAreaId  Int
   status      Boolean   @default(false)
   tasks       Tasks[]
-  workAreas   WorkAreas @relation(fields: [workAreaId], references: [id])
+  workAreas   WorkAreas @relation(fields: [workAreaId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  Users       Users     @relation(fields: [usersId], references: [id])
-  usersId     Int
+  Users       Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int
 }
 
 model Tasks {
@@ -66,7 +66,7 @@ model Tasks {
   name      String
   projectId Int
   status    TaskRole   @default(UNRESOLVED)
-  projects  Projects   @relation(fields: [projectId], references: [id])
+  project   Projects   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   employees Users[]
   subtasks  SubTasks[]
 }
@@ -79,8 +79,8 @@ model SubTasks {
   hours       Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  Tasks       Tasks    @relation(fields: [tasksId], references: [id])
-  tasksId     Int
+  Tasks       Tasks    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId      Int
 }
 
 enum UserRole {
