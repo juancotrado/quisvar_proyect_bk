@@ -7,7 +7,7 @@ class TasksServices {
       const task = await prisma.workAreas.findMany({
         include: {
           _count: true,
-          projects: { select: { id: true } },
+          //projects: { select: { id: true } },
         },
       });
       const url = ' http://localhost:8081/api/v1/projects';

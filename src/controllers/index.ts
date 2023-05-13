@@ -7,7 +7,7 @@ import {
 } from './users.controllers';
 import { login } from './auth.controllers';
 import { showTasks } from './tasks.controllers';
-export { showTasks };
+
 // import // showTask,
 // deleteTasks,
 // showTasks,
@@ -19,7 +19,14 @@ import {
    deleteWorkarea,
   showWorkArea,
  } from './workareas.controllers';
+ import {
+  showProjects,
+  showProject,
+ deleteProject,
+} from './projects.controllers';
 export { showUsers, createUser, deleteUser, updateUser, showUser };
  export { showWorkareas, deleteWorkarea, showWorkArea };
 // export { showTask, showTasks, deleteTasks, updateTask, createTask };
 export { login };
+export { showTasks };
+export { showProjects,showProject, deleteProject };
