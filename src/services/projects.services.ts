@@ -12,6 +12,7 @@ class ProjectsServices {
       throw error;
     }
   }
+
   static async find(id: Projects['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const findProject = await prisma.projects.findUnique({
@@ -25,6 +26,7 @@ class ProjectsServices {
     if (!findProject) throw new AppError('Could not found user ', 404);
     return findProject;
   }
+
   static async delete(id: Projects['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const deleteProject = await prisma.projects.delete({

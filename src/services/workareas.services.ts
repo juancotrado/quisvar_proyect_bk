@@ -4,7 +4,11 @@ import AppError from '../utils/appError';
 class WorkAreasServices {
   static async getAll() {
     try {
-      const getWorkAreas = await prisma.workAreas.findMany({});
+      const getWorkAreas = await prisma.workAreas.findMany({
+        include: {
+          _count: true,
+        },
+      });
       if (getWorkAreas.length == 0)
         throw new AppError('Could not found work areas', 404);
       return getWorkAreas;
@@ -18,6 +22,31 @@ class WorkAreasServices {
     const findWorkArea = await prisma.workAreas.findUnique({
       where: {
         id,
+      },
+      include: {
+        project: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            startDate: true,
+            untilDate: true,
+            price: true,
+            status: true,
+            Users: {
+              select: {
+                profile: {
+                  select: {
+                    userId: true,
+                    lastName: true,
+                    firstName: true,
+                    phone: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
     if (!findWorkArea) throw new AppError('Could not found user ', 404);
