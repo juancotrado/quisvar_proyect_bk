@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import { ProjectsServices } from '../services';
-import { Prisma } from '@prisma/client';
 
 export const showProjects = async (
   req: Request,

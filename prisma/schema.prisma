@@ -41,7 +41,7 @@ model WorkAreas {
   id          Int        @id @default(autoincrement())
   name        String
   description String?
-  projects    Projects[]
+  project    Projects[]
 }
 
 model Projects {
@@ -52,6 +52,7 @@ model Projects {
   untilDate   DateTime
   price       Decimal   @default(0)
   workAreaId  Int
+  status      Boolean   @default(false)
   tasks       Tasks[]
   workAreas   WorkAreas @relation(fields: [workAreaId], references: [id])
   createdAt   DateTime  @default(now())

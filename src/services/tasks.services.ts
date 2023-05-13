@@ -8,20 +8,72 @@ import {
 import AppError from '../utils/appError';
 
 class TasksServices {
-  static async getTask() {
-    try {
-      const task = await prisma.workAreas.findMany({
-        include: {
-          _count: true,
-          projects: { select: { id: true } },
+  // static async getTask() {
+  //   try {
+  //     const task = await prisma.workAreas.findMany({
+  //       include: {
+  //         _count: true,
+  //         projects: { select: { id: true } },
+  //       },
+  //     });
+  //     return task;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+
+  static async find(id: Tasks['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const findTask = await prisma.tasks.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        status: true,
+        projects: {
+          select: { id: true, name: true },
         },
-      });
-      const url = ' http://localhost:8081/api/v1/projects';
-      const newTask = task;
-      return task;
-    } catch (error) {
-      throw error;
-    }
+        employees: {
+          select: {
+            id: true,
+            profile: {
+              select: {
+                dni: true,
+                firstName: true,
+                lastName: true,
+                phone: true,
+              },
+            },
+          },
+        },
+        subtasks: true,
+      },
+    });
+    if (!findTask) throw new AppError('Could not found task ', 404);
+    return findTask;
+  }
+
+  static async create({
+    name,
+    project_id,
+    employees,
+  }: Tasks & { project_id: Projects['id'] } & {
+    employees: { [id: string]: Users['id'] }[];
+  }) {
+    const newTask = prisma.tasks.create({
+      data: {
+        name,
+        projects: {
+          connect: {
+            id: project_id,
+          },
+        },
+        employees: {
+          connect: employees,
+        },
+      },
+    });
+    return newTask;
   }
 
   static async update(id: Tasks['id'], { name }: Tasks) {
