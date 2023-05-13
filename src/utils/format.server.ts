@@ -1,9 +1,14 @@
-import { Profiles, UserRole, Users } from '@prisma/client';
+import { Profiles, Projects, UserRole, Users } from '@prisma/client';
 
 export type userProfilePick = Pick<
   Users & Profiles,
   'email' | 'password' | 'firstName' | 'dni' | 'phone' | 'lastName'
 >;
+
+export type projectPick = Pick<
+  Projects,
+  'name' | 'description' | 'untilDate' | 'price'
+> ;
 
 export interface userHash {
   password: string;

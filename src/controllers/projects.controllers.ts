@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ProjectsServices } from '../services';
+import { projectPick } from '../utils/format.server';
 
 export const showProjects = async (
   req: Request,
@@ -24,6 +25,19 @@ export const showProject = async (
     const project_id = parseInt(id);
     const query = await ProjectsServices.find(project_id);
     res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const createProject = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = req;
+    const createNewProject = await ProjectsServices.createProject(body);
+    res.status(201).json(createNewProject);
   } catch (error) {
     next(error);
   }

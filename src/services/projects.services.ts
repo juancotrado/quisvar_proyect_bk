@@ -1,5 +1,6 @@
-import { Projects, prisma } from '../utils/prisma.server';
+import { Projects, Users, WorkAreas, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
+import { projectPick, userProfilePick } from '../utils/format.server';
 
 class ProjectsServices {
   static async getAll() {
@@ -20,11 +21,41 @@ class ProjectsServices {
         id,
       },
       include: {
-        tasks: { select: { subtasks: true } },
+        tasks: true,
       },
     });
     if (!findProject) throw new AppError('Could not found user ', 404);
     return findProject;
+  }
+
+  static async createProject({
+    name,
+    description,
+    price,
+    untilDate,
+    userId,
+    workAreaId,
+  }: projectPick & { userId: Users['id'] } & { workAreaId: WorkAreas['id'] }) {
+    const newProject = await prisma.projects.create({
+      data: {
+        name,
+        description,
+        price,
+        untilDate,
+        Users: {
+          connect: {
+            id: userId,
+          },
+        },
+        workAreas: {
+          connect: {
+            id: workAreaId,
+          },
+        },
+      },
+    });
+
+    return newProject;
   }
 
   static async delete(id: Projects['id']) {
