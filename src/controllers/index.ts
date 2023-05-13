@@ -14,12 +14,12 @@ export { showTasks };
 // updateTask,
 // createTask,
 // './tasks.controllers';
-// import {
-//   showWorkareas,
-//   deleteWorkarea,
-//   showWorkArea,
-// } from './workareas.controllers';
+import {
+   showWorkareas,
+   deleteWorkarea,
+  showWorkArea,
+ } from './workareas.controllers';
 export { showUsers, createUser, deleteUser, updateUser, showUser };
-// export { showWorkareas, deleteWorkarea, showWorkArea };
+ export { showWorkareas, deleteWorkarea, showWorkArea };
 // export { showTask, showTasks, deleteTasks, updateTask, createTask };
 export { login };
