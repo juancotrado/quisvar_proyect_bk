@@ -64,6 +64,7 @@ model Tasks {
   id        Int        @id @default(autoincrement())
   name      String
   projectId Int
+  status    TaskRole   @default(UNRESOLVED)
   projects  Projects   @relation(fields: [projectId], references: [id])
   employees Users[]
   subtasks  SubTasks[]
@@ -73,9 +74,8 @@ model SubTasks {
   id          Int      @id @default(autoincrement())
   name        String
   description String?
-  price       Decimal
-  days        Int
-  status      TaskRole @default(UNRESOLVED)
+  price       Float
+  hours       Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   Tasks       Tasks    @relation(fields: [tasksId], references: [id])

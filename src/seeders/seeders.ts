@@ -147,22 +147,26 @@ const newProjects: Pick<
   },
 ];
 
-const newTask: Pick<Tasks, 'name' | 'projectId'>[] = [
+const newTask: Pick<Tasks, 'name' | 'projectId' | 'status'>[] = [
   {
     name: 'task1',
-    projectId: 1,
+    status: 'UNRESOLVED',
+    projectId: 5,
   },
   {
     name: 'task2',
-    projectId: 1,
+    status: 'DONE',
+    projectId: 5,
   },
   {
     name: 'task3',
-    projectId: 2,
+    status: 'PROCESS',
+    projectId: 6,
   },
   {
     name: 'task4',
-    projectId: 3,
+    projectId: 7,
+    status: 'UNRESOLVED',
   },
 ];
 const createProjects = async () => {
@@ -179,39 +183,35 @@ const createTask = async () => {
 
 const newSubtask: Pick<
   SubTasks,
-  'name' | 'description' | 'days' | 'price' | 'status' | 'tasksId'
+  'name' | 'description' | 'hours' | 'price' | 'tasksId'
 >[] = [
   {
     name: 'project1',
     description: null,
-    price: Prisma.Decimal('10.99'),
-    days: 20,
-    status: 'UNRESOLVED',
-    tasksId: 1,
+    price: 100.76,
+    hours: 20,
+    tasksId: 6,
   },
   {
     name: 'project2',
     description: null,
-    price: Prisma.Decimal('10.99'),
-    days: 20,
-    status: 'UNRESOLVED',
-    tasksId: 1,
+    price: 100.76,
+    hours: 20,
+    tasksId: 5,
   },
   {
     name: 'project3',
     description: null,
-    price: Prisma.Decimal('10.99'),
-    days: 20,
-    status: 'UNRESOLVED',
-    tasksId: 1,
+    price: 100.76,
+    hours: 20,
+    tasksId: 5,
   },
   {
     name: 'project4',
     description: null,
-    price: Prisma.Decimal('10.99'),
-    days: 20,
-    status: 'UNRESOLVED',
-    tasksId: 1,
+    price: 100.76,
+    hours: 20,
+    tasksId: 7,
   },
 ];
 
