@@ -1,18 +1,16 @@
 import { Router } from 'express';
-import { showTasks } from '../controllers';
-// import
-// showTask,
-// deleteTasks,
-//  showTasks,
-// updateTask,
-// createTask,
-// '../controllers';
+import {
+  createTask,
+  deleteTasks,
+  showTask,
+  updateTaskStatus,
+} from '../controllers';
 
 const router = Router();
 
-router.get('/', showTasks);
-// router.get('/:id', showTask);
-// router.post('/', createTask);
+router.get('/:id', showTask);
+router.patch('/status/:id', updateTaskStatus);
+router.post('/', createTask);
 // router.put('/:id', updateTask);
-// router.delete('/:id', deleteTasks);
+router.delete('/:id', deleteTasks);
 export default router;

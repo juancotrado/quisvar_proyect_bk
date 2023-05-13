@@ -6,20 +6,20 @@ import {
   showUser,
 } from './users.controllers';
 import { login } from './auth.controllers';
-import { showTasks } from './tasks.controllers';
-export { showTasks };
-// import // showTask,
-// deleteTasks,
-// showTasks,
-// updateTask,
-// createTask,
-// './tasks.controllers';
 import {
-   showWorkareas,
-   deleteWorkarea,
+  showTask,
+  createTask,
+  updateTaskStatus,
+  deleteTasks,
+} from './tasks.controllers';
+export { showTask, createTask, updateTaskStatus, deleteTasks };
+import {
+  showWorkareas,
+  deleteWorkarea,
   showWorkArea,
- } from './workareas.controllers';
+  updateWorkarea,
+} from './workareas.controllers';
 export { showUsers, createUser, deleteUser, updateUser, showUser };
- export { showWorkareas, deleteWorkarea, showWorkArea };
+export { showWorkareas, deleteWorkarea, showWorkArea, updateWorkarea };
 // export { showTask, showTasks, deleteTasks, updateTask, createTask };
 export { login };
