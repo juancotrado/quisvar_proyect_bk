@@ -6,12 +6,14 @@ import {
   showUsers,
   updateUser,
 } from '../controllers';
+import authenticateHandler from '../middlewares/auth.middleware';
+import { adminRoleHandler, modRoleHandler, userRoleHandler } from '../middlewares/role.middleware';
 
 const router = Router();
 
-router.get('/', showUsers);
-router.get('/:id', showUser);
-router.post('/', createUser);
-router.patch('/:id', updateUser);
-router.delete('/:id', deleteUser);
+router.get('/', authenticateHandler, modRoleHandler, showUsers);
+router.get('/:id', authenticateHandler, modRoleHandler,  showUser);
+router.post('/', authenticateHandler,adminRoleHandler,  createUser);
+router.patch('/:id', authenticateHandler, adminRoleHandler, updateUser);
+router.delete('/:id', authenticateHandler, adminRoleHandler, deleteUser);
 export default router;

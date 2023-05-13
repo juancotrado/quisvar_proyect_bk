@@ -5,11 +5,13 @@ import {
   showWorkArea,
   updateWorkarea,
 } from '../controllers';
+import authenticateHandler from '../middlewares/auth.middleware';
+import { modRoleHandler, userRoleHandler } from '../middlewares/role.middleware';
 
 const router = Router();
 
-router.get('/', showWorkareas);
-router.get('/:id', showWorkArea);
-router.put('/:id', updateWorkarea);
-router.delete('/:id', deleteWorkarea);
+router.get('/', authenticateHandler,userRoleHandler,  showWorkareas);
+router.get('/:id', authenticateHandler,userRoleHandler, showWorkArea);
+router.put('/:id', authenticateHandler,modRoleHandler, updateWorkarea);
+router.delete('/:id', authenticateHandler,modRoleHandler, deleteWorkarea);
 export default router;
