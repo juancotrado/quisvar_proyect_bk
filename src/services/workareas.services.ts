@@ -4,7 +4,7 @@ import AppError from '../utils/appError';
 class WorkAreasServices {
   static async getAll() {
     try {
-      const getWorkAreas = await prisma.workAreas.findMany();
+      const getWorkAreas = await prisma.workAreas.findMany({});
       if (getWorkAreas.length == 0)
         throw new AppError('Could not found work areas', 404);
       return getWorkAreas;

@@ -23,3 +23,5 @@ export { showUsers, createUser, deleteUser, updateUser, showUser };
 export { showWorkareas, deleteWorkarea, showWorkArea, updateWorkarea };
 // export { showTask, showTasks, deleteTasks, updateTask, createTask };
 export { login };
+// export { showTasks };
+// export { showProjects,showProject, deleteProject };

@@ -2,7 +2,13 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import { prisma } from './utils/prisma.server';
-import { userRouter, taskRouter, authRouter, workareasRouter } from './routes';
+import {
+  userRouter,
+  taskRouter,
+  authRouter,
+  workareasRouter,
+  projectRouter,
+} from './routes';
 // import { handleError } from './middlewares';
 import AppError from './utils/appError';
 import globalErrorHandler from './middlewares/error.middleware';
@@ -18,6 +24,7 @@ class Server {
     tasks: `/${process.env.ROUTE}/tasks`,
     auth: `/${process.env.ROUTE}/auth/login`,
     workareas: `/${process.env.ROUTE}/workareas`,
+    projects: `/${process.env.ROUTE}/projects`,
   };
 
   constructor() {
@@ -34,6 +41,7 @@ class Server {
   routes() {
     this.app.use(this.path.users, userRouter);
     this.app.use(this.path.tasks, taskRouter);
+    this.app.use(this.path.projects, projectRouter);
     this.app.use(this.path.workareas, workareasRouter);
     this.app.use(this.path.auth, authRouter);
     this.app.all('*', (req, res, next) => {
