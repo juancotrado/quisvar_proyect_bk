@@ -44,8 +44,8 @@ export const showTask = async (
   try {
     const { id } = req.params;
     const _task_id = parseInt(id);
-    const query = await TasksServices.find(_task_id);
-    res.status(200).json(query);
+    // const query = await TasksServices.find(_task_id);
+    // res.status(200).json(query);
   } catch (error) {
     next(error);
   }
@@ -58,8 +58,8 @@ export const createTask = async (
 ) => {
   try {
     const { body } = req;
-    const query = await TasksServices.create(body);
-    res.status(201).json(query);
+    // const query = await TasksServices.create(body);
+    // res.status(201).json(query);
   } catch (error) {
     next(error);
   }
