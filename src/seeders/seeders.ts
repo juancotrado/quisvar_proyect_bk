@@ -1,56 +1,34 @@
 import {
   Profiles,
-  TaskRole,
+  Projects,
+  SubTasks,
   Tasks,
   Users,
-  UsersOnTasks,
   WorkAreas,
 } from '@prisma/client';
-import { userProfilePick } from '../utils/format.server';
 import { prisma } from '../utils/prisma.server';
-const { Prisma, PrismaClient } = require('@prisma/client');
-const { Decimal } = Prisma;
+const { Prisma } = require('@prisma/client');
 
-const newUser: Users[] = [
+const newUser: Pick<Users, 'role' | 'password' | 'email'>[] = [
   {
-    id: 1,
-    status: false,
     role: 'EMPLOYEE',
     password: 'user1',
     email: 'user1@gmail.com',
-    createdAt: new Date('2022-05-12T12:30:00Z'),
-    updatedAt: new Date('2022-05-12T12:30:00Z'),
-    workAreaId: 1,
   },
   {
-    id: 2,
-    status: false,
     role: 'EMPLOYEE',
     password: 'user2',
     email: 'user2@gmail.com',
-    createdAt: new Date('2022-05-12T12:30:00Z'),
-    updatedAt: new Date('2022-05-12T12:30:00Z'),
-    workAreaId: 1,
   },
   {
-    id: 3,
-    status: false,
     role: 'MOD',
     password: 'user3',
     email: 'user3@gmail.com',
-    createdAt: new Date('2022-05-12T12:30:00Z'),
-    updatedAt: new Date('2022-05-12T12:30:00Z'),
-    workAreaId: 1,
   },
   {
-    id: 4,
-    status: false,
     role: 'ADMIN',
     password: 'user4',
     email: 'user4@gmail.com',
-    createdAt: new Date('2022-05-12T12:30:00Z'),
-    updatedAt: new Date('2022-05-12T12:30:00Z'),
-    workAreaId: 1,
   },
 ];
 
@@ -60,41 +38,32 @@ const createUsers = async () => {
   });
 };
 
-const newProfile: Profiles[] = [
+const newProfile: Pick<
+  Profiles,
+  'firstName' | 'lastName' | 'dni' | 'userId'
+>[] = [
   {
-    id: 1,
     firstName: 'user1',
     lastName: 'test',
     dni: '01010101',
-    phone: null,
-    updatedAt: new Date('2022-05-12T12:30:00Z'),
     userId: 1,
   },
   {
-    id: 2,
     firstName: 'user2',
     lastName: 'test',
     dni: '01010102',
-    phone: null,
-    updatedAt: new Date('2022-05-12T12:30:00Z'),
     userId: 2,
   },
   {
-    id: 3,
     firstName: 'user3',
     lastName: 'test',
     dni: '01010103',
-    phone: null,
-    updatedAt: new Date('2022-05-12T12:30:00Z'),
     userId: 3,
   },
   {
-    id: 4,
     firstName: 'user4',
     lastName: 'test',
     dni: '01010104',
-    phone: null,
-    updatedAt: new Date('2022-05-12T12:30:00Z'),
     userId: 4,
   },
 ];
@@ -105,26 +74,22 @@ const createProfile = async () => {
   });
 };
 
-const newWorkAreas: WorkAreas[] = [
+const newWorkAreas: Pick<WorkAreas, 'name' | 'description'>[] = [
   {
-    id: 1,
     name: 'Salud',
-    createdAt: new Date('2022-05-12T12:30:00Z'),
+    description: null,
   },
   {
-    id: 2,
     name: 'Educacion',
-    createdAt: new Date('2022-05-12T12:30:00Z'),
+    description: null,
   },
   {
-    id: 3,
     name: 'Saneamiento',
-    createdAt: new Date('2022-05-12T12:30:00Z'),
+    description: null,
   },
   {
-    id: 4,
     name: 'Carreteras',
-    createdAt: new Date('2022-05-12T12:30:00Z'),
+    description: null,
   },
 ];
 
@@ -134,83 +99,131 @@ const createWorkAreas = async () => {
   });
 };
 
-const newTask: Tasks[] = [
+const newProjects: Pick<
+  Projects,
+  | 'name'
+  | 'description'
+  | 'startDate'
+  | 'untilDate'
+  | 'price'
+  | 'workAreaId'
+  | 'usersId'
+>[] = [
   {
-    id: 1,
-    name: 'task1',
+    name: 'project1',
     description: null,
+    startDate: new Date(),
+    untilDate: new Date(),
     price: Prisma.Decimal('10.99'),
-    status: 'UNRESOLVED',
-    createdAt: new Date(),
-    updatedAt: new Date(),
     workAreaId: 1,
+    usersId: 1,
   },
   {
-    id: 2,
-    name: 'task2',
+    name: 'project2',
     description: null,
+    startDate: new Date(),
+    untilDate: new Date(),
     price: Prisma.Decimal('10.99'),
-    status: 'UNRESOLVED',
-    createdAt: new Date(),
-    updatedAt: new Date(),
     workAreaId: 2,
+    usersId: 2,
   },
   {
-    id: 3,
-    name: 'task3',
+    name: 'project3',
     description: null,
+    startDate: new Date(),
+    untilDate: new Date(),
     price: Prisma.Decimal('10.99'),
-    status: 'DONE',
-    createdAt: new Date(),
-    updatedAt: new Date(),
     workAreaId: 3,
+    usersId: 3,
   },
   {
-    id: 4,
-    name: 'task4',
+    name: 'project4',
     description: null,
+    startDate: new Date(),
+    untilDate: new Date(),
     price: Prisma.Decimal('10.99'),
-    status: 'PROCESS',
-    createdAt: new Date(),
-    updatedAt: new Date(),
     workAreaId: 4,
+    usersId: 4,
   },
 ];
+
+const newTask: Pick<Tasks, 'name' | 'projectId'>[] = [
+  {
+    name: 'task1',
+    projectId: 1,
+  },
+  {
+    name: 'task2',
+    projectId: 1,
+  },
+  {
+    name: 'task3',
+    projectId: 2,
+  },
+  {
+    name: 'task4',
+    projectId: 3,
+  },
+];
+const createProjects = async () => {
+  await prisma.projects.createMany({
+    data: newProjects,
+  });
+};
 
 const createTask = async () => {
   await prisma.tasks.createMany({
     data: newTask,
   });
 };
-const newUserOnTask: UsersOnTasks[] = [
+
+const newSubtask: Pick<
+  SubTasks,
+  'name' | 'description' | 'days' | 'price' | 'status' | 'tasksId'
+>[] = [
   {
-    userId: 1,
-    taskId: 1,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    name: 'project1',
+    description: null,
+    price: Prisma.Decimal('10.99'),
+    days: 20,
+    status: 'UNRESOLVED',
+    tasksId: 1,
   },
   {
-    userId: 2,
-    taskId: 2,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    name: 'project2',
+    description: null,
+    price: Prisma.Decimal('10.99'),
+    days: 20,
+    status: 'UNRESOLVED',
+    tasksId: 1,
   },
   {
-    userId: 3,
-    taskId: 3,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    name: 'project3',
+    description: null,
+    price: Prisma.Decimal('10.99'),
+    days: 20,
+    status: 'UNRESOLVED',
+    tasksId: 1,
   },
   {
-    userId: 4,
-    taskId: 4,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    name: 'project4',
+    description: null,
+    price: Prisma.Decimal('10.99'),
+    days: 20,
+    status: 'UNRESOLVED',
+    tasksId: 1,
   },
 ];
 
-const createUserOnTask = async () => {
-  await prisma.usersOnTasks.createMany({
-    data: newUserOnTask,
+const createSubTask = async () => {
+  await prisma.subTasks.createMany({
+    data: newSubtask,
   });
 };
+
+createUsers();
+createProfile();
+createWorkAreas();
+createProjects();
+createTask();
+createSubTask();
