@@ -1,4 +1,4 @@
-import { WorkAreas, prisma } from '../utils/prisma.server';
+import { Tasks, WorkAreas, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 
 class WorkAreasServices {
@@ -17,6 +17,12 @@ class WorkAreasServices {
     }
   }
 
+  static async create({ description, name }: WorkAreas) {
+    const createWorkArea = await prisma.workAreas.create({
+      data: { description, name },
+    });
+    return createWorkArea;
+  }
   static async find(id: WorkAreas['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const findWorkArea = await prisma.workAreas.findUnique({

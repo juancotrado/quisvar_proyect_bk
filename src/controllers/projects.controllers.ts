@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { ProjectsServices } from '../services';
 import { projectPick } from '../utils/format.server';
+import { cpSync } from 'fs';
 
 export const showProjects = async (
   req: Request,
@@ -38,6 +39,22 @@ export const createProject = async (
     const { body } = req;
     const createNewProject = await ProjectsServices.createProject(body);
     res.status(201).json(createNewProject);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateProject = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = req;
+    const { id } = req.params;
+    const _project_id = parseInt(id);
+    const query = await ProjectsServices.update(_project_id, body);
+    res.status(200).json(query);
   } catch (error) {
     next(error);
   }

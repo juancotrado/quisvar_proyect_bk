@@ -96,7 +96,6 @@ export const assignedTask = async (
     const query = await TasksServices.assigned(_task_id, userId, status);
     return res.status(200).json(query);
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };

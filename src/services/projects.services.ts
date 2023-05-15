@@ -74,6 +74,36 @@ class ProjectsServices {
     return newProject;
   }
 
+  static async update(
+    id: Projects['id'],
+    {
+      name,
+      description,
+      startDate,
+      untilDate,
+      price,
+      status,
+      userId,
+    }: Projects & { userId: Users['id'] }
+  ) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const updateProject = await prisma.projects.update({
+      where: { id },
+      data: {
+        name,
+        description,
+        startDate,
+        untilDate,
+        price,
+        status,
+        Users: {
+          connect: { id: userId },
+        },
+      },
+    });
+    return updateProject;
+  }
+
   static async delete(id: Projects['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const deleteProject = await prisma.projects.delete({
