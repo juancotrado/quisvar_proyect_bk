@@ -35,13 +35,17 @@ class TasksServices {
         },
         employees: {
           select: {
-            id: true,
-            profile: {
+            user: {
               select: {
-                dni: true,
-                firstName: true,
-                lastName: true,
-                phone: true,
+                id: true,
+                profile: {
+                  select: {
+                    dni: true,
+                    firstName: true,
+                    lastName: true,
+                    phone: true,
+                  },
+                },
               },
             },
           },
@@ -58,7 +62,7 @@ class TasksServices {
     project_id,
     employees,
   }: Tasks & { project_id: Projects['id'] } & {
-    employees: { [id: string]: Users['id'] }[];
+    employees: { userId: Users['id'] }[];
   }) {
     const newTask = prisma.tasks.create({
       data: {
@@ -69,21 +73,30 @@ class TasksServices {
           },
         },
         employees: {
-          connect: employees,
+          create: employees,
         },
       },
     });
     return newTask;
   }
 
-  static async update(id: Tasks['id'], { name }: Tasks) {
+  static async update(
+    id: Tasks['id'],
+    {
+      name,
+      employees,
+    }: Tasks & { project_id: Projects['id'] } & {
+      employees: { userId: Users['id'] }[];
+    }
+  ) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const updateTask = await prisma.tasks.update({
       where: { id },
       data: {
         name,
         employees: {
-          connect: { id: 2 },
+          deleteMany: { taskId: id },
+          create: employees,
         },
       },
     });
