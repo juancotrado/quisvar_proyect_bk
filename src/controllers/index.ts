@@ -4,6 +4,7 @@ import {
   deleteUser,
   updateUser,
   showUser,
+  showTaskUser,
 } from './users.controllers';
 import { login } from './auth.controllers';
 import {
@@ -33,7 +34,14 @@ export {
   assignedTask,
   updateTask,
 };
-export { showUsers, createUser, deleteUser, updateUser, showUser };
+export {
+  showUsers,
+  createUser,
+  deleteUser,
+  updateUser,
+  showUser,
+  showTaskUser,
+};
 export { showWorkareas, deleteWorkarea, showWorkArea, updateWorkarea };
 // export { showTask, showTasks, deleteTasks, updateTask, createTask };
 export { login };

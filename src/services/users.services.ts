@@ -1,7 +1,7 @@
 import { error } from 'console';
 import AppError from '../utils/appError';
 import { userProfilePick } from '../utils/format.server';
-import { Users, prisma } from '../utils/prisma.server';
+import { Users, Tasks, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
 
 class UsersServices {
@@ -29,6 +29,30 @@ class UsersServices {
     });
     if (!findUser) throw new AppError('Could not found user ', 404);
     return findUser;
+  }
+  static async findTaskUser(id: Users['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const findTaskUser = await prisma.users.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        tasks: {
+          select: {
+            assignedAt: true,
+            task: {
+              select: {
+                id: true,
+                subtasks: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!findTaskUser) throw new AppError('Could not found user ', 404);
+    return findTaskUser;
   }
 
   static async createUser({

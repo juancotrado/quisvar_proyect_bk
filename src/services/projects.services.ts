@@ -21,7 +21,23 @@ class ProjectsServices {
         id,
       },
       include: {
-        tasks: true,
+        tasks: {
+          include: {
+            employees: {
+              select: {
+                user: {
+                  select: {
+                    profile: {
+                      select: {
+                        firstName: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
     if (!findProject) throw new AppError('Could not found user ', 404);

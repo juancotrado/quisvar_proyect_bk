@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createUser,
   deleteUser,
+  showTaskUser,
   showUser,
   showUsers,
   updateUser,
@@ -17,7 +18,8 @@ const router = Router();
 
 router.get('/', authenticateHandler, modRoleHandler, showUsers);
 router.get('/:id', authenticateHandler, modRoleHandler, showUser);
-router.post('/', createUser);
+router.post('/', authenticateHandler, adminRoleHandler, createUser);
 router.patch('/:id', authenticateHandler, adminRoleHandler, updateUser);
 router.delete('/:id', authenticateHandler, adminRoleHandler, deleteUser);
+router.get('/:id/tasks', authenticateHandler, userRoleHandler, showTaskUser);
 export default router;

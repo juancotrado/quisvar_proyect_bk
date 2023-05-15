@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { Prisma } from '@prisma/client';
 import { UsersServices } from '../services';
 import { userProfilePick } from '../utils/format.server';
 import AppError from '../utils/appError';
+import { UserType } from '../middlewares/auth.middleware';
 
 export const showUsers = async (
   req: Request,
@@ -14,6 +14,7 @@ export const showUsers = async (
     if (query.length == 0) {
       throw new AppError('no hay naa', 404);
     }
+
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -45,6 +46,7 @@ export const createUser = async (
     const query = await UsersServices.createUser(body);
     res.status(201).json(query);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
@@ -61,6 +63,22 @@ export const updateUser = async (
     const query = await UsersServices.update(_id, body);
     res.status(200).json(query);
   } catch (error) {
+    next(error);
+  }
+};
+export const showTaskUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userInfo: UserType = res.locals.userInfo;
+    const { id } = userInfo;
+    const query = await UsersServices.findTaskUser(id);
+
+    res.status(200).json(query);
+  } catch (error) {
+    console.log(error);
     next(error);
   }
 };
