@@ -11,6 +11,7 @@ import {
   createTask,
   updateTaskStatus,
   deleteTasks,
+  assignedTask,
   updateTask,
 } from './tasks.controllers';
 import {
@@ -24,7 +25,14 @@ import {
   showProject,
   showProjects,
 } from './projects.controllers';
-export { showTask, createTask, updateTaskStatus, deleteTasks, updateTask };
+export {
+  showTask,
+  createTask,
+  updateTaskStatus,
+  deleteTasks,
+  assignedTask,
+  updateTask,
+};
 export { showUsers, createUser, deleteUser, updateUser, showUser };
 export { showWorkareas, deleteWorkarea, showWorkArea, updateWorkarea };
 // export { showTask, showTasks, deleteTasks, updateTask, createTask };

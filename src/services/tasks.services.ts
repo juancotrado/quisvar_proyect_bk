@@ -79,7 +79,39 @@ class TasksServices {
     });
     return newTask;
   }
-
+  static async assigned(id: Tasks['id'], userId: Users['id'], option: string) {
+    if (option == 'decline') {
+      console.log(id, userId, option);
+      const declineTask = prisma.tasks.update({
+        where: { id },
+        data: {
+          employees: {
+            delete: {
+              taskId_userId: {
+                taskId: id,
+                userId,
+              },
+            },
+          },
+        },
+      });
+      return declineTask;
+    }
+    if (option == 'apply') {
+      const applyTask = prisma.tasks.update({
+        where: { id },
+        data: {
+          employees: {
+            create: {
+              userId,
+            },
+          },
+        },
+      });
+      return applyTask;
+    }
+    throw new AppError('Oops!,We need status for this query', 400);
+  }
   static async update(
     id: Tasks['id'],
     {
