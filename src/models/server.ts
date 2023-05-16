@@ -1,7 +1,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
-import { prisma } from './utils/prisma.server';
+import { prisma } from '../utils/prisma.server';
 import { Server as WebSocketServer } from 'socket.io';
 import http from 'http';
 import {
@@ -11,16 +11,16 @@ import {
   workareasRouter,
   projectRouter,
   subTaskRouter,
-} from './routes';
-import AppError from './utils/appError';
-import globalErrorHandler from './middlewares/error.middleware';
+} from '../routes';
+import AppError from '../utils/appError';
+import globalErrorHandler from '../middlewares/error.middleware';
 import morgan from 'morgan';
 
 dotenv.config();
 class Server {
   private app!: Application;
-  private io;
-  private httpServer;
+  private io: WebSocketServer;
+  private httpServer: http.Server;
   private PORT: string = process.env.PORT || '8080';
   private HOST: string = process.env.HOST || 'localhost';
   private path: any = {
