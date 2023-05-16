@@ -26,7 +26,12 @@ class UsersServices {
       where: {
         id,
       },
-      include: {
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        status: true,
+        createdAt: true,
         profile: true,
       },
     });

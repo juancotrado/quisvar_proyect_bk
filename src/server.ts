@@ -10,6 +10,7 @@ import {
   authRouter,
   workareasRouter,
   projectRouter,
+  subTaskRouter,
 } from './routes';
 import AppError from './utils/appError';
 import globalErrorHandler from './middlewares/error.middleware';
@@ -63,6 +64,7 @@ class Server {
     this.app.use(this.path.projects, projectRouter);
     this.app.use(this.path.workareas, workareasRouter);
     this.app.use(this.path.auth, authRouter);
+    this.app.use(this.path.subtasks, subTaskRouter);
     this.app.all('*', (req, res, next) => {
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)
