@@ -15,6 +15,7 @@ import {
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
 import morgan from 'morgan';
+import Sockets from './sockets';
 
 dotenv.config();
 class Server {
@@ -40,6 +41,7 @@ class Server {
         origin: '*',
       },
     });
+    this.conectionWebSockect();
     this.middlewares();
     this.routes();
   }
@@ -50,13 +52,7 @@ class Server {
   }
 
   conectionWebSockect() {
-    this.io.on('connection', socket => {
-      console.log('Connect user with id ==>', socket.id);
-      socket.on('data', value => {
-        console.log('id', value.id);
-        socket.broadcast.emit('data', value);
-      });
-    });
+    new Sockets(this.io);
   }
   routes() {
     this.app.use(this.path.users, userRouter);
