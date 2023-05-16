@@ -52,9 +52,9 @@ class Server {
   conectionWebSockect() {
     this.io.on('connection', socket => {
       console.log('usuario conectado con el ID', socket.id);
-      socket.on('tasks', value => {
-        console.log(value);
-        socket.broadcast.emit('tasks', value);
+      socket.on('data', value => {
+        console.log('id', value.id);
+        socket.broadcast.emit('data', value);
       });
     });
   }
