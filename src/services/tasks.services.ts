@@ -8,20 +8,6 @@ import {
 import AppError from '../utils/appError';
 
 class TasksServices {
-  // static async getTask() {
-  //   try {
-  //     const task = await prisma.workAreas.findMany({
-  //       include: {
-  //         _count: true,
-  //         projects: { select: { id: true } },
-  //       },
-  //     });
-  //     return task;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
-
   static async find(id: Tasks['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const findTask = await prisma.tasks.findUnique({
@@ -79,6 +65,7 @@ class TasksServices {
     });
     return newTask;
   }
+
   static async assigned(id: Tasks['id'], userId: Users['id'], option: string) {
     if (option == 'decline') {
       console.log(id, userId, option);
@@ -112,6 +99,7 @@ class TasksServices {
     }
     throw new AppError('Oops!,We need status for this query', 400);
   }
+
   static async update(
     id: Tasks['id'],
     {

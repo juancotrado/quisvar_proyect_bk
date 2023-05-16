@@ -2,24 +2,30 @@ import { Router } from 'express';
 import {
   createUser,
   deleteUser,
-  showTaskUser,
+  showTaskByUser,
   showUser,
   showUsers,
   updateUser,
 } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 import {
-  adminRoleHandler,
-  modRoleHandler,
-  userRoleHandler,
+  _admin_role,
+  _mod_role,
+  _employee_role,
 } from '../middlewares/role.middleware';
 
 const router = Router();
-
-router.get('/', authenticateHandler, modRoleHandler, showUsers);
-router.get('/:id', authenticateHandler, modRoleHandler, showUser);
-router.post('/', authenticateHandler, adminRoleHandler, createUser);
-router.patch('/:id', authenticateHandler, adminRoleHandler, updateUser);
-router.delete('/:id', authenticateHandler, adminRoleHandler, deleteUser);
-router.get('/:id/tasks', authenticateHandler, userRoleHandler, showTaskUser);
+router.use(authenticateHandler);
+//EMPLOYEE ROLE
+router.use(_employee_role);
+router.get('/:id/tasks', showTaskByUser);
+//MOD ROLE
+router.use(_mod_role);
+router.get('/', showUsers);
+router.get('/:id', showUser);
+//ADMIN ROLE
+router.use(_admin_role);
+router.post('/', createUser);
+router.patch('/:id', updateUser);
+router.delete('/:id', deleteUser);
 export default router;

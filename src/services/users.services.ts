@@ -5,12 +5,15 @@ import { Users, Tasks, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
 
 class UsersServices {
-  static async getUsers() {
+  static async getAll() {
     try {
       const users = await prisma.users.findMany({
         orderBy: { profile: { firstName: 'asc' } },
         include: { profile: true },
       });
+      if (users.length == 0) {
+        throw new AppError('Could not found user logs', 404);
+      }
       return users;
     } catch (error) {
       throw error;
@@ -30,7 +33,8 @@ class UsersServices {
     if (!findUser) throw new AppError('Could not found user ', 404);
     return findUser;
   }
-  static async findTaskUser(id: Users['id']) {
+
+  static async findListTask(id: Users['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const findTaskUser = await prisma.users.findUnique({
       where: {
@@ -55,7 +59,7 @@ class UsersServices {
     return findTaskUser;
   }
 
-  static async createUser({
+  static async create({
     email,
     password,
     firstName,

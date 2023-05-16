@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import { WorkAreasServices } from '../services';
-import { Prisma } from '@prisma/client';
 
 export const showWorkareas = async (
   req: Request,

@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { authServices } from '../services';
-import { Prisma } from '@prisma/client';
 
 export const login = async (
   req: Request,

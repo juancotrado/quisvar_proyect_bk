@@ -12,22 +12,22 @@ const { Prisma } = require('@prisma/client');
 const newUser: Pick<Users, 'role' | 'password' | 'email'>[] = [
   {
     role: 'EMPLOYEE',
-    password: 'user1',
+    password: '$2a$10$yBo.kWh0whcDmJezWweaPO1SBWaAG4qld5GrtCCGPk4pNeNVkU9gG',
     email: 'user1@gmail.com',
   },
   {
     role: 'EMPLOYEE',
-    password: 'user2',
+    password: '$2a$10$yBo.kWh0whcDmJezWweaPO1SBWaAG4qld5GrtCCGPk4pNeNVkU9gG',
     email: 'user2@gmail.com',
   },
   {
     role: 'MOD',
-    password: 'user3',
+    password: '$2a$10$yBo.kWh0whcDmJezWweaPO1SBWaAG4qld5GrtCCGPk4pNeNVkU9gG',
     email: 'user3@gmail.com',
   },
   {
     role: 'ADMIN',
-    password: 'user4',
+    password: '$2a$10$yBo.kWh0whcDmJezWweaPO1SBWaAG4qld5GrtCCGPk4pNeNVkU9gG',
     email: 'user4@gmail.com',
   },
 ];
@@ -40,25 +40,25 @@ const newProfile: Pick<
     firstName: 'user1',
     lastName: 'test',
     dni: '01010101',
-    userId: 1,
+    userId: 2,
   },
   {
     firstName: 'user2',
     lastName: 'test',
     dni: '01010102',
-    userId: 2,
+    userId: 3,
   },
   {
     firstName: 'user3',
     lastName: 'test',
     dni: '01010103',
-    userId: 3,
+    userId: 4,
   },
   {
     firstName: 'user4',
     lastName: 'test',
     dni: '01010104',
-    userId: 4,
+    userId: 5,
   },
 ];
 

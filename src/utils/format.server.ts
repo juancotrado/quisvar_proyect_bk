@@ -7,8 +7,8 @@ export type userProfilePick = Pick<
 
 export type projectPick = Pick<
   Projects,
-  'name' | 'description' | 'untilDate' | 'price'
-> ;
+  'name' | 'description' | 'untilDate' | 'price' | 'startDate'
+>;
 
 export interface userHash {
   password: string;

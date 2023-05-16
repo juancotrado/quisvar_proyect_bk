@@ -11,7 +11,6 @@ import {
   workareasRouter,
   projectRouter,
 } from './routes';
-// import { handleError } from './middlewares';
 import AppError from './utils/appError';
 import globalErrorHandler from './middlewares/error.middleware';
 import morgan from 'morgan';
@@ -24,11 +23,12 @@ class Server {
   private PORT: string = process.env.PORT || '8080';
   private HOST: string = process.env.HOST || 'localhost';
   private path: any = {
-    users: `/${process.env.ROUTE}/users`,
-    tasks: `/${process.env.ROUTE}/tasks`,
     auth: `/${process.env.ROUTE}/auth/login`,
+    users: `/${process.env.ROUTE}/users`,
     workareas: `/${process.env.ROUTE}/workareas`,
     projects: `/${process.env.ROUTE}/projects`,
+    tasks: `/${process.env.ROUTE}/tasks`,
+    subtasks: `/${process.env.ROUTE}/subtasks`,
   };
 
   constructor() {
@@ -41,7 +41,6 @@ class Server {
     });
     this.middlewares();
     this.routes();
-    // this.handleError();
   }
   middlewares() {
     this.app.use(cors());
@@ -51,7 +50,7 @@ class Server {
 
   conectionWebSockect() {
     this.io.on('connection', socket => {
-      console.log('usuario conectado con el ID', socket.id);
+      console.log('Connect user with id ==>', socket.id);
       socket.on('data', value => {
         console.log('id', value.id);
         socket.broadcast.emit('data', value);

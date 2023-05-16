@@ -1,11 +1,9 @@
 import { Router } from 'express';
 import {
-  createTask,
-  deleteTasks,
-  showTask,
-  updateTaskStatus,
-  updateTask,
-  assignedTask,
+  showSubTask,
+  createSubTask,
+  updateSubTask,
+  deleteSubTasks,
 } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 
@@ -19,12 +17,11 @@ const router = Router();
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);
-router.get('/:id', showTask);
-router.patch('/:id', assignedTask);
-router.put('/:id', updateTask);
+router.get('/:id', showSubTask);
 //MOD ROLE
 router.use(_mod_role);
-router.post('/', createTask);
-router.patch('/status/:id', updateTaskStatus);
-router.delete('/:id', deleteTasks);
+router.post('/', createSubTask);
+router.put('/:id', updateSubTask);
+router.delete('/:id', deleteSubTasks);
+
 export default router;

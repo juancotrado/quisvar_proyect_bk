@@ -17,12 +17,6 @@ class WorkAreasServices {
     }
   }
 
-  static async create({ description, name }: WorkAreas) {
-    const createWorkArea = await prisma.workAreas.create({
-      data: { description, name },
-    });
-    return createWorkArea;
-  }
   static async find(id: WorkAreas['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const findWorkArea = await prisma.workAreas.findUnique({
@@ -39,7 +33,7 @@ class WorkAreasServices {
             untilDate: true,
             price: true,
             status: true,
-            Users: {
+            moderator: {
               select: {
                 profile: {
                   select: {
@@ -57,6 +51,13 @@ class WorkAreasServices {
     });
     if (!findWorkArea) throw new AppError('Could not found user ', 404);
     return findWorkArea;
+  }
+
+  static async create({ description, name }: WorkAreas) {
+    const createWorkArea = await prisma.workAreas.create({
+      data: { description, name },
+    });
+    return createWorkArea;
   }
 
   static async update(id: WorkAreas['id'], { name, description }: WorkAreas) {

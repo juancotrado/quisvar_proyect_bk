@@ -2,12 +2,16 @@ import { Router } from 'express';
 import { showProject, deleteProject, showProjects } from '../controllers';
 import { createProject } from '../controllers/projects.controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
-import { modRoleHandler, userRoleHandler } from '../middlewares/role.middleware';
+import { _mod_role, _employee_role } from '../middlewares/role.middleware';
 
 const router = Router();
-
-router.get('/',authenticateHandler, userRoleHandler, showProjects);
-router.delete('/:id', authenticateHandler, modRoleHandler, deleteProject);
-router.get('/:id', authenticateHandler, userRoleHandler, showProject);
-router.post('/', authenticateHandler ,modRoleHandler, createProject);
+router.use(authenticateHandler);
+//EMPLOYEE ROLE
+router.use(_employee_role);
+router.get('/', showProjects);
+router.get('/:id', showProject);
+//MOD ROLE
+router.use(_mod_role);
+router.delete('/:id', deleteProject);
+router.post('/', createProject);
 export default router;

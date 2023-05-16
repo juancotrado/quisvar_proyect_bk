@@ -4,7 +4,7 @@ import {
   deleteUser,
   updateUser,
   showUser,
-  showTaskUser,
+  showTaskByUser,
 } from './users.controllers';
 import { login } from './auth.controllers';
 import {
@@ -19,13 +19,50 @@ import {
   showWorkareas,
   deleteWorkarea,
   showWorkArea,
+  createWorkArea,
   updateWorkarea,
 } from './workareas.controllers';
 import {
   deleteProject,
   showProject,
   showProjects,
+  createProject,
+  updateProject,
 } from './projects.controllers';
+import {
+  showSubTask,
+  createSubTask,
+  deleteSubTasks,
+  updateSubTask,
+} from './subtasks.controllers';
+// User Controllers
+export {
+  showUsers,
+  createUser,
+  deleteUser,
+  updateUser,
+  showUser,
+  showTaskByUser,
+};
+//Auth Controllers
+export { login };
+//WorkAreas Controllers
+export {
+  showWorkareas,
+  deleteWorkarea,
+  showWorkArea,
+  createWorkArea,
+  updateWorkarea,
+};
+//Project Controllers
+export {
+  showProjects,
+  showProject,
+  deleteProject,
+  createProject,
+  updateProject,
+};
+//Task Controllers
 export {
   showTask,
   createTask,
@@ -34,16 +71,6 @@ export {
   assignedTask,
   updateTask,
 };
-export {
-  showUsers,
-  createUser,
-  deleteUser,
-  updateUser,
-  showUser,
-  showTaskUser,
-};
-export { showWorkareas, deleteWorkarea, showWorkArea, updateWorkarea };
-// export { showTask, showTasks, deleteTasks, updateTask, createTask };
-export { login };
-// export { showTasks };
-export { showProjects, showProject, deleteProject };
+
+//Subtask Controllers
+export { showSubTask, createSubTask, deleteSubTasks, updateSubTask };

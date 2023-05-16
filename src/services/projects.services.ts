@@ -1,6 +1,6 @@
 import { Projects, Users, WorkAreas, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-import { projectPick, userProfilePick } from '../utils/format.server';
+import { projectPick } from '../utils/format.server';
 
 class ProjectsServices {
   static async getAll() {
@@ -44,12 +44,13 @@ class ProjectsServices {
     return findProject;
   }
 
-  static async createProject({
+  static async create({
     name,
     description,
     price,
     untilDate,
     userId,
+    startDate,
     workAreaId,
   }: projectPick & { userId: Users['id'] } & { workAreaId: WorkAreas['id'] }) {
     const newProject = await prisma.projects.create({
@@ -57,8 +58,9 @@ class ProjectsServices {
         name,
         description,
         price,
+        startDate,
         untilDate,
-        Users: {
+        moderator: {
           connect: {
             id: userId,
           },
@@ -96,7 +98,7 @@ class ProjectsServices {
         untilDate,
         price,
         status,
-        Users: {
+        moderator: {
           connect: { id: userId },
         },
       },

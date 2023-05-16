@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { UsersServices } from '../services';
 import { userProfilePick } from '../utils/format.server';
-import AppError from '../utils/appError';
 import { UserType } from '../middlewares/auth.middleware';
 
 export const showUsers = async (
@@ -10,11 +9,7 @@ export const showUsers = async (
   next: NextFunction
 ) => {
   try {
-    const query = await UsersServices.getUsers();
-    if (query.length == 0) {
-      throw new AppError('no hay naa', 404);
-    }
-
+    const query = await UsersServices.getAll();
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -36,6 +31,21 @@ export const showUser = async (
   }
 };
 
+export const showTaskByUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userInfo: UserType = res.locals.userInfo;
+    const { id } = userInfo;
+    const query = await UsersServices.findListTask(id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createUser = async (
   req: Request,
   res: Response,
@@ -43,10 +53,9 @@ export const createUser = async (
 ) => {
   try {
     const body: userProfilePick = req.body;
-    const query = await UsersServices.createUser(body);
+    const query = await UsersServices.create(body);
     res.status(201).json(query);
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -63,22 +72,6 @@ export const updateUser = async (
     const query = await UsersServices.update(_id, body);
     res.status(200).json(query);
   } catch (error) {
-    next(error);
-  }
-};
-export const showTaskUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const userInfo: UserType = res.locals.userInfo;
-    const { id } = userInfo;
-    const query = await UsersServices.findTaskUser(id);
-
-    res.status(200).json(query);
-  } catch (error) {
-    console.log(error);
     next(error);
   }
 };
