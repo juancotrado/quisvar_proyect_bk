@@ -2,6 +2,8 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import { prisma } from './utils/prisma.server';
+import { Server as WebSocketServer } from 'socket.io';
+import http from 'http';
 import {
   userRouter,
   taskRouter,
@@ -17,6 +19,8 @@ import morgan from 'morgan';
 dotenv.config();
 class Server {
   private app!: Application;
+  private io;
+  private httpServer;
   private PORT: string = process.env.PORT || '8080';
   private HOST: string = process.env.HOST || 'localhost';
   private path: any = {
@@ -29,6 +33,12 @@ class Server {
 
   constructor() {
     this.app = express();
+    this.httpServer = http.createServer(this.app);
+    this.io = new WebSocketServer(this.httpServer, {
+      cors: {
+        origin: '*',
+      },
+    });
     this.middlewares();
     this.routes();
     // this.handleError();
@@ -37,6 +47,16 @@ class Server {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(morgan('dev'));
+  }
+
+  conectionWebSockect() {
+    this.io.on('connection', socket => {
+      console.log('usuario conectado con el ID', socket.id);
+      socket.on('tasks', value => {
+        console.log(value);
+        socket.broadcast.emit('tasks', value);
+      });
+    });
   }
   routes() {
     this.app.use(this.path.users, userRouter);
@@ -52,7 +72,7 @@ class Server {
     this.app.use(globalErrorHandler);
   }
   listen() {
-    this.app.listen(this.PORT, () => {
+    this.httpServer.listen(this.PORT, () => {
       if (this.PORT && this.HOST) {
         prisma;
         console.log(
