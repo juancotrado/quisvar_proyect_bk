@@ -53,6 +53,7 @@ class UsersServices {
             task: {
               select: {
                 id: true,
+                name: true,
                 subtasks: true,
                 status: true,
               },
