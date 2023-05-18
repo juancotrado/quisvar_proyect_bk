@@ -45,9 +45,9 @@ class TasksServices {
 
   static async create({
     name,
-    project_id,
+    projectId,
     employees,
-  }: Tasks & { project_id: Projects['id'] } & {
+  }: Tasks & { projectId: Projects['id'] } & {
     employees: { userId: Users['id'] }[];
   }) {
     const newTask = prisma.tasks.create({
@@ -55,7 +55,7 @@ class TasksServices {
         name,
         project: {
           connect: {
-            id: project_id,
+            id: projectId,
           },
         },
         employees: {
