@@ -18,6 +18,10 @@ class Sockets {
         const result = await TasksServices.updateStatus(data.id, data.body);
         console.log('complete update status', result);
       });
+      socket.on('create-task', async task => {
+        const newTask = await TasksServices.create(task);
+        this.io.emit('add-task', newTask);
+      });
       socket.on('disconnect', () => {
         console.log('User disconected ==>', socket.id);
       });
