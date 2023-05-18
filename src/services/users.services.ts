@@ -50,6 +50,16 @@ class UsersServices {
         },
       },
       include: {
+        project: {
+          select: {
+            name: true,
+          },
+        },
+        employees: {
+          select: {
+            assignedAt: true,
+          },
+        },
         subtasks: true,
       },
     });

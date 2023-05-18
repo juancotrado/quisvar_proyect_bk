@@ -53,7 +53,7 @@ model Projects {
   workAreaId  Int
   status      Boolean   @default(false)
   tasks       Tasks[]
-  workAreas   WorkAreas @relation(fields: [workAreaId], references: [id], onDelete: Cascade)
+  workAreas   WorkAreas @relation(fields: [workAreaId], references: [id])
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   moderator   Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -65,7 +65,7 @@ model Tasks {
   name      String
   projectId Int
   status    TaskRole      @default(UNRESOLVED)
-  project   Projects      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project   Projects      @relation(fields: [projectId], references: [id])
   subtasks  SubTasks[]
   employees TaskOnUsers[]
 }

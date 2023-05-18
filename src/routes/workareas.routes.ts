@@ -15,9 +15,9 @@ router.use(authenticateHandler);
 router.use(_employee_role);
 router.get('/', showWorkareas);
 router.get('/:id', showWorkArea);
-router.post('/', createWorkArea);
 //MOD ROLE
 router.use(_mod_role);
+router.post('/', createWorkArea);
 router.put('/:id', updateWorkarea);
 router.delete('/:id', deleteWorkarea);
 export default router;
