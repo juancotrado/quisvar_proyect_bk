@@ -22,6 +22,11 @@ class Sockets {
         const newTask = await TasksServices.create(task);
         this.io.emit('add-task', newTask);
       });
+      socket.on('edit-task', async task => {
+        console.log(task);
+        const newTask = await TasksServices.update(task.id, task);
+        this.io.emit('update-task', newTask);
+      });
       socket.on('disconnect', () => {
         console.log('User disconected ==>', socket.id);
       });
