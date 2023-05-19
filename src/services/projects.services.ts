@@ -32,6 +32,7 @@ class ProjectsServices {
                     profile: {
                       select: {
                         firstName: true,
+                        userId: true,
                       },
                     },
                   },
