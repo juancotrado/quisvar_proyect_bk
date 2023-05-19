@@ -80,6 +80,7 @@ class TasksServices {
               },
             },
           },
+          status: 'UNRESOLVED',
         },
       });
       return declineTask;
@@ -93,6 +94,7 @@ class TasksServices {
               userId,
             },
           },
+          status: 'PROCESS',
         },
       });
       return applyTask;
