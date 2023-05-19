@@ -110,7 +110,6 @@ class TasksServices {
     }
     throw new AppError('Oops!,We need status for this query', 400);
   }
-
   static async update(
     id: Tasks['id'],
     {

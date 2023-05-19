@@ -14,6 +14,7 @@ import {
   _admin_role,
   _mod_role,
 } from '../middlewares/role.middleware';
+import taskVerify from '../middlewares/user.middleware';
 
 const router = Router();
 router.use(authenticateHandler);
@@ -21,7 +22,7 @@ router.use(authenticateHandler);
 router.use(_employee_role);
 router.patch('/status/:id', updateTaskStatus);
 router.get('/:id', showTask);
-router.patch('/:id', assignedTask);
+router.patch('/:id', taskVerify, assignedTask);
 router.put('/:id', updateTask);
 //MOD ROLE
 router.use(_mod_role);

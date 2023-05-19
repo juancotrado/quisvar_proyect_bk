@@ -5,7 +5,9 @@ import { projectPick } from '../utils/format.server';
 class ProjectsServices {
   static async getAll() {
     try {
-      const getProjects = await prisma.projects.findMany({});
+      const getProjects = await prisma.projects.findMany({
+        orderBy: { createdAt: 'desc' },
+      });
       if (getProjects.length == 0)
         throw new AppError('Could not found work areas', 404);
       return getProjects;
