@@ -15,6 +15,19 @@ class Sockets {
         socket.broadcast.emit('data', tasks);
       });
       socket.on('update-status', async data => {
+        const statusAsiged = {
+          PROCESS: 'apply',
+          UNRESOLVED: 'decline',
+          DONE: 'done',
+        };
+        const { status } = data.body;
+        if (statusAsiged[status as keyof typeof statusAsiged]) {
+          await TasksServices.assigned(
+            data.id,
+            data.userId,
+            statusAsiged[status as keyof typeof statusAsiged]
+          );
+        }
         const result = await TasksServices.updateStatus(data.id, data.body);
         console.log('complete update status', result);
       });
