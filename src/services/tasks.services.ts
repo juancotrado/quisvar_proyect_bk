@@ -62,6 +62,9 @@ class TasksServices {
           create: employees,
         },
       },
+      include: {
+        employees: true,
+      },
     });
     return newTask;
   }
