@@ -99,6 +99,15 @@ class TasksServices {
       });
       return applyTask;
     }
+    if (option == 'done') {
+      const doneTask = prisma.tasks.update({
+        where: { id },
+        data: {
+          status: 'DONE',
+        },
+      });
+      return doneTask;
+    }
     throw new AppError('Oops!,We need status for this query', 400);
   }
 
