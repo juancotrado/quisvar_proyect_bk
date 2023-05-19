@@ -45,11 +45,11 @@ class WorkAreasServices {
                 },
               },
             },
-            // _count: {
-            //   select: {
-            //     tasks: true,
-            //   },
-            // },
+            _count: {
+              select: {
+                tasks: true,
+              },
+            },
           },
         },
       },
