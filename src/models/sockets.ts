@@ -27,6 +27,11 @@ class Sockets {
         const newTask = await TasksServices.update(task.id, task);
         this.io.emit('update-task', newTask);
       });
+      socket.on('delete-task', async id => {
+        this.io.emit('delete-task-success', id);
+        await TasksServices.delete(id);
+        console.log('se elimino correctamente la tarea');
+      });
       socket.on('disconnect', () => {
         console.log('User disconected ==>', socket.id);
       });
