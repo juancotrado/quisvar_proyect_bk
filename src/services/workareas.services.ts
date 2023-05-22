@@ -24,30 +24,23 @@ class WorkAreasServices {
         id,
       },
       include: {
-        project: {
+        indexTasks: {
+          orderBy: { name: 'asc' },
           select: {
             id: true,
             name: true,
-            description: true,
-            startDate: true,
-            untilDate: true,
-            price: true,
-            status: true,
-            moderator: {
+            tasks: {
+              orderBy: { name: 'asc' },
               select: {
-                profile: {
+                id: true,
+                name: true,
+                subTasks: {
+                  orderBy: { name: 'asc' },
                   select: {
-                    userId: true,
-                    lastName: true,
-                    firstName: true,
-                    phone: true,
+                    id: true,
+                    name: true,
                   },
                 },
-              },
-            },
-            _count: {
-              select: {
-                tasks: true,
               },
             },
           },
@@ -58,32 +51,32 @@ class WorkAreasServices {
     return findWorkArea;
   }
 
-  static async create({ description, name }: WorkAreas) {
-    const createWorkArea = await prisma.workAreas.create({
-      data: { description, name },
-    });
-    return createWorkArea;
-  }
+  // static async create({ description, name }: WorkAreas) {
+  //   const createWorkArea = await prisma.workAreas.create({
+  //     data: { description, name },
+  //   });
+  //   return createWorkArea;
+  // }
 
-  static async update(id: WorkAreas['id'], { name, description }: WorkAreas) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
-    const updateWorkArea = await prisma.workAreas.update({
-      where: { id },
-      data: {
-        name,
-        description,
-      },
-    });
-    return updateWorkArea;
-  }
+  // static async update(id: WorkAreas['id'], { name, description }: WorkAreas) {
+  //   if (!id) throw new AppError('Oops!,Invalid ID', 400);
+  //   const updateWorkArea = await prisma.workAreas.update({
+  //     where: { id },
+  //     data: {
+  //       name,
+  //       description,
+  //     },
+  //   });
+  //   return updateWorkArea;
+  // }
 
-  static async delete(id: WorkAreas['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
-    const deleteWorkArea = await prisma.workAreas.delete({
-      where: { id },
-    });
-    return deleteWorkArea;
-  }
+  // static async delete(id: WorkAreas['id']) {
+  //   if (!id) throw new AppError('Oops!,Invalid ID', 400);
+  //   const deleteWorkArea = await prisma.workAreas.delete({
+  //     where: { id },
+  //   });
+  //   return deleteWorkArea;
+  // }
 }
 
 export default WorkAreasServices;

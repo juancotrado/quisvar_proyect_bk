@@ -11,6 +11,7 @@ import {
   workareasRouter,
   projectRouter,
   subTaskRouter,
+  indexTasksRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -29,6 +30,7 @@ class Server {
     users: `/${process.env.ROUTE}/users`,
     workareas: `/${process.env.ROUTE}/workareas`,
     projects: `/${process.env.ROUTE}/projects`,
+    indextasks: `/${process.env.ROUTE}/indextasks`,
     tasks: `/${process.env.ROUTE}/tasks`,
     subtasks: `/${process.env.ROUTE}/subtasks`,
   };
@@ -55,12 +57,13 @@ class Server {
     new Sockets(this.io);
   }
   routes() {
+    this.app.use(this.path.auth, authRouter);
     this.app.use(this.path.users, userRouter);
-    this.app.use(this.path.tasks, taskRouter);
     this.app.use(this.path.projects, projectRouter);
     this.app.use(this.path.workareas, workareasRouter);
-    this.app.use(this.path.auth, authRouter);
-    this.app.use(this.path.subtasks, subTaskRouter);
+    this.app.use(this.path.indextasks, indexTasksRouter);
+    this.app.use(this.path.tasks, taskRouter);
+    // this.app.use(this.path.subtasks, subTaskRouter);
     this.app.all('*', (req, res, next) => {
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)

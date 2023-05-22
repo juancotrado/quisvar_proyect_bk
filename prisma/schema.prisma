@@ -12,17 +12,17 @@ datasource db {
 }
 
 model Users {
-  id         Int           @id @default(autoincrement())
-  status     Boolean       @default(true)
-  role       UserRole      @default(EMPLOYEE)
-  password   String
-  email      String        @unique
-  workAreaId Int?
-  profile    Profiles?
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  projects   Projects[]
-  tasks      TaskOnUsers[]
+  id        Int           @id @default(autoincrement())
+  status    Boolean       @default(true)
+  role      UserRole      @default(EMPLOYEE)
+  password  String
+  email     String        @unique
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  profile   Profiles?
+  area      WorkAreas[]
+  project   Projects[]
+  subTasks  TaskOnUsers[]
 }
 
 model Profiles {
@@ -32,64 +32,73 @@ model Profiles {
   dni       String   @unique @db.VarChar(8)
   phone     String?  @unique
   updatedAt DateTime @updatedAt
-  userId    Int      @unique
+  userId    Int      @unique @map("user_id")
   user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model WorkAreas {
-  id          Int        @id @default(autoincrement())
+model Projects {
+  id          Int         @id @default(autoincrement())
   name        String
   description String?
-  project     Projects[]
+  startDate   DateTime    @default(now())
+  untilDate   DateTime
+  status      Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  userId      Int         @unique @map("coordinator")
+  moderator   Users       @relation(fields: [userId], references: [id])
+  areas       WorkAreas[]
 }
 
-model Projects {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String?
-  startDate   DateTime  @default(now())
-  untilDate   DateTime
-  price       Float     @default(0)
-  workAreaId  Int
-  status      Boolean   @default(false)
-  tasks       Tasks[]
-  workAreas   WorkAreas @relation(fields: [workAreaId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  moderator   Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int
+model WorkAreas {
+  id         Int          @id @default(autoincrement())
+  name       String
+  userId     Int          @unique @map("user_id")
+  user       Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  indexTasks IndexTasks[]
+  projects   Projects     @relation(fields: [projectId], references: [id])
+  projectId  Int          @map("project_id")
+}
+
+model IndexTasks {
+  id         Int       @id @default(autoincrement())
+  name       String
+  workAreaId Int       @map("work_area_id")
+  workArea   WorkAreas @relation(fields: [workAreaId], references: [id])
+  tasks      Tasks[]
 }
 
 model Tasks {
-  id        Int           @id @default(autoincrement())
-  name      String
-  projectId Int
-  status    TaskRole      @default(UNRESOLVED)
-  project   Projects      @relation(fields: [projectId], references: [id])
-  subtasks  SubTasks[]
-  employees TaskOnUsers[]
+  id          Int        @id @default(autoincrement())
+  name        String
+  indexTaskId Int        @map("index_task_id")
+  intexTask   IndexTasks @relation(fields: [indexTaskId], references: [id])
+  subTasks    SubTasks[]
 }
 
 model SubTasks {
-  id          Int      @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
+  status      TaskRole      @default(UNRESOLVED)
   name        String
+  percentage  Int           @default(0)
   description String?
   price       Float
   hours       Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  tasks       Tasks    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
   taskId      Int
+  task        Tasks         @relation(fields: [taskId], references: [id])
+  users       TaskOnUsers[]
 }
 
 model TaskOnUsers {
-  taskId     Int
+  subtaskId  Int
   userId     Int
-  task       Tasks    @relation(fields: [taskId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user       Users    @relation(fields: [userId], references: [id], onUpdate: Cascade)
+  subtask    SubTasks @relation(fields: [subtaskId], references: [id], onUpdate: Cascade)
   assignedAt DateTime @default(now())
 
-  @@id([taskId, userId])
+  @@id([subtaskId, userId])
 }
 
 enum UserRole {

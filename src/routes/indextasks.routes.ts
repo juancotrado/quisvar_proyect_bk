@@ -1,10 +1,5 @@
 import { Router } from 'express';
-// createTask,
-// deleteTasks,
-// updateTaskStatus,
-// updateTask,
-// assignedTask,
-import { showTask } from '../controllers';
+import { showIndexTask } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 
 import {
@@ -12,14 +7,13 @@ import {
   _admin_role,
   _mod_role,
 } from '../middlewares/role.middleware';
-import taskVerify from '../middlewares/user.middleware';
 
 const router = Router();
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);
 // router.patch('/status/:id', updateTaskStatus);
-router.get('/:id', showTask);
+router.get('/:id', showIndexTask);
 // router.patch('/:id', taskVerify, assignedTask);
 // router.put('/:id', updateTask);
 //MOD ROLE

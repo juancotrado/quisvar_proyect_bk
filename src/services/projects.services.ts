@@ -23,99 +23,91 @@ class ProjectsServices {
         id,
       },
       include: {
-        tasks: {
-          include: {
-            employees: {
-              select: {
-                user: {
-                  select: {
-                    profile: {
-                      select: {
-                        firstName: true,
-                        userId: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            subtasks: true,
+        moderator: {
+          select: {
+            profile: true,
+          },
+        },
+        areas: {
+          select: {
+            id: true,
+            name: true,
           },
         },
       },
     });
-    if (!findProject) throw new AppError('Could not found user ', 404);
+    if (!findProject) throw new AppError('Could not found logs project', 404);
     return findProject;
   }
 
-  static async create({
-    name,
-    description,
-    price,
-    untilDate,
-    userId,
-    startDate,
-    workAreaId,
-  }: projectPick & { userId: Users['id'] } & { workAreaId: WorkAreas['id'] }) {
-    const newProject = await prisma.projects.create({
-      data: {
-        name,
-        description,
-        price,
-        startDate,
-        untilDate,
-        moderator: {
-          connect: {
-            id: userId,
-          },
-        },
-        workAreas: {
-          connect: {
-            id: workAreaId,
-          },
-        },
-      },
-    });
+  // static async create({
+  //   name,
+  //   description,
+  //   price,
+  //   untilDate,
+  //   userId,
+  //   startDate,
+  //   workAreaId,
+  // }: projectPick & { userId: Users['id'] } & { workAreaId: WorkAreas['id'] }) {
+  //   const newProject = await prisma.projects.create({
+  //     data: {
+  //       name,
+  //       description,
+  //       price,
+  //       startDate,
+  //       untilDate,
+  //       moderator: {
+  //         connect: {
+  //           id: userId,
+  //         },
+  //       },
+  //       workAreas: {
+  //         connect: {
+  //           id: workAreaId,
+  //         },
+  //       },
+  //     },
+  //   });
 
-    return newProject;
-  }
+  //   return newProject;
+  // }
 
-  static async update(
-    id: Projects['id'],
-    {
-      name,
-      description,
-      startDate,
-      untilDate,
-      price,
-      status,
-      userId,
-    }: Projects & { userId: Users['id'] }
-  ) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
-    const updateProject = await prisma.projects.update({
-      where: { id },
-      data: {
-        name,
-        description,
-        startDate,
-        untilDate,
-        price,
-        status,
-        moderator: {
-          connect: { id: userId },
-        },
-      },
-    });
-    return updateProject;
-  }
+  // static async update(
+  //   id: Projects['id'],
+  //   {
+  //     name,
+  //     description,
+  //     startDate,
+  //     untilDate,
+  //     price,
+  //     status,
+  //     userId,
+  //   }: Projects & { userId: Users['id'] }
+  // ) {
+  //   if (!id) throw new AppError('Oops!,Invalid ID', 400);
+  //   const updateProject = await prisma.projects.update({
+  //     where: { id },
+  //     data: {
+  //       name,
+  //       description,
+  //       startDate,
+  //       untilDate,
+  //       price,
+  //       status,
+  //       moderator: {
+  //         connect: { id: userId },
+  //       },
+  //     },
+  //   });
+  //   return updateProject;
+  // }
 
-  static async delete(id: Projects['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
-    const deleteProject = await prisma.projects.delete({
-      where: { id },
-    });
-    return deleteProject;
-  }
+  // static async delete(id: Projects['id']) {
+  //   if (!id) throw new AppError('Oops!,Invalid ID', 400);
+  //   const deleteProject = await prisma.projects.delete({
+  //     where: { id },
+  //   });
+  //   return deleteProject;
+  // }
 }
 export default ProjectsServices;

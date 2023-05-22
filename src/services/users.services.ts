@@ -43,24 +43,7 @@ class UsersServices {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const findTaskUser = await prisma.tasks.findMany({
       where: {
-        employees: {
-          some: {
-            user: { id },
-          },
-        },
-      },
-      include: {
-        project: {
-          select: {
-            name: true,
-          },
-        },
-        employees: {
-          select: {
-            assignedAt: true,
-          },
-        },
-        subtasks: true,
+        id,
       },
     });
     if (!findTaskUser) throw new AppError('Could not found user ', 404);

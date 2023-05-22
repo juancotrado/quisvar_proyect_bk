@@ -6,6 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node ./src/app.ts",
+    "generate": "npx prisma generate",
+    "reset": "npx prisma migrate reset",
+    "dbpush": "npx prisma db push",
+    "studio": "npx prisma studio",
     "dev": "nodemon ./src/app.ts",
     "seed": "ts-node ./src/seeders/seeders.ts",
     "prepare": "husky install"

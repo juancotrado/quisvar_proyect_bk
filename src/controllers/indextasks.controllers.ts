@@ -1,16 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
-import { TasksServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
+import { IndexTasksServices } from '../services';
 
-export const showTask = async (
+export const showIndexTask = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const { id } = req.params;
-    const _task_id = parseInt(id);
-    const query = await TasksServices.find(_task_id);
+    const _index_task_id = parseInt(id);
+    const query = await IndexTasksServices.find(_index_task_id);
     res.status(200).json(query);
   } catch (error) {
     next(error);
