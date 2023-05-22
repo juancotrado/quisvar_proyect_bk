@@ -1,4 +1,4 @@
-import express, { Application } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import { prisma } from '../utils/prisma.server';
@@ -63,8 +63,8 @@ class Server {
     this.app.use(this.path.workareas, workareasRouter);
     this.app.use(this.path.indextasks, indexTasksRouter);
     this.app.use(this.path.tasks, taskRouter);
-    // this.app.use(this.path.subtasks, subTaskRouter);
-    this.app.all('*', (req, res, next) => {
+    this.app.use(this.path.subtasks, subTaskRouter);
+    this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)
       );

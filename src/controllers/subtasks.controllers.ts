@@ -1,20 +1,20 @@
-// import { NextFunction, Request, Response } from 'express';
-// import { SubTasksServices } from '../services';
+import { NextFunction, Request, Response } from 'express';
+import { SubTasksServices } from '../services';
 
-// export const showSubTask = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { id } = req.params;
-//     const _subtask_id = parseInt(id);
-//     const query = await SubTasksServices.find(_subtask_id);
-//     res.status(200).json(query);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+export const showSubTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _subtask_id = parseInt(id);
+    const query = await SubTasksServices.find(_subtask_id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 
 // export const createSubTask = async (
 //   req: Request,

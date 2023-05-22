@@ -24,12 +24,10 @@ import { showWorkArea } from './workareas.controllers';
 // createProject,
 // updateProject,
 import { showProject } from './projects.controllers';
-// import {
-//   showSubTask,
-//   createSubTask,
-//   deleteSubTasks,
-//   updateSubTask,
-// } from './subtasks.controllers';
+// createSubTask,
+// deleteSubTasks,
+// updateSubTask,
+import { showSubTask } from './subtasks.controllers';
 // User Controllers
 export {
   showUsers,
@@ -70,4 +68,7 @@ export {
 };
 
 //Subtask Controllers
-// export { showSubTask, createSubTask, deleteSubTasks, updateSubTask };
+export {
+  showSubTask,
+  // createSubTask, deleteSubTasks, updateSubTask
+};

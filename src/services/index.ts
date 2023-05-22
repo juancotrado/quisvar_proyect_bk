@@ -4,7 +4,7 @@ import WorkAreasServices from './workareas.services';
 import authServices from './auth.services';
 import ProjectsServices from './projects.services';
 import IndexTasksServices from './indextasks.services';
-// import SubTasksServices from './subtasks.services';
+import SubTasksServices from './subtasks.services';
 export {
   UsersServices,
   TasksServices,
@@ -12,5 +12,5 @@ export {
   authServices,
   WorkAreasServices,
   ProjectsServices,
-  //   SubTasksServices,
+  SubTasksServices,
 };

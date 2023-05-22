@@ -1,10 +1,10 @@
 import { Router } from 'express';
-// import {
-//   showSubTask,
-//   createSubTask,
-//   updateSubTask,
-//   deleteSubTasks,
-// } from '../controllers';
+import {
+  showSubTask,
+  //   createSubTask,
+  //   updateSubTask,
+  //   deleteSubTasks,
+} from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 
 import {
@@ -17,7 +17,7 @@ const router = Router();
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);
-// router.get('/:id', showSubTask);
+router.get('/:id', showSubTask);
 //MOD ROLE
 router.use(_mod_role);
 // router.post('/', createSubTask);
