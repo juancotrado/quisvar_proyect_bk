@@ -12,6 +12,7 @@ import {
   projectRouter,
   subTaskRouter,
   indexTasksRouter,
+  profileRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -28,6 +29,7 @@ class Server {
   private path: any = {
     auth: `/${process.env.ROUTE}/auth/login`,
     users: `/${process.env.ROUTE}/users`,
+    profile: `/${process.env.ROUTE}/profile`,
     workareas: `/${process.env.ROUTE}/workareas`,
     projects: `/${process.env.ROUTE}/projects`,
     indextasks: `/${process.env.ROUTE}/indextasks`,
@@ -59,6 +61,7 @@ class Server {
   routes() {
     this.app.use(this.path.auth, authRouter);
     this.app.use(this.path.users, userRouter);
+    this.app.use(this.path.profile, profileRouter);
     this.app.use(this.path.projects, projectRouter);
     this.app.use(this.path.workareas, workareasRouter);
     this.app.use(this.path.indextasks, indexTasksRouter);

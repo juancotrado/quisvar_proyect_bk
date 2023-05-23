@@ -30,6 +30,7 @@ import {
 // deleteSubTasks,
 // updateSubTask,
 import { showSubTask } from './subtasks.controllers';
+import { showProfile } from './profile.controllers';
 // User Controllers
 export {
   showUsers,
@@ -74,3 +75,4 @@ export {
   showSubTask,
   // createSubTask, deleteSubTasks, updateSubTask
 };
+export { showProfile };

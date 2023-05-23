@@ -11,6 +11,7 @@ class WorkAreasServices {
   static async getAll() {
     try {
       const getWorkAreas = await prisma.workAreas.findMany({
+        orderBy: { name: 'asc' },
         select: {
           id: true,
           name: true,

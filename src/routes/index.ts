@@ -5,6 +5,7 @@ import workareasRouter from './workareas.routes';
 import projectRouter from './projects.routes';
 import subTaskRouter from './subtasks.routes';
 import indexTasksRouter from './indextasks.routes';
+import profileRouter from './profile.routes';
 export {
   userRouter,
   taskRouter,
@@ -13,4 +14,5 @@ export {
   projectRouter,
   subTaskRouter,
   indexTasksRouter,
+  profileRouter,
 };
