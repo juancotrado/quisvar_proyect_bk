@@ -29,6 +29,9 @@ class ProjectsServices {
           },
         },
         areas: {
+          orderBy: {
+            name: 'asc',
+          },
           select: {
             id: true,
             name: true,
@@ -40,74 +43,64 @@ class ProjectsServices {
     return findProject;
   }
 
-  // static async create({
-  //   name,
-  //   description,
-  //   price,
-  //   untilDate,
-  //   userId,
-  //   startDate,
-  //   workAreaId,
-  // }: projectPick & { userId: Users['id'] } & { workAreaId: WorkAreas['id'] }) {
-  //   const newProject = await prisma.projects.create({
-  //     data: {
-  //       name,
-  //       description,
-  //       price,
-  //       startDate,
-  //       untilDate,
-  //       moderator: {
-  //         connect: {
-  //           id: userId,
-  //         },
-  //       },
-  //       workAreas: {
-  //         connect: {
-  //           id: workAreaId,
-  //         },
-  //       },
-  //     },
-  //   });
+  static async create({
+    name,
+    description,
+    untilDate,
+    userId,
+    startDate,
+  }: projectPick & { userId: Users['id'] }) {
+    const newProject = await prisma.projects.create({
+      data: {
+        name,
+        description,
+        startDate,
+        untilDate,
+        moderator: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
+    });
 
-  //   return newProject;
-  // }
+    return newProject;
+  }
 
-  // static async update(
-  //   id: Projects['id'],
-  //   {
-  //     name,
-  //     description,
-  //     startDate,
-  //     untilDate,
-  //     price,
-  //     status,
-  //     userId,
-  //   }: Projects & { userId: Users['id'] }
-  // ) {
-  //   if (!id) throw new AppError('Oops!,Invalid ID', 400);
-  //   const updateProject = await prisma.projects.update({
-  //     where: { id },
-  //     data: {
-  //       name,
-  //       description,
-  //       startDate,
-  //       untilDate,
-  //       price,
-  //       status,
-  //       moderator: {
-  //         connect: { id: userId },
-  //       },
-  //     },
-  //   });
-  //   return updateProject;
-  // }
+  static async update(
+    id: Projects['id'],
+    {
+      name,
+      description,
+      startDate,
+      untilDate,
+      status,
+      userId,
+    }: Projects & { userId: Users['id'] }
+  ) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const updateProject = await prisma.projects.update({
+      where: { id },
+      data: {
+        name,
+        description,
+        startDate,
+        untilDate,
+        status,
+        moderator: {
+          connect: { id: userId },
+        },
+      },
+    });
+    return updateProject;
+  }
 
-  // static async delete(id: Projects['id']) {
-  //   if (!id) throw new AppError('Oops!,Invalid ID', 400);
-  //   const deleteProject = await prisma.projects.delete({
-  //     where: { id },
-  //   });
-  //   return deleteProject;
-  // }
+  static async delete(id: Projects['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const deleteProject = await prisma.projects.delete({
+      where: { id },
+    });
+    return deleteProject;
+  }
 }
 export default ProjectsServices;

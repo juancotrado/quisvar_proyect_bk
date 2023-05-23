@@ -19,11 +19,13 @@ import { showTask } from './tasks.controllers';
 // createWorkArea,
 // updateWorkarea,
 import { showWorkArea } from './workareas.controllers';
-// deleteProject,
-// showProjects,
-// createProject,
-// updateProject,
-import { showProject } from './projects.controllers';
+import {
+  deleteProject,
+  showProjects,
+  createProject,
+  updateProject,
+  showProject,
+} from './projects.controllers';
 // createSubTask,
 // deleteSubTasks,
 // updateSubTask,
@@ -49,11 +51,11 @@ export {
 };
 // //Project Controllers
 export {
-  // showProjects,
+  showProjects,
   showProject,
-  // deleteProject,
-  // createProject,
-  // updateProject,
+  deleteProject,
+  createProject,
+  updateProject,
 };
 //IndexTask Controllers
 export { showIndexTask };

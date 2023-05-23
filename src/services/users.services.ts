@@ -1,7 +1,7 @@
 import { error } from 'console';
 import AppError from '../utils/appError';
 import { userProfilePick } from '../utils/format.server';
-import { Users, Tasks, prisma } from '../utils/prisma.server';
+import { Prisma, Users, WorkAreas, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
 
 class UsersServices {
@@ -68,23 +68,16 @@ class UsersServices {
       data: {
         email,
         password: passwordHash,
-      },
-    });
-    if (newUser) {
-      await prisma.profiles.create({
-        data: {
-          firstName,
-          lastName,
-          dni,
-          phone,
-          user: {
-            connect: {
-              id: newUser.id,
-            },
+        profile: {
+          create: {
+            firstName,
+            lastName,
+            dni,
+            phone,
           },
         },
-      });
-    }
+      },
+    });
     return newUser;
   }
 

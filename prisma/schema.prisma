@@ -32,7 +32,7 @@ model Profiles {
   dni       String   @unique @db.VarChar(8)
   phone     String?  @unique
   updatedAt DateTime @updatedAt
-  userId    Int      @unique @map("user_id")
+  userId    Int      @unique
   user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -45,7 +45,7 @@ model Projects {
   status      Boolean     @default(false)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  userId      Int         @unique @map("coordinator")
+  userId      Int
   moderator   Users       @relation(fields: [userId], references: [id])
   areas       WorkAreas[]
 }
@@ -53,17 +53,17 @@ model Projects {
 model WorkAreas {
   id         Int          @id @default(autoincrement())
   name       String
-  userId     Int          @unique @map("user_id")
-  user       Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int
+  projectId  Int
   indexTasks IndexTasks[]
-  projects   Projects     @relation(fields: [projectId], references: [id])
-  projectId  Int          @map("project_id")
+  user       Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project    Projects     @relation(fields: [projectId], references: [id])
 }
 
 model IndexTasks {
   id         Int       @id @default(autoincrement())
   name       String
-  workAreaId Int       @map("work_area_id")
+  workAreaId Int
   workArea   WorkAreas @relation(fields: [workAreaId], references: [id])
   tasks      Tasks[]
 }
@@ -71,8 +71,8 @@ model IndexTasks {
 model Tasks {
   id          Int        @id @default(autoincrement())
   name        String
-  indexTaskId Int        @map("index_task_id")
-  intexTask   IndexTasks @relation(fields: [indexTaskId], references: [id])
+  indexTaskId Int
+  indexTask   IndexTasks @relation(fields: [indexTaskId], references: [id])
   subTasks    SubTasks[]
 }
 
@@ -82,7 +82,7 @@ model SubTasks {
   name        String
   percentage  Int           @default(0)
   description String?
-  price       Float
+  price       Decimal       @db.Money
   hours       Int
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt

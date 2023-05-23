@@ -34,31 +34,33 @@ class TasksServices {
     return findTask;
   }
 
-  // static async create({
-  //   name,
-  //   projectId,
-  //   employees,
-  // }: Tasks & { projectId: Projects['id'] } & {
-  //   employees: { userId: Users['id'] }[];
-  // }) {
-  //   const newTask = prisma.tasks.create({
-  //     data: {
-  //       name,
-  //       project: {
-  //         connect: {
-  //           id: projectId,
-  //         },
-  //       },
-  //       employees: {
-  //         create: employees,
-  //       },
-  //     },
-  //     include: {
-  //       employees: true,
-  //     },
-  //   });
-  //   return newTask;
-  // }
+  static async create({ name, indexTaskId }: Tasks) {
+    const newTask = prisma.tasks.create({
+      data: {
+        name,
+        indexTask: {
+          connect: {
+            id: indexTaskId,
+          },
+        },
+      },
+    });
+    return newTask;
+  }
+
+  static async update(id: Tasks['id'], { name, indexTaskId }: Tasks) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const updateTask = await prisma.tasks.update({
+      where: { id },
+      data: {
+        name,
+        indexTask: {
+          connect: { id: indexTaskId },
+        },
+      },
+    });
+    return updateTask;
+  }
 
   // static async assigned(id: Tasks['id'], userId: Users['id'], option: string) {
   //   if (option == 'decline') {
@@ -104,51 +106,6 @@ class TasksServices {
   //   }
   //   throw new AppError('Oops!,We need status for this query', 400);
   // }
-  // static async update(
-  //   id: Tasks['id'],
-  //   {
-  //     name,
-  //     employees,
-  //   }: Tasks & { project_id: Projects['id'] } & {
-  //     // employees: { userId: Users['id'] }[];
-  //     employees: { user: { profile: { userId: Users['id'] } } }[];
-  //   }
-  // ) {
-  //   const parseUsers = employees.map(user => ({
-  //     userId: user.user.profile.userId,
-  //   }));
-  //   if (!id) throw new AppError('Oops!,Invalid ID', 400);
-  //   const updateTask = await prisma.tasks.update({
-  //     where: { id },
-  //     data: {
-  //       name,
-  //       employees: {
-  //         deleteMany: { taskId: id },
-  //         create: parseUsers,
-  //       },
-  //     },
-  //     include: {
-  //       employees: {
-  //         select: {
-  //           taskId: true,
-  //           userId: true,
-  //           assignedAt: true,
-  //           user: {
-  //             select: {
-  //               profile: {
-  //                 select: {
-  //                   firstName: true,
-  //                   userId: true,
-  //                 },
-  //               },
-  //             },
-  //           },
-  //         },
-  //       },
-  //     },
-  //   });
-  //   return updateTask;
-  // }
 
   // static async updateStatus(id: Tasks['id'], { status }: Tasks) {
   //   const updateTaskStatus = await prisma.tasks.update({
@@ -164,12 +121,12 @@ class TasksServices {
   //   return updateTaskStatus;
   // }
 
-  // static async delete(id: Tasks['id']) {
-  //   if (!id) throw new AppError('Oops!,Invalid ID', 400);
-  //   const deleteTask = await prisma.tasks.delete({
-  //     where: { id },
-  //   });
-  //   return deleteTask;
-  // }
+  static async delete(id: Tasks['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const deleteTask = await prisma.tasks.delete({
+      where: { id },
+    });
+    return deleteTask;
+  }
 }
 export default TasksServices;
