@@ -23,7 +23,20 @@ const authenticateHandler = async (
       res.locals.userInfo = userInfo;
       return next();
     }
-    throw new AppError('secret word undefined', 404);
+    throw new AppError('You do not have a token, please insert one', 404);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifySecretEnv = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (SECRET) return next();
+    throw new AppError('Secret word undefined', 400);
   } catch (error) {
     next(error);
   }

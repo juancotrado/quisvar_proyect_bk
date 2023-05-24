@@ -29,11 +29,23 @@ export const downloadProfile = async (
     const dirPath = dirSplit.slice(0, dirSplit.length - 2).join('/');
     const folder = '/files';
     const newDirPath = dirPath + folder + '/Vector.rar';
-    // res.download('./files/Vector.svg', err => {
+    // res.download('./files/Vector.rar', err => {
     //   console.log(err);
     //   res.status(404).json(err);
     // });
     res.json({ message: newDirPath });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const uploadProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    console.log(req);
   } catch (error) {
     next(error);
   }

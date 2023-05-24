@@ -19,6 +19,7 @@ import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
 import morgan from 'morgan';
 import Sockets from './sockets';
+import { verifySecretEnv } from '../middlewares/auth.middleware';
 
 dotenv.config();
 class Server {
@@ -55,6 +56,7 @@ class Server {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(morgan('dev'));
+    this.app.use(verifySecretEnv);
   }
 
   conectionWebSockect() {
