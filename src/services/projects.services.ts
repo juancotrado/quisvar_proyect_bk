@@ -1,4 +1,10 @@
-import { Projects, Users, WorkAreas, prisma } from '../utils/prisma.server';
+import {
+  Projects,
+  Specialities,
+  Users,
+  WorkAreas,
+  prisma,
+} from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import { projectPick } from '../utils/format.server';
 
@@ -49,13 +55,23 @@ class ProjectsServices {
     untilDate,
     userId,
     startDate,
-  }: projectPick & { userId: Users['id'] }) {
+    typeSpeciality,
+    specialityId,
+  }: projectPick & { userId: Users['id'] } & {
+    specialityId: Specialities['id'];
+  }) {
     const newProject = await prisma.projects.create({
       data: {
         name,
         description,
         startDate,
         untilDate,
+        typeSpeciality,
+        speciality: {
+          connect: {
+            id: specialityId,
+          },
+        },
         moderator: {
           connect: {
             id: userId,
@@ -76,7 +92,11 @@ class ProjectsServices {
       untilDate,
       status,
       userId,
-    }: Projects & { userId: Users['id'] }
+      typeSpeciality,
+      specialityId,
+    }: Projects & { userId: Users['id'] } & {
+      specialityId: Specialities['id'];
+    }
   ) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const updateProject = await prisma.projects.update({
@@ -86,7 +106,13 @@ class ProjectsServices {
         description,
         startDate,
         untilDate,
+        typeSpeciality,
         status,
+        speciality: {
+          connect: {
+            id: specialityId,
+          },
+        },
         moderator: {
           connect: { id: userId },
         },

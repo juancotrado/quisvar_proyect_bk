@@ -46,7 +46,7 @@ class UsersServices {
         id,
       },
     });
-    if (!findTaskUser) throw new AppError('Could not found user ', 404);
+    if (!findTaskUser) throw new AppError('Could not found task ', 404);
     return findTaskUser;
   }
 

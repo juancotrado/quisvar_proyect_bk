@@ -17,19 +17,19 @@ export const showTask = async (
   }
 };
 
-// export const createTask = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { body } = req;
-//     const query = await TasksServices.create(body);
-//     res.status(201).json(query);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+export const createTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = req;
+    const query = await TasksServices.create(body);
+    res.status(201).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 
 // export const assignedTask = async (
 //   req: Request,
@@ -49,21 +49,21 @@ export const showTask = async (
 //   }
 // };
 
-// export const updateTask = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { body } = req;
-//     const { id } = req.params;
-//     const _task_id = parseInt(id);
-//     const query = await TasksServices.update(_task_id, body);
-//     res.status(200).json(query);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+export const updateTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = req;
+    const { id } = req.params;
+    const _task_id = parseInt(id);
+    const query = await TasksServices.update(_task_id, body);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 
 // export const updateTaskStatus = async (
 //   req: Request,
@@ -81,17 +81,17 @@ export const showTask = async (
 //   }
 // };
 
-// export const deleteTasks = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { id } = req.params;
-//     const _task_id = parseInt(id);
-//     const query = await TasksServices.delete(_task_id);
-//     res.status(204).json(query);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+export const deleteTasks = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _task_id = parseInt(id);
+    const query = await TasksServices.delete(_task_id);
+    res.status(204).json(query);
+  } catch (error) {
+    next(error);
+  }
+};

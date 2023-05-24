@@ -13,6 +13,7 @@ import {
   subTaskRouter,
   indexTasksRouter,
   profileRouter,
+  speacilitiesRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -30,8 +31,9 @@ class Server {
     auth: `/${process.env.ROUTE}/auth/login`,
     users: `/${process.env.ROUTE}/users`,
     profile: `/${process.env.ROUTE}/profile`,
-    workareas: `/${process.env.ROUTE}/workareas`,
+    specialities: `/${process.env.ROUTE}/specialities`,
     projects: `/${process.env.ROUTE}/projects`,
+    workareas: `/${process.env.ROUTE}/workareas`,
     indextasks: `/${process.env.ROUTE}/indextasks`,
     tasks: `/${process.env.ROUTE}/tasks`,
     subtasks: `/${process.env.ROUTE}/subtasks`,
@@ -63,6 +65,7 @@ class Server {
     this.app.use(this.path.users, userRouter);
     this.app.use(this.path.profile, profileRouter);
     this.app.use(this.path.projects, projectRouter);
+    this.app.use(this.path.specialities, speacilitiesRouter);
     this.app.use(this.path.workareas, workareasRouter);
     this.app.use(this.path.indextasks, indexTasksRouter);
     this.app.use(this.path.tasks, taskRouter);

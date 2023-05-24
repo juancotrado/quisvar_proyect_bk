@@ -5,6 +5,8 @@ import authServices from './auth.services';
 import ProjectsServices from './projects.services';
 import IndexTasksServices from './indextasks.services';
 import SubTasksServices from './subtasks.services';
+import ProfileServices from './profile.services';
+import SpecialitiesServices from './specialities.services';
 export {
   UsersServices,
   TasksServices,
@@ -13,4 +15,6 @@ export {
   WorkAreasServices,
   ProjectsServices,
   SubTasksServices,
+  ProfileServices,
+  SpecialitiesServices,
 };

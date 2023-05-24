@@ -8,17 +8,21 @@ import {
 } from './users.controllers';
 import { login } from './auth.controllers';
 import { showIndexTask } from './indextasks.controllers';
-// createTask,
 // updateTaskStatus,
-// deleteTasks,
 // assignedTask,
-// updateTask,
-import { showTask } from './tasks.controllers';
+import {
+  createTask,
+  deleteTasks,
+  updateTask,
+  showTask,
+} from './tasks.controllers';
 // showWorkareas,
-// deleteWorkarea,
-// createWorkArea,
-// updateWorkarea,
-import { showWorkArea } from './workareas.controllers';
+import {
+  deleteWorkarea,
+  createWorkArea,
+  updateWorkarea,
+  showWorkArea,
+} from './workareas.controllers';
 import {
   deleteProject,
   showProjects,
@@ -26,11 +30,24 @@ import {
   updateProject,
   showProject,
 } from './projects.controllers';
-// createSubTask,
-// deleteSubTasks,
-// updateSubTask,
-import { showSubTask } from './subtasks.controllers';
-import { showProfile } from './profile.controllers';
+import {
+  createSubTask,
+  deleteSubTasks,
+  updateSubTask,
+  showSubTask,
+} from './subtasks.controllers';
+import {
+  showProfile,
+  downloadProfile,
+  updateProfile,
+} from './profile.controllers';
+import {
+  showSpecialities,
+  createSpeciality,
+  deleteSpeciality,
+  showSpeciality,
+  updateSpeciality,
+} from './speacialities.controllers';
 // User Controllers
 export {
   showUsers,
@@ -42,13 +59,22 @@ export {
 };
 //Auth Controllers
 export { login };
+//Specialities Controllers
+export {
+  showSpecialities,
+  createSpeciality,
+  deleteSpeciality,
+  showSpeciality,
+  updateSpeciality,
+};
+
 //WorkAreas Controllers
 export {
   showWorkArea,
   // showWorkareas,
-  // deleteWorkarea,
-  // createWorkArea,
-  // updateWorkarea,
+  deleteWorkarea,
+  createWorkArea,
+  updateWorkarea,
 };
 // //Project Controllers
 export {
@@ -63,16 +89,13 @@ export { showIndexTask };
 //Task Controllers
 export {
   showTask,
-  // createTask,
+  createTask,
   // updateTaskStatus,
-  // deleteTasks,
   // assignedTask,
-  // updateTask,
+  deleteTasks,
+  updateTask,
 };
-
 //Subtask Controllers
-export {
-  showSubTask,
-  // createSubTask, deleteSubTasks, updateSubTask
-};
-export { showProfile };
+export { showSubTask, createSubTask, deleteSubTasks, updateSubTask };
+//Profile Controllers
+export { showProfile, downloadProfile, updateProfile };
