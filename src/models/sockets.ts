@@ -12,12 +12,12 @@ class Sockets {
   socketEvents() {
     this.io.on('connection', socket => {
       console.log('Connect user with id ==>', socket.id);
-      socket.on('data', tasks => {
-        socket.broadcast.emit('data', tasks);
-      });
-      this.io.engine.use((req: Request, res: Response, next: NextFunction) => {
-        console.log('awa');
-      });
+      // socket.on('data', tasks => {
+      //   socket.broadcast.emit('data', tasks);
+      // });
+      // this.io.engine.use((req: Request, res: Response, next: NextFunction) => {
+      //   console.log('awa');
+      // });
       // socket.on('update-status', async data => {
       //   const statusAsiged = {
       //     PROCESS: 'apply',
