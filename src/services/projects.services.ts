@@ -57,9 +57,7 @@ class ProjectsServices {
     startDate,
     typeSpeciality,
     specialityId,
-  }: projectPick & { userId: Users['id'] } & {
-    specialityId: Specialities['id'];
-  }) {
+  }: Required<projectPick>) {
     const newProject = await prisma.projects.create({
       data: {
         name,
@@ -79,7 +77,6 @@ class ProjectsServices {
         },
       },
     });
-
     return newProject;
   }
 

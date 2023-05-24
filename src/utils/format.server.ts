@@ -1,4 +1,10 @@
-import { Profiles, Projects, UserRole, Users } from '@prisma/client';
+import {
+  Profiles,
+  Projects,
+  Specialities,
+  UserRole,
+  Users,
+} from '@prisma/client';
 
 export type userProfilePick = Pick<
   Users & Profiles,
@@ -8,7 +14,9 @@ export type userProfilePick = Pick<
 export type projectPick = Pick<
   Projects,
   'name' | 'description' | 'untilDate' | 'startDate' | 'typeSpeciality'
->;
+> & { userId: Users['id'] } & {
+  specialityId: Specialities['id'];
+};
 
 export interface userHash {
   password: string;

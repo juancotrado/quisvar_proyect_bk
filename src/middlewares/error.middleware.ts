@@ -10,14 +10,24 @@ const globalErrorHandler = (
 ) => {
   err.statusCode = err.statusCode || 500;
   err.message = err.message || 'fail';
-
+  const typingError =
+    err.message.length > 500
+      ? 'typing error in variables, enter the necessary fields'
+      : err.message;
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    if (err.code === 'P2002')
+      return res.status(err.statusCode).json({
+        status: err.statusCode,
+        message: `Error with column ${err.meta?.target}`,
+        error: err,
+      });
     return res.status(400).json(err);
   }
+
   res.status(err.statusCode).json({
     status: err.status,
     error: err,
-    message: err.message,
+    message: typingError,
   });
 };
 
