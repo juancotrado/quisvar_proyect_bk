@@ -36,18 +36,27 @@ model Profiles {
   user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Specialities {
+  id       Int        @id @default(autoincrement())
+  name     String
+  projects Projects[]
+}
+
 model Projects {
-  id          Int         @id @default(autoincrement())
-  name        String
-  description String?
-  startDate   DateTime    @default(now())
-  untilDate   DateTime
-  status      Boolean     @default(false)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  userId      Int
-  moderator   Users       @relation(fields: [userId], references: [id])
-  areas       WorkAreas[]
+  id             Int          @id @default(autoincrement())
+  name           String
+  typeSpeciality String
+  description    String?
+  startDate      DateTime     @default(now())
+  untilDate      DateTime
+  status         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  userId         Int
+  moderator      Users        @relation(fields: [userId], references: [id])
+  areas          WorkAreas[]
+  speciality     Specialities @relation(fields: [specialityId], references: [id])
+  specialityId   Int
 }
 
 model WorkAreas {

@@ -7,7 +7,7 @@ export type userProfilePick = Pick<
 
 export type projectPick = Pick<
   Projects,
-  'name' | 'description' | 'untilDate' | 'startDate'
+  'name' | 'description' | 'untilDate' | 'startDate' | 'typeSpeciality'
 >;
 
 export interface userHash {
