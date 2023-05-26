@@ -123,10 +123,9 @@ class SubTasksServices {
       data: {
         status,
       },
-      // select: {
-      //   id: true,
-      //   status: true,
-      // },
+      include: {
+        _count: true,
+      },
     });
     return updateTaskStatus;
   }
