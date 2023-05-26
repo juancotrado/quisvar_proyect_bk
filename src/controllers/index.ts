@@ -36,6 +36,7 @@ import {
   updateSubTask,
   showSubTask,
   assignedSubTask,
+  updateStatusSubTask,
 } from './subtasks.controllers';
 import {
   showProfile,
@@ -103,6 +104,7 @@ export {
   deleteSubTasks,
   updateSubTask,
   assignedSubTask,
+  updateStatusSubTask,
 };
 //Profile Controllers
 export { showProfile, downloadProfile, updateProfile };

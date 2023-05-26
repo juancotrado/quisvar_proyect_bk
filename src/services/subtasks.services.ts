@@ -117,6 +117,20 @@ class SubTasksServices {
     return updateTask;
   }
 
+  static async updateStatus(id: Tasks['id'], { status }: SubTasks) {
+    const updateTaskStatus = await prisma.subTasks.update({
+      where: { id },
+      data: {
+        status,
+      },
+      // select: {
+      //   id: true,
+      //   status: true,
+      // },
+    });
+    return updateTaskStatus;
+  }
+
   static async delete(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const deleteTask = await prisma.subTasks.delete({

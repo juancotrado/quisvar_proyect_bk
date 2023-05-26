@@ -65,6 +65,22 @@ export const assignedSubTask = async (
   }
 };
 
+export const updateStatusSubTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const { body } = req;
+    const _task_id = parseInt(id);
+    const query = await SubTasksServices.updateStatus(_task_id, body);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteSubTasks = async (
   req: Request,
   res: Response,
