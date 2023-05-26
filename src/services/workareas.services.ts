@@ -47,13 +47,7 @@ class WorkAreasServices {
               select: {
                 id: true,
                 name: true,
-                subTasks: {
-                  orderBy: { name: 'asc' },
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
+                subTasks: true,
               },
             },
           },
