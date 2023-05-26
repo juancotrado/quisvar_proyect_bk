@@ -2,9 +2,9 @@ import { Router } from 'express';
 import {
   showWorkArea,
   // showWorkareas,
-  // deleteWorkarea,
-  // updateWorkarea,
-  // createWorkArea,
+  deleteWorkarea,
+  updateWorkarea,
+  createWorkArea,
 } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 import { _mod_role, _employee_role } from '../middlewares/role.middleware';
@@ -17,7 +17,7 @@ router.use(_employee_role);
 router.get('/:id', showWorkArea);
 //MOD ROLE
 router.use(_mod_role);
-// router.post('/', createWorkArea);
-// router.put('/:id', updateWorkarea);
-// router.delete('/:id', deleteWorkarea);
+router.post('/', createWorkArea);
+router.put('/:id', updateWorkarea);
+router.delete('/:id', deleteWorkarea);
 export default router;

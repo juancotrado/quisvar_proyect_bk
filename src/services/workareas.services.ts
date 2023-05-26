@@ -59,18 +59,14 @@ class WorkAreasServices {
 
   static async create({
     name,
-    user_id,
-    project_id,
-  }: WorkAreas & { user_id: Users['id']; project_id: Projects['id'] }) {
+    projectId,
+  }: WorkAreas & { projectId: Projects['id'] }) {
     const createWorkArea = await prisma.workAreas.create({
       data: {
         name,
-        user: {
-          connect: { id: user_id },
-        },
         project: {
           connect: {
-            id: project_id,
+            id: projectId,
           },
         },
       },
@@ -80,7 +76,7 @@ class WorkAreasServices {
 
   static async update(
     id: WorkAreas['id'],
-    { name, projectId, userId }: WorkAreas
+    { name, projectId, userId }: WorkAreas & { userId: Users['id'] }
   ) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const updateWorkArea = await prisma.workAreas.update({

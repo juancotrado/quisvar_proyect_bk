@@ -62,10 +62,10 @@ model Projects {
 model WorkAreas {
   id         Int          @id @default(autoincrement())
   name       String
-  userId     Int
+  userId     Int?
   projectId  Int
   indexTasks IndexTasks[]
-  user       Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       Users?       @relation(fields: [userId], references: [id], onDelete: Cascade)
   project    Projects     @relation(fields: [projectId], references: [id])
 }
 
