@@ -6,6 +6,13 @@ class SpecialitiesServices {
     try {
       const getSpecialities = await prisma.specialities.findMany({
         orderBy: { name: 'asc' },
+        include: {
+          _count: {
+            select: {
+              projects: true,
+            },
+          },
+        },
       });
       if (getSpecialities.length == 0)
         throw new AppError('Could not found work areas', 404);
@@ -19,7 +26,32 @@ class SpecialitiesServices {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const findSpeciality = await prisma.specialities.findUnique({
       where: { id },
-      include: { projects: true },
+      include: {
+        projects: {
+          orderBy: { name: 'asc' },
+          include: {
+            areas: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            moderator: {
+              select: {
+                id: true,
+                profile: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    dni: true,
+                    phone: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
     if (!findSpeciality)
       throw new AppError('Could not found logs specialities', 404);
