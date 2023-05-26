@@ -54,6 +54,51 @@ class SubTasksServices {
     return newTask;
   }
 
+  static async assigned(
+    id: SubTasks['id'],
+    userId: Users['id'],
+    option: 'decline' | 'apply' | 'done'
+  ) {
+    if (option == 'decline') {
+      return await prisma.subTasks.update({
+        where: { id },
+        data: {
+          status: 'UNRESOLVED',
+          users: {
+            delete: {
+              subtaskId_userId: {
+                subtaskId: id,
+                userId,
+              },
+            },
+          },
+        },
+      });
+    }
+    if (option == 'apply') {
+      return await prisma.subTasks.update({
+        where: { id },
+        data: {
+          status: 'PROCESS',
+          users: {
+            create: {
+              userId,
+            },
+          },
+        },
+      });
+    }
+    if (option == 'done') {
+      return prisma.subTasks.update({
+        where: { id },
+        data: {
+          status: 'DONE',
+        },
+      });
+    }
+    throw new AppError('Oops!,We need status for this query', 400);
+  }
+
   static async update(
     id: SubTasks['id'],
     { name, hours, price, description, percentage }: SubTasks

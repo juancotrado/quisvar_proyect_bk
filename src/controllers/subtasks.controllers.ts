@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { SubTasksServices } from '../services';
+import { UserType } from '../middlewares/auth.middleware';
 
 export const showSubTask = async (
   req: Request,
@@ -41,6 +42,24 @@ export const updateSubTask = async (
     const _subtask_id = parseInt(id);
     const query = await SubTasksServices.update(_subtask_id, body);
     res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const assignedSubTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const userInfo: UserType = res.locals.userInfo;
+    const userId = userInfo.id;
+    const _task_id = parseInt(id);
+    const status = req.query.status as 'decline' | 'apply' | 'done';
+    const query = await SubTasksServices.assigned(_task_id, userId, status);
+    return res.status(200).json(query);
   } catch (error) {
     next(error);
   }

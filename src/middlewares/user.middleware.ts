@@ -8,12 +8,12 @@ const taskVerify = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const userInfo: UserType = res.locals.userInfo;
     const userId = userInfo.id;
-    const _task_id = parseInt(id);
+    const _sub_task_id = parseInt(id);
     const verifyTask = await prisma.taskOnUsers.findUnique({
       where: {
-        taskId_userId: {
-          taskId: _task_id,
+        subtaskId_userId: {
           userId,
+          subtaskId: _sub_task_id,
         },
       },
     });
