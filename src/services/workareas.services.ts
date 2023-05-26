@@ -47,7 +47,6 @@ class WorkAreasServices {
               select: {
                 id: true,
                 name: true,
-                subTasks: true,
               },
             },
           },
