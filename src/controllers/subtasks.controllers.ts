@@ -73,8 +73,9 @@ export const updateStatusSubTask = async (
   try {
     const { id } = req.params;
     const { body } = req;
+    const userInfo: UserType = res.locals.userInfo;
     const _task_id = parseInt(id);
-    const query = await SubTasksServices.updateStatus(_task_id, body);
+    const query = await SubTasksServices.updateStatus(_task_id, body, userInfo);
     res.status(200).json(query);
   } catch (error) {
     next(error);

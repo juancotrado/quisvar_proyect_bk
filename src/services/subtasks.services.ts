@@ -138,16 +138,66 @@ class SubTasksServices {
     return updateTask;
   }
 
-  static async updateStatus(id: Tasks['id'], { status }: SubTasks) {
+  static async updateStatus(
+    id: Tasks['id'],
+    { status }: SubTasks,
+    user: Users
+  ) {
     const updateTaskStatus = await prisma.subTasks.update({
       where: { id },
       data: {
         status,
       },
       include: {
+        users: {
+          select: {
+            user: { select: { id: true, profile: true } },
+          },
+        },
         _count: true,
       },
     });
+    if (status === 'PROCESS') {
+      return await prisma.subTasks.update({
+        where: { id },
+        data: {
+          users: {
+            create: {
+              userId: user.id,
+            },
+          },
+        },
+        include: {
+          users: {
+            select: {
+              user: { select: { id: true, profile: true } },
+            },
+          },
+        },
+      });
+    }
+    if (status === 'UNRESOLVED') {
+      return await prisma.subTasks.update({
+        where: { id },
+        data: {
+          users: {
+            delete: {
+              subtaskId_userId: {
+                subtaskId: id,
+                userId: user.id,
+              },
+            },
+          },
+        },
+        include: {
+          users: {
+            select: {
+              user: { select: { id: true, profile: true } },
+            },
+          },
+        },
+      });
+    }
     return updateTaskStatus;
   }
 
