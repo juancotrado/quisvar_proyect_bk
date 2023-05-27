@@ -12,6 +12,10 @@ class Sockets {
   socketEvents() {
     this.io.on('connection', socket => {
       console.log('Connect user with id ==>', socket.id);
+      socket.on('update-subTask', subTask => console.log(subTask));
+      socket.on('client:update-status-subTask', subTask => {
+        this.io.emit('server:update-status-subTask', subTask);
+      });
       // socket.on('data', tasks => {
       //   socket.broadcast.emit('data', tasks);
       // });
