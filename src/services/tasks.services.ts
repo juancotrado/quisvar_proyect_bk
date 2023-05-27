@@ -1,5 +1,6 @@
 import {
   Projects,
+  SubTasks,
   Tasks,
   Users,
   WorkAreas,
@@ -8,7 +9,7 @@ import {
 import AppError from '../utils/appError';
 
 class TasksServices {
-  static async find(id: Tasks['id']) {
+  static async find(id: Tasks['id'], status?: SubTasks['status']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const findTask = await prisma.tasks.findUnique({
       where: { id },
@@ -16,6 +17,9 @@ class TasksServices {
         id: true,
         name: true,
         subTasks: {
+          where: {
+            status,
+          },
           include: {
             users: {
               select: {

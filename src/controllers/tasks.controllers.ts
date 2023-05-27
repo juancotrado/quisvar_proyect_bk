@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { TasksServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
+import { SubTasks } from '@prisma/client';
 
 export const showTask = async (
   req: Request,
@@ -9,8 +10,9 @@ export const showTask = async (
 ) => {
   try {
     const { id } = req.params;
+    const status = req.query.status as SubTasks['status'];
     const _task_id = parseInt(id);
-    const query = await TasksServices.find(_task_id);
+    const query = await TasksServices.find(_task_id, status);
     res.status(200).json(query);
   } catch (error) {
     next(error);

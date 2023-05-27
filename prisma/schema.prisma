@@ -119,5 +119,7 @@ enum UserRole {
 enum TaskRole {
   UNRESOLVED
   PROCESS
+  INREVIEW
+  DENIED
   DONE
 }
