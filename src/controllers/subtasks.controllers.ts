@@ -57,7 +57,7 @@ export const assignedSubTask = async (
     const userInfo: UserType = res.locals.userInfo;
     const userId = userInfo.id;
     const _task_id = parseInt(id);
-    const status = req.query.status as 'decline' | 'apply' | 'done';
+    const status = req.query.status as 'decline' | 'apply' | 'review';
     const query = await SubTasksServices.assigned(_task_id, userId, status);
     return res.status(200).json(query);
   } catch (error) {

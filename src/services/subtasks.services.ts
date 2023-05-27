@@ -57,7 +57,7 @@ class SubTasksServices {
   static async assigned(
     id: SubTasks['id'],
     userId: Users['id'],
-    option: 'decline' | 'apply' | 'done'
+    option: 'decline' | 'apply' | 'review'
   ) {
     if (option == 'decline') {
       return await prisma.subTasks.update({
@@ -70,6 +70,13 @@ class SubTasksServices {
                 subtaskId: id,
                 userId,
               },
+            },
+          },
+        },
+        include: {
+          users: {
+            select: {
+              user: { select: { id: true, profile: true } },
             },
           },
         },
@@ -86,13 +93,27 @@ class SubTasksServices {
             },
           },
         },
+        include: {
+          users: {
+            select: {
+              user: { select: { id: true, profile: true } },
+            },
+          },
+        },
       });
     }
-    if (option == 'done') {
+    if (option == 'review') {
       return prisma.subTasks.update({
         where: { id },
         data: {
-          status: 'DONE',
+          status: 'INREVIEW',
+        },
+        include: {
+          users: {
+            select: {
+              user: { select: { id: true, profile: true } },
+            },
+          },
         },
       });
     }
