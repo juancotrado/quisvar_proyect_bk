@@ -5,6 +5,7 @@ import {
   deleteWorkarea,
   updateWorkarea,
   createWorkArea,
+  showReviewList,
 } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 import { _mod_role, _employee_role } from '../middlewares/role.middleware';
@@ -17,6 +18,7 @@ router.use(_employee_role);
 router.get('/:id', showWorkArea);
 //MOD ROLE
 router.use(_mod_role);
+router.get('/:id/review', showReviewList);
 router.post('/', createWorkArea);
 router.put('/:id', updateWorkarea);
 router.delete('/:id', deleteWorkarea);

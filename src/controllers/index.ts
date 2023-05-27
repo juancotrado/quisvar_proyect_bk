@@ -22,6 +22,7 @@ import {
   createWorkArea,
   updateWorkarea,
   showWorkArea,
+  showReviewList,
 } from './workareas.controllers';
 import {
   deleteProject,
@@ -77,8 +78,9 @@ export {
   deleteWorkarea,
   createWorkArea,
   updateWorkarea,
+  showReviewList,
 };
-// //Project Controllers
+//Project Controllers
 export {
   showProjects,
   showProject,

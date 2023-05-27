@@ -26,14 +26,15 @@ export const downloadProfile = async (
 ) => {
   try {
     const dirSplit = __dirname.split('\\');
+    console.log(__dirname);
     const dirPath = dirSplit.slice(0, dirSplit.length - 2).join('/');
     const folder = '/files';
     const newDirPath = dirPath + folder + '/Vector.rar';
-    // res.download('./files/Vector.rar', err => {
-    //   console.log(err);
-    //   res.status(404).json(err);
-    // });
-    res.json({ message: newDirPath });
+    res.download('./files/Vector.rar', err => {
+      console.log(err);
+      res.status(404).json(err);
+    });
+    // res.json({ message: newDirPath });
   } catch (error) {
     next(error);
   }

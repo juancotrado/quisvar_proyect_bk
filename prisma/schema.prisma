@@ -86,19 +86,20 @@ model Tasks {
 }
 
 model SubTasks {
-  id          Int           @id @default(autoincrement())
-  status      TaskRole      @default(UNRESOLVED)
-  name        String
-  percentage  Int           @default(0)
-  description String?
-  price       Decimal       @db.Money
-  hours       Int
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  taskId      Int
-  task        Tasks         @relation(fields: [taskId], references: [id])
-  users       TaskOnUsers[]
-}
+  id           Int           @id @default(autoincrement())
+  status       TaskRole      @default(UNRESOLVED)
+  name         String
+  percentage   Int           @default(0)
+  description  String?
+  price        Decimal       @db.Money
+  hours        Int
+  feedback     String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  taskId       Int
+  task         Tasks         @relation(fields: [taskId], references: [id])
+  users        TaskOnUsers[]
+} 
 
 model TaskOnUsers {
   subtaskId  Int

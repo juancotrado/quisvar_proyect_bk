@@ -29,6 +29,21 @@ export const showWorkArea = async (
   }
 };
 
+export const showReviewList = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _user_id = parseInt(id);
+    const query = await WorkAreasServices.getReviewfromUser(_user_id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createWorkArea = async (
   req: Request,
   res: Response,

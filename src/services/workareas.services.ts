@@ -31,6 +31,62 @@ class WorkAreasServices {
     }
   }
 
+  static async getReviewfromUser(userId: Users['id']) {
+    const getTask = await prisma.subTasks.findMany({
+      where: {
+        status: 'INREVIEW',
+        task: {
+          indexTask: {
+            workArea: {
+              userId,
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        task: {
+          select: {
+            name: true,
+            indexTask: {
+              select: {
+                name: true,
+                workArea: {
+                  select: {
+                    name: true,
+                    project: {
+                      select: {
+                        name: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        users: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                role: true,
+                profile: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return getTask;
+  }
+
   static async find(id: WorkAreas['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const findWorkArea = await prisma.workAreas.findUnique({
