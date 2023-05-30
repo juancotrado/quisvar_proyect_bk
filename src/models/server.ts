@@ -53,6 +53,7 @@ class Server {
     this.routes();
   }
   middlewares() {
+    this.app.use('/static', express.static('uploads'));
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(morgan('dev'));

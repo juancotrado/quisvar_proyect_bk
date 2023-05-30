@@ -16,11 +16,14 @@ class Sockets {
         socket.join(room);
       });
 
-      socket.on('update-subTask', subTask => console.log(subTask));
-      socket.on('client:update-status-subTask', subTask => {
+      socket.on('client:update-subTask', subTask => {
+        this.io.to(subTask.taskId).emit('server:update-subTask', subTask);
+      });
+      socket.on('client:upload-file-subTask', subTask => {
         this.io
           .to(subTask.taskId)
-          .emit('server:update-status-subTask', subTask);
+          .emit('server:client:upload-file-subTask', subTask);
+        this.io.to(subTask.taskId).emit('server:update-subTask', subTask);
       });
 
       // socket.on('data', tasks => {

@@ -16,13 +16,17 @@ import {
 } from '../middlewares/role.middleware';
 import taskVerify from '../middlewares/user.middleware';
 import { statusVerify } from '../middlewares/subtask.middleware';
+import { upload } from '../middlewares/upload.middleware';
+import { uploadFileSubTask } from '../controllers/subtasks.controllers';
 
 const router = Router();
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);
 router.get('/:id', showSubTask);
+
 router.patch('/:id', taskVerify, assignedSubTask);
+router.post('/upload/:id', upload.single('myFiles'), uploadFileSubTask);
 router.patch('/status/:id', statusVerify, updateStatusSubTask);
 //MOD ROLE
 router.use(_mod_role);

@@ -7,11 +7,12 @@ const FILE_TYPES = ['.rar', '.zip'];
 
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, 'uploads');
+    callback(null, './uploads');
   },
   filename: (req, file, callback) => {
     const uniqueSuffix = Date.now();
-    callback(null, file.fieldname + '-' + uniqueSuffix + file.originalname);
+    const { id } = req.params;
+    callback(null, id + '-' + uniqueSuffix + '$' + file.originalname);
   },
 });
 
@@ -28,7 +29,7 @@ const checkFileType = (
 export const upload = multer({
   storage: storage,
   limits: { fileSize: MAX_SIZE },
-  fileFilter: checkFileType,
+  // fileFilter: checkFileType,
 });
 
 export const uploadFile = (req: Request, res: Response, next: NextFunction) => {

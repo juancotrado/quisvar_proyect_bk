@@ -96,3 +96,20 @@ export const deleteSubTasks = async (
     next(error);
   }
 };
+export const uploadFileSubTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.file) return;
+    const { filename } = req.file;
+
+    const query = await SubTasksServices.upload(filename, +id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};

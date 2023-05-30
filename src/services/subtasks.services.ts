@@ -208,5 +208,17 @@ class SubTasksServices {
     });
     return deleteTask;
   }
+  static async upload(fileName: string, id: SubTasks['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const uploadFile = await prisma.subTasks.update({
+      where: { id },
+      data: {
+        files: {
+          push: fileName,
+        },
+      },
+    });
+    return uploadFile;
+  }
 }
 export default SubTasksServices;
