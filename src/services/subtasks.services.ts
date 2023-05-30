@@ -6,6 +6,7 @@ import {
   prisma,
 } from '../utils/prisma.server';
 import AppError from '../utils/appError';
+import fs from 'fs';
 
 class SubTasksServices {
   static async find(id: SubTasks['id']) {
@@ -215,6 +216,49 @@ class SubTasksServices {
       data: {
         files: {
           push: fileName,
+        },
+      },
+      include: {
+        users: {
+          select: {
+            user: {
+              select: {
+                profile: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return uploadFile;
+  }
+  static async deleteFile(fileName: string, id: SubTasks['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+
+    const subTasks = await prisma.subTasks.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!subTasks) throw new AppError('Subtarea no encotrada', 400);
+    fs.unlinkSync(`./uploads/${fileName}`);
+    const uploadFile = await prisma.subTasks.update({
+      where: { id },
+      data: {
+        files: {
+          set: subTasks?.files.filter(name => name !== fileName),
+        },
+      },
+      include: {
+        users: {
+          select: {
+            user: {
+              select: {
+                profile: true,
+              },
+            },
+          },
         },
       },
     });

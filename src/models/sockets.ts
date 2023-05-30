@@ -20,9 +20,7 @@ class Sockets {
         this.io.to(subTask.taskId).emit('server:update-subTask', subTask);
       });
       socket.on('client:upload-file-subTask', subTask => {
-        this.io
-          .to(subTask.taskId)
-          .emit('server:client:upload-file-subTask', subTask);
+        this.io.to(subTask.taskId).emit('server:upload-file-subTask', subTask);
         this.io.to(subTask.taskId).emit('server:update-subTask', subTask);
       });
 

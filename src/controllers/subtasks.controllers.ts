@@ -113,3 +113,17 @@ export const uploadFileSubTask = async (
     next(error);
   }
 };
+export const deleteFileSubTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const { filename } = req.params;
+    const query = await SubTasksServices.deleteFile(filename, +id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
