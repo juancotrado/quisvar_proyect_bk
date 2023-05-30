@@ -5,6 +5,7 @@ import {
   updateUser,
   showUser,
   showTaskByUser,
+  showSubTasksByUser,
 } from './users.controllers';
 import { login } from './auth.controllers';
 import { showIndexTask } from './indextasks.controllers';
@@ -59,6 +60,7 @@ export {
   updateUser,
   showUser,
   showTaskByUser,
+  showSubTasksByUser,
 };
 //Auth Controllers
 export { login };

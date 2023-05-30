@@ -93,6 +93,7 @@ model SubTasks {
   description  String?
   price        Decimal       @db.Money
   hours        Int
+  files        String[]
   feedback     String?
   feedbackDate DateTime?
   createdAt    DateTime      @default(now())

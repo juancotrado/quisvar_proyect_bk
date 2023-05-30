@@ -6,6 +6,7 @@ import {
   showUser,
   showUsers,
   updateUser,
+  showSubTasksByUser,
 } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 import {
@@ -21,6 +22,7 @@ router.use(authenticateHandler);
 router.use(_employee_role);
 router.get('/', showUsers);
 router.get('/:id/tasks', showTaskByUser);
+router.get('/:id/subTasks', showSubTasksByUser);
 //MOD ROLE
 router.use(_mod_role);
 router.get('/:id', showUser);

@@ -49,6 +49,19 @@ class UsersServices {
     if (!findTaskUser) throw new AppError('Could not found task ', 404);
     return findTaskUser;
   }
+  static async findListSubTask(id: Users['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const subTasks = await prisma.taskOnUsers.findMany({
+      where: {
+        userId: id,
+      },
+      include: {
+        subtask: true,
+      },
+    });
+    if (!subTasks) throw new AppError('Could not found task ', 404);
+    return subTasks.map(taskOnUser => taskOnUser.subtask);
+  }
 
   static async create({
     email,

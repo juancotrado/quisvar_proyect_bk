@@ -45,6 +45,20 @@ export const showTaskByUser = async (
     next(error);
   }
 };
+export const showSubTasksByUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _id = parseInt(id);
+    const query = await UsersServices.findListSubTask(_id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const createUser = async (
   req: Request,
