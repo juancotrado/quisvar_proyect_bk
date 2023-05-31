@@ -2,6 +2,7 @@ import { Response, Request, NextFunction } from 'express';
 import AppError from '../utils/appError';
 import { UserType } from './auth.middleware';
 import { prisma } from '../utils/prisma.server';
+import { error } from 'console';
 
 const taskVerify = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -26,4 +27,22 @@ const taskVerify = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+export const verifyStatusUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userInfo: UserType = res.locals.userInfo;
+    if (!userInfo.status) {
+      throw new AppError(
+        `Tu cuenta ha sido suspendida, hable con el admnistrador`,
+        400
+      );
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
 export default taskVerify;

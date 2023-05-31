@@ -23,6 +23,7 @@ model Users {
   area      WorkAreas[]
   project   Projects[]
   subTasks  TaskOnUsers[]
+  files     Files[]
 }
 
 model Profiles {
@@ -99,9 +100,9 @@ model SubTasks {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   taskId       Int
-  files        String[]
   task         Tasks         @relation(fields: [taskId], references: [id])
   users        TaskOnUsers[]
+  filesData    Files[]
 }
 
 model TaskOnUsers {
@@ -112,6 +113,16 @@ model TaskOnUsers {
   assignedAt DateTime @default(now())
 
   @@id([subtaskId, userId])
+}
+
+model Files {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  subtaskId  Int
+  user       Users     @relation(fields: [userId], references: [id], onUpdate: Cascade)
+  type       FileTypes
+  SubTasks   SubTasks  @relation(fields: [subTasksId], references: [id])
+  subTasksId Int
 }
 
 enum UserRole {
@@ -126,4 +137,12 @@ enum TaskRole {
   INREVIEW
   DENIED
   DONE
+}
+
+enum FileTypes {
+  MATERIAL
+  GUIDE
+  REVIEW
+  FEED
+  INSPECT
 }

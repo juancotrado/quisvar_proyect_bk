@@ -16,6 +16,7 @@ export class authServices {
         id: true,
         role: true,
         password: true,
+        status: true,
         email: true,
         profile: {
           select: {

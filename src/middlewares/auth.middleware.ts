@@ -15,7 +15,7 @@ const authenticateHandler = async (
   next: NextFunction
 ) => {
   const { authorization } = req.headers;
-  const token = authorization?.split(' ').at(1);
+  const token = authorization?.split(' ')[1];
   try {
     if (SECRET && token) {
       const decodedToken = jwt.verify(token, SECRET);
