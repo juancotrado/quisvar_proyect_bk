@@ -99,7 +99,6 @@ model SubTasks {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   taskId       Int
-  files        String[]
   task         Tasks         @relation(fields: [taskId], references: [id])
   users        TaskOnUsers[]
 }
