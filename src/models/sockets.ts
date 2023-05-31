@@ -19,10 +19,13 @@ class Sockets {
       socket.on('client:update-subTask', subTask => {
         this.io.to(subTask.taskId).emit('server:update-subTask', subTask);
       });
-      socket.on('client:upload-file-subTask', subTask => {
-        this.io.to(subTask.taskId).emit('server:upload-file-subTask', subTask);
-        this.io.to(subTask.taskId).emit('server:update-subTask', subTask);
+      socket.on('client:create-subTask', subTask => {
+        this.io.to(subTask.taskId).emit('server:create-subTask', subTask);
       });
+      // socket.on('client:upload-file-subTask', subTask => {
+      //   this.io.to(subTask.taskId).emit('server:upload-file-subTask', subTask);
+      //   this.io.to(subTask.taskId).emit('server:update-subTask', subTask);
+      // });
 
       // socket.on('data', tasks => {
       //   socket.broadcast.emit('data', tasks);

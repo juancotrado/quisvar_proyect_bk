@@ -51,6 +51,13 @@ class SubTasksServices {
           connect: { id: taskId },
         },
       },
+      include: {
+        users: {
+          select: {
+            user: { select: { id: true, profile: true } },
+          },
+        },
+      },
     });
     return newTask;
   }

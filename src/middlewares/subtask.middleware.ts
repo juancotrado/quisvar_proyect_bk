@@ -2,6 +2,7 @@ import { Response, Request, NextFunction } from 'express';
 import AppError from '../utils/appError';
 import { UserType } from './auth.middleware';
 import { SubTasks, Users, prisma } from '../utils/prisma.server';
+import { SubTasksServices } from '../services';
 
 const permStatus: SubTasks['status'][] = ['UNRESOLVED', 'PROCESS', 'INREVIEW'];
 const permRole: Users['role'][] = ['ADMIN', 'MOD'];
@@ -22,6 +23,20 @@ export const statusVerify = async (
         400
       );
     }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const validTaskById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { taskId } = req.body;
+    await SubTasksServices.find(taskId);
     next();
   } catch (error) {
     next(error);
