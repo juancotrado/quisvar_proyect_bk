@@ -94,6 +94,11 @@ class WorkAreasServices {
         id,
       },
       include: {
+        user: {
+          include: {
+            profile: true,
+          },
+        },
         indexTasks: {
           orderBy: { name: 'asc' },
           select: {
@@ -104,6 +109,7 @@ class WorkAreasServices {
               select: {
                 id: true,
                 name: true,
+                _count: { select: { subTasks: true } },
               },
             },
           },

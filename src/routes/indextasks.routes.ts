@@ -1,5 +1,10 @@
 import { Router } from 'express';
-import { showIndexTask } from '../controllers';
+import {
+  createIndexTask,
+  deleteIndexTasks,
+  showIndexTask,
+  updatIndexTask,
+} from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 
 import {
@@ -15,9 +20,9 @@ router.use(_employee_role);
 // router.patch('/status/:id', updateTaskStatus);
 router.get('/:id', showIndexTask);
 // router.patch('/:id', taskVerify, assignedTask);
-// router.put('/:id', updateTask);
 //MOD ROLE
+router.patch('/:id', updatIndexTask);
 router.use(_mod_role);
-// router.post('/', createTask);
-// router.delete('/:id', deleteTasks);
+router.post('/', createIndexTask);
+router.delete('/:id', deleteIndexTasks);
 export default router;
