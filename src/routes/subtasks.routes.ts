@@ -15,7 +15,11 @@ import {
   _mod_role,
 } from '../middlewares/role.middleware';
 import taskVerify from '../middlewares/user.middleware';
-import { statusVerify, validTaskById } from '../middlewares/subtask.middleware';
+import {
+  statusVerify,
+  validSubtaskByIdAndStatus,
+  validTaskById,
+} from '../middlewares/subtask.middleware';
 import { upload } from '../middlewares/upload.middleware';
 import {
   deleteFileSubTask,
@@ -36,6 +40,6 @@ router.patch('/status/:id', statusVerify, updateStatusSubTask);
 router.use(_mod_role);
 router.post('/', validTaskById, createSubTask);
 router.put('/:id', updateSubTask);
-router.delete('/:id', deleteSubTasks);
+router.delete('/:id', validSubtaskByIdAndStatus, deleteSubTasks);
 
 export default router;

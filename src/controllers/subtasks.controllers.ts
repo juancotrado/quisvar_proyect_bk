@@ -91,7 +91,7 @@ export const deleteSubTasks = async (
     const { id } = req.params;
     const _subtask_id = parseInt(id);
     const query = await SubTasksServices.delete(_subtask_id);
-    res.status(204).json(query);
+    res.status(200).json(query);
   } catch (error) {
     next(error);
   }

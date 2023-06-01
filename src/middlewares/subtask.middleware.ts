@@ -2,7 +2,7 @@ import { Response, Request, NextFunction } from 'express';
 import AppError from '../utils/appError';
 import { UserType } from './auth.middleware';
 import { SubTasks, Users, prisma } from '../utils/prisma.server';
-import { SubTasksServices } from '../services';
+import { SubTasksServices, TasksServices } from '../services';
 
 const permStatus: SubTasks['status'][] = ['UNRESOLVED', 'PROCESS', 'INREVIEW'];
 const permRole: Users['role'][] = ['ADMIN', 'MOD'];
@@ -36,7 +36,22 @@ export const validTaskById = async (
 ) => {
   try {
     const { taskId } = req.body;
-    await SubTasksServices.find(taskId);
+    await TasksServices.find(taskId);
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+export const validSubtaskByIdAndStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const { status } = await SubTasksServices.find(+id);
+    if (status !== 'UNRESOLVED')
+      throw new AppError('No puede eliminar esta subtarea', 400);
     next();
   } catch (error) {
     next(error);
