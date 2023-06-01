@@ -100,12 +100,12 @@ class WorkAreasServices {
           },
         },
         indexTasks: {
-          orderBy: { id: 'desc' },
+          orderBy: { id: 'asc' },
           select: {
             id: true,
             name: true,
             tasks: {
-              orderBy: { id: 'desc' },
+              orderBy: { id: 'asc' },
               select: {
                 id: true,
                 name: true,
