@@ -73,12 +73,15 @@ class SubTasksServices {
         data: {
           status: 'UNRESOLVED',
           users: {
-            delete: {
-              subtaskId_userId: {
-                subtaskId: id,
-                userId,
-              },
+            deleteMany: {
+              subtaskId: id,
             },
+            // delete:
+            //   subtaskId_userId: {
+            //     subtaskId: id,
+            //     userId,
+            //   },
+            // },
           },
         },
         include: {
@@ -243,34 +246,35 @@ class SubTasksServices {
     userData: { id: number; name: string }[],
     id: SubTasks['id']
   ) {
+    const newUserData = userData.map(user => ({ userId: user.id }));
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
-    const assignUserBySubtaskPromises = userData.map(async user => {
-      return await prisma.subTasks.update({
-        where: { id },
-        data: {
-          status: 'PROCESS',
-          users: {
-            create: {
-              userId: user.id,
-            },
-          },
+    // const assignUserBySubtaskPromises = userData.map(async user => {
+    return await prisma.subTasks.update({
+      where: { id },
+      data: {
+        status: 'PROCESS',
+        users: {
+          create: newUserData,
         },
-        include: {
-          users: {
-            select: {
-              user: {
-                select: {
-                  profile: true,
-                },
+      },
+      include: {
+        users: {
+          select: {
+            user: {
+              select: {
+                profile: true,
               },
             },
           },
         },
-      });
+      },
     });
-    await Promise.all(assignUserBySubtaskPromises);
-    return assignUserBySubtaskPromises[assignUserBySubtaskPromises.length - 1];
+    // }
+    // );
+    // await Promise.all(assignUserBySubtaskPromises);
+    // return assignUserBySubtaskPromises[assignUserBySubtaskPromises.length - 1];
   }
+
   static async deleteFile(fileName: string, id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
 

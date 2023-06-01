@@ -33,7 +33,8 @@ router.use(authenticateHandler);
 router.use(_employee_role);
 router.get('/:id', showSubTask);
 
-router.patch('/asigned/:id', taskVerify, assignedSubTask);
+// router.patch('/asigned/:id', taskVerify, assignedSubTask);
+router.patch('/asigned/:id', assignedSubTask);
 router.post('/upload/:id', upload.single('myFiles'), uploadFileSubTask);
 router.delete('/deleteFile/:id/:filename', deleteFileSubTask);
 router.patch('/status/:id', statusVerify, updateStatusSubTask);
