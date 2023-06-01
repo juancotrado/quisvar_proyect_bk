@@ -14,6 +14,7 @@ import {
   indexTasksRouter,
   profileRouter,
   speacilitiesRouter,
+  filesRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -28,7 +29,7 @@ class Server {
   private httpServer: http.Server;
   private PORT: string = process.env.PORT || '8080';
   private HOST: string = process.env.HOST || 'localhost';
-  private path: any = {
+  private path = {
     auth: `/${process.env.ROUTE}/auth/login`,
     users: `/${process.env.ROUTE}/users`,
     profile: `/${process.env.ROUTE}/profile`,
@@ -38,6 +39,7 @@ class Server {
     indextasks: `/${process.env.ROUTE}/indextasks`,
     tasks: `/${process.env.ROUTE}/tasks`,
     subtasks: `/${process.env.ROUTE}/subtasks`,
+    files: `/${process.env.ROUTE}/files`,
   };
 
   constructor() {
@@ -73,6 +75,7 @@ class Server {
     this.app.use(this.path.indextasks, indexTasksRouter);
     this.app.use(this.path.tasks, taskRouter);
     this.app.use(this.path.subtasks, subTaskRouter);
+    this.app.use(this.path.files, filesRouter);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)

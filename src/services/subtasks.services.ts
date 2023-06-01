@@ -239,6 +239,38 @@ class SubTasksServices {
     });
     return uploadFile;
   }
+  static async assignUserBySubtask(
+    userData: { id: number; name: string }[],
+    id: SubTasks['id']
+  ) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const assignUserBySubtaskPromises = userData.map(async user => {
+      return await prisma.subTasks.update({
+        where: { id },
+        data: {
+          status: 'PROCESS',
+          users: {
+            create: {
+              userId: user.id,
+            },
+          },
+        },
+        include: {
+          users: {
+            select: {
+              user: {
+                select: {
+                  profile: true,
+                },
+              },
+            },
+          },
+        },
+      });
+    });
+    await Promise.all(assignUserBySubtaskPromises);
+    return assignUserBySubtaskPromises[assignUserBySubtaskPromises.length - 1];
+  }
   static async deleteFile(fileName: string, id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
 

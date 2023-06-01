@@ -113,6 +113,25 @@ export const uploadFileSubTask = async (
     next(error);
   }
 };
+export const assignUserBySubtask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const { body } = req;
+    console.log(body, id);
+    // if (!req.file) return;
+    // const { filename } = req.file;
+
+    const query = await SubTasksServices.assignUserBySubtask(body, +id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteFileSubTask = async (
   req: Request,
   res: Response,

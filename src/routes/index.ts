@@ -7,6 +7,7 @@ import subTaskRouter from './subtasks.routes';
 import indexTasksRouter from './indextasks.routes';
 import profileRouter from './profile.routes';
 import speacilitiesRouter from './specialities.routes';
+import filesRouter from './files.route';
 export {
   userRouter,
   taskRouter,
@@ -17,4 +18,5 @@ export {
   indexTasksRouter,
   profileRouter,
   speacilitiesRouter,
+  filesRouter,
 };

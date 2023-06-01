@@ -22,6 +22,7 @@ import {
 } from '../middlewares/subtask.middleware';
 import { upload } from '../middlewares/upload.middleware';
 import {
+  assignUserBySubtask,
   deleteFileSubTask,
   uploadFileSubTask,
 } from '../controllers/subtasks.controllers';
@@ -36,10 +37,12 @@ router.patch('/asigned/:id', taskVerify, assignedSubTask);
 router.post('/upload/:id', upload.single('myFiles'), uploadFileSubTask);
 router.delete('/deleteFile/:id/:filename', deleteFileSubTask);
 router.patch('/status/:id', statusVerify, updateStatusSubTask);
+
 //MOD ROLE
 router.use(_mod_role);
 router.post('/', validTaskById, createSubTask);
 router.patch('/:id', updateSubTask);
+router.patch('/assignUser/:id', assignUserBySubtask);
 router.delete('/:id', validSubtaskByIdAndStatus, deleteSubTasks);
 
 export default router;
