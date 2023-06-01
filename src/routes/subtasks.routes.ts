@@ -32,14 +32,14 @@ router.use(authenticateHandler);
 router.use(_employee_role);
 router.get('/:id', showSubTask);
 
-router.patch('/:id', taskVerify, assignedSubTask);
+router.patch('/asigned/:id', taskVerify, assignedSubTask);
 router.post('/upload/:id', upload.single('myFiles'), uploadFileSubTask);
 router.delete('/deleteFile/:id/:filename', deleteFileSubTask);
 router.patch('/status/:id', statusVerify, updateStatusSubTask);
 //MOD ROLE
 router.use(_mod_role);
 router.post('/', validTaskById, createSubTask);
-router.put('/:id', updateSubTask);
+router.patch('/:id', updateSubTask);
 router.delete('/:id', validSubtaskByIdAndStatus, deleteSubTasks);
 
 export default router;
