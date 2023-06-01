@@ -1,10 +1,5 @@
 import { Router } from 'express';
-// createTask,
-// deleteTasks,
-// updateTaskStatus,
-// updateTask,
-// assignedTask,
-import { showTask } from '../controllers';
+import { createTask, deleteTasks, updateTask, showTask } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 
 import {
@@ -20,10 +15,10 @@ router.use(authenticateHandler);
 router.use(_employee_role);
 // router.patch('/status/:id', updateTaskStatus);
 router.get('/:id', showTask);
-// router.patch('/:id', taskVerify, assignedTask);
-// router.put('/:id', updateTask);
 //MOD ROLE
+// router.patch('/:id', taskVerify, assignedTask);
 router.use(_mod_role);
-// router.post('/', createTask);
-// router.delete('/:id', deleteTasks);
+router.post('/', createTask);
+router.patch('/:id', updateTask);
+router.delete('/:id', deleteTasks);
 export default router;

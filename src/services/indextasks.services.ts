@@ -34,17 +34,12 @@ class IndexTasksServices {
     });
     return newTask;
   }
-  static async update(id: IndexTasks['id'], { name, workAreaId }: IndexTasks) {
+  static async update(id: IndexTasks['id'], { name }: IndexTasks) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const updateTask = await prisma.indexTasks.update({
       where: { id },
       data: {
         name,
-        workArea: {
-          connect: {
-            id: workAreaId,
-          },
-        },
       },
     });
     return updateTask;

@@ -21,6 +21,13 @@ const globalErrorHandler = (
         message: `Error with column ${err.meta?.target}`,
         error: err,
       });
+    if (err.code === 'P2003') {
+      return res.status(err.statusCode).json({
+        status: err.statusCode,
+        message: `Foreing key error with columns ${err.meta?.field_name}`,
+        error: err,
+      });
+    }
     return res.status(400).json(err);
   }
 

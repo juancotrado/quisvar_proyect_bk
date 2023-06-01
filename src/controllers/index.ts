@@ -8,7 +8,12 @@ import {
   showSubTasksByUser,
 } from './users.controllers';
 import { login } from './auth.controllers';
-import { showIndexTask } from './indextasks.controllers';
+import {
+  createIndexTask,
+  deleteIndexTasks,
+  showIndexTask,
+  updatIndexTask,
+} from './indextasks.controllers';
 // updateTaskStatus,
 // assignedTask,
 import {
@@ -91,7 +96,7 @@ export {
   updateProject,
 };
 //IndexTask Controllers
-export { showIndexTask };
+export { showIndexTask, deleteIndexTasks, createIndexTask, updatIndexTask };
 //Task Controllers
 export {
   showTask,
