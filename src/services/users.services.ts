@@ -8,7 +8,7 @@ class UsersServices {
   static async getAll() {
     try {
       const users = await prisma.users.findMany({
-        orderBy: { profile: { firstName: 'asc' } },
+        orderBy: { profile: { updatedAt: 'asc' } },
         include: { profile: true },
       });
       if (users.length == 0) {
