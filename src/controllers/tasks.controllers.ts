@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { TasksServices } from '../services';
-import { UserType } from '../middlewares/auth.middleware';
 import { SubTasks } from '@prisma/client';
+import fs from 'fs';
 
 export const showTask = async (
   req: Request,
@@ -27,29 +27,15 @@ export const createTask = async (
   try {
     const { body } = req;
     const query = await TasksServices.create(body);
+    if (query) {
+      const newDir = query.dir + '/' + query.item + '.' + query.name;
+      fs.mkdirSync(newDir);
+    }
     res.status(201).json(query);
   } catch (error) {
     next(error);
   }
 };
-
-// export const assignedTask = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { id } = req.params;
-//     const userInfo: UserType = res.locals.userInfo;
-//     const userId = userInfo.id;
-//     const _task_id = parseInt(id);
-//     const status = req.query.status as string;
-//     const query = await TasksServices.assigned(_task_id, userId, status);
-//     return res.status(200).json(query);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
 
 export const updateTask = async (
   req: Request,
@@ -60,28 +46,18 @@ export const updateTask = async (
     const { body } = req;
     const { id } = req.params;
     const _task_id = parseInt(id);
+    const oldTask = await TasksServices.findShort(_task_id);
     const query = await TasksServices.update(_task_id, body);
+    if (query && oldTask) {
+      const oldDir = oldTask.dir + '/' + oldTask.item + '.' + oldTask.name;
+      const newDir = query.dir + '/' + query.item + '.' + query.name;
+      fs.renameSync(oldDir, newDir);
+    }
     res.status(200).json(query);
   } catch (error) {
     next(error);
   }
 };
-
-// export const updateTaskStatus = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { id } = req.params;
-//     const { body } = req;
-//     const _task_id = parseInt(id);
-//     const query = await TasksServices.updateStatus(_task_id, body);
-//     res.status(200).json(query);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
 
 export const deleteTasks = async (
   req: Request,
@@ -92,6 +68,10 @@ export const deleteTasks = async (
     const { id } = req.params;
     const _task_id = parseInt(id);
     const query = await TasksServices.delete(_task_id);
+    if (query) {
+      const path = query.dir + '/' + query.item + '.' + query.name;
+      fs.rmSync(path, { recursive: true });
+    }
     res.status(204).json(query);
   } catch (error) {
     next(error);

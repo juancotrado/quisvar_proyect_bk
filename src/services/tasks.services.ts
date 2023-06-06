@@ -1,13 +1,6 @@
-import {
-  Projects,
-  SubTasks,
-  Tasks,
-  Users,
-  WorkAreas,
-  prisma,
-} from '../utils/prisma.server';
+import { IndexTasks, SubTasks, Tasks, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-
+import fs from 'fs';
 class TasksServices {
   static async find(id: Tasks['id'], status?: SubTasks['status']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
@@ -38,10 +31,32 @@ class TasksServices {
     return findTask;
   }
 
+  static async findShort(id: Tasks['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const findTask = await prisma.tasks.findUnique({
+      where: { id },
+    });
+    if (!findTask) throw new AppError('Could not found task ', 404);
+    return findTask;
+  }
+
+  static async findIndexTask(id: IndexTasks['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const findArea = await prisma.indexTasks.findUnique({
+      where: { id },
+    });
+    if (!findArea) throw new AppError('Could not found area', 404);
+    return findArea;
+  }
+
   static async create({ name, indexTaskId }: Tasks) {
-    const newTask = prisma.tasks.create({
+    const getIndex = await prisma.tasks.count({ where: { indexTaskId } });
+    const _index_task = await this.findIndexTask(indexTaskId);
+    const newTask = await prisma.tasks.create({
       data: {
         name,
+        dir: `${_index_task.dir}/${_index_task.item}.${_index_task.name}`,
+        item: `${_index_task.item}.${getIndex + 1}`,
         indexTask: {
           connect: {
             id: indexTaskId,
@@ -63,70 +78,29 @@ class TasksServices {
     return updateTask;
   }
 
-  // static async assigned(id: Tasks['id'], userId: Users['id'], option: string) {
-  //   if (option == 'decline') {
-  //     console.log(id, userId, option);
-  //     const declineTask = prisma.tasks.update({
-  //       where: { id },
-  //       data: {
-  //         employees: {
-  //           delete: {
-  //             taskId_userId: {
-  //               taskId: id,
-  //               userId,
-  //             },
-  //           },
-  //         },
-  //         status: 'UNRESOLVED',
-  //       },
-  //     });
-  //     return declineTask;
-  //   }
-  //   if (option == 'apply') {
-  //     const applyTask = prisma.tasks.update({
-  //       where: { id },
-  //       data: {
-  //         employees: {
-  //           create: {
-  //             userId,
-  //           },
-  //         },
-  //         status: 'PROCESS',
-  //       },
-  //     });
-  //     return applyTask;
-  //   }
-  //   if (option == 'done') {
-  //     const doneTask = prisma.tasks.update({
-  //       where: { id },
-  //       data: {
-  //         status: 'DONE',
-  //       },
-  //     });
-  //     return doneTask;
-  //   }
-  //   throw new AppError('Oops!,We need status for this query', 400);
-  // }
-
-  // static async updateStatus(id: Tasks['id'], { status }: Tasks) {
-  //   const updateTaskStatus = await prisma.tasks.update({
-  //     where: { id },
-  //     data: {
-  //       status,
-  //     },
-  //     select: {
-  //       id: true,
-  //       status: true,
-  //     },
-  //   });
-  //   return updateTaskStatus;
-  // }
-
   static async delete(id: Tasks['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const { indexTaskId } = await this.findShort(id);
     const deleteTask = await prisma.tasks.delete({
       where: { id },
     });
+    if (deleteTask) {
+      const getTasks = await prisma.tasks.findMany({
+        where: { indexTaskId },
+        include: {
+          indexTask: { select: { item: true } },
+        },
+      });
+      getTasks.forEach(async (task, index) => {
+        const _task = await prisma.tasks.update({
+          where: { id: task.id },
+          data: { item: `${task.indexTask.item}.${index + 1}` },
+        });
+        const oldDir = task.dir + '/' + task.item + '.' + task.name;
+        const newDir = _task.dir + '/' + _task.item + '.' + _task.name;
+        fs.renameSync(oldDir, newDir);
+      });
+    }
     return deleteTask;
   }
 }
