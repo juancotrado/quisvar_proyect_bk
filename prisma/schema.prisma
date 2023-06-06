@@ -45,12 +45,13 @@ model Specialities {
 
 model Projects {
   id             Int          @id @default(autoincrement())
-  name           String
+  name           String       @unique()
   typeSpeciality String
   description    String?
   startDate      DateTime     @default(now())
   untilDate      DateTime
   status         Boolean      @default(false)
+  dir            String       @default("")
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   userId         Int
@@ -65,23 +66,30 @@ model WorkAreas {
   name       String
   userId     Int?
   projectId  Int
+  item       String       @default("")
+  dir        String       @default("")
   indexTasks IndexTasks[]
   user       Users?       @relation(fields: [userId], references: [id], onDelete: Cascade)
   project    Projects     @relation(fields: [projectId], references: [id])
 }
 
 model IndexTasks {
-  id         Int       @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   name       String
   workAreaId Int
-  workArea   WorkAreas @relation(fields: [workAreaId], references: [id])
+  workArea   WorkAreas  @relation(fields: [workAreaId], references: [id])
+  item       String     @default("")
+  dir        String     @default("")
   tasks      Tasks[]
+  subTasks   SubTasks[]
 }
 
 model Tasks {
   id          Int        @id @default(autoincrement())
   name        String
   indexTaskId Int
+  item        String     @default("")
+  dir         String     @default("")
   indexTask   IndexTasks @relation(fields: [indexTaskId], references: [id])
   subTasks    SubTasks[]
 }
@@ -99,10 +107,12 @@ model SubTasks {
   feedbackDate DateTime?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  taskId       Int
-  task         Tasks         @relation(fields: [taskId], references: [id])
   users        TaskOnUsers[]
   filesData    Files[]
+  taskId       Int?
+  indexTasksId Int?
+  task         Tasks?        @relation(fields: [taskId], references: [id])
+  indexTasks   IndexTasks?   @relation(fields: [indexTasksId], references: [id])
 }
 
 model TaskOnUsers {

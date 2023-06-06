@@ -7,7 +7,8 @@ import {
   prisma,
 } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-
+import ProjectsServices from './projects.services';
+import fs from 'fs';
 class WorkAreasServices {
   static async getAll() {
     try {
@@ -120,13 +121,16 @@ class WorkAreasServices {
     return findWorkArea;
   }
 
-  static async create({
-    name,
-    projectId,
-  }: WorkAreas & { projectId: Projects['id'] }) {
+  static async create(
+    { name, projectId }: WorkAreas & { projectId: Projects['id'] },
+    _dir: string
+  ) {
+    const getIndex = await prisma.workAreas.count({ where: { projectId } });
     const createWorkArea = await prisma.workAreas.create({
       data: {
         name,
+        dir: `${_dir}`,
+        item: `${getIndex + 1}`,
         project: {
           connect: {
             id: projectId,
@@ -139,18 +143,13 @@ class WorkAreasServices {
 
   static async update(
     id: WorkAreas['id'],
-    { name, projectId, userId }: WorkAreas & { userId: Users['id'] }
+    { name, userId }: WorkAreas & { userId: Users['id'] }
   ) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const updateWorkArea = await prisma.workAreas.update({
       where: { id },
       data: {
         name,
-        project: {
-          connect: {
-            id: projectId,
-          },
-        },
         user: {
           connect: {
             id: userId,
@@ -161,10 +160,24 @@ class WorkAreasServices {
     return updateWorkArea;
   }
 
-  static async delete(id: WorkAreas['id']) {
+  static async delete(id: WorkAreas['id'], projectId: number) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
+
     const deleteWorkArea = await prisma.workAreas.delete({
       where: { id },
+    });
+    const getProjects = await prisma.workAreas.findMany({
+      where: { projectId },
+    });
+    getProjects.forEach(async (project, index) => {
+      const _project = await prisma.workAreas.update({
+        where: { id: project.id },
+        data: { item: `${index + 1}` },
+      });
+      fs.renameSync(
+        `${project.dir}/${project.item}.${project.name}`,
+        `${_project.dir}/${_project.item}.${project.name}`
+      );
     });
     return deleteWorkArea;
   }

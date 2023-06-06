@@ -17,6 +17,7 @@ class Sockets {
       });
 
       socket.on('client:update-subTask', subTask => {
+        console.log(subTask);
         this.io.to(subTask.taskId).emit('server:update-subTask', subTask);
       });
       socket.on('client:create-subTask', subTask => {

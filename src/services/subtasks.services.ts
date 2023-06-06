@@ -283,7 +283,6 @@ class SubTasksServices {
         id,
       },
     });
-
     if (!subTasks) throw new AppError('Subtarea no encotrada', 400);
     fs.unlinkSync(`./uploads/${fileName}`);
     const uploadFile = await prisma.subTasks.update({

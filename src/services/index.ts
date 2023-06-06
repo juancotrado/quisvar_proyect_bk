@@ -18,3 +18,4 @@ export {
   ProfileServices,
   SpecialitiesServices,
 };
+export const _dirPath = './uploads';

@@ -7,6 +7,7 @@ import {
 } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import { projectPick } from '../utils/format.server';
+import { _dirPath } from '.';
 
 class ProjectsServices {
   static async getAll() {
@@ -24,6 +25,10 @@ class ProjectsServices {
 
   static async find(id: Projects['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const findProjects = await prisma.projects.count({
+      where: { specialityId: 4 },
+    });
+    console.log(findProjects + 1);
     const findProject = await prisma.projects.findUnique({
       where: {
         id,
@@ -64,6 +69,7 @@ class ProjectsServices {
         description,
         startDate,
         untilDate,
+        dir: `${_dirPath}/${name}`,
         typeSpeciality,
         speciality: {
           connect: {
@@ -105,6 +111,7 @@ class ProjectsServices {
         untilDate,
         typeSpeciality,
         status,
+        dir: `${_dirPath}/${name}`,
         speciality: {
           connect: {
             id: specialityId,

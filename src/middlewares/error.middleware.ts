@@ -18,7 +18,7 @@ const globalErrorHandler = (
     if (err.code === 'P2002')
       return res.status(err.statusCode).json({
         status: err.statusCode,
-        message: `Error with column ${err.meta?.target}`,
+        message: `Error with column "${err.meta?.target}"`,
         error: err,
       });
     if (err.code === 'P2003') {
