@@ -34,15 +34,8 @@ class SubTasksServices {
     return findSubTask;
   }
 
-  static async create({
-    name,
-    price,
-    hours,
-    description,
-    taskId,
-    indexTaskId,
-  }: SubTasks) {
-    let data = { name, price, description, hours };
+  static async create({ name, price, hours, taskId, indexTaskId }: SubTasks) {
+    let data = { name, price, hours };
     if (taskId) {
       const newSub = { ...data, taskId };
       data = newSub;
@@ -135,7 +128,7 @@ class SubTasksServices {
 
   static async update(
     id: SubTasks['id'],
-    { name, hours, price, description, percentage }: SubTasks
+    { name, hours, price, percentage }: SubTasks
   ) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const updateTask = await prisma.subTasks.update({
@@ -144,7 +137,7 @@ class SubTasksServices {
         name,
         hours,
         price,
-        description,
+
         percentage,
       },
     });
@@ -226,9 +219,9 @@ class SubTasksServices {
     const uploadFile = await prisma.subTasks.update({
       where: { id },
       data: {
-        files: {
-          push: fileName,
-        },
+        // files: {
+        //   push: file,
+        // },
       },
       include: {
         users: {
@@ -291,7 +284,7 @@ class SubTasksServices {
       where: { id },
       data: {
         files: {
-          set: subTasks?.files.filter(name => name !== fileName),
+          // set: subTasks?.files.filter(name => name !== fileName),
         },
       },
       include: {

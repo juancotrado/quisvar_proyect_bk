@@ -95,23 +95,19 @@ model Tasks {
 }
 
 model SubTasks {
-  id           Int           @id @default(autoincrement())
-  status       TaskRole      @default(UNRESOLVED)
-  name         String
-  percentage   Int           @default(0)
-  description  String?
-  price        Decimal       @db.Money
-  hours        Int
-  files        String[]
-  feedback     String?
-  feedbackDate DateTime?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  users        TaskOnUsers[]
-  filesData    Files[]
-  taskId       Int?
+  id          Int           @id @default(autoincrement())
+  status      TaskRole      @default(UNRESOLVED)
+  name        String
+  percentage  Int           @default(0)
+  price       Decimal       @db.Money
+  hours       Int
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  users       TaskOnUsers[]
+  files       Files[]
+  taskId      Int?
   indexTaskId Int?
-  task         Tasks?        @relation(fields: [taskId], references: [id])
+  task        Tasks?        @relation(fields: [taskId], references: [id])
   indexTask   IndexTasks?   @relation(fields: [indexTaskId], references: [id])
 }
 
@@ -122,7 +118,6 @@ model TaskOnUsers {
   subtask    SubTasks @relation(fields: [subtaskId], references: [id], onUpdate: Cascade)
   assignedAt DateTime @default(now())
 
-
   @@id([subtaskId, userId])
 }
 
@@ -130,6 +125,7 @@ model Files {
   id         Int       @id @default(autoincrement())
   userId     Int
   subtaskId  Int
+  dir        String?
   user       Users     @relation(fields: [userId], references: [id], onUpdate: Cascade)
   type       FileTypes
   SubTasks   SubTasks  @relation(fields: [subTasksId], references: [id])
