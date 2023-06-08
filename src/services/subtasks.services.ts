@@ -40,17 +40,19 @@ class SubTasksServices {
     hours,
     description,
     taskId,
-  }: SubTasks & { taskId: Tasks['id'] }) {
+    indexTaskId,
+  }: SubTasks) {
+    let data = { name, price, description, hours };
+    if (taskId) {
+      const newSub = { ...data, taskId };
+      data = newSub;
+    }
+    if (indexTaskId) {
+      const newSub = { ...data, indexTaskId };
+      data = newSub;
+    }
     const newTask = prisma.subTasks.create({
-      data: {
-        name,
-        price,
-        description,
-        hours,
-        task: {
-          connect: { id: taskId },
-        },
-      },
+      data,
       include: {
         users: {
           select: {

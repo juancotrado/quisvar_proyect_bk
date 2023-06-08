@@ -110,9 +110,9 @@ model SubTasks {
   users        TaskOnUsers[]
   filesData    Files[]
   taskId       Int?
-  indexTasksId Int?
+  indexTaskId Int?
   task         Tasks?        @relation(fields: [taskId], references: [id])
-  indexTasks   IndexTasks?   @relation(fields: [indexTasksId], references: [id])
+  indexTask   IndexTasks?   @relation(fields: [indexTaskId], references: [id])
 }
 
 model TaskOnUsers {
@@ -121,6 +121,7 @@ model TaskOnUsers {
   user       Users    @relation(fields: [userId], references: [id], onUpdate: Cascade)
   subtask    SubTasks @relation(fields: [subtaskId], references: [id], onUpdate: Cascade)
   assignedAt DateTime @default(now())
+
 
   @@id([subtaskId, userId])
 }

@@ -35,9 +35,9 @@ export const validTaskById = async (
   next: NextFunction
 ) => {
   try {
-    const { taskId } = req.body;
-    await TasksServices.find(taskId);
-    next();
+    const { taskId, indexTaskId } = req.body;
+    if (taskId || indexTaskId) next();
+    throw new AppError(`You need taskId or indexTaskId`, 400);
   } catch (error) {
     next(error);
   }
