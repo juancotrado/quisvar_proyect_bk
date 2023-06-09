@@ -124,11 +124,10 @@ model TaskOnUsers {
 model Files {
   id         Int       @id @default(autoincrement())
   userId     Int
-  subtaskId  Int
   dir        String?
   user       Users     @relation(fields: [userId], references: [id], onUpdate: Cascade)
   type       FileTypes
-  SubTasks   SubTasks  @relation(fields: [subTasksId], references: [id])
+  subTasks   SubTasks  @relation(fields: [subTasksId], references: [id])
   subTasksId Int
 }
 

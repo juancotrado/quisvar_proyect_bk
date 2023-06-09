@@ -2,6 +2,8 @@ import { IndexTasks, WorkAreas } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import fs from 'fs';
+import { renameDir } from '../utils/fileSystem';
+import PathServices from './paths.services';
 class IndexTasksServices {
   static async find(id: IndexTasks['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
@@ -46,7 +48,6 @@ class IndexTasksServices {
     const newTask = await prisma.indexTasks.create({
       data: {
         name,
-        dir: `${_area.dir}/${_area.item}.${_area.name}`,
         item: `${_area.item}.${getIndex + 1}`,
         workArea: {
           connect: {
@@ -72,24 +73,23 @@ class IndexTasksServices {
   static async delete(id: IndexTasks['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const { workAreaId } = await this.findShort(id);
+    const dirArea = await PathServices.pathArea(workAreaId);
     const deleteTask = await prisma.indexTasks.delete({
       where: { id },
     });
-    if (deleteTask) {
-      const getTasks = await prisma.indexTasks.findMany({
-        where: { workAreaId },
-        include: { workArea: { select: { item: true } } },
+    const getTasks = await prisma.indexTasks.findMany({
+      where: { workAreaId },
+      include: { workArea: { select: { item: true } } },
+    });
+    getTasks.forEach(async (task, index) => {
+      const _task = await prisma.indexTasks.update({
+        where: { id: task.id },
+        data: { item: `${task.workArea.item}.${index + 1}` },
       });
-      getTasks.forEach(async (task, index) => {
-        const _task = await prisma.indexTasks.update({
-          where: { id: task.id },
-          data: { item: `${task.workArea.item}.${index + 1}` },
-        });
-        const oldDir = task.dir + '/' + task.item + '.' + task.name;
-        const newDir = _task.dir + '/' + _task.item + '.' + _task.name;
-        fs.renameSync(oldDir, newDir);
-      });
-    }
+      const oldDir = dirArea + '/' + task.item + '.' + task.name;
+      const newDir = dirArea + '/' + _task.item + '.' + _task.name;
+      renameDir(oldDir, newDir);
+    });
     return deleteTask;
   }
 }

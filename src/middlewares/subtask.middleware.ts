@@ -36,7 +36,10 @@ export const validTaskById = async (
 ) => {
   try {
     const { taskId, indexTaskId } = req.body;
-    if (taskId || indexTaskId) next();
+    if (taskId || indexTaskId) {
+      console.log(indexTaskId);
+      next();
+    }
     throw new AppError(`You need taskId or indexTaskId`, 400);
   } catch (error) {
     next(error);

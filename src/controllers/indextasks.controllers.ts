@@ -1,7 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 import { UserType } from '../middlewares/auth.middleware';
-import { IndexTasksServices, WorkAreasServices } from '../services';
+import {
+  IndexTasksServices,
+  PathServices,
+  WorkAreasServices,
+} from '../services';
 import fs from 'fs';
+import { renameDir, setNewPath } from '../utils/fileSystem';
 
 export const showIndexTask = async (
   req: Request,
@@ -26,10 +31,8 @@ export const createIndexTask = async (
   try {
     const { body } = req;
     const query = await IndexTasksServices.create(body);
-    if (query) {
-      const newDir = query.dir + '/' + query.item + '.' + query.name;
-      fs.mkdirSync(newDir);
-    }
+    const path = await PathServices.pathIndexTask(query.id);
+    if (query) fs.mkdirSync(path);
     res.status(201).json(query);
   } catch (error) {
     next(error);
@@ -45,13 +48,11 @@ export const updatIndexTask = async (
     const { body } = req;
     const { id } = req.params;
     const _task_id = parseInt(id);
-    const oldTask = await IndexTasksServices.findShort(_task_id);
+    const oldDir = await PathServices.pathIndexTask(_task_id);
     const query = await IndexTasksServices.update(_task_id, body);
-    if (query && oldTask) {
-      const oldDir = oldTask.dir + '/' + oldTask.item + '.' + oldTask.name;
-      const newDir = query.dir + '/' + query.item + '.' + query.name;
-      fs.renameSync(oldDir, newDir);
-    }
+    const path = query.item + '.' + query.name;
+    const newDir = setNewPath(oldDir, path);
+    if (query) renameDir(oldDir, newDir);
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -66,11 +67,9 @@ export const deleteIndexTasks = async (
   try {
     const { id } = req.params;
     const _task_id = parseInt(id);
+    const path = await PathServices.pathIndexTask(_task_id);
     const query = await IndexTasksServices.delete(_task_id);
-    if (query) {
-      const path = query.dir + '/' + query.item + '.' + query.name;
-      fs.rmSync(path, { recursive: true });
-    }
+    if (query) fs.rmSync(path, { recursive: true });
     res.status(204).json(query);
   } catch (error) {
     next(error);

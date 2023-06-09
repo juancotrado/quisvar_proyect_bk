@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { TasksServices } from '../services';
+import { PathServices, TasksServices } from '../services';
 import { SubTasks } from '@prisma/client';
 import fs from 'fs';
+import { renameDir, setNewPath } from '../utils/fileSystem';
 
 export const showTask = async (
   req: Request,
@@ -27,10 +28,8 @@ export const createTask = async (
   try {
     const { body } = req;
     const query = await TasksServices.create(body);
-    if (query) {
-      const newDir = query.dir + '/' + query.item + '.' + query.name;
-      fs.mkdirSync(newDir);
-    }
+    const path = await PathServices.pathTask(query.id);
+    if (query) fs.mkdirSync(path);
     res.status(201).json(query);
   } catch (error) {
     next(error);
@@ -46,13 +45,11 @@ export const updateTask = async (
     const { body } = req;
     const { id } = req.params;
     const _task_id = parseInt(id);
-    const oldTask = await TasksServices.findShort(_task_id);
+    const oldDir = await PathServices.pathTask(_task_id);
     const query = await TasksServices.update(_task_id, body);
-    if (query && oldTask) {
-      const oldDir = oldTask.dir + '/' + oldTask.item + '.' + oldTask.name;
-      const newDir = query.dir + '/' + query.item + '.' + query.name;
-      fs.renameSync(oldDir, newDir);
-    }
+    const path = query.item + '.' + query.name;
+    const newDir = setNewPath(oldDir, path);
+    if (query) renameDir(oldDir, newDir);
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -68,10 +65,8 @@ export const deleteTasks = async (
     const { id } = req.params;
     const _task_id = parseInt(id);
     const query = await TasksServices.delete(_task_id);
-    if (query) {
-      const path = query.dir + '/' + query.item + '.' + query.name;
-      fs.rmSync(path, { recursive: true });
-    }
+    const path = await PathServices.pathTask(_task_id);
+    if (query) fs.rmSync(path, { recursive: true });
     res.status(204).json(query);
   } catch (error) {
     next(error);

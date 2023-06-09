@@ -41,7 +41,7 @@ router.patch('/status/:id', statusVerify, updateStatusSubTask);
 
 //MOD ROLE
 router.use(_mod_role);
-router.post('/', validTaskById, createSubTask);
+router.post('/', createSubTask);
 router.patch('/:id', updateSubTask);
 router.patch('/assignUser/:id', assignUserBySubtask);
 router.delete('/:id', validSubtaskByIdAndStatus, deleteSubTasks);

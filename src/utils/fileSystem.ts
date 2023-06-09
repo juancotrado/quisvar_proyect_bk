@@ -1,0 +1,21 @@
+import fs from 'fs';
+export const renameDir = (oldDir: string, newDir: string) => {
+  if (oldDir !== newDir) {
+    const subDir = fs
+      .readdirSync(oldDir)
+      .some(file => fs.statSync(oldDir + '/' + file).isDirectory());
+    if (subDir) {
+      fs.cpSync(oldDir, newDir, { recursive: true });
+      fs.rmSync(oldDir, { recursive: true });
+    } else {
+      fs.renameSync(oldDir, newDir);
+    }
+  }
+};
+
+export const setNewPath = (oldDir: string, path: string) => {
+  const arrayOldDir = oldDir.split('/');
+  const newPath = arrayOldDir.slice(0, arrayOldDir.length - 1);
+  const newDir = [...newPath, path].join('/');
+  return newDir;
+};

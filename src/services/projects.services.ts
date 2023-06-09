@@ -96,7 +96,6 @@ class ProjectsServices {
       status,
       userId,
       typeSpeciality,
-      specialityId,
     }: Projects & { userId: Users['id'] } & {
       specialityId: Specialities['id'];
     }
@@ -111,12 +110,11 @@ class ProjectsServices {
         untilDate,
         typeSpeciality,
         status,
-        dir: `${_dirPath}/${name}`,
-        speciality: {
-          connect: {
-            id: specialityId,
-          },
-        },
+        // speciality: {
+        //   connect: {
+        //     id: specialityId,
+        //   },
+        // },
         moderator: {
           connect: { id: userId },
         },

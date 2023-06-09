@@ -9,6 +9,8 @@ import {
 import AppError from '../utils/appError';
 import ProjectsServices from './projects.services';
 import fs from 'fs';
+import { renameDir } from '../utils/fileSystem';
+import PathServices from './paths.services';
 class WorkAreasServices {
   static async getAll() {
     try {
@@ -121,15 +123,14 @@ class WorkAreasServices {
     return findWorkArea;
   }
 
-  static async create(
-    { name, projectId }: WorkAreas & { projectId: Projects['id'] },
-    _dir: string
-  ) {
+  static async create({
+    name,
+    projectId,
+  }: WorkAreas & { projectId: Projects['id'] }) {
     const getIndex = await prisma.workAreas.count({ where: { projectId } });
     const createWorkArea = await prisma.workAreas.create({
       data: {
         name,
-        dir: `${_dir}`,
         item: `${getIndex + 1}`,
         project: {
           connect: {
@@ -162,22 +163,22 @@ class WorkAreasServices {
 
   static async delete(id: WorkAreas['id'], projectId: number) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
-
+    const dirProject = await PathServices.pathProject(projectId);
     const deleteWorkArea = await prisma.workAreas.delete({
       where: { id },
     });
     const getProjects = await prisma.workAreas.findMany({
       where: { projectId },
+      orderBy: { id: 'asc' },
     });
     getProjects.forEach(async (project, index) => {
       const _project = await prisma.workAreas.update({
         where: { id: project.id },
         data: { item: `${index + 1}` },
       });
-      fs.renameSync(
-        `${project.dir}/${project.item}.${project.name}`,
-        `${_project.dir}/${_project.item}.${project.name}`
-      );
+      const oldDir = dirProject + '/' + project.item + '.' + project.name;
+      const newDir = dirProject + '/' + _project.item + '.' + project.name;
+      renameDir(oldDir, newDir);
     });
     return deleteWorkArea;
   }

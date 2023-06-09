@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, query } from 'express';
-import { ProjectsServices } from '../services';
+import { PathServices, ProjectsServices } from '../services';
 import fs, { mkdir, mkdirSync } from 'fs';
+import { renameDir, setNewPath } from '../utils/fileSystem';
 
 const path = './uploads';
 
@@ -43,11 +44,9 @@ export const createProject = async (
 ) => {
   try {
     const { body } = req;
-    const createNewProject = await ProjectsServices.create(body);
-    if (createNewProject) {
-      mkdirSync(createNewProject.dir);
-    }
-    res.status(201).json(createNewProject);
+    const query = await ProjectsServices.create(body);
+    if (query) mkdirSync(query.dir);
+    res.status(201).json(query);
   } catch (error) {
     next(error);
   }
@@ -62,11 +61,10 @@ export const updateProject = async (
     const { body } = req;
     const { id } = req.params;
     const _project_id = parseInt(id);
-    const oldDir = (await ProjectsServices.find(_project_id)).dir;
+    const oldDir = await PathServices.pathProject(_project_id);
     const query = await ProjectsServices.update(_project_id, body);
-    if (oldDir && query) {
-      fs.renameSync(oldDir, `${query.dir}`);
-    }
+    const newDir = setNewPath(oldDir, query.name);
+    if (query) renameDir(oldDir, newDir);
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -81,10 +79,9 @@ export const deleteProject = async (
   try {
     const { id } = req.params;
     const project_id = parseInt(id);
+    const path = await PathServices.pathProject(project_id);
     const query = await ProjectsServices.delete(project_id);
-    if (query) {
-      fs.rmSync(query.dir, { recursive: true });
-    }
+    if (query) fs.rmSync(path, { recursive: true });
     res.status(204).json(query);
   } catch (error) {
     next(error);

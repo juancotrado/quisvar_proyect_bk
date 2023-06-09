@@ -7,6 +7,7 @@ import {
 } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import fs from 'fs';
+import TasksServices from './tasks.services';
 
 class SubTasksServices {
   static async find(id: SubTasks['id']) {
@@ -37,24 +38,28 @@ class SubTasksServices {
   static async create({ name, price, hours, taskId, indexTaskId }: SubTasks) {
     let data = { name, price, hours };
     if (taskId) {
-      const newSub = { ...data, taskId };
+      const task = await TasksServices.findShort(taskId);
+      const path = task.dir + '/' + task.item + '.' + task.name;
+      const newSub = { ...data, taskId, path };
       data = newSub;
     }
     if (indexTaskId) {
-      const newSub = { ...data, indexTaskId };
+      const indexTask = await TasksServices.findIndexTask(indexTaskId);
+      const path = indexTask.dir + '/' + indexTask.item + '.' + indexTask.name;
+      const newSub = { ...data, indexTaskId, path };
       data = newSub;
     }
-    const newTask = prisma.subTasks.create({
-      data,
-      include: {
-        users: {
-          select: {
-            user: { select: { id: true, profile: true } },
-          },
-        },
-      },
-    });
-    return newTask;
+    // const newTask = prisma.subTasks.create({
+    //   data,
+    //   include: {
+    //     users: {
+    //       select: {
+    //         user: { select: { id: true, profile: true } },
+    //       },
+    //     },
+    //   },
+    // });
+    return data;
   }
 
   static async assigned(

@@ -7,6 +7,7 @@ import IndexTasksServices from './indextasks.services';
 import SubTasksServices from './subtasks.services';
 import ProfileServices from './profile.services';
 import SpecialitiesServices from './specialities.services';
+import PathServices from './paths.services';
 export {
   UsersServices,
   TasksServices,
@@ -17,5 +18,6 @@ export {
   SubTasksServices,
   ProfileServices,
   SpecialitiesServices,
+  PathServices,
 };
 export const _dirPath = './uploads';
