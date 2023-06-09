@@ -51,7 +51,6 @@ model Projects {
   startDate      DateTime     @default(now())
   untilDate      DateTime
   status         Boolean      @default(false)
-  dir            String       @default("")
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   userId         Int
@@ -67,7 +66,6 @@ model WorkAreas {
   userId     Int?
   projectId  Int
   item       String       @default("")
-  dir        String       @default("")
   indexTasks IndexTasks[]
   user       Users?       @relation(fields: [userId], references: [id], onDelete: Cascade)
   project    Projects     @relation(fields: [projectId], references: [id])
@@ -79,7 +77,6 @@ model IndexTasks {
   workAreaId Int
   workArea   WorkAreas  @relation(fields: [workAreaId], references: [id])
   item       String     @default("")
-  dir        String     @default("")
   tasks      Tasks[]
   subTasks   SubTasks[]
 }
@@ -89,7 +86,6 @@ model Tasks {
   name        String
   indexTaskId Int
   item        String     @default("")
-  dir         String     @default("")
   indexTask   IndexTasks @relation(fields: [indexTaskId], references: [id])
   subTasks    SubTasks[]
 }
@@ -123,6 +119,7 @@ model TaskOnUsers {
 
 model Files {
   id         Int       @id @default(autoincrement())
+  name       String
   userId     Int
   dir        String?
   user       Users     @relation(fields: [userId], references: [id], onUpdate: Cascade)

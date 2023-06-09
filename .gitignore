@@ -2,4 +2,6 @@ node_modules
 .env
 database/.env
 database
-uploads
+uploads/**
+file_model/**
+file_review/**

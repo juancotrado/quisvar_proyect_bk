@@ -1,10 +1,4 @@
-import {
-  Projects,
-  Specialities,
-  Users,
-  WorkAreas,
-  prisma,
-} from '../utils/prisma.server';
+import { Projects, Specialities, Users, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import { projectPick } from '../utils/format.server';
 import { _dirPath } from '.';
@@ -25,10 +19,6 @@ class ProjectsServices {
 
   static async find(id: Projects['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
-    const findProjects = await prisma.projects.count({
-      where: { specialityId: 4 },
-    });
-    console.log(findProjects + 1);
     const findProject = await prisma.projects.findUnique({
       where: {
         id,
@@ -53,7 +43,12 @@ class ProjectsServices {
     if (!findProject) throw new AppError('Could not found logs project', 404);
     return findProject;
   }
-
+  static async findShort(id: Projects['id']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const findProject = await prisma.projects.findUnique({ where: { id } });
+    if (!findProject) throw new AppError('Could not found logs project', 404);
+    return findProject;
+  }
   static async create({
     name,
     description,
@@ -69,7 +64,6 @@ class ProjectsServices {
         description,
         startDate,
         untilDate,
-        dir: `${_dirPath}/${name}`,
         typeSpeciality,
         speciality: {
           connect: {

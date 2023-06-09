@@ -7,8 +7,6 @@ import {
   prisma,
 } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-import ProjectsServices from './projects.services';
-import fs from 'fs';
 import { renameDir } from '../utils/fileSystem';
 import PathServices from './paths.services';
 class WorkAreasServices {

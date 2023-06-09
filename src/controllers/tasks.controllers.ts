@@ -64,8 +64,8 @@ export const deleteTasks = async (
   try {
     const { id } = req.params;
     const _task_id = parseInt(id);
-    const query = await TasksServices.delete(_task_id);
     const path = await PathServices.pathTask(_task_id);
+    const query = await TasksServices.delete(_task_id);
     if (query) fs.rmSync(path, { recursive: true });
     res.status(204).json(query);
   } catch (error) {

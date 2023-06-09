@@ -39,13 +39,13 @@ class SubTasksServices {
     let data = { name, price, hours };
     if (taskId) {
       const task = await TasksServices.findShort(taskId);
-      const path = task.dir + '/' + task.item + '.' + task.name;
+      const path = '/' + task.item + '.' + task.name;
       const newSub = { ...data, taskId, path };
       data = newSub;
     }
     if (indexTaskId) {
       const indexTask = await TasksServices.findIndexTask(indexTaskId);
-      const path = indexTask.dir + '/' + indexTask.item + '.' + indexTask.name;
+      const path = '/' + indexTask.item + '.' + indexTask.name;
       const newSub = { ...data, indexTaskId, path };
       data = newSub;
     }
