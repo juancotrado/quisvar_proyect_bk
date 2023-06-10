@@ -1,5 +1,10 @@
 import { NextFunction, Request, Response, query } from 'express';
-import { PathServices, ProjectsServices } from '../services';
+import {
+  PathServices,
+  ProjectsServices,
+  _materialPath,
+  _reviewPath,
+} from '../services';
 import { rmSync, mkdirSync } from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
 
@@ -66,8 +71,14 @@ export const updateProject = async (
     const newDir = setNewPath(oldDir, query.name);
     if (query) {
       renameDir(oldDir, newDir);
-      renameDir(`./file_model/${project.name}`, `./file_model/${query.name}`);
-      renameDir(`./file_review/${project.name}`, `./file_review/${query.name}`);
+      renameDir(
+        `./${_materialPath}/${project.name}`,
+        `./${_materialPath}/${query.name}`
+      );
+      renameDir(
+        `./${_reviewPath}/${project.name}`,
+        `./${_reviewPath}/${query.name}`
+      );
     }
     res.status(200).json(query);
   } catch (error) {
@@ -85,7 +96,11 @@ export const deleteProject = async (
     const project_id = parseInt(id);
     const path = await PathServices.pathProject(project_id);
     const query = await ProjectsServices.delete(project_id);
-    if (query) rmSync(path, { recursive: true });
+    if (query) {
+      rmSync(path, { recursive: true });
+      rmSync(`${_materialPath}/${query.name}`, { recursive: true });
+      rmSync(`${_reviewPath}/${query.name}`, { recursive: true });
+    }
     res.status(204).json(query);
   } catch (error) {
     next(error);
