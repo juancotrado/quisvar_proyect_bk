@@ -23,3 +23,5 @@ export {
   FilesServices,
 };
 export const _dirPath = './uploads';
+export const _materialPath = './file_model';
+export const _reviewPath = './file_review';

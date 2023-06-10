@@ -19,3 +19,7 @@ export const setNewPath = (oldDir: string, path: string) => {
   const newDir = [...newPath, path].join('/');
   return newDir;
 };
+
+export const parsePath = (item: string, name: string) => {
+  return '/' + item + '.' + name;
+};

@@ -93,6 +93,7 @@ model Tasks {
 model SubTasks {
   id          Int           @id @default(autoincrement())
   status      TaskRole      @default(UNRESOLVED)
+  item        String        @default("")
   name        String
   percentage  Int           @default(0)
   price       Decimal       @db.Money
@@ -144,8 +145,6 @@ enum TaskRole {
 
 enum FileTypes {
   MATERIAL
-  GUIDE
+  SUCCESSFUL
   REVIEW
-  FEED
-  INSPECT
 }

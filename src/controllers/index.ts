@@ -57,6 +57,7 @@ import {
   showSpeciality,
   updateSpeciality,
 } from './speacialities.controllers';
+import { deleteFile, uploadFile } from './files.controllers';
 // User Controllers
 export {
   showUsers,
@@ -117,3 +118,6 @@ export {
 };
 //Profile Controllers
 export { showProfile, downloadProfile, updateProfile };
+
+//Files Controllers
+export { uploadFile, deleteFile };

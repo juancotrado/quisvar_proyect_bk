@@ -74,8 +74,12 @@ export const updateStatusSubTask = async (
     const { id } = req.params;
     const { body } = req;
     const userInfo: UserType = res.locals.userInfo;
-    const _task_id = parseInt(id);
-    const query = await SubTasksServices.updateStatus(_task_id, body, userInfo);
+    const _subtask_id = parseInt(id);
+    const query = await SubTasksServices.updateStatus(
+      _subtask_id,
+      body,
+      userInfo
+    );
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -103,10 +107,8 @@ export const uploadFileSubTask = async (
 ) => {
   try {
     const { id } = req.params;
-
     if (!req.file) return;
     const { filename } = req.file;
-
     const query = await SubTasksServices.upload(filename, +id);
     res.status(200).json(query);
   } catch (error) {

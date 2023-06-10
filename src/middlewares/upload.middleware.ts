@@ -1,18 +1,33 @@
+import { Files } from '@prisma/client';
 import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import path from 'path';
+import { FilesServices, PathServices } from '../services';
+import AppError from '../utils/appError';
 
 const MAX_SIZE = 1024 * 1000 * 1000;
 const FILE_TYPES = ['.rar', '.zip'];
 
 const storage = multer.diskStorage({
-  destination: (req, file, callback) => {
-    callback(null, './uploads');
+  destination: async (req, file, callback) => {
+    try {
+      const { id } = req.params;
+      const _subtask_id = parseInt(id);
+      const status = req.query.status as Files['type'];
+      const path = await PathServices.pathSubTask(_subtask_id, status);
+      callback(null, path);
+    } catch (error) {
+      callback(new AppError(`No se pudo encontrar la ruta`, 404), '');
+    }
   },
-  filename: (req, file, callback) => {
-    const uniqueSuffix = Date.now();
+  filename: async (req, file, callback) => {
     const { id } = req.params;
-    callback(null, id + '-' + uniqueSuffix + '$' + file.originalname);
+    const _subtask_id = parseInt(id);
+    const extName = path.extname(file.originalname);
+    const { item, name } = await FilesServices.getSubTask(_subtask_id);
+    const uniqueSuffix = Date.now();
+    callback(null, item + '.' + name + '@' + uniqueSuffix + '@' + extName);
+    // callback(null, _subtask_id + '-' + uniqueSuffix + '@' + file.originalname);
   },
 });
 
