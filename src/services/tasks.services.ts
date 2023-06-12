@@ -16,6 +16,7 @@ class TasksServices {
             status,
           },
           include: {
+            files: true,
             users: {
               select: {
                 user: {

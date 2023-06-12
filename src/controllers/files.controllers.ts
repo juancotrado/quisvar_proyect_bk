@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { FilesServices } from '../services';
+import { Request, Response, NextFunction, query } from 'express';
+import { FilesServices, SubTasksServices } from '../services';
 import { Files } from '@prisma/client';
 
 export const uploadFile = async (
@@ -13,7 +13,8 @@ export const uploadFile = async (
     const _subtask_id = parseInt(id);
     if (!req.file) return;
     const { filename } = req.file;
-    const query = await FilesServices.create(_subtask_id, filename, status);
+    await FilesServices.create(_subtask_id, filename, status);
+    const query = await SubTasksServices.find(_subtask_id);
     res.status(201).json(query);
   } catch (error) {
     next(error);

@@ -15,6 +15,7 @@ class SubTasksServices {
     const findSubTask = await prisma.subTasks.findUnique({
       where: { id },
       include: {
+        files: true,
         users: {
           select: {
             user: {
@@ -164,6 +165,7 @@ class SubTasksServices {
         status,
       },
       include: {
+        files: true,
         users: {
           select: {
             user: { select: { id: true, profile: true } },

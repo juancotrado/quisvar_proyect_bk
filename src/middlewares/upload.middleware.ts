@@ -26,7 +26,10 @@ const storage = multer.diskStorage({
     const extName = path.extname(file.originalname);
     const { item, name } = await FilesServices.getSubTask(_subtask_id);
     const uniqueSuffix = Date.now();
-    callback(null, item + '.' + name + '@' + uniqueSuffix + '@' + extName);
+    callback(
+      null,
+      item + '.' + name + '@' + uniqueSuffix + '$' + file.originalname
+    );
     // callback(null, _subtask_id + '-' + uniqueSuffix + '@' + file.originalname);
   },
 });

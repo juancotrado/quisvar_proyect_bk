@@ -95,6 +95,7 @@ class WorkAreasServices {
         id,
       },
       include: {
+        project: { select: { name: true } },
         user: {
           include: {
             profile: true,
