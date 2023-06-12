@@ -29,8 +29,9 @@ export const deleteFile = async (
   try {
     const { id } = req.params;
     const _file_id = parseInt(id);
-    const query = await FilesServices.delete(_file_id);
-    res.status(204).json(query);
+    const fileDelete = await FilesServices.delete(_file_id);
+    const query = await SubTasksServices.find(fileDelete.subTasksId);
+    res.status(200).json(query);
   } catch (error) {
     next(error);
   }
