@@ -7,6 +7,7 @@ import {
 } from '../services';
 import { rmSync, mkdirSync } from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
+import { archiverFolder } from '../utils/archiver';
 
 export const showProjects = async (
   req: Request,
@@ -51,6 +52,25 @@ export const createProject = async (
       mkdirSync(`./file_review/${query.name}`);
     }
     res.status(201).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const archiverProject = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { projectName } = req.body;
+    const folderPath = `uploads/${projectName}/`;
+    const zipFileName = `${projectName}.zip`;
+    const zipFilePath = `./uploads/${zipFileName}`;
+    const resArchiver = await archiverFolder(folderPath, zipFilePath);
+    res.status(201).json({
+      result: resArchiver,
+      url: `${zipFileName}`,
+    });
   } catch (error) {
     next(error);
   }
