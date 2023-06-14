@@ -90,6 +90,7 @@ class SubTasksServices {
           },
         },
         include: {
+          files: true,
           users: {
             select: {
               user: { select: { id: true, profile: true } },
@@ -110,6 +111,7 @@ class SubTasksServices {
           },
         },
         include: {
+          files: true,
           users: {
             select: {
               user: { select: { id: true, profile: true } },
@@ -125,6 +127,7 @@ class SubTasksServices {
           status: 'INREVIEW',
         },
         include: {
+          files: true,
           users: {
             select: {
               user: { select: { id: true, profile: true } },
@@ -203,6 +206,7 @@ class SubTasksServices {
           },
         },
         include: {
+          files: true,
           users: {
             select: {
               user: { select: { id: true, profile: true } },
@@ -225,6 +229,7 @@ class SubTasksServices {
           },
         },
         include: {
+          files: true,
           users: {
             select: {
               user: { select: { id: true, profile: true } },
