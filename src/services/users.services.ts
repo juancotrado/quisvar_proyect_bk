@@ -56,7 +56,21 @@ class UsersServices {
         userId: id,
       },
       include: {
-        subtask: true,
+        subtask: {
+          include: {
+            task: {
+              select: {
+                id: true,
+                indexTask: {
+                  select: {
+                    id: true,
+                    workAreaId: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
     if (!subTasks) throw new AppError('Could not found task ', 404);
