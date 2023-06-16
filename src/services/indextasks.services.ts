@@ -1,4 +1,4 @@
-import { IndexTasks, WorkAreas } from '@prisma/client';
+import { IndexTasks, SubTasks, Tasks, WorkAreas } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import fs from 'fs';
@@ -24,6 +24,35 @@ class IndexTasksServices {
     return findIndexTask;
   }
 
+  static async findSubtasks(id: IndexTasks['id'], status?: SubTasks['status']) {
+    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const findTask = await prisma.indexTasks.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        subTasks: {
+          where: {
+            status,
+          },
+          include: {
+            files: true,
+            users: {
+              select: {
+                user: {
+                  select: {
+                    profile: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!findTask) throw new AppError('Could not found task ', 404);
+    return findTask;
+  }
   static async findShort(id: IndexTasks['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const findIndexTask = await prisma.indexTasks.findUnique({
@@ -42,12 +71,13 @@ class IndexTasksServices {
     return findArea;
   }
 
-  static async create({ name, workAreaId }: IndexTasks) {
+  static async create({ name, workAreaId, unique }: IndexTasks) {
     const getIndex = await prisma.indexTasks.count({ where: { workAreaId } });
     const _area = await this.findArea(workAreaId);
     const newTask = await prisma.indexTasks.create({
       data: {
         name,
+        unique,
         item: `${_area.item}.${getIndex + 1}`,
         workArea: {
           connect: {
@@ -79,6 +109,7 @@ class IndexTasksServices {
     });
     const getTasks = await prisma.indexTasks.findMany({
       where: { workAreaId },
+      orderBy: { id: 'asc' },
       include: { workArea: { select: { item: true } } },
     });
     getTasks.forEach(async (task, index) => {

@@ -36,31 +36,39 @@ class WorkAreasServices {
     const getTask = await prisma.subTasks.findMany({
       where: {
         status: 'INREVIEW',
-        task: {
-          indexTask: {
-            workArea: {
-              userId,
-            },
-          },
-        },
+        AND: [
+          { task: { indexTask: { workArea: { userId } } } },
+          { indexTask: { workArea: { userId } } },
+        ],
       },
       select: {
         id: true,
         name: true,
+        item: true,
+        indexTask: {
+          select: {
+            name: true,
+            item: true,
+            workArea: {
+              select: {
+                name: true,
+                item: true,
+              },
+            },
+          },
+        },
         task: {
           select: {
             name: true,
+            item: true,
             indexTask: {
               select: {
                 name: true,
+                item: true,
                 workArea: {
                   select: {
                     name: true,
-                    project: {
-                      select: {
-                        name: true,
-                      },
-                    },
+                    item: true,
                   },
                 },
               },
@@ -106,11 +114,14 @@ class WorkAreasServices {
           select: {
             id: true,
             name: true,
+            unique: true,
+            item: true,
             tasks: {
               orderBy: { id: 'asc' },
               select: {
                 id: true,
                 name: true,
+                item: true,
                 _count: { select: { subTasks: true } },
               },
             },

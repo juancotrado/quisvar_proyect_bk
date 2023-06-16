@@ -12,6 +12,7 @@ import {
   createIndexTask,
   deleteIndexTasks,
   showIndexTask,
+  showSubtasksByIndexTask,
   updatIndexTask,
 } from './indextasks.controllers';
 // updateTaskStatus,
@@ -97,7 +98,13 @@ export {
   updateProject,
 };
 //IndexTask Controllers
-export { showIndexTask, deleteIndexTasks, createIndexTask, updatIndexTask };
+export {
+  showIndexTask,
+  deleteIndexTasks,
+  createIndexTask,
+  updatIndexTask,
+  showSubtasksByIndexTask,
+};
 //Task Controllers
 export {
   showTask,

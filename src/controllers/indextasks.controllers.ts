@@ -7,6 +7,7 @@ import {
 } from '../services';
 import fs from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
+import { SubTasks } from '@prisma/client';
 
 export const showIndexTask = async (
   req: Request,
@@ -17,6 +18,22 @@ export const showIndexTask = async (
     const { id } = req.params;
     const _index_task_id = parseInt(id);
     const query = await IndexTasksServices.find(_index_task_id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const showSubtasksByIndexTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const status = req.query.status as SubTasks['status'];
+    const _task_id = parseInt(id);
+    const query = await IndexTasksServices.findSubtasks(_task_id, status);
     res.status(200).json(query);
   } catch (error) {
     next(error);

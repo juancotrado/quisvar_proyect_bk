@@ -51,6 +51,7 @@ model Projects {
   startDate      DateTime     @default(now())
   untilDate      DateTime
   status         Boolean      @default(false)
+  unique         Boolean      @default(false)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   userId         Int
@@ -74,6 +75,7 @@ model WorkAreas {
 model IndexTasks {
   id         Int        @id @default(autoincrement())
   name       String
+  unique     Boolean    @default(false)
   workAreaId Int
   workArea   WorkAreas  @relation(fields: [workAreaId], references: [id])
   item       String     @default("")
