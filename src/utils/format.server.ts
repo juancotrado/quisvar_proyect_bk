@@ -13,7 +13,12 @@ export type userProfilePick = Pick<
 
 export type projectPick = Pick<
   Projects,
-  'name' | 'description' | 'untilDate' | 'startDate' | 'typeSpeciality'
+  | 'name'
+  | 'description'
+  | 'untilDate'
+  | 'startDate'
+  | 'typeSpeciality'
+  | 'unique'
 > & { userId: Users['id'] } & {
   specialityId: Specialities['id'];
 };

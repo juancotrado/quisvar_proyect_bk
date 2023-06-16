@@ -78,7 +78,7 @@ class IndexTasksServices {
       data: {
         name,
         unique,
-        item: `${_area.item}.${getIndex + 1}`,
+        item: _area.item ? `${getIndex + 1}` : `${_area.item}.${getIndex + 1}`,
         workArea: {
           connect: {
             id: workAreaId,
@@ -115,7 +115,11 @@ class IndexTasksServices {
     getTasks.forEach(async (task, index) => {
       const _task = await prisma.indexTasks.update({
         where: { id: task.id },
-        data: { item: `${task.workArea.item}.${index + 1}` },
+        data: {
+          item: task.workArea.item
+            ? `${index + 1}`
+            : `${task.workArea.item}.${index + 1}`,
+        },
       });
       const oldDir = dirArea + '/' + task.item + '.' + task.name;
       const newDir = dirArea + '/' + _task.item + '.' + _task.name;

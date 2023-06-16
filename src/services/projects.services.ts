@@ -56,6 +56,7 @@ class ProjectsServices {
     userId,
     startDate,
     typeSpeciality,
+    unique,
     specialityId,
   }: Required<projectPick>) {
     const newProject = await prisma.projects.create({
@@ -63,6 +64,7 @@ class ProjectsServices {
         name,
         description,
         startDate,
+        unique,
         untilDate,
         typeSpeciality,
         speciality: {
@@ -77,7 +79,19 @@ class ProjectsServices {
         },
       },
     });
-    return newProject;
+    if (newProject.unique) {
+      const area = await prisma.workAreas.create({
+        data: {
+          name,
+          item: '0',
+          project: {
+            connect: { id: newProject.id },
+          },
+        },
+      });
+      return { ...newProject, workAreaId: area.id };
+    }
+    return { ...newProject, workAreaId: 0 };
   }
 
   static async update(
@@ -119,6 +133,13 @@ class ProjectsServices {
 
   static async delete(id: Projects['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    const { unique } = await this.findShort(id);
+    if (unique) {
+      await prisma.workAreas.deleteMany({
+        where: { projectId: id },
+      });
+    }
+
     const deleteProject = await prisma.projects.delete({
       where: { id },
     });

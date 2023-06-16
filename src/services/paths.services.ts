@@ -16,12 +16,17 @@ class PathServices {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const area = await prisma.workAreas.findUnique({
       where: { id },
-      select: { name: true, item: true, project: { select: { name: true } } },
+      select: {
+        name: true,
+        item: true,
+        project: { select: { name: true, unique: true } },
+      },
     });
     if (!area)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
     const projectPath = _dirPath + '/' + area.project.name;
-    const areaPath = '/' + area.item + '.' + area.name;
+    let areaPath = '/' + area.item + '.' + area.name;
+    if (area.project.unique) areaPath = '/' + area.name;
     const path = projectPath + areaPath;
     return path;
   }
@@ -36,7 +41,7 @@ class PathServices {
           select: {
             item: true,
             name: true,
-            project: { select: { name: true } },
+            project: { select: { name: true, unique: true } },
           },
         },
       },
@@ -44,7 +49,8 @@ class PathServices {
     if (!task)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
     const projectPath = _dirPath + '/' + task.workArea.project.name;
-    const areaPath = '/' + task.workArea.item + '.' + task.workArea.name;
+    let areaPath = '/' + task.workArea.item + '.' + task.workArea.name;
+    if (task.workArea.project.unique) areaPath = '/' + task.workArea.name;
     const indexTaskPath = '/' + task.item + '.' + task.name;
     const path = projectPath + areaPath + indexTaskPath;
     return path;
@@ -64,7 +70,7 @@ class PathServices {
               select: {
                 item: true,
                 name: true,
-                project: { select: { name: true } },
+                project: { select: { name: true, unique: true } },
               },
             },
           },
@@ -74,8 +80,10 @@ class PathServices {
     if (!task)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
     const projectPath = _dirPath + '/' + task.indexTask.workArea.project.name;
-    const areaPath =
+    let areaPath =
       '/' + task.indexTask.workArea.item + '.' + task.indexTask.workArea.name;
+    if (task.indexTask.workArea.project.unique)
+      areaPath = '/' + task.indexTask.workArea.name;
     const indexTaskPath = '/' + task.indexTask.item + '.' + task.indexTask.name;
     const taskPath = '/' + task.item + '.' + task.name;
     const path = projectPath + areaPath + indexTaskPath + taskPath;
@@ -100,7 +108,7 @@ class PathServices {
                   select: {
                     item: true,
                     name: true,
-                    project: { select: { name: true } },
+                    project: { select: { name: true, unique: true } },
                   },
                 },
               },
@@ -128,7 +136,8 @@ class PathServices {
       const { workArea } = indexTask;
       const { project } = workArea;
       const pathProject = _dirPath + '/' + project.name;
-      const areaPath = parsePath(workArea.item, workArea.name);
+      let areaPath = parsePath(workArea.item, workArea.name);
+      if (project.unique) areaPath = '/' + workArea.name;
       const indexTaskPath = parsePath(indexTask.item, indexTask.name);
       const taskPath = parsePath(task.item, task.name);
       // const subTaskPath = parsePath(subTask.item, subTask.name);

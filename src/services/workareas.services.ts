@@ -36,27 +36,12 @@ class WorkAreasServices {
     const getTask = await prisma.subTasks.findMany({
       where: {
         status: 'INREVIEW',
-        AND: [
-          { task: { indexTask: { workArea: { userId } } } },
-          { indexTask: { workArea: { userId } } },
-        ],
+        task: { indexTask: { workArea: { userId } } },
       },
       select: {
         id: true,
         name: true,
         item: true,
-        indexTask: {
-          select: {
-            name: true,
-            item: true,
-            workArea: {
-              select: {
-                name: true,
-                item: true,
-              },
-            },
-          },
-        },
         task: {
           select: {
             name: true,
@@ -136,7 +121,7 @@ class WorkAreasServices {
   static async create({
     name,
     projectId,
-  }: WorkAreas & { projectId: Projects['id'] }) {
+  }: Pick<WorkAreas, 'name' | 'projectId'>) {
     const getIndex = await prisma.workAreas.count({ where: { projectId } });
     const createWorkArea = await prisma.workAreas.create({
       data: {

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response, query } from 'express';
 import {
   PathServices,
   ProjectsServices,
+  WorkAreasServices,
   _materialPath,
   _reviewPath,
 } from '../services';
@@ -50,7 +51,13 @@ export const createProject = async (
       mkdirSync(path);
       mkdirSync(`./file_model/${query.name}`);
       mkdirSync(`./file_review/${query.name}`);
+      if (query.unique) {
+        const pathArea = await PathServices.pathArea(query.workAreaId);
+        console.log(pathArea);
+        mkdirSync(pathArea);
+      }
     }
+
     res.status(201).json(query);
   } catch (error) {
     next(error);
