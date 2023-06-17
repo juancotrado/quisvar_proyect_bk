@@ -1,4 +1,4 @@
-# Welcome to tu doctor net Backend!
+# Task Manager Backend
 
 ## Tools
 
@@ -8,6 +8,8 @@ Backend made with TS, Express and Prisma
 - [Prisma](https://www.prisma.io/)
 
 ## Development
+
+Install dependences
 
 ```sh
 npm install
