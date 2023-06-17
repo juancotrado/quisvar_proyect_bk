@@ -2,13 +2,13 @@ import { NextFunction, Request, Response, query } from 'express';
 import {
   PathServices,
   ProjectsServices,
-  WorkAreasServices,
   _materialPath,
   _reviewPath,
 } from '../services';
 import { rmSync, mkdirSync } from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
 import { archiverFolder } from '../utils/archiver';
+import fs from 'fs';
 
 export const showProjects = async (
   req: Request,
@@ -77,6 +77,21 @@ export const archiverProject = async (
     res.status(201).json({
       result: resArchiver,
       url: `${zipFileName}`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteArchiverProject = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { projectName } = req.query;
+    fs.unlinkSync(`./uploads/${projectName}.zip`);
+    res.status(200).json({
+      projectName,
     });
   } catch (error) {
     next(error);
