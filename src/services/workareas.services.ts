@@ -25,7 +25,7 @@ class WorkAreasServices {
         },
       });
       if (getWorkAreas.length == 0)
-        throw new AppError('Could not found work areas', 404);
+        throw new AppError('No se pudo encontrar las areas de trabajo', 404);
       return getWorkAreas;
     } catch (error) {
       throw error;
@@ -82,7 +82,7 @@ class WorkAreasServices {
   }
 
   static async find(id: WorkAreas['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findWorkArea = await prisma.workAreas.findUnique({
       where: {
         id,
@@ -114,7 +114,8 @@ class WorkAreasServices {
         },
       },
     });
-    if (!findWorkArea) throw new AppError('Could not found user ', 404);
+    if (!findWorkArea)
+      throw new AppError('No se pudo encontrar el usuario', 404);
     return findWorkArea;
   }
 
@@ -141,7 +142,7 @@ class WorkAreasServices {
     id: WorkAreas['id'],
     { name, userId }: WorkAreas & { userId: Users['id'] }
   ) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateWorkArea = await prisma.workAreas.update({
       where: { id },
       data: {
@@ -157,7 +158,7 @@ class WorkAreasServices {
   }
 
   static async delete(id: WorkAreas['id'], projectId: number) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const dirProject = await PathServices.pathProject(projectId);
     const deleteWorkArea = await prisma.workAreas.delete({
       where: { id },

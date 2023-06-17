@@ -8,10 +8,7 @@ const roleHandler =
     const userInfo: UserType = res.locals.userInfo;
     const { role } = userInfo;
     if (!roles.includes(role)) {
-      throw new AppError(
-        `${role} does not have permissions for this route`,
-        400
-      );
+      throw new AppError(`${role} no tiene acceso a esta ruta`, 400);
     }
     next();
   };

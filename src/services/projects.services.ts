@@ -10,7 +10,7 @@ class ProjectsServices {
         orderBy: { createdAt: 'desc' },
       });
       if (getProjects.length == 0)
-        throw new AppError('Could not found work areas', 404);
+        throw new AppError('No se pudo encontrar las areas de trabajo', 404);
       return getProjects;
     } catch (error) {
       throw error;
@@ -18,7 +18,7 @@ class ProjectsServices {
   }
 
   static async find(id: Projects['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findProject = await prisma.projects.findUnique({
       where: {
         id,
@@ -40,13 +40,15 @@ class ProjectsServices {
         },
       },
     });
-    if (!findProject) throw new AppError('Could not found logs project', 404);
+    if (!findProject)
+      throw new AppError('No se pudo encontrar los proyectos registrados', 404);
     return findProject;
   }
   static async findShort(id: Projects['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findProject = await prisma.projects.findUnique({ where: { id } });
-    if (!findProject) throw new AppError('Could not found logs project', 404);
+    if (!findProject)
+      throw new AppError('No se pudo encontrar los proyectos registrados', 404);
     return findProject;
   }
   static async create({
@@ -108,7 +110,7 @@ class ProjectsServices {
       specialityId: Specialities['id'];
     }
   ) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateProject = await prisma.projects.update({
       where: { id },
       data: {
@@ -132,7 +134,7 @@ class ProjectsServices {
   }
 
   static async delete(id: Projects['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const { unique } = await this.findShort(id);
     if (unique) {
       await prisma.workAreas.deleteMany({

@@ -12,19 +12,19 @@ const globalErrorHandler = (
   err.message = err.message || 'fail';
   const typingError =
     err.message.length > 500
-      ? 'typing error in variables, enter the necessary fields'
+      ? 'Variables incorrectas, ingrese los campos necesarios'
       : err.message;
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === 'P2002')
       return res.status(err.statusCode).json({
         status: err.statusCode,
-        message: `Error with column "${err.meta?.target}"`,
+        message: `Error en la columna"${err.meta?.target}"`,
         error: err,
       });
     if (err.code === 'P2003') {
       return res.status(err.statusCode).json({
         status: err.statusCode,
-        message: `Foreing key error with columns ${err.meta?.field_name}`,
+        message: `Error de llave foranea en la columna ${err.meta?.field_name}`,
         error: err,
       });
     }

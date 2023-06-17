@@ -11,7 +11,7 @@ import TasksServices from './tasks.services';
 import PathServices from './paths.services';
 class SubTasksServices {
   static async find(id: SubTasks['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findSubTask = await prisma.subTasks.findUnique({
       where: { id },
       include: {
@@ -32,7 +32,7 @@ class SubTasksServices {
         },
       },
     });
-    if (!findSubTask) throw new AppError('Could not found task ', 404);
+    if (!findSubTask) throw new AppError('No se pudo encontrar la tares ', 404);
     return findSubTask;
   }
 
@@ -136,14 +136,14 @@ class SubTasksServices {
         },
       });
     }
-    throw new AppError('Oops!,We need status for this query', 400);
+    throw new AppError('Oops!, Necesitamos un status para esta consulta', 400);
   }
 
   static async update(
     id: SubTasks['id'],
     { name, hours, price, percentage }: SubTasks
   ) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateTask = await prisma.subTasks.update({
       where: { id },
       data: {
@@ -161,7 +161,7 @@ class SubTasksServices {
     { status }: SubTasks,
     user: Users
   ) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateTaskStatus = await prisma.subTasks.update({
       where: { id },
       data: {
@@ -178,7 +178,7 @@ class SubTasksServices {
       },
     });
     const subTask = await prisma.subTasks.findUnique({ where: { id } });
-    if (!subTask) throw new AppError('Oops!,Invalid ID', 400);
+    if (!subTask) throw new AppError('Oops!,ID invalido', 400);
     if (status === 'DONE') {
       const files = await prisma.files.findMany({
         where: { subTasksId: id, type: 'REVIEW' },
@@ -242,7 +242,7 @@ class SubTasksServices {
   }
 
   static async delete(id: SubTasks['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const subTask = await prisma.subTasks.findUnique({ where: { id } });
     if (subTask && subTask.taskId) {
       const { taskId } = subTask;
@@ -286,7 +286,7 @@ class SubTasksServices {
   }
 
   static async upload(fileName: string, id: SubTasks['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const uploadFile = await prisma.subTasks.update({
       where: { id },
       data: {
@@ -314,7 +314,7 @@ class SubTasksServices {
     id: SubTasks['id']
   ) {
     const newUserData = userData.map(user => ({ userId: user.id }));
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     // const assignUserBySubtaskPromises = userData.map(async user => {
     return await prisma.subTasks.update({
       where: { id },
@@ -343,7 +343,7 @@ class SubTasksServices {
   }
 
   static async deleteFile(fileName: string, id: SubTasks['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
 
     const subTasks = await prisma.subTasks.findUnique({
       where: {

@@ -19,7 +19,7 @@ const taskVerify = async (req: Request, res: Response, next: NextFunction) => {
       },
     });
     if (!verifyTask) {
-      throw new AppError(`You dont have any task for this route`, 404);
+      throw new AppError(`No tiene ninguna tarea en esta ruta`, 404);
     }
     next();
   } catch (error) {

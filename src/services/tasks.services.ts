@@ -5,7 +5,7 @@ import PathServices from './paths.services';
 import { renameDir } from '../utils/fileSystem';
 class TasksServices {
   static async find(id: Tasks['id'], status?: SubTasks['status']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findTask = await prisma.tasks.findUnique({
       where: { id },
       select: {
@@ -30,16 +30,16 @@ class TasksServices {
         },
       },
     });
-    if (!findTask) throw new AppError('Could not found task ', 404);
+    if (!findTask) throw new AppError('No se pudo encontrar la tarea ', 404);
     return findTask;
   }
 
   static async findShort(id: Tasks['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findTask = await prisma.tasks.findUnique({
       where: { id },
     });
-    if (!findTask) throw new AppError('Could not found task ', 404);
+    if (!findTask) throw new AppError('No se pudo encontrar la tarea ', 404);
     return findTask;
   }
 
@@ -48,7 +48,7 @@ class TasksServices {
     const findArea = await prisma.indexTasks.findUnique({
       where: { id },
     });
-    if (!findArea) throw new AppError('Could not found area', 404);
+    if (!findArea) throw new AppError('No se pudo encontrar el area', 404);
     return findArea;
   }
 
@@ -70,7 +70,7 @@ class TasksServices {
   }
 
   static async update(id: Tasks['id'], { name }: Tasks) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateTask = await prisma.tasks.update({
       where: { id },
       data: {
@@ -81,7 +81,7 @@ class TasksServices {
   }
 
   static async delete(id: Tasks['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const { indexTaskId } = await this.findShort(id);
     const dirIndexTask = await PathServices.pathIndexTask(indexTaskId);
     const deleteTask = await prisma.tasks.delete({

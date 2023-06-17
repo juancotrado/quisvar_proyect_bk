@@ -15,7 +15,7 @@ class SpecialitiesServices {
         },
       });
       if (getSpecialities.length == 0)
-        throw new AppError('Could not found work areas', 404);
+        throw new AppError('No se pudo encontrar las areas de trabajo', 404);
       return getSpecialities;
     } catch (error) {
       throw error;
@@ -23,7 +23,7 @@ class SpecialitiesServices {
   }
 
   static async find(id: Specialities['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findSpeciality = await prisma.specialities.findUnique({
       where: { id },
       include: {
@@ -54,7 +54,10 @@ class SpecialitiesServices {
       },
     });
     if (!findSpeciality)
-      throw new AppError('Could not found logs specialities', 404);
+      throw new AppError(
+        'No se pudo encontrar el registro de especialidades',
+        404
+      );
     return findSpeciality;
   }
 
@@ -66,7 +69,7 @@ class SpecialitiesServices {
   }
 
   static async update(id: Specialities['id'], { name }: Specialities) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateSpeciality = await prisma.specialities.update({
       where: { id },
       data: { name },
@@ -75,7 +78,7 @@ class SpecialitiesServices {
   }
 
   static async delete(id: Specialities['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const deleteSpeciality = await prisma.specialities.delete({
       where: { id },
     });
