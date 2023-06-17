@@ -7,7 +7,7 @@ class ProfileServices {
     userId: Users['id'],
     { firstName, lastName, phone }: Profiles
   ) {
-    if (!userId) throw new AppError('Oops!,Invalid ID', 400);
+    if (!userId) throw new AppError('Oops!,ID invalido', 400);
     const updateProfile = await prisma.profiles.update({
       where: {
         userId,

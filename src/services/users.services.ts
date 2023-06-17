@@ -12,7 +12,7 @@ class UsersServices {
         include: { profile: true },
       });
       if (users.length == 0) {
-        throw new AppError('Could not found user logs', 404);
+        throw new AppError('No se pudo encontrar el registro de usuarios', 404);
       }
       return users;
     } catch (error) {
@@ -21,7 +21,7 @@ class UsersServices {
   }
 
   static async find(id: Users['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findUser = await prisma.users.findUnique({
       where: {
         id,
@@ -35,22 +35,23 @@ class UsersServices {
         profile: true,
       },
     });
-    if (!findUser) throw new AppError('Could not found user ', 404);
+    if (!findUser) throw new AppError('No se pudo encontrar el usuario', 404);
     return findUser;
   }
 
   static async findListTask(id: Users['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findTaskUser = await prisma.tasks.findMany({
       where: {
         id,
       },
     });
-    if (!findTaskUser) throw new AppError('Could not found task ', 404);
+    if (!findTaskUser)
+      throw new AppError('No se pudo encontrar la tarea ', 404);
     return findTaskUser;
   }
   static async findListSubTask(id: Users['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const subTasks = await prisma.taskOnUsers.findMany({
       where: {
         userId: id,
@@ -73,7 +74,7 @@ class UsersServices {
         },
       },
     });
-    if (!subTasks) throw new AppError('Could not found task ', 404);
+    if (!subTasks) throw new AppError('No se pudo encontrar las tareas', 404);
     return subTasks.map(taskOnUser => taskOnUser.subtask);
   }
 
@@ -89,8 +90,7 @@ class UsersServices {
     const findUserByDNI = await prisma.profiles.findUnique({
       where: { dni },
     });
-    if (findUserByDNI)
-      throw new AppError('Oops!, DNI has been registered', 404);
+    if (findUserByDNI) throw new AppError('Oops!, DNI ha sido registrado', 404);
     const newUser = await prisma.users.create({
       data: {
         email,
@@ -112,7 +112,7 @@ class UsersServices {
     id: Users['id'],
     { role, status }: Pick<Users, 'role' | 'status'>
   ) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateUser = await prisma.users.update({
       where: { id },
       data: {
@@ -124,7 +124,7 @@ class UsersServices {
   }
 
   static async delete(id: Users['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const deleteUser = await prisma.users.delete({
       where: { id },
     });

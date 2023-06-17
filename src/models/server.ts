@@ -90,10 +90,10 @@ class Server {
       if (this.PORT && this.HOST) {
         prisma;
         console.log(
-          `Server has running in 🚀 ==> http://${this.HOST}:${this.PORT}/`
+          `Servidor desplegado en 🚀 ==> http://${this.HOST}:${this.PORT}/`
         );
       } else {
-        console.log('Could not connect to server 😥');
+        console.log('No se pudo conectar al servidor 😥');
       }
     });
   }

@@ -41,7 +41,7 @@ const checkFileType = (
 ) => {
   const extName = path.extname(file.originalname);
   if (FILE_TYPES.includes(extName)) return callback(null, true);
-  return callback(new Error('upload the file with the requested extension!'));
+  return callback(new Error('Suba el archivo con la extension solicitada!'));
 };
 
 export const upload = multer({
@@ -52,7 +52,7 @@ export const upload = multer({
 
 export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.status(200).json({ message: 'Succefully upload file' });
+    res.status(200).json({ message: 'Archivo subido exitosamente' });
   } catch (error) {
     next(error);
   }

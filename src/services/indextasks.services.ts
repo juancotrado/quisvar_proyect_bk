@@ -6,7 +6,7 @@ import { renameDir } from '../utils/fileSystem';
 import PathServices from './paths.services';
 class IndexTasksServices {
   static async find(id: IndexTasks['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!, ID invalido', 400);
     const findIndexTask = await prisma.indexTasks.findUnique({
       where: { id },
       select: {
@@ -20,12 +20,13 @@ class IndexTasksServices {
         },
       },
     });
-    if (!findIndexTask) throw new AppError('Could not found work areas', 404);
+    if (!findIndexTask)
+      throw new AppError('No se pudieron encontrar las áreas de trabajo', 404);
     return findIndexTask;
   }
 
   static async findSubtasks(id: IndexTasks['id'], status?: SubTasks['status']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findTask = await prisma.indexTasks.findUnique({
       where: { id },
       select: {
@@ -50,24 +51,25 @@ class IndexTasksServices {
         },
       },
     });
-    if (!findTask) throw new AppError('Could not found task ', 404);
+    if (!findTask) throw new AppError('No se pudo encontrar la tarea ', 404);
     return findTask;
   }
   static async findShort(id: IndexTasks['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findIndexTask = await prisma.indexTasks.findUnique({
       where: { id },
     });
-    if (!findIndexTask) throw new AppError('Could not found work areas', 404);
+    if (!findIndexTask)
+      throw new AppError('No se pudo encontrar las areas de trabajo', 404);
     return findIndexTask;
   }
 
   static async findArea(id: WorkAreas['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findArea = await prisma.workAreas.findUnique({
       where: { id },
     });
-    if (!findArea) throw new AppError('Could not found area', 404);
+    if (!findArea) throw new AppError('No se pudo encontrar las areas', 404);
     return findArea;
   }
 
@@ -90,7 +92,7 @@ class IndexTasksServices {
   }
 
   static async update(id: IndexTasks['id'], { name }: IndexTasks) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateTask = await prisma.indexTasks.update({
       where: { id },
       data: {
@@ -101,7 +103,7 @@ class IndexTasksServices {
   }
 
   static async delete(id: IndexTasks['id']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const { workAreaId } = await this.findShort(id);
     const dirArea = await PathServices.pathArea(workAreaId);
     const deleteTask = await prisma.indexTasks.delete({

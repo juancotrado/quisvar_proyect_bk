@@ -5,7 +5,7 @@ import { Files, SubTasks, prisma } from '../utils/prisma.server';
 
 class PathServices {
   static async pathProject(id: number) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const project = await prisma.projects.findUnique({ where: { id } });
     if (!project)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
@@ -13,7 +13,7 @@ class PathServices {
     return path;
   }
   static async pathArea(id: number) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const area = await prisma.workAreas.findUnique({
       where: { id },
       select: {
@@ -31,7 +31,7 @@ class PathServices {
     return path;
   }
   static async pathIndexTask(id: number) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const task = await prisma.indexTasks.findUnique({
       where: { id },
       select: {
@@ -56,7 +56,7 @@ class PathServices {
     return path;
   }
   static async pathTask(id: number) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const task = await prisma.tasks.findUnique({
       where: { id },
       select: {
@@ -90,7 +90,7 @@ class PathServices {
     return path;
   }
   static async pathSubTask(id: number, type: Files['type']) {
-    if (!id) throw new AppError('Oops!,Invalid ID', 400);
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const subTask = await prisma.subTasks.findUnique({
       where: { id },
       select: {

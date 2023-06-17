@@ -19,7 +19,7 @@ export const statusVerify = async (
     const { role } = userInfo;
     if (!permRole.includes(role) && !permStatus.includes(body.status)) {
       throw new AppError(
-        `You dont have permission with ${body.status} for this route`,
+        `No cuenta con permisos con ${body.status} para esta ruta`,
         400
       );
     }
@@ -40,7 +40,7 @@ export const validTaskById = async (
       console.log(indexTaskId);
       next();
     }
-    throw new AppError(`You need taskId or indexTaskId`, 400);
+    throw new AppError(`Necesita taskId o indexTaskId`, 400);
   } catch (error) {
     next(error);
   }
