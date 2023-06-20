@@ -15,7 +15,21 @@ class SubTasksServices {
     const findSubTask = await prisma.subTasks.findUnique({
       where: { id },
       include: {
-        files: true,
+        files: {
+          select: {
+            dir: true,
+            name: true,
+            subTasksId: true,
+            type: true,
+            user: {
+              select: {
+                profile: {
+                  select: { firstName: true, lastName: true },
+                },
+              },
+            },
+          },
+        },
         users: {
           select: {
             user: {
@@ -90,7 +104,21 @@ class SubTasksServices {
           },
         },
         include: {
-          files: true,
+          files: {
+            select: {
+              dir: true,
+              name: true,
+              subTasksId: true,
+              type: true,
+              user: {
+                select: {
+                  profile: {
+                    select: { firstName: true, lastName: true },
+                  },
+                },
+              },
+            },
+          },
           users: {
             select: {
               user: { select: { id: true, profile: true } },
@@ -111,7 +139,21 @@ class SubTasksServices {
           },
         },
         include: {
-          files: true,
+          files: {
+            select: {
+              dir: true,
+              name: true,
+              subTasksId: true,
+              type: true,
+              user: {
+                select: {
+                  profile: {
+                    select: { firstName: true, lastName: true },
+                  },
+                },
+              },
+            },
+          },
           users: {
             select: {
               user: { select: { id: true, profile: true } },
@@ -127,7 +169,21 @@ class SubTasksServices {
           status: 'INREVIEW',
         },
         include: {
-          files: true,
+          files: {
+            select: {
+              dir: true,
+              name: true,
+              subTasksId: true,
+              type: true,
+              user: {
+                select: {
+                  profile: {
+                    select: { firstName: true, lastName: true },
+                  },
+                },
+              },
+            },
+          },
           users: {
             select: {
               user: { select: { id: true, profile: true } },
@@ -168,7 +224,21 @@ class SubTasksServices {
         status,
       },
       include: {
-        files: true,
+        files: {
+          select: {
+            dir: true,
+            name: true,
+            subTasksId: true,
+            type: true,
+            user: {
+              select: {
+                profile: {
+                  select: { firstName: true, lastName: true },
+                },
+              },
+            },
+          },
+        },
         users: {
           select: {
             user: { select: { id: true, profile: true } },
@@ -185,12 +255,13 @@ class SubTasksServices {
       });
       const oldDir = await PathServices.pathSubTask(id, 'REVIEW');
       const newDir = await PathServices.pathSubTask(id, 'SUCCESSFUL');
+
       files.forEach(async file => {
         const ext = file.name.split('@').at(-1);
         const newFileName = subTask.item + '.' + subTask.name + ext;
         await prisma.files.update({
           where: { id: file.id },
-          data: { type: 'SUCCESSFUL', name: newFileName },
+          data: { type: 'SUCCESSFUL', name: newFileName, dir: newDir },
         });
         fs.renameSync(`${oldDir}/${file.name}`, `${newDir}/${newFileName}`);
       });
@@ -206,7 +277,21 @@ class SubTasksServices {
           },
         },
         include: {
-          files: true,
+          files: {
+            select: {
+              dir: true,
+              name: true,
+              subTasksId: true,
+              type: true,
+              user: {
+                select: {
+                  profile: {
+                    select: { firstName: true, lastName: true },
+                  },
+                },
+              },
+            },
+          },
           users: {
             select: {
               user: { select: { id: true, profile: true } },
@@ -229,7 +314,21 @@ class SubTasksServices {
           },
         },
         include: {
-          files: true,
+          files: {
+            select: {
+              dir: true,
+              name: true,
+              subTasksId: true,
+              type: true,
+              user: {
+                select: {
+                  profile: {
+                    select: { firstName: true, lastName: true },
+                  },
+                },
+              },
+            },
+          },
           users: {
             select: {
               user: { select: { id: true, profile: true } },

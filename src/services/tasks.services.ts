@@ -16,7 +16,21 @@ class TasksServices {
             status,
           },
           include: {
-            files: true,
+            files: {
+              select: {
+                dir: true,
+                name: true,
+                subTasksId: true,
+                type: true,
+                user: {
+                  select: {
+                    profile: {
+                      select: { firstName: true, lastName: true },
+                    },
+                  },
+                },
+              },
+            },
             users: {
               select: {
                 user: {

@@ -13,8 +13,10 @@ class FilesServices {
       where: { id: subTasksId },
     });
     if (!subTask) throw new AppError(`no se pudo encontrar la subtarea`, 404);
+    const dir = await PathServices.pathSubTask(subTasksId, 'REVIEW');
     const newFile = await prisma.files.create({
       data: {
+        dir,
         type,
         subTasksId,
         name: filename,
