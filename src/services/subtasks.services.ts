@@ -16,11 +16,7 @@ class SubTasksServices {
       where: { id },
       include: {
         files: {
-          select: {
-            dir: true,
-            name: true,
-            subTasksId: true,
-            type: true,
+          include: {
             user: {
               select: {
                 profile: {
@@ -207,6 +203,13 @@ class SubTasksServices {
         hours,
         price,
         percentage,
+      },
+      include: {
+        users: {
+          select: {
+            user: { select: { id: true, profile: true } },
+          },
+        },
       },
     });
     return updateTask;
@@ -424,6 +427,17 @@ class SubTasksServices {
         },
       },
       include: {
+        files: {
+          include: {
+            user: {
+              select: {
+                profile: {
+                  select: { id: true, firstName: true, lastName: true },
+                },
+              },
+            },
+          },
+        },
         users: {
           select: {
             user: {

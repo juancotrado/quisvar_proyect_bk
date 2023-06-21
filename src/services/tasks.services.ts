@@ -17,11 +17,7 @@ class TasksServices {
           },
           include: {
             files: {
-              select: {
-                dir: true,
-                name: true,
-                subTasksId: true,
-                type: true,
+              include: {
                 user: {
                   select: {
                     profile: {

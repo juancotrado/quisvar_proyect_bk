@@ -37,7 +37,17 @@ class IndexTasksServices {
             status,
           },
           include: {
-            files: true,
+            files: {
+              include: {
+                user: {
+                  select: {
+                    profile: {
+                      select: { id: true, firstName: true, lastName: true },
+                    },
+                  },
+                },
+              },
+            },
             users: {
               select: {
                 user: {
