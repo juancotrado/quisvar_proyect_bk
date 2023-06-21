@@ -91,7 +91,7 @@ class PathServices {
   }
   static async pathTask2(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const task2 = await prisma.task_lvl_2.findUnique({
+    const task_2 = await prisma.task_lvl_2.findUnique({
       where: { id },
       select: {
         name: true,
@@ -117,16 +117,24 @@ class PathServices {
         },
       },
     });
-    if (!task2)
+    if (!task_2)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
-    const { task } = task2;
+    const { task } = task_2;
     const { indexTask } = task;
     const { workArea } = indexTask;
     const { project } = workArea;
+    const projectPath = _dirPath + '/' + project.name;
+    let areaPath = parsePath(workArea.item, workArea.name);
+    if (project.unique) areaPath = '/' + workArea.name;
+    const indexTaskPath = parsePath(indexTask.item, indexTask.name);
+    const taskPath = parsePath(task.item, task.name);
+    const task_2Path = parsePath(task_2.item, task.name);
+    const path = projectPath + areaPath + indexTaskPath + taskPath + task_2Path;
+    return path;
   }
   static async pathTask3(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const task3 = await prisma.task_lvl_3.findUnique({
+    const task_3 = await prisma.task_lvl_3.findUnique({
       where: { id },
       select: {
         name: true,
@@ -158,8 +166,28 @@ class PathServices {
         },
       },
     });
-    if (!task3)
+    if (!task_3)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
+    const { task_2 } = task_3;
+    const { task } = task_2;
+    const { indexTask } = task;
+    const { workArea } = indexTask;
+    const { project } = workArea;
+    const projectPath = _dirPath + '/' + project.name;
+    let areaPath = parsePath(workArea.item, workArea.name);
+    if (project.unique) areaPath = '/' + workArea.name;
+    const indexTaskPath = parsePath(indexTask.item, indexTask.name);
+    const taskPath = parsePath(task.item, task.name);
+    const task_2Path = parsePath(task_2.item, task_2.name);
+    const task_3Path = parsePath(task_3.item, task_3.name);
+    const path =
+      projectPath +
+      areaPath +
+      indexTaskPath +
+      taskPath +
+      task_2Path +
+      task_3Path;
+    return path;
   }
   static async pathSubTask(id: number, type: Files['type']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
