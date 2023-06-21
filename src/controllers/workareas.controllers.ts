@@ -58,10 +58,9 @@ export const updateWorkarea = async (
     const { id } = req.params;
     const { body } = req;
     const _work_area_id = parseInt(id);
-    console.log(body, id);
     const oldDir = await PathServices.pathArea(_work_area_id);
     const query = await WorkAreasServices.update(_work_area_id, body);
-    const path = query.item ? query.name : query.item + '.' + query.name;
+    const path = +query.item ? query.item + '.' + query.name : query.name;
     const newDir = setNewPath(oldDir, path);
     if (query) renameDir(oldDir, newDir);
     res.status(200).json({ ...query, newDir });

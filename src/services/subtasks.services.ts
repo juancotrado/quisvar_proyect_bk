@@ -46,15 +46,16 @@ class SubTasksServices {
     return findSubTask;
   }
 
-  static async create({ name, price, hours, taskId, indexTaskId }: SubTasks) {
+  static async create({
+    name,
+    price,
+    hours,
+    taskId,
+    indexTaskId,
+    task_2_Id,
+    task_3_Id,
+  }: SubTasks) {
     let data = { name, price, hours };
-    if (taskId) {
-      const quantityTask = await prisma.subTasks.count({ where: { taskId } });
-      const task = await TasksServices.findShort(taskId);
-      const item = task.item + '.' + (quantityTask + 1);
-      const newSub = { ...data, taskId, item };
-      data = newSub;
-    }
     if (indexTaskId) {
       const indexTask = await TasksServices.findIndexTask(indexTaskId);
       const quantityIndexTask = await prisma.subTasks.count({
@@ -64,6 +65,30 @@ class SubTasksServices {
       const newSub = { ...data, indexTaskId, item };
       data = newSub;
     }
+    if (taskId) {
+      const quantityTask = await prisma.subTasks.count({ where: { taskId } });
+      const task = await TasksServices.findShort(taskId);
+      const item = task.item + '.' + (quantityTask + 1);
+      const newSub = { ...data, taskId, item };
+      data = newSub;
+    }
+    if (task_2_Id) {
+      const quantityTask = await prisma.subTasks.count({
+        where: { task_2_Id },
+      });
+      const item = '.' + (quantityTask + 1);
+      const newSub = { ...data, task_2_Id };
+      data = newSub;
+    }
+    if (task_3_Id) {
+      const quantityTask = await prisma.subTasks.count({
+        where: { task_3_Id },
+      });
+      const item = '.' + (quantityTask + 1);
+      const newSub = { ...data, task_3_Id };
+      data = newSub;
+    }
+
     const newTask = await prisma.subTasks.create({
       data,
       include: {

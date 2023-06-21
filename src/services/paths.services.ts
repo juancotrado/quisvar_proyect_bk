@@ -89,6 +89,78 @@ class PathServices {
     const path = projectPath + areaPath + indexTaskPath + taskPath;
     return path;
   }
+  static async pathTask2(id: number) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const task2 = await prisma.task_lvl_2.findUnique({
+      where: { id },
+      select: {
+        name: true,
+        item: true,
+        task: {
+          select: {
+            name: true,
+            item: true,
+            indexTask: {
+              select: {
+                name: true,
+                item: true,
+                workArea: {
+                  select: {
+                    item: true,
+                    name: true,
+                    project: { select: { name: true, unique: true } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!task2)
+      throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
+    const { task } = task2;
+    const { indexTask } = task;
+    const { workArea } = indexTask;
+    const { project } = workArea;
+  }
+  static async pathTask3(id: number) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const task3 = await prisma.task_lvl_3.findUnique({
+      where: { id },
+      select: {
+        name: true,
+        item: true,
+        task_2: {
+          select: {
+            name: true,
+            item: true,
+            task: {
+              select: {
+                name: true,
+                item: true,
+                indexTask: {
+                  select: {
+                    name: true,
+                    item: true,
+                    workArea: {
+                      select: {
+                        item: true,
+                        name: true,
+                        project: { select: { name: true, unique: true } },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!task3)
+      throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
+  }
   static async pathSubTask(id: number, type: Files['type']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const subTask = await prisma.subTasks.findUnique({

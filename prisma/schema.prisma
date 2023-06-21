@@ -84,13 +84,43 @@ model IndexTasks {
 }
 
 model Tasks {
-  id          Int        @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
   name        String
   indexTaskId Int
-  item        String     @default("")
-  indexTask   IndexTasks @relation(fields: [indexTaskId], references: [id])
+  item        String       @default("")
+  indexTask   IndexTasks   @relation(fields: [indexTaskId], references: [id])
+  tasks_2     Task_lvl_2[]
   subTasks    SubTasks[]
 }
+
+model Task_lvl_2 {
+  id       Int          @id @default(autoincrement())
+  name     String
+  taskId   Int
+  item     String       @default("")
+  task     Tasks        @relation(fields: [taskId], references: [id])
+  tasks_3  Task_lvl_3[]
+  subTasks SubTasks[]
+}
+
+model Task_lvl_3 {
+  id        Int        @id @default(autoincrement())
+  name      String
+  item      String     @default("")
+  task_2_Id Int
+  task_2    Task_lvl_2 @relation(fields: [task_2_Id], references: [id])
+  // tasks     Task_lvl_4[]
+  subTasks  SubTasks[]
+}
+
+// model Task_lvl_4 {
+//   id        Int        @id @default(autoincrement())
+//   name      String
+//   item      String     @default("")
+//   task_3_Id Int
+//   task_3    Task_lvl_3 @relation(fields: [task_3_Id], references: [id])
+//   subTasks  SubTasks[]
+// }
 
 model SubTasks {
   id          Int           @id @default(autoincrement())
@@ -99,15 +129,21 @@ model SubTasks {
   name        String
   percentage  Int           @default(0)
   price       Decimal       @db.Money
-  hours       Int
+  hours       Float
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   users       TaskOnUsers[]
   files       Files[]
   taskId      Int?
   indexTaskId Int?
-  task        Tasks?        @relation(fields: [taskId], references: [id])
+  task_2_Id   Int?
+  task_3_Id   Int?
+  // task_4_Id   Int?
   indexTask   IndexTasks?   @relation(fields: [indexTaskId], references: [id])
+  task        Tasks?        @relation(fields: [taskId], references: [id])
+  Task_lvl_2  Task_lvl_2?   @relation(fields: [task_2_Id], references: [id])
+  Task_lvl_3  Task_lvl_3?   @relation(fields: [task_3_Id], references: [id])
+  // Task_lvl_4  Task_lvl_4?   @relation(fields: [task_4_Id], references: [id])
 }
 
 model TaskOnUsers {

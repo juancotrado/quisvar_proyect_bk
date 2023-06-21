@@ -1,6 +1,5 @@
 import { IndexTasks, SubTasks, Tasks, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-import fs from 'fs';
 import PathServices from './paths.services';
 import { renameDir } from '../utils/fileSystem';
 class TasksServices {
@@ -43,7 +42,6 @@ class TasksServices {
     if (!findTask) throw new AppError('No se pudo encontrar la tarea ', 404);
     return findTask;
   }
-
   static async findShort(id: Tasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findTask = await prisma.tasks.findUnique({
