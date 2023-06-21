@@ -25,7 +25,7 @@ class TasksServices {
                 user: {
                   select: {
                     profile: {
-                      select: { firstName: true, lastName: true },
+                      select: { id: true, firstName: true, lastName: true },
                     },
                   },
                 },

@@ -24,7 +24,7 @@ class SubTasksServices {
             user: {
               select: {
                 profile: {
-                  select: { firstName: true, lastName: true },
+                  select: { id: true, firstName: true, lastName: true },
                 },
               },
             },
@@ -113,7 +113,7 @@ class SubTasksServices {
               user: {
                 select: {
                   profile: {
-                    select: { firstName: true, lastName: true },
+                    select: { id: true, firstName: true, lastName: true },
                   },
                 },
               },
@@ -148,7 +148,7 @@ class SubTasksServices {
               user: {
                 select: {
                   profile: {
-                    select: { firstName: true, lastName: true },
+                    select: { id: true, firstName: true, lastName: true },
                   },
                 },
               },
@@ -178,7 +178,7 @@ class SubTasksServices {
               user: {
                 select: {
                   profile: {
-                    select: { firstName: true, lastName: true },
+                    select: { id: true, firstName: true, lastName: true },
                   },
                 },
               },
@@ -233,7 +233,7 @@ class SubTasksServices {
             user: {
               select: {
                 profile: {
-                  select: { firstName: true, lastName: true },
+                  select: { id: true, firstName: true, lastName: true },
                 },
               },
             },
@@ -286,7 +286,7 @@ class SubTasksServices {
               user: {
                 select: {
                   profile: {
-                    select: { firstName: true, lastName: true },
+                    select: { id: true, firstName: true, lastName: true },
                   },
                 },
               },
@@ -323,7 +323,7 @@ class SubTasksServices {
               user: {
                 select: {
                   profile: {
-                    select: { firstName: true, lastName: true },
+                    select: { id: true, firstName: true, lastName: true },
                   },
                 },
               },
