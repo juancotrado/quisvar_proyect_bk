@@ -86,11 +86,12 @@ class IndexTasksServices {
   static async create({ name, workAreaId, unique }: IndexTasks) {
     const getIndex = await prisma.indexTasks.count({ where: { workAreaId } });
     const _area = await this.findArea(workAreaId);
+    console.log();
     const newTask = await prisma.indexTasks.create({
       data: {
         name,
         unique,
-        item: _area.item ? `${getIndex + 1}` : `${_area.item}.${getIndex + 1}`,
+        item: _area.item ? `${_area.item}.${getIndex + 1}` : `${getIndex + 1}`,
         workArea: {
           connect: {
             id: workAreaId,

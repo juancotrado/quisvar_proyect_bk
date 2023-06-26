@@ -9,6 +9,8 @@ import AppError from '../utils/appError';
 import fs from 'fs';
 import TasksServices from './tasks.services';
 import PathServices from './paths.services';
+import Task_2_Services from './task_2.services';
+import Task_3_Services from './task_3.services';
 class SubTasksServices {
   static async find(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
@@ -50,8 +52,8 @@ class SubTasksServices {
     name,
     price,
     hours,
-    taskId,
     indexTaskId,
+    taskId,
     task_2_Id,
     task_3_Id,
   }: SubTasks) {
@@ -76,16 +78,18 @@ class SubTasksServices {
       const quantityTask = await prisma.subTasks.count({
         where: { task_2_Id },
       });
-      const item = '.' + (quantityTask + 1);
-      const newSub = { ...data, task_2_Id };
+      const task_2 = await Task_2_Services.findShort(task_2_Id);
+      const item = task_2.item + '.' + (quantityTask + 1);
+      const newSub = { ...data, task_2_Id, item };
       data = newSub;
     }
     if (task_3_Id) {
+      const task_3 = await Task_3_Services.findShort(task_3_Id);
       const quantityTask = await prisma.subTasks.count({
         where: { task_3_Id },
       });
-      const item = '.' + (quantityTask + 1);
-      const newSub = { ...data, task_3_Id };
+      const item = task_3.item + '.' + (quantityTask + 1);
+      const newSub = { ...data, task_3_Id, item };
       data = newSub;
     }
 
@@ -371,7 +375,27 @@ class SubTasksServices {
   static async delete(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const subTask = await prisma.subTasks.findUnique({ where: { id } });
-    if (subTask && subTask.taskId) {
+    if (!subTask) throw new AppError(`No se pudo encontrar la subtarea`, 404);
+    if (subTask.indexTaskId) {
+      const { indexTaskId } = subTask;
+      const deleteTask = await prisma.subTasks.delete({
+        where: { id },
+      });
+      const getSubTasks = await prisma.subTasks.findMany({
+        where: { indexTaskId },
+        include: {
+          indexTask: { select: { item: true } },
+        },
+      });
+      getSubTasks.forEach(async (subTask, index) => {
+        await prisma.subTasks.update({
+          where: { id: subTask.id },
+          data: { item: `${subTask.indexTask?.item}.${index + 1}` },
+        });
+      });
+      return deleteTask;
+    }
+    if (subTask.taskId) {
       const { taskId } = subTask;
       const deleteTask = await prisma.subTasks.delete({
         where: { id },
@@ -390,21 +414,40 @@ class SubTasksServices {
       });
       return deleteTask;
     }
-    if (subTask && subTask.indexTaskId) {
-      const { indexTaskId } = subTask;
+    if (subTask.task_2_Id) {
+      const { task_2_Id } = subTask;
       const deleteTask = await prisma.subTasks.delete({
         where: { id },
       });
       const getSubTasks = await prisma.subTasks.findMany({
-        where: { indexTaskId },
+        where: { task_2_Id },
         include: {
-          indexTask: { select: { item: true } },
+          task_lvl_2: { select: { item: true } },
         },
       });
       getSubTasks.forEach(async (subTask, index) => {
         await prisma.subTasks.update({
           where: { id: subTask.id },
-          data: { item: `${subTask.indexTask?.item}.${index + 1}` },
+          data: { item: `${subTask.task_lvl_2?.item}.${index + 1}` },
+        });
+      });
+      return deleteTask;
+    }
+    if (subTask.task_3_Id) {
+      const { task_3_Id } = subTask;
+      const deleteTask = await prisma.subTasks.delete({
+        where: { id },
+      });
+      const getSubTasks = await prisma.subTasks.findMany({
+        where: { task_3_Id },
+        include: {
+          task_lvl_3: { select: { item: true } },
+        },
+      });
+      getSubTasks.forEach(async (subTask, index) => {
+        await prisma.subTasks.update({
+          where: { id: subTask.id },
+          data: { item: `${subTask.task_lvl_3?.item}.${index + 1}` },
         });
       });
       return deleteTask;

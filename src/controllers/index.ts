@@ -59,6 +59,16 @@ import {
   updateSpeciality,
 } from './speacialities.controllers';
 import { deleteFile, uploadFile } from './files.controllers';
+import {
+  createTaskLvl_2,
+  deleteTaskLvl_2,
+  updateTaskLvl_2,
+} from './task_2.controllers';
+import {
+  createTaskLvl_3,
+  deleteTaskLvl_3,
+  updateTaskLvl_3,
+} from './task_3.controllers';
 // User Controllers
 export {
   showUsers,
@@ -106,14 +116,12 @@ export {
   showSubtasksByIndexTask,
 };
 //Task Controllers
-export {
-  showTask,
-  createTask,
-  // updateTaskStatus,
-  // assignedTask,
-  deleteTasks,
-  updateTask,
-};
+export { showTask, createTask, deleteTasks, updateTask };
+//Task Lvl2 Controllers
+export { createTaskLvl_2, updateTaskLvl_2, deleteTaskLvl_2 };
+//Task Lvl3 Controllers
+export { createTaskLvl_3, updateTaskLvl_3, deleteTaskLvl_3 };
+
 //Subtask Controllers
 export {
   showSubTask,

@@ -44,9 +44,7 @@ class TasksServices {
   }
   static async findShort(id: Tasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const findTask = await prisma.tasks.findUnique({
-      where: { id },
-    });
+    const findTask = await prisma.tasks.findUnique({ where: { id } });
     if (!findTask) throw new AppError('No se pudo encontrar la tarea ', 404);
     return findTask;
   }
@@ -60,12 +58,13 @@ class TasksServices {
     return findArea;
   }
 
-  static async create({ name, indexTaskId }: Tasks) {
+  static async create({ name, indexTaskId, unique }: Tasks) {
     const getIndex = await prisma.tasks.count({ where: { indexTaskId } });
     const _index_task = await this.findIndexTask(indexTaskId);
     const newTask = await prisma.tasks.create({
       data: {
         name,
+        unique,
         item: `${_index_task.item}.${getIndex + 1}`,
         indexTask: {
           connect: {
