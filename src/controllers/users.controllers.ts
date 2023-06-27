@@ -52,8 +52,10 @@ export const showSubTasksByUser = async (
 ) => {
   try {
     const { id } = req.params;
+    const { project } = req.query;
     const _id = parseInt(id);
-    const query = await UsersServices.findListSubTask(_id);
+    const _project = parseInt(project as string);
+    const query = await UsersServices.findListSubTask(_id, _project);
     res.status(200).json(query);
   } catch (error) {
     next(error);

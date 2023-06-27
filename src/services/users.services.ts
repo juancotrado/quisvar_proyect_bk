@@ -50,15 +50,73 @@ class UsersServices {
       throw new AppError('No se pudo encontrar la tarea ', 404);
     return findTaskUser;
   }
-  static async findListSubTask(id: Users['id']) {
-    if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const subTasks = await prisma.taskOnUsers.findMany({
+  static async findListSubTask(userId: Users['id'], projectId: number) {
+    if (!userId) throw new AppError('Oops!,ID invalido', 400);
+    console.log(projectId);
+    if (!projectId) throw new AppError('Oops!,ID invalido', 400);
+    const subtaskByIndexTask = await prisma.subTasks.findMany({
       where: {
-        userId: id,
+        users: {
+          every: { userId },
+        },
+        indexTask: { workArea: { projectId } },
       },
       include: {
-        subtask: {
-          include: {
+        users: {
+          select: {
+            assignedAt: true,
+          },
+        },
+        indexTask: {
+          select: {
+            id: true,
+            workAreaId: true,
+          },
+        },
+      },
+    });
+    const subtaskByTask = await prisma.subTasks.findMany({
+      where: {
+        users: {
+          every: { userId },
+        },
+        task: { indexTask: { workArea: { projectId } } },
+      },
+      include: {
+        users: {
+          select: {
+            assignedAt: true,
+          },
+        },
+        task: {
+          select: {
+            id: true,
+            indexTask: {
+              select: {
+                id: true,
+                workAreaId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    const subtaskByTask2 = await prisma.subTasks.findMany({
+      where: {
+        users: {
+          every: { userId },
+        },
+        task_lvl_2: { task: { indexTask: { workArea: { projectId } } } },
+      },
+      include: {
+        users: {
+          select: {
+            assignedAt: true,
+          },
+        },
+        task_lvl_2: {
+          select: {
+            id: true,
             task: {
               select: {
                 id: true,
@@ -74,8 +132,55 @@ class UsersServices {
         },
       },
     });
-    if (!subTasks) throw new AppError('No se pudo encontrar las tareas', 404);
-    return subTasks.map(taskOnUser => taskOnUser.subtask);
+    const subtaskByTask3 = await prisma.subTasks.findMany({
+      where: {
+        users: {
+          every: { userId },
+        },
+        task_lvl_3: {
+          task_2: { task: { indexTask: { workArea: { projectId } } } },
+        },
+      },
+      include: {
+        users: {
+          select: {
+            assignedAt: true,
+          },
+        },
+        task_lvl_3: {
+          select: {
+            id: true,
+            task_2: {
+              select: {
+                id: true,
+                task: {
+                  select: {
+                    id: true,
+                    indexTask: {
+                      select: {
+                        id: true,
+                        workAreaId: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const subTasksList = [
+      ...subtaskByIndexTask,
+      ...subtaskByTask,
+      ...subtaskByTask2,
+      ...subtaskByTask3,
+    ];
+    if (!subTasksList)
+      throw new AppError('No se pudo encontrar las tareas', 404);
+    // return subTasks.map(taskOnUser => taskOnUser.subtask);
+    return subTasksList;
   }
 
   static async create({
