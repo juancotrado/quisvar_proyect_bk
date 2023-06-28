@@ -1,0 +1,9 @@
+on: push
+name: restart deploy
+jobs:
+  deploy:
+    name: restart deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restart project from git actions
+        run: docker restart project_backend
