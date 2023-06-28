@@ -19,8 +19,8 @@ router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);
 // router.patch('/status/:id', updateTaskStatus);
-router.get('/:id', showIndexTask);
-router.get('/:id/subtasks', showSubtasksByIndexTask);
+router.get('/:id', showSubtasksByIndexTask);
+// router.get('/:id/subtasks', showSubtasksByIndexTask);
 // router.patch('/:id', taskVerify, assignedTask);
 //MOD ROLE
 router.patch('/:id', updatIndexTask);
