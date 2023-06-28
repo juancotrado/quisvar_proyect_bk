@@ -12,6 +12,30 @@ class Task_2_Services {
       select: {
         id: true,
         name: true,
+        subTasks: {
+          include: {
+            files: {
+              include: {
+                user: {
+                  select: {
+                    profile: {
+                      select: { id: true, firstName: true, lastName: true },
+                    },
+                  },
+                },
+              },
+            },
+            users: {
+              select: {
+                user: {
+                  select: {
+                    profile: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
     return findTaskLvl2;
