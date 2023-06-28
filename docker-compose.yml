@@ -1,4 +1,4 @@
-version: "2"
+version: '2'
 services:
   node:
     build:
@@ -9,10 +9,15 @@ services:
     restart: always
     working_dir: /home/node/app
     environment:
-      # VIRTUAL_HOST:
+      VIRTUAL_HOST: quisvar.sumak.digital, www.quisvar.sumak.digital
       NODE_ENV: production
     volumes:
       - ./:/home/node/app
     ports:
       - ${PORT}:8081
-    command: "npm run start"
+    command: 'npm run start'
+
+networks:
+  default:
+    external:
+      name: proxynet
