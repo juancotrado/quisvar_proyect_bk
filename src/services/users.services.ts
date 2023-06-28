@@ -58,15 +58,23 @@ class UsersServices {
         select: {
           subtask: {
             include: {
-              indexTask: { select: { id: true } },
+              indexTask: {
+                select: { id: true, workAreaId: true },
+              },
               task: {
-                select: { id: true, indexTask: { select: { id: true } } },
+                select: {
+                  id: true,
+                  indexTask: { select: { id: true, workAreaId: true } },
+                },
               },
               task_lvl_2: {
                 select: {
                   id: true,
                   task: {
-                    select: { id: true, indexTask: { select: { id: true } } },
+                    select: {
+                      id: true,
+                      indexTask: { select: { id: true, workAreaId: true } },
+                    },
                   },
                 },
               },
@@ -79,7 +87,7 @@ class UsersServices {
                       task: {
                         select: {
                           id: true,
-                          indexTask: { select: { id: true } },
+                          indexTask: { select: { id: true, workAreaId: true } },
                         },
                       },
                     },
