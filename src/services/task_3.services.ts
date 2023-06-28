@@ -5,6 +5,42 @@ import PathServices from './paths.services';
 import { renameDir } from '../utils/fileSystem';
 
 class Task_3_Services {
+  static async find(id: Task_lvl_3['id']) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const findTaskLvl3 = await prisma.task_lvl_3.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        subTasks: {
+          include: {
+            files: {
+              include: {
+                user: {
+                  select: {
+                    profile: {
+                      select: { id: true, firstName: true, lastName: true },
+                    },
+                  },
+                },
+              },
+            },
+            users: {
+              select: {
+                user: {
+                  select: {
+                    profile: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return findTaskLvl3;
+  }
+
   static async findTaskLvl2(id: Task_lvl_2['id']) {
     if (!id) throw new AppError('Oops!,Invalid ID', 400);
     const findTaskLvl_3 = await prisma.task_lvl_2.findUnique({ where: { id } });

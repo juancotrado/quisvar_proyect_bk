@@ -3,6 +3,21 @@ import { PathServices, Task_3_Services } from '../services';
 import { mkdirSync, rmSync } from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
 
+export const showTaskLvl_3 = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _task2_id = parseInt(id);
+    const query = await Task_3_Services.find(_task2_id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createTaskLvl_3 = async (
   req: Request,
   res: Response,
