@@ -1,7 +1,6 @@
-import { error } from 'console';
 import AppError from '../utils/appError';
 import { userProfilePick } from '../utils/format.server';
-import { Prisma, Users, WorkAreas, prisma } from '../utils/prisma.server';
+import { Users, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
 
 class UsersServices {
@@ -52,8 +51,50 @@ class UsersServices {
   }
   static async findListSubTask(userId: Users['id'], projectId: number) {
     if (!userId) throw new AppError('Oops!,ID invalido', 400);
-    console.log(projectId);
-    if (!projectId) throw new AppError('Oops!,ID invalido', 400);
+    if (!projectId) {
+      const subTaskGeneral = await prisma.taskOnUsers.findMany({
+        where: { userId },
+        orderBy: { subtaskId: 'desc' },
+        select: {
+          subtask: {
+            include: {
+              indexTask: { select: { id: true } },
+              task: {
+                select: { id: true, indexTask: { select: { id: true } } },
+              },
+              task_lvl_2: {
+                select: {
+                  id: true,
+                  task: {
+                    select: { id: true, indexTask: { select: { id: true } } },
+                  },
+                },
+              },
+              task_lvl_3: {
+                select: {
+                  id: true,
+                  task_2: {
+                    select: {
+                      id: true,
+                      task: {
+                        select: {
+                          id: true,
+                          indexTask: { select: { id: true } },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+      if (!subTaskGeneral)
+        throw new AppError('No se pudo encontrar las tareas', 404);
+      const list = subTaskGeneral.map(s => s.subtask);
+      return list;
+    }
     const subtaskByIndexTask = await prisma.subTasks.findMany({
       where: {
         users: {
@@ -170,7 +211,6 @@ class UsersServices {
         },
       },
     });
-
     const subTasksList = [
       ...subtaskByIndexTask,
       ...subtaskByTask,
@@ -179,7 +219,6 @@ class UsersServices {
     ];
     if (!subTasksList)
       throw new AppError('No se pudo encontrar las tareas', 404);
-    // return subTasks.map(taskOnUser => taskOnUser.subtask);
     return subTasksList;
   }
 
