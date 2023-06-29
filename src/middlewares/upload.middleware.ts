@@ -28,14 +28,14 @@ const storage = multer.diskStorage({
       const typeSubTask = req.query.status as Files['type'];
       const { item, name } = await FilesServices.getSubTask(_subtask_id);
       const uniqueSuffix = Date.now();
-      if (typeSubTask === 'REVIEW') {
-        const files = await FilesServices.findBySubTask(
-          _subtask_id,
-          typeSubTask
-        );
-        const filesList = files.map(f => '.' + f.name.split('.').at(-1));
-        if (filesList.includes(extName)) throw new Error();
-      }
+      // if (typeSubTask === 'REVIEW') {
+      //   const files = await FilesServices.findBySubTask(
+      //     _subtask_id,
+      //     typeSubTask
+      //   );
+      //   const filesList = files.map(f => '.' + f.name.split('.').at(-1));
+      //   if (filesList.includes(extName)) throw new Error();
+      // }
       callback(
         null,
         item + '.' + name + '@' + uniqueSuffix + '$' + file.originalname
