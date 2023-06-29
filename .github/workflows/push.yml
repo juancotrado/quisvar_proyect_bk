@@ -1,0 +1,11 @@
+on: push
+name: restart deploy
+jobs:
+  lint-code:
+    name: restart deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show Containers
+        run: docker ps
+      - name: Restart project from git actions
+        run: docker restart project_backend
