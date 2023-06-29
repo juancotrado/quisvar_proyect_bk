@@ -4,6 +4,16 @@ import PathServices from './paths.services';
 import fs from 'fs';
 // awa
 class FilesServices {
+  static async findBySubTask(subTasksId: SubTasks['id'], type: Files['type']) {
+    if (!subTasksId) throw new AppError(`Oops!! id invalido`, 404);
+    const filesList = await prisma.files.findMany({
+      where: { subTasksId, type },
+    });
+    if (!filesList)
+      throw new AppError(`no se pudo encontrar la lista de archivos`, 404);
+    return filesList;
+  }
+
   static async create(
     subTasksId: Files['subTasksId'],
     filename: string,
@@ -26,6 +36,7 @@ class FilesServices {
     });
     return newFile;
   }
+
   static async getSubTask(id: SubTasks['id']) {
     if (!id) throw new AppError('Opps!, id invalido', 400);
     const subTask = await prisma.subTasks.findFirst({

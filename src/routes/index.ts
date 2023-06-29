@@ -9,7 +9,7 @@ import taskLvl_2Router from './task_2.routes';
 import taskLvl_3Router from './task_3.routes';
 import profileRouter from './profile.routes';
 import speacilitiesRouter from './specialities.routes';
-import filesRouter from './files.route';
+import filesRouter from './files.routes';
 export {
   userRouter,
   authRouter,
