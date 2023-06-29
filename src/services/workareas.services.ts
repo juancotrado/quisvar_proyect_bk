@@ -101,6 +101,7 @@ class WorkAreasServices {
             name: true,
             unique: true,
             item: true,
+            subTasks: true,
             tasks: {
               orderBy: { id: 'asc' },
               select: {
@@ -108,6 +109,7 @@ class WorkAreasServices {
                 name: true,
                 unique: true,
                 item: true,
+                subTasks: true,
                 tasks_2: {
                   orderBy: { id: 'asc' },
                   select: {
@@ -115,6 +117,7 @@ class WorkAreasServices {
                     name: true,
                     unique: true,
                     item: true,
+                    subTasks: true,
                     tasks_3: {
                       orderBy: { id: 'asc' },
                       select: {
@@ -122,6 +125,7 @@ class WorkAreasServices {
                         name: true,
                         unique: true,
                         item: true,
+                        subTasks: true,
                         _count: { select: { subTasks: true } },
                       },
                     },
