@@ -228,7 +228,7 @@ class SubTasksServices {
 
   static async updateStatus(
     id: SubTasks['id'],
-    { status }: SubTasks,
+    { status, percentage }: SubTasks,
     user: Users
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
@@ -236,6 +236,7 @@ class SubTasksServices {
       where: { id },
       data: {
         status,
+        percentage,
       },
       include: {
         files: {
