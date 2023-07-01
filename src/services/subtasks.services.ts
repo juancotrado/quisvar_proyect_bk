@@ -120,21 +120,11 @@ class SubTasksServices {
             deleteMany: {
               subtaskId: id,
             },
-            // delete:
-            //   subtaskId_userId: {
-            //     subtaskId: id,
-            //     userId,
-            //   },
-            // },
           },
         },
         include: {
           files: {
-            select: {
-              dir: true,
-              name: true,
-              subTasksId: true,
-              type: true,
+            include: {
               user: {
                 select: {
                   profile: {
@@ -165,11 +155,7 @@ class SubTasksServices {
         },
         include: {
           files: {
-            select: {
-              dir: true,
-              name: true,
-              subTasksId: true,
-              type: true,
+            include: {
               user: {
                 select: {
                   profile: {
@@ -195,11 +181,7 @@ class SubTasksServices {
         },
         include: {
           files: {
-            select: {
-              dir: true,
-              name: true,
-              subTasksId: true,
-              type: true,
+            include: {
               user: {
                 select: {
                   profile: {
@@ -258,11 +240,7 @@ class SubTasksServices {
       },
       include: {
         files: {
-          select: {
-            dir: true,
-            name: true,
-            subTasksId: true,
-            type: true,
+          include: {
             user: {
               select: {
                 profile: {
@@ -311,11 +289,7 @@ class SubTasksServices {
         },
         include: {
           files: {
-            select: {
-              dir: true,
-              name: true,
-              subTasksId: true,
-              type: true,
+            include: {
               user: {
                 select: {
                   profile: {
@@ -348,11 +322,7 @@ class SubTasksServices {
         },
         include: {
           files: {
-            select: {
-              dir: true,
-              name: true,
-              subTasksId: true,
-              type: true,
+            include: {
               user: {
                 select: {
                   profile: {

@@ -21,15 +21,31 @@ const storage = multer.diskStorage({
     }
   },
   filename: async (req, file, callback) => {
-    const { id } = req.params;
-    const _subtask_id = parseInt(id);
-    const extName = path.extname(file.originalname);
-    const { item, name } = await FilesServices.getSubTask(_subtask_id);
-    const uniqueSuffix = Date.now();
-    callback(
-      null,
-      item + '.' + name + '@' + uniqueSuffix + '$' + file.originalname
-    );
+    try {
+      const { id } = req.params;
+      const _subtask_id = parseInt(id);
+      const extName = path.extname(file.originalname);
+      const typeSubTask = req.query.status as Files['type'];
+      const { item, name } = await FilesServices.getSubTask(_subtask_id);
+      const uniqueSuffix = Date.now();
+      // if (typeSubTask === 'REVIEW') {
+      //   const files = await FilesServices.findBySubTask(
+      //     _subtask_id,
+      //     typeSubTask
+      //   );
+      //   const filesList = files.map(f => '.' + f.name.split('.').at(-1));
+      //   if (filesList.includes(extName)) throw new Error();
+      // }
+      callback(
+        null,
+        item + '.' + name + '@' + uniqueSuffix + '$' + file.originalname
+      );
+    } catch (error) {
+      callback(
+        new AppError(`Oops! , envie archivos con extension no repetida`, 404),
+        ''
+      );
+    }
     // callback(null, _subtask_id + '-' + uniqueSuffix + '@' + file.originalname);
   },
 });
