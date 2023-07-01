@@ -38,6 +38,7 @@ router.patch('/asigned/:id', assignedSubTask);
 // router.post('/upload/:id', upload.single('myFiles'), uploadFileSubTask);
 router.delete('/deleteFile/:id/:filename', deleteFileSubTask);
 router.patch('/status/:id', updateStatusSubTask);
+router.patch('/pdf/:id', updateStatusSubTask);
 
 //MOD ROLE
 router.use(_mod_role);
