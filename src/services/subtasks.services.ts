@@ -300,8 +300,8 @@ class SubTasksServices {
       const newDir = await PathServices.pathSubTask(id, 'SUCCESSFUL');
 
       files.forEach(async file => {
-        const ext = file.name.split('@').at(-1);
-        const newFileName = subTask.item + '.' + subTask.name + ext;
+        const ext = file.name.split('.').at(-1);
+        const newFileName = subTask.item + '.' + subTask.name + '.' + ext;
         await prisma.files.update({
           where: { id: file.id },
           data: { type: 'SUCCESSFUL', name: newFileName, dir: newDir },
