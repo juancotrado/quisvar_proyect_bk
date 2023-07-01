@@ -58,7 +58,7 @@ model Projects {
   userId         Int
   moderator      Users        @relation(fields: [userId], references: [id])
   areas          WorkAreas[]
-  speciality     Specialities @relation(fields: [specialityId], references: [id])
+  speciality     Specialities @relation(fields: [specialityId], references: [id], onDelete: Cascade)
   specialityId   Int
 }
 
@@ -78,7 +78,7 @@ model IndexTasks {
   name       String
   unique     Boolean    @default(false)
   workAreaId Int
-  workArea   WorkAreas  @relation(fields: [workAreaId], references: [id])
+  workArea   WorkAreas  @relation(fields: [workAreaId], references: [id], onDelete: Cascade)
   item       String     @default("")
   tasks      Tasks[]
   subTasks   SubTasks[]
@@ -90,7 +90,7 @@ model Tasks {
   unique      Boolean      @default(false)
   indexTaskId Int
   item        String       @default("")
-  indexTask   IndexTasks   @relation(fields: [indexTaskId], references: [id])
+  indexTask   IndexTasks   @relation(fields: [indexTaskId], references: [id], onDelete: Cascade)
   tasks_2     Task_lvl_2[]
   subTasks    SubTasks[]
 }
@@ -101,7 +101,7 @@ model Task_lvl_2 {
   unique   Boolean      @default(false)
   taskId   Int
   item     String       @default("")
-  task     Tasks        @relation(fields: [taskId], references: [id])
+  task     Tasks        @relation(fields: [taskId], references: [id], onDelete: Cascade)
   tasks_3  Task_lvl_3[]
   subTasks SubTasks[]
 }
@@ -112,7 +112,7 @@ model Task_lvl_3 {
   unique    Boolean    @default(false)
   item      String     @default("")
   task_2_Id Int
-  task_2    Task_lvl_2 @relation(fields: [task_2_Id], references: [id])
+  task_2    Task_lvl_2 @relation(fields: [task_2_Id], references: [id], onDelete: Cascade)
   // tasks     Task_lvl_4[]
   subTasks  SubTasks[]
 }
@@ -144,18 +144,18 @@ model SubTasks {
   task_3_Id   Int?
   hasPDF      Boolean       @default(false)
   // task_4_Id   Int?
-  indexTask   IndexTasks?   @relation(fields: [indexTaskId], references: [id])
-  task        Tasks?        @relation(fields: [taskId], references: [id])
-  task_lvl_2  Task_lvl_2?   @relation(fields: [task_2_Id], references: [id])
-  task_lvl_3  Task_lvl_3?   @relation(fields: [task_3_Id], references: [id])
+  indexTask   IndexTasks?   @relation(fields: [indexTaskId], references: [id], onDelete: Cascade)
+  task        Tasks?        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  task_lvl_2  Task_lvl_2?   @relation(fields: [task_2_Id], references: [id], onDelete: Cascade)
+  task_lvl_3  Task_lvl_3?   @relation(fields: [task_3_Id], references: [id], onDelete: Cascade)
   // Task_lvl_4  Task_lvl_4?   @relation(fields: [task_4_Id], references: [id])
 }
 
 model TaskOnUsers {
   subtaskId  Int
   userId     Int
-  user       Users    @relation(fields: [userId], references: [id], onUpdate: Cascade)
-  subtask    SubTasks @relation(fields: [subtaskId], references: [id], onUpdate: Cascade)
+  user       Users    @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  subtask    SubTasks @relation(fields: [subtaskId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   assignedAt DateTime @default(now())
   untilDate  DateTime @default(now())
 

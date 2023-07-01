@@ -10,6 +10,7 @@ import taskLvl_3Router from './task_3.routes';
 import profileRouter from './profile.routes';
 import speacilitiesRouter from './specialities.routes';
 import filesRouter from './files.routes';
+import reportsRouter from './reports.routes';
 export {
   userRouter,
   authRouter,
@@ -23,4 +24,5 @@ export {
   profileRouter,
   speacilitiesRouter,
   filesRouter,
+  reportsRouter,
 };

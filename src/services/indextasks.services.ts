@@ -80,6 +80,7 @@ class IndexTasksServices {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findArea = await prisma.workAreas.findUnique({
       where: { id },
+      include: { project: { select: { unique: true } } },
     });
     if (!findArea) throw new AppError('No se pudo encontrar las areas', 404);
     return findArea;
@@ -93,7 +94,9 @@ class IndexTasksServices {
       data: {
         name,
         unique,
-        item: _area.item ? `${_area.item}.${getIndex + 1}` : `${getIndex + 1}`,
+        item: _area.project.unique
+          ? `${getIndex + 1}`
+          : `${_area.item}.${getIndex + 1}`,
         workArea: {
           connect: {
             id: workAreaId,

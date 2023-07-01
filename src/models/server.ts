@@ -17,6 +17,7 @@ import {
   filesRouter,
   taskLvl_2Router,
   taskLvl_3Router,
+  reportsRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -44,6 +45,7 @@ class Server {
     tasks3: `/${process.env.ROUTE}/tasks3`,
     subtasks: `/${process.env.ROUTE}/subtasks`,
     files: `/${process.env.ROUTE}/files`,
+    reports: `/${process.env.ROUTE}/reports`,
   };
 
   constructor() {
@@ -84,6 +86,7 @@ class Server {
     this.app.use(this.path.tasks3, taskLvl_3Router);
     this.app.use(this.path.subtasks, subTaskRouter);
     this.app.use(this.path.files, filesRouter);
+    this.app.use(this.path.files, reportsRouter);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)

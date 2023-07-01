@@ -27,6 +27,7 @@ class PathServices {
     const projectPath = _dirPath + '/' + area.project.name;
     let areaPath = '/' + area.item + '.' + area.name;
     if (area.project.unique) areaPath = '/' + area.name;
+    console.log(areaPath);
     const path = projectPath + areaPath;
     return path;
   }
@@ -53,6 +54,7 @@ class PathServices {
     if (task.workArea.project.unique) areaPath = '/' + task.workArea.name;
     const indexTaskPath = '/' + task.item + '.' + task.name;
     const path = projectPath + areaPath + indexTaskPath;
+    console.log(path, '<<<<');
     return path;
   }
   static async pathTask(id: number) {

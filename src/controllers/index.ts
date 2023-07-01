@@ -70,6 +70,7 @@ import {
   deleteTaskLvl_3,
   updateTaskLvl_3,
 } from './task_3.controllers';
+import { showListReportByUser } from './reports.controllers';
 // User Controllers
 export {
   showUsers,
@@ -138,3 +139,6 @@ export { showProfile, downloadProfile, updateProfile };
 
 //Files Controllers
 export { uploadFile, deleteFile };
+
+//Reports Controllers
+export { showListReportByUser };

@@ -11,6 +11,7 @@ import PathServices from './paths.services';
 import FilesServices from './files.services';
 import Task_2_Services from './task_2.services';
 import Task_3_Services from './task_3.services';
+import ReportsServices from './reports.services';
 export {
   UsersServices,
   TasksServices,
@@ -25,6 +26,7 @@ export {
   FilesServices,
   Task_2_Services,
   Task_3_Services,
+  ReportsServices,
 };
 export const _dirPath = './uploads';
 export const _materialPath = './file_model';

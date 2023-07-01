@@ -32,8 +32,9 @@ export const showSubtasksByIndexTask = async (
   try {
     const { id } = req.params;
     const status = req.query.status as SubTasks['status'];
-    const _task_id = parseInt(id);
-    const query = await IndexTasksServices.findSubtasks(_task_id, status);
+    const _index_task_id = parseInt(id);
+    const pathIndex = await PathServices.pathIndexTask(_index_task_id);
+    const query = await IndexTasksServices.findSubtasks(_index_task_id, status);
     res.status(200).json(query);
   } catch (error) {
     next(error);
