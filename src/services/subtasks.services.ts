@@ -143,6 +143,12 @@ class SubTasksServices {
       });
     }
     if (option == 'apply') {
+      const getHours = await prisma.subTasks.findUnique({
+        where: { id },
+        select: { hours: true },
+      });
+      const today = new Date().getTime();
+      const hours = (getHours ? getHours.hours : 0) * 60 * 60 * 1000;
       return await prisma.subTasks.update({
         where: { id },
         data: {
@@ -150,6 +156,7 @@ class SubTasksServices {
           users: {
             create: {
               userId,
+              untilDate: new Date(today + hours),
             },
           },
         },

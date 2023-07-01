@@ -157,6 +157,7 @@ model TaskOnUsers {
   user       Users    @relation(fields: [userId], references: [id], onUpdate: Cascade)
   subtask    SubTasks @relation(fields: [subtaskId], references: [id], onUpdate: Cascade)
   assignedAt DateTime @default(now())
+  untilDate  DateTime @default(now())
 
   @@id([subtaskId, userId])
 }
@@ -170,6 +171,7 @@ model Files {
   type       FileTypes
   subTasks   SubTasks  @relation(fields: [subTasksId], references: [id])
   subTasksId Int
+  assignedAt DateTime  @default(now())
 }
 
 enum UserRole {
