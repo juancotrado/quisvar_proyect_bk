@@ -9,7 +9,7 @@ router.get('/');
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);
-router.get('/:id', showListReportByUser);
+router.get('/user', showListReportByUser);
 //ADMIN ROLE
 router.use(_admin_role);
 
