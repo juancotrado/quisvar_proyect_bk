@@ -178,6 +178,7 @@ class SubTasksServices {
         where: { id },
         data: {
           status: 'INREVIEW',
+          hasPDF: false,
         },
         include: {
           files: {
@@ -224,6 +225,37 @@ class SubTasksServices {
       },
     });
     return updateTask;
+  }
+
+  static async updateHasPDF(id: SubTasks['id'], hasPDF: SubTasks['hasPDF']) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const updateStatusPDF = await prisma.subTasks.update({
+      where: { id },
+      data: { hasPDF },
+      include: {
+        files: {
+          include: {
+            user: {
+              select: {
+                profile: {
+                  select: { id: true, firstName: true, lastName: true },
+                },
+              },
+            },
+          },
+        },
+        users: {
+          select: {
+            user: {
+              select: {
+                profile: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return updateStatusPDF;
   }
 
   static async updateStatus(

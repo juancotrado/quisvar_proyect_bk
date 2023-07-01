@@ -48,6 +48,7 @@ model Projects {
   name           String       @unique()
   typeSpeciality String
   description    String?
+  CUI            String?
   startDate      DateTime     @default(now())
   untilDate      DateTime
   status         Boolean      @default(false)
@@ -141,6 +142,7 @@ model SubTasks {
   indexTaskId Int?
   task_2_Id   Int?
   task_3_Id   Int?
+  hasPDF      Boolean       @default(false)
   // task_4_Id   Int?
   indexTask   IndexTasks?   @relation(fields: [indexTaskId], references: [id])
   task        Tasks?        @relation(fields: [taskId], references: [id])
