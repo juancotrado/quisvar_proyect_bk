@@ -50,6 +50,8 @@ class IndexTasksServices {
             },
             users: {
               select: {
+                assignedAt: true,
+                untilDate: true,
                 user: {
                   select: {
                     profile: true,

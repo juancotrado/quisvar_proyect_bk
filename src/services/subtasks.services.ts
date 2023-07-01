@@ -149,6 +149,7 @@ class SubTasksServices {
       });
       const today = new Date().getTime();
       const hours = (getHours ? getHours.hours : 0) * 60 * 60 * 1000;
+      console.log('==>', hours);
       return await prisma.subTasks.update({
         where: { id },
         data: {
@@ -495,6 +496,12 @@ class SubTasksServices {
   ) {
     const newUserData = userData.map(user => ({ userId: user.id }));
     if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const getHours = await prisma.subTasks.findUnique({
+      where: { id },
+      select: { hours: true },
+    });
+    const today = new Date().getTime();
+    const hours = (getHours ? getHours.hours : 0) * 60 * 60 * 1000;
     // const assignUserBySubtaskPromises = userData.map(async user => {
     return await prisma.subTasks.update({
       where: { id },
@@ -502,6 +509,14 @@ class SubTasksServices {
         status: 'PROCESS',
         users: {
           create: newUserData,
+          updateMany: {
+            data: {
+              untilDate: new Date(today + hours),
+            },
+            where: {
+              subtaskId: id,
+            },
+          },
         },
       },
       include: {
