@@ -10,7 +10,7 @@ class ReportsServices {
     if (!userId) throw new AppError('Oops!, ID invalido', 400);
     const reportList = await prisma.taskOnUsers.findMany({
       where: {
-        assignedAt: { gte: initialDate, lt: untilDate },
+        assignedAt: { gte: initialDate, lte: untilDate },
         userId,
         subtask: { status: 'DONE' },
       },
