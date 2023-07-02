@@ -191,7 +191,7 @@ class WorkAreasServices {
         id,
       },
       include: {
-        project: { select: { name: true } },
+        project: { select: { name: true, description: true } },
         user: {
           include: {
             profile: true,
