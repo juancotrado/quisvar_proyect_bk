@@ -127,6 +127,9 @@ class ReportsServices {
         },
       },
     });
+    const projectList = await prisma.projects.findMany({
+      select: { id: true, name: true, CUI: true, description: true },
+    });
     if (!reportList) new AppError('no se pudo encontrar los registros', 404);
     const newReport = reportList.map(({ subtask }) => {
       let project;
@@ -149,7 +152,16 @@ class ReportsServices {
       }
       return { ...subtask, project, workArea };
     });
-    return newReport;
+    const newReportByList = projectList.map(project => {
+      const subtasks = newReport.filter(
+        subtask => subtask.project?.id === project.id
+      );
+      return { ...project, subtasks };
+    });
+    const filterProjects = newReportByList.filter(
+      project => project.subtasks.length !== 0
+    );
+    return filterProjects;
   }
 }
 export default ReportsServices;
