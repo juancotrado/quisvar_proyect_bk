@@ -17,6 +17,7 @@ export const showListReportByUser = async (
     const until = req.query.until as string;
     const startDate = new Date(initial);
     const untilDate = new Date(until);
+    console.log(startDate, untilDate);
     if (!startDate || !untilDate)
       throw new AppError('Ingrese Fechas validas', 400);
     const query = await ReportsServices.getReportByUser(
