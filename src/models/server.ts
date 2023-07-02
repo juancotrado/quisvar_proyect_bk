@@ -86,7 +86,7 @@ class Server {
     this.app.use(this.path.tasks3, taskLvl_3Router);
     this.app.use(this.path.subtasks, subTaskRouter);
     this.app.use(this.path.files, filesRouter);
-    this.app.use(this.path.files, reportsRouter);
+    this.app.use(this.path.reports, reportsRouter);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)
