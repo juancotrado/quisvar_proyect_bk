@@ -71,11 +71,11 @@ class Task_3_Services {
     return newTaskLvl_3;
   }
 
-  static async update(id: Task_lvl_3['id'], { name }: Task_lvl_3) {
+  static async update(id: Task_lvl_3['id'], { name, unique }: Task_lvl_3) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateTaskLvl_3 = await prisma.task_lvl_3.update({
       where: { id },
-      data: { name },
+      data: { name, unique },
     });
     return updateTaskLvl_3;
   }

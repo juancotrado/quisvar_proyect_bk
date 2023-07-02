@@ -76,12 +76,13 @@ class TasksServices {
     return newTask;
   }
 
-  static async update(id: Tasks['id'], { name }: Tasks) {
+  static async update(id: Tasks['id'], { name, unique }: Tasks) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateTask = await prisma.tasks.update({
       where: { id },
       data: {
         name,
+        unique,
       },
     });
     return updateTask;
