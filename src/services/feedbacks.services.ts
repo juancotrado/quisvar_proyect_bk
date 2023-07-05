@@ -6,6 +6,7 @@ class FeedBackServices {
     if (!subTasksId) throw new AppError('Oops, ID invalid', 400);
     const getFeedBackList = await prisma.feedback.findMany({
       where: { subTasksId },
+      orderBy: { createdAt: 'desc' },
       select: {
         id: true,
         comment: true,
