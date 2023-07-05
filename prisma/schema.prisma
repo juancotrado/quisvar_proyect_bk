@@ -139,6 +139,7 @@ model SubTasks {
   users       TaskOnUsers[]
   files       Files[]
   taskId      Int?
+  feedBacks   Feedback[]
   indexTaskId Int?
   task_2_Id   Int?
   task_3_Id   Int?
@@ -162,6 +163,17 @@ model TaskOnUsers {
   @@id([subtaskId, userId])
 }
 
+model Feedback {
+  id         Int      @id @default(autoincrement())
+  comment    String?
+  files      Files[]
+  status     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  subTasks   SubTasks @relation(fields: [subTasksId], references: [id])
+  subTasksId Int
+}
+
 model Files {
   id         Int       @id @default(autoincrement())
   name       String
@@ -171,6 +183,8 @@ model Files {
   type       FileTypes
   subTasks   SubTasks  @relation(fields: [subTasksId], references: [id])
   subTasksId Int
+  feedbackId Int?
+  feedback   Feedback? @relation(fields: [feedbackId], references: [id])
   assignedAt DateTime  @default(now())
 }
 
@@ -186,6 +200,7 @@ enum TaskRole {
   INREVIEW
   DENIED
   DONE
+  LIQUIDATION
 }
 
 enum FileTypes {

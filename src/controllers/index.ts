@@ -71,6 +71,7 @@ import {
   updateTaskLvl_3,
 } from './task_3.controllers';
 import { showListReportByUser } from './reports.controllers';
+import { createFeedback, findFeedbacks } from './feedbacks.controllers';
 // User Controllers
 export {
   showUsers,
@@ -142,3 +143,6 @@ export { uploadFile, deleteFile };
 
 //Reports Controllers
 export { showListReportByUser };
+
+//FeedBack Controllers
+export { createFeedback, findFeedbacks };
