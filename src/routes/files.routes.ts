@@ -7,6 +7,7 @@ import {
   showProfile,
   updateProfile,
   uploadFile,
+  uploadFiles,
 } from '../controllers';
 import { upload } from '../middlewares/upload.middleware';
 
@@ -17,6 +18,7 @@ router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);
 router.post('/upload/:id', upload.single('file'), uploadFile);
+router.post('/uploads/:id', upload.array('file'), uploadFiles);
 router.delete('/remove/:id', deleteFile);
 //ADMIN ROLE
 router.use(_admin_role);

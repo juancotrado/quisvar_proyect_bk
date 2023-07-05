@@ -24,8 +24,6 @@ const storage = multer.diskStorage({
     try {
       const { id } = req.params;
       const _subtask_id = parseInt(id);
-      const extName = path.extname(file.originalname);
-      const typeSubTask = req.query.status as Files['type'];
       const { item, name } = await FilesServices.getSubTask(_subtask_id);
       const uniqueSuffix = Date.now();
       // if (typeSubTask === 'REVIEW') {

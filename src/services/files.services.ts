@@ -14,6 +14,16 @@ class FilesServices {
     return filesList;
   }
 
+  static async createMany(data: Files[], subTasksId: SubTasks['id']) {
+    const subTask = await prisma.subTasks.findUnique({
+      where: { id: subTasksId },
+    });
+    if (!subTask) throw new AppError(`no se pudo encontrar la subtarea`, 404);
+    const newFile = await prisma.files.createMany({
+      data: data,
+    });
+    return newFile;
+  }
   static async create(
     subTasksId: Files['subTasksId'],
     filename: string,

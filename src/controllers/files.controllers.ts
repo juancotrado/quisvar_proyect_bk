@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, query } from 'express';
-import { FilesServices, SubTasksServices } from '../services';
-import { Files } from '@prisma/client';
+import { FilesServices, PathServices, SubTasksServices } from '../services';
+import { FileInfo, Files } from '@prisma/client';
 import { UserType } from '../middlewares/auth.middleware';
 
 export const uploadFile = async (
@@ -13,6 +13,7 @@ export const uploadFile = async (
     const userInfo: UserType = res.locals.userInfo;
     const status = req.query.status as Files['type'];
     const _subtask_id = parseInt(id);
+    console.log(req.files);
     if (!req.file) return;
     const { filename } = req.file;
     await FilesServices.create(_subtask_id, filename, status, userInfo.id);
@@ -23,6 +24,34 @@ export const uploadFile = async (
   }
 };
 
+export const uploadFiles = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const userInfo: UserType = res.locals.userInfo;
+    const status = req.query.status as Files['type'];
+    const _subtask_id = parseInt(id);
+    const newFiles = req.files as FileInfo[];
+    const dir = await PathServices.pathSubTask(_subtask_id, 'REVIEW');
+    const data = newFiles.map(file => ({
+      dir,
+      type: status,
+      subTasksId: _subtask_id,
+      name: file.filename,
+      userId: userInfo.id,
+    }));
+    console.log(data);
+    if (!req.files) return;
+    await FilesServices.createMany(data, _subtask_id);
+    const query = await SubTasksServices.find(_subtask_id);
+    res.status(201).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 export const deleteFile = async (
   req: Request,
   res: Response,

@@ -59,7 +59,7 @@ import {
   showSpeciality,
   updateSpeciality,
 } from './speacialities.controllers';
-import { deleteFile, uploadFile } from './files.controllers';
+import { deleteFile, uploadFile, uploadFiles } from './files.controllers';
 import {
   createTaskLvl_2,
   deleteTaskLvl_2,
@@ -138,7 +138,7 @@ export {
 export { showProfile, downloadProfile, updateProfile };
 
 //Files Controllers
-export { uploadFile, deleteFile };
+export { uploadFile, deleteFile, uploadFiles };
 
 //Reports Controllers
 export { showListReportByUser };
