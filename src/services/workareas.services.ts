@@ -264,20 +264,13 @@ class WorkAreasServices {
     return createWorkArea;
   }
 
-  static async update(
-    id: WorkAreas['id'],
-    { name, userId }: WorkAreas & { userId: Users['id'] }
-  ) {
+  static async update(id: WorkAreas['id'], { name, userId }: WorkAreas) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateWorkArea = await prisma.workAreas.update({
       where: { id },
       data: {
         name,
-        user: {
-          connect: {
-            id: userId,
-          },
-        },
+        userId,
       },
     });
     return updateWorkArea;

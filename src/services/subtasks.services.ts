@@ -302,7 +302,7 @@ class SubTasksServices {
     if (!subTask) throw new AppError('Oops!,ID invalido', 400);
     if (status === 'DONE') {
       const files = await prisma.files.findMany({
-        where: { subTasksId: id, type: 'REVIEW' },
+        where: { subTasksId: id, type: 'REVIEW', feedback: { is: null } },
       });
       const oldDir = await PathServices.pathSubTask(id, 'REVIEW');
       const newDir = await PathServices.pathSubTask(id, 'SUCCESSFUL');
