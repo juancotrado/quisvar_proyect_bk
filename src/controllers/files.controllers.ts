@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction, query } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { FilesServices, PathServices, SubTasksServices } from '../services';
-import { FileInfo, Files } from '@prisma/client';
+import { Files } from '@prisma/client';
 import { UserType } from '../middlewares/auth.middleware';
 
 export const uploadFile = async (
@@ -34,7 +34,7 @@ export const uploadFiles = async (
     const userInfo: UserType = res.locals.userInfo;
     const status = req.query.status as Files['type'];
     const _subtask_id = parseInt(id);
-    const newFiles = req.files as FileInfo[];
+    const newFiles = req.files as Express.Multer.File[];
     const dir = await PathServices.pathSubTask(_subtask_id, 'REVIEW');
     const data = newFiles.map(file => ({
       dir,

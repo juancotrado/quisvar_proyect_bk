@@ -1,5 +1,11 @@
 import AppError from '../utils/appError';
-import { Files, SubTasks, Users, prisma } from '../utils/prisma.server';
+import {
+  FileTypes,
+  Files,
+  SubTasks,
+  Users,
+  prisma,
+} from '../utils/prisma.server';
 import PathServices from './paths.services';
 import fs from 'fs';
 // awa
@@ -14,7 +20,16 @@ class FilesServices {
     return filesList;
   }
 
-  static async createMany(data: Files[], subTasksId: SubTasks['id']) {
+  static async createMany(
+    data: {
+      dir: string;
+      type: FileTypes;
+      subTasksId: number;
+      name: string;
+      userId: number;
+    }[],
+    subTasksId: SubTasks['id']
+  ) {
     const subTask = await prisma.subTasks.findUnique({
       where: { id: subTasksId },
     });
