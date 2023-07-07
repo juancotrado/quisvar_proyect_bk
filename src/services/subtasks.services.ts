@@ -12,31 +12,38 @@ import PathServices from './paths.services';
 import Task_2_Services from './task_2.services';
 import Task_3_Services from './task_3.services';
 class SubTasksServices {
+  static includeData = {
+    feedBacks: {
+      include: {
+        files: true,
+      },
+    },
+    files: {
+      include: {
+        user: {
+          select: {
+            profile: {
+              select: { id: true, firstName: true, lastName: true },
+            },
+          },
+        },
+      },
+    },
+    users: {
+      select: {
+        user: { select: { id: true, profile: true } },
+      },
+    },
+  };
+  // constructor() {
+  //   this.includeData=this.includeData
+  // }
   static async find(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findSubTask = await prisma.subTasks.findUnique({
       where: { id },
       include: {
-        files: {
-          include: {
-            user: {
-              select: {
-                profile: {
-                  select: { id: true, firstName: true, lastName: true },
-                },
-              },
-            },
-          },
-        },
-        users: {
-          select: {
-            user: {
-              select: {
-                profile: true,
-              },
-            },
-          },
-        },
+        ...this.includeData,
         task: {
           select: {
             name: true,
@@ -122,24 +129,7 @@ class SubTasksServices {
             },
           },
         },
-        include: {
-          files: {
-            include: {
-              user: {
-                select: {
-                  profile: {
-                    select: { id: true, firstName: true, lastName: true },
-                  },
-                },
-              },
-            },
-          },
-          users: {
-            select: {
-              user: { select: { id: true, profile: true } },
-            },
-          },
-        },
+        include: this.includeData,
       });
     }
     if (option == 'apply') {
@@ -161,24 +151,7 @@ class SubTasksServices {
             },
           },
         },
-        include: {
-          files: {
-            include: {
-              user: {
-                select: {
-                  profile: {
-                    select: { id: true, firstName: true, lastName: true },
-                  },
-                },
-              },
-            },
-          },
-          users: {
-            select: {
-              user: { select: { id: true, profile: true } },
-            },
-          },
-        },
+        include: this.includeData,
       });
     }
     if (option == 'review') {
@@ -188,24 +161,7 @@ class SubTasksServices {
           status: 'INREVIEW',
           hasPDF: false,
         },
-        include: {
-          files: {
-            include: {
-              user: {
-                select: {
-                  profile: {
-                    select: { id: true, firstName: true, lastName: true },
-                  },
-                },
-              },
-            },
-          },
-          users: {
-            select: {
-              user: { select: { id: true, profile: true } },
-            },
-          },
-        },
+        include: this.includeData,
       });
     }
     throw new AppError('Oops!, Necesitamos un status para esta consulta', 400);
@@ -240,28 +196,7 @@ class SubTasksServices {
     const updateStatusPDF = await prisma.subTasks.update({
       where: { id },
       data: { hasPDF },
-      include: {
-        files: {
-          include: {
-            user: {
-              select: {
-                profile: {
-                  select: { id: true, firstName: true, lastName: true },
-                },
-              },
-            },
-          },
-        },
-        users: {
-          select: {
-            user: {
-              select: {
-                profile: true,
-              },
-            },
-          },
-        },
-      },
+      include: this.includeData,
     });
     return updateStatusPDF;
   }
@@ -278,25 +213,7 @@ class SubTasksServices {
         status,
         percentage,
       },
-      include: {
-        files: {
-          include: {
-            user: {
-              select: {
-                profile: {
-                  select: { id: true, firstName: true, lastName: true },
-                },
-              },
-            },
-          },
-        },
-        users: {
-          select: {
-            user: { select: { id: true, profile: true } },
-          },
-        },
-        _count: true,
-      },
+      include: this.includeData,
     });
     const subTask = await prisma.subTasks.findUnique({ where: { id } });
     if (!subTask) throw new AppError('Oops!,ID invalido', 400);
@@ -327,24 +244,7 @@ class SubTasksServices {
             },
           },
         },
-        include: {
-          files: {
-            include: {
-              user: {
-                select: {
-                  profile: {
-                    select: { id: true, firstName: true, lastName: true },
-                  },
-                },
-              },
-            },
-          },
-          users: {
-            select: {
-              user: { select: { id: true, profile: true } },
-            },
-          },
-        },
+        include: this.includeData,
       });
     }
     if (status === 'UNRESOLVED') {
@@ -360,24 +260,7 @@ class SubTasksServices {
             },
           },
         },
-        include: {
-          files: {
-            include: {
-              user: {
-                select: {
-                  profile: {
-                    select: { id: true, firstName: true, lastName: true },
-                  },
-                },
-              },
-            },
-          },
-          users: {
-            select: {
-              user: { select: { id: true, profile: true } },
-            },
-          },
-        },
+        include: this.includeData,
       });
     }
     return updateTaskStatus;
@@ -519,28 +402,7 @@ class SubTasksServices {
           },
         },
       },
-      include: {
-        files: {
-          include: {
-            user: {
-              select: {
-                profile: {
-                  select: { id: true, firstName: true, lastName: true },
-                },
-              },
-            },
-          },
-        },
-        users: {
-          select: {
-            user: {
-              select: {
-                profile: true,
-              },
-            },
-          },
-        },
-      },
+      include: this.includeData,
     });
     // }
     // );
