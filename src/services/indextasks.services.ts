@@ -37,6 +37,11 @@ class IndexTasksServices {
             status,
           },
           include: {
+            feedBacks: {
+              include: {
+                files: true,
+              },
+            },
             files: {
               include: {
                 user: {

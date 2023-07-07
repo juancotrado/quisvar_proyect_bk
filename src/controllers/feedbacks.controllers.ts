@@ -29,3 +29,16 @@ export const createFeedback = async (
     next(error);
   }
 };
+export const editFeedback = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = req;
+    const query = await FeedBackServices.update(body);
+    res.status(201).json(query);
+  } catch (error) {
+    next(error);
+  }
+};

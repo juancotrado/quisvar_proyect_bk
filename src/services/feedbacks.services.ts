@@ -33,9 +33,8 @@ class FeedBackServices {
   static async create(
     {
       subTasksId,
-      comment,
     }: //     filesList,
-    Pick<Feedback, 'subTasksId' | 'comment'> //       & { //     filesList: { id: number }[]; //   }
+    Pick<Feedback, 'subTasksId'> //       & { //     filesList: { id: number }[]; //   }
   ) {
     const getFileList = await prisma.files.findMany({
       where: { subTasksId, type: 'REVIEW', feedback: { is: null } },
@@ -47,10 +46,19 @@ class FeedBackServices {
       data: {
         subTasksId,
         files: { connect: getFileList },
-        comment,
       },
     });
     return newFeedBack;
+  }
+  static async update({ comment, id }: Feedback) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const updateFeedback = await prisma.feedback.update({
+      where: { id },
+      data: {
+        comment,
+      },
+    });
+    return updateFeedback;
   }
 }
 export default FeedBackServices;
