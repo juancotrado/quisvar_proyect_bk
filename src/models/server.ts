@@ -20,6 +20,7 @@ import {
   reportsRouter,
   feedbacksRouter,
   duplicatesRouter,
+  archiverRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -50,6 +51,7 @@ class Server {
     reports: `/${process.env.ROUTE}/reports`,
     feedbacks: `/${process.env.ROUTE}/feedbacks`,
     duplicates: `/${process.env.ROUTE}/duplicates`,
+    archiver: `/${process.env.ROUTE}/archiver`,
   };
 
   constructor() {
@@ -93,6 +95,7 @@ class Server {
     this.app.use(this.path.reports, reportsRouter);
     this.app.use(this.path.feedbacks, feedbacksRouter);
     this.app.use(this.path.duplicates, duplicatesRouter);
+    this.app.use(this.path.archiver, archiverRouter);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)
