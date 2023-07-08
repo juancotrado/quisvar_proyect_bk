@@ -107,13 +107,17 @@ class IndexTasksServices {
     const getTasks = await prisma.indexTasks.findMany({
       where: { workAreaId },
       orderBy: { id: 'asc' },
-      include: { workArea: { select: { item: true } } },
+      include: {
+        workArea: {
+          select: { item: true, project: { select: { unique: true } } },
+        },
+      },
     });
     getTasks.forEach(async (task, index) => {
       const _task = await prisma.indexTasks.update({
         where: { id: task.id },
         data: {
-          item: task.workArea.item
+          item: task.workArea.project.unique
             ? `${index + 1}`
             : `${task.workArea.item}.${index + 1}`,
         },
