@@ -98,119 +98,119 @@ class DuplicatesServices {
     });
     if (!createProject)
       throw new AppError('No se pudo Duplicar el proyecto', 400);
-    await this.duplicateArea(id, createProject.id);
-    // const getAreas = await prisma.workAreas.findMany({
-    //   where: { projectId: id },
-    //   select: {
-    //     id: true,
-    //     item: true,
-    //     name: true,
-    //     userId: true,
-    //     indexTasks: { select: { item: true, name: true, unique: true } },
-    //   },
-    // });
-    // const awas = getAreas.map(area => {
-    //   const { indexTasks, id, ...data } = area;
-    //   return { projectId: createProject.id, ...data };
-    // });
-    // await prisma.workAreas.createMany({ data: awas });
-    // const getIdAreas = await prisma.workAreas.findMany({
-    //   where: { projectId: createProject.id },
-    //   select: { id: true, item: true },
-    // });
-    // getAreas.forEach(async area => {
-    //   const findArea = getIdAreas.filter(a => a.item == area.item);
-    //   const getIndexTasks = await prisma.indexTasks.findMany({
-    //     where: { workAreaId: area.id },
-    //     orderBy: { id: 'asc' },
-    //     select: { item: true, name: true, id: true, unique: true },
-    //   });
-    //   const awas2 = getIndexTasks.map(index => {
-    //     const { id, ...data } = index;
-    //     return { workAreaId: findArea[0].id, ...data };
-    //   });
-    //   await prisma.indexTasks.createMany({ data: awas2 });
-    //   const getIdIndexAreas = await prisma.indexTasks.findMany({
-    //     where: { workAreaId: findArea[0].id },
-    //     select: { id: true, item: true },
-    //   });
-    //   getIndexTasks.forEach(async indexTask => {
-    //     const findIndexTask = getIdIndexAreas.filter(
-    //       a => a.item == indexTask.item
-    //     );
-    //     //***********************SUBTAKS******************* */
-    //     await this.duplicateSubTask(
-    //       indexTask.id,
-    //       findIndexTask[0].id,
-    //       'indexTaskId'
-    //     );
-    //     //**************************************************** */
-    //     const getTasks = await prisma.tasks.findMany({
-    //       where: { indexTaskId: indexTask.id },
-    //       orderBy: { id: 'asc' },
-    //       select: { item: true, name: true, id: true, unique: true },
-    //     });
-    //     const awas3 = getTasks.map(task => {
-    //       const { id, ...data } = task;
-    //       return { indexTaskId: findIndexTask[0].id, ...data };
-    //     });
-    //     await prisma.tasks.createMany({ data: awas3 });
-    //     const getIdTaks = await prisma.tasks.findMany({
-    //       where: { indexTaskId: findIndexTask[0].id },
-    //       select: { id: true, item: true },
-    //     });
-    //     getTasks.forEach(async task => {
-    //       const findTask = getIdTaks.filter(a => a.item == task.item);
-    //       //***********************SUBTAKS******************* */
-    //       await this.duplicateSubTask(task.id, findTask[0].id, 'taskId');
-    //       //**************************************************** */
-    //       const getTasks2 = await prisma.task_lvl_2.findMany({
-    //         where: { taskId: task.id },
-    //         orderBy: { id: 'asc' },
-    //         select: { item: true, name: true, id: true, unique: true },
-    //       });
-    //       const awas4 = getTasks2.map(task2 => {
-    //         const { id, ...data } = task2;
-    //         return { taskId: findTask[0].id, ...data };
-    //       });
-    //       await prisma.task_lvl_2.createMany({ data: awas4 });
-    //       const getIdTasks2 = await prisma.task_lvl_2.findMany({
-    //         where: { taskId: findTask[0].id },
-    //         select: { id: true, item: true },
-    //       });
-    //       getTasks2.forEach(async task2 => {
-    //         const findTask2 = getIdTasks2.filter(a => a.item == task2.item);
-    //         //***********************SUBTAKS******************* */
-    //         await this.duplicateSubTask(task2.id, findTask2[0].id, 'task_2_Id');
-    //         //**************************************************** */
-    //         const getTasks3 = await prisma.task_lvl_3.findMany({
-    //           where: { task_2_Id: task2.id },
-    //           orderBy: { id: 'asc' },
-    //           select: { item: true, name: true, id: true, unique: true },
-    //         });
-    //         const awas5 = getTasks3.map(task3 => {
-    //           const { id, ...data } = task3;
-    //           return { task_2_Id: findTask2[0].id, ...data };
-    //         });
-    //         await prisma.task_lvl_3.createMany({ data: awas5 });
-    //         const getIdTasks3 = await prisma.task_lvl_3.findMany({
-    //           where: { task_2_Id: findTask2[0].id },
-    //           select: { id: true, item: true },
-    //         });
-    //         getTasks3.forEach(async task3 => {
-    //           const findTask3 = getIdTasks3.filter(a => a.item == task3.item);
-    //           //***********************SUBTAKS******************* */
-    //           await this.duplicateSubTask(
-    //             task3.id,
-    //             findTask3[0].id,
-    //             'task_3_Id'
-    //           );
-    //           //**************************************************** */
-    //         });
-    //       });
-    //     });
-    //   });
-    // });
+    // await this.duplicateArea(id, createProject.id);
+    const getAreas = await prisma.workAreas.findMany({
+      where: { projectId: id },
+      select: {
+        id: true,
+        item: true,
+        name: true,
+        userId: true,
+        indexTasks: { select: { item: true, name: true, unique: true } },
+      },
+    });
+    const awas = getAreas.map(area => {
+      const { indexTasks, id, ...data } = area;
+      return { projectId: createProject.id, ...data };
+    });
+    await prisma.workAreas.createMany({ data: awas });
+    const getIdAreas = await prisma.workAreas.findMany({
+      where: { projectId: createProject.id },
+      select: { id: true, item: true },
+    });
+    getAreas.forEach(async area => {
+      const findArea = getIdAreas.filter(a => a.item == area.item);
+      const getIndexTasks = await prisma.indexTasks.findMany({
+        where: { workAreaId: area.id },
+        orderBy: { id: 'asc' },
+        select: { item: true, name: true, id: true, unique: true },
+      });
+      const awas2 = getIndexTasks.map(index => {
+        const { id, ...data } = index;
+        return { workAreaId: findArea[0].id, ...data };
+      });
+      await prisma.indexTasks.createMany({ data: awas2 });
+      const getIdIndexAreas = await prisma.indexTasks.findMany({
+        where: { workAreaId: findArea[0].id },
+        select: { id: true, item: true },
+      });
+      getIndexTasks.forEach(async indexTask => {
+        const findIndexTask = getIdIndexAreas.filter(
+          a => a.item == indexTask.item
+        );
+        //***********************SUBTAKS******************* */
+        await this.duplicateSubTask(
+          indexTask.id,
+          findIndexTask[0].id,
+          'indexTaskId'
+        );
+        //**************************************************** */
+        const getTasks = await prisma.tasks.findMany({
+          where: { indexTaskId: indexTask.id },
+          orderBy: { id: 'asc' },
+          select: { item: true, name: true, id: true, unique: true },
+        });
+        const awas3 = getTasks.map(task => {
+          const { id, ...data } = task;
+          return { indexTaskId: findIndexTask[0].id, ...data };
+        });
+        await prisma.tasks.createMany({ data: awas3 });
+        const getIdTaks = await prisma.tasks.findMany({
+          where: { indexTaskId: findIndexTask[0].id },
+          select: { id: true, item: true },
+        });
+        getTasks.forEach(async task => {
+          const findTask = getIdTaks.filter(a => a.item == task.item);
+          //***********************SUBTAKS******************* */
+          await this.duplicateSubTask(task.id, findTask[0].id, 'taskId');
+          //**************************************************** */
+          const getTasks2 = await prisma.task_lvl_2.findMany({
+            where: { taskId: task.id },
+            orderBy: { id: 'asc' },
+            select: { item: true, name: true, id: true, unique: true },
+          });
+          const awas4 = getTasks2.map(task2 => {
+            const { id, ...data } = task2;
+            return { taskId: findTask[0].id, ...data };
+          });
+          await prisma.task_lvl_2.createMany({ data: awas4 });
+          const getIdTasks2 = await prisma.task_lvl_2.findMany({
+            where: { taskId: findTask[0].id },
+            select: { id: true, item: true },
+          });
+          getTasks2.forEach(async task2 => {
+            const findTask2 = getIdTasks2.filter(a => a.item == task2.item);
+            //***********************SUBTAKS******************* */
+            await this.duplicateSubTask(task2.id, findTask2[0].id, 'task_2_Id');
+            //**************************************************** */
+            const getTasks3 = await prisma.task_lvl_3.findMany({
+              where: { task_2_Id: task2.id },
+              orderBy: { id: 'asc' },
+              select: { item: true, name: true, id: true, unique: true },
+            });
+            const awas5 = getTasks3.map(task3 => {
+              const { id, ...data } = task3;
+              return { task_2_Id: findTask2[0].id, ...data };
+            });
+            await prisma.task_lvl_3.createMany({ data: awas5 });
+            const getIdTasks3 = await prisma.task_lvl_3.findMany({
+              where: { task_2_Id: findTask2[0].id },
+              select: { id: true, item: true },
+            });
+            getTasks3.forEach(async task3 => {
+              const findTask3 = getIdTasks3.filter(a => a.item == task3.item);
+              //***********************SUBTAKS******************* */
+              await this.duplicateSubTask(
+                task3.id,
+                findTask3[0].id,
+                'task_3_Id'
+              );
+              //**************************************************** */
+            });
+          });
+        });
+      });
+    });
 
     return { oldName: getProyect.name, ...createProject };
   }
