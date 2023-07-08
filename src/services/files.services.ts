@@ -20,7 +20,7 @@ class FilesServices {
     return filesList;
   }
 
-  static async createMany(
+  static async createManyFiles(
     data: {
       dir: string;
       type: FileTypes;

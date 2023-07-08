@@ -1,5 +1,6 @@
 import AppError from '../utils/appError';
 import { Projects, prisma } from '../utils/prisma.server';
+import PathServices from './paths.services';
 
 class DuplicatesServices {
   static async duplicateSubTask(
@@ -10,17 +11,55 @@ class DuplicatesServices {
     const listSubtasks = await prisma.subTasks.findMany({
       where: { [type]: idOld },
       select: {
+        id: true,
         hours: true,
         item: true,
         name: true,
         price: true,
+        files: {
+          where: {
+            AND: [
+              { type: 'MATERIAL' },
+              // { type: 'SUCCESSFUL' }
+            ],
+          },
+        },
       },
     });
-    const newListSubTasks = listSubtasks.map(data => ({
-      [type]: idNew,
-      ...data,
-    }));
-    return await prisma.subTasks.createMany({ data: newListSubTasks });
+    const newListSubTasks = listSubtasks.map(data => {
+      const { files, id, ..._data } = data;
+      return { [type]: idNew, ..._data };
+    });
+    const newSubTaks = await prisma.subTasks.createMany({
+      data: newListSubTasks,
+    });
+    const getIdSubTaks = await prisma.subTasks.findMany({
+      where: { [type]: idNew },
+      select: { id: true, item: true },
+    });
+    if (listSubtasks.length > 0) {
+      listSubtasks.forEach(async subtask => {
+        const findSubTask = getIdSubTaks.filter(s => s.item == subtask.item);
+        const _subtask_id = findSubTask[0].id;
+        if (subtask.files.length > 0) {
+          const newFiles = await Promise.all(
+            subtask.files.map(async file => {
+              const { dir, ...data } = file;
+              if (file.type === 'MATERIAL') {
+                const newDir = await PathServices.pathSubTask(
+                  _subtask_id,
+                  file.type
+                );
+                return { dir: newDir, ...data };
+              }
+              return file;
+            })
+          );
+          await prisma.files.createMany({ data: newFiles });
+        }
+      });
+    }
+    return newSubTaks;
   }
   static async proyect(id: Projects['id']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
@@ -36,131 +75,6 @@ class DuplicatesServices {
         unique: true,
         specialityId: true,
         CUI: true,
-        // areas: {
-        //   orderBy: { id: 'asc' },
-        //   select: {
-        //     name: true,
-        //     userId: true,
-        //     item: true,
-        //     indexTasks: {
-        //       orderBy: { id: 'asc' },
-        //       select: {
-        //         name: true,
-        //         item: true,
-        //         unique: true,
-        //         subTasks: {
-        //           select: {
-        //             hours: true,
-        //             item: true,
-        //             name: true,
-        //             price: true,
-        //             files: {
-        //               where: {
-        //                 AND: [{ type: 'MATERIAL' }, { type: 'SUCCESSFUL' }],
-        //               },
-        //               select: {
-        //                 name: true,
-        //                 type: true,
-        //                 dir: true,
-        //                 userId: true,
-        //               },
-        //             },
-        //           },
-        //         },
-        //         tasks: {
-        //           orderBy: { id: 'asc' },
-        //           select: {
-        //             name: true,
-        //             item: true,
-        //             unique: true,
-        //             subTasks: {
-        //               orderBy: { id: 'asc' },
-        //               select: {
-        //                 hours: true,
-        //                 item: true,
-        //                 name: true,
-        //                 price: true,
-        //                 files: {
-        //                   where: {
-        //                     AND: [{ type: 'MATERIAL' }, { type: 'SUCCESSFUL' }],
-        //                   },
-        //                   select: {
-        //                     name: true,
-        //                     type: true,
-        //                     dir: true,
-        //                     userId: true,
-        //                   },
-        //                 },
-        //               },
-        //             },
-        //             tasks_2: {
-        //               orderBy: { id: 'asc' },
-        //               select: {
-        //                 name: true,
-        //                 item: true,
-        //                 unique: true,
-        //                 subTasks: {
-        //                   orderBy: { id: 'asc' },
-        //                   select: {
-        //                     hours: true,
-        //                     item: true,
-        //                     name: true,
-        //                     price: true,
-        //                     files: {
-        //                       where: {
-        //                         AND: [
-        //                           { type: 'MATERIAL' },
-        //                           { type: 'SUCCESSFUL' },
-        //                         ],
-        //                       },
-        //                       select: {
-        //                         name: true,
-        //                         type: true,
-        //                         dir: true,
-        //                         userId: true,
-        //                       },
-        //                     },
-        //                   },
-        //                 },
-        //                 tasks_3: {
-        //                   orderBy: { id: 'asc' },
-        //                   select: {
-        //                     name: true,
-        //                     item: true,
-        //                     unique: true,
-        //                     subTasks: {
-        //                       orderBy: { id: 'asc' },
-        //                       select: {
-        //                         hours: true,
-        //                         item: true,
-        //                         name: true,
-        //                         price: true,
-        //                         files: {
-        //                           where: {
-        //                             AND: [
-        //                               { type: 'MATERIAL' },
-        //                               { type: 'SUCCESSFUL' },
-        //                             ],
-        //                           },
-        //                           select: {
-        //                             name: true,
-        //                             type: true,
-        //                             dir: true,
-        //                             userId: true,
-        //                           },
-        //                         },
-        //                       },
-        //                     },
-        //                   },
-        //                 },
-        //               },
-        //             },
-        //           },
-        //         },
-        //       },
-        //     },
-        //   },
-        // },
       },
     });
     if (!getProyect)

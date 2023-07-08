@@ -35,7 +35,7 @@ export const uploadFiles = async (
     const status = req.query.status as Files['type'];
     const _subtask_id = parseInt(id);
     const newFiles = req.files as Express.Multer.File[];
-    const dir = await PathServices.pathSubTask(_subtask_id, 'REVIEW');
+    const dir = await PathServices.pathSubTask(_subtask_id, status);
     const data = newFiles.map(file => ({
       dir,
       type: status,
@@ -43,9 +43,8 @@ export const uploadFiles = async (
       name: file.filename,
       userId: userInfo.id,
     }));
-    console.log(data);
     if (!req.files) return;
-    await FilesServices.createMany(data, _subtask_id);
+    await FilesServices.createManyFiles(data, _subtask_id);
     const query = await SubTasksServices.find(_subtask_id);
     res.status(201).json(query);
   } catch (error) {
