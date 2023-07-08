@@ -40,3 +40,85 @@ export const duplicateProject = async (
     next(error);
   }
 };
+
+export const duplicateArea = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _work_area_id = parseInt(id);
+    const duplicate = await DuplicatesServices.area(_work_area_id);
+    const oldPath = await PathServices.pathArea(_work_area_id);
+    const newPath = await PathServices.pathArea(duplicate.id);
+    res.status(201).json({ oldPath, newPath });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const duplicateIndexTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _index_task_id = parseInt(id);
+    const duplicate = await DuplicatesServices.indexTask(_index_task_id);
+    const oldPath = await PathServices.pathIndexTask(_index_task_id);
+    const newPath = await PathServices.pathIndexTask(duplicate.id);
+    res.status(201).json({ oldPath, newPath });
+  } catch (error) {
+    next(error);
+  }
+};
+export const duplicateTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _task_id = parseInt(id);
+    const duplicate = await DuplicatesServices.task(_task_id);
+    const oldPath = await PathServices.pathTask(_task_id);
+    const newPath = await PathServices.pathTask(duplicate.id);
+    res.status(201).json({ oldPath, newPath });
+  } catch (error) {
+    next(error);
+  }
+};
+export const duplicateTask2 = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _task_2_id = parseInt(id);
+    const duplicate = await DuplicatesServices.task2(_task_2_id);
+    const oldPath = await PathServices.pathTask2(_task_2_id);
+    const newPath = await PathServices.pathTask2(duplicate.id);
+    res.status(201).json({ oldPath, newPath });
+  } catch (error) {
+    next(error);
+  }
+};
+export const duplicateTask3 = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _task_3_id = parseInt(id);
+    const duplicate = await DuplicatesServices.task3(_task_3_id);
+    const oldPath = await PathServices.pathTask3(_task_3_id);
+    const newPath = await PathServices.pathTask3(duplicate.id);
+    res.status(201).json({ oldPath, newPath });
+  } catch (error) {
+    next(error);
+  }
+};

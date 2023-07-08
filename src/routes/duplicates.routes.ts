@@ -5,7 +5,14 @@ import {
   _admin_role,
   _mod_role,
 } from '../middlewares/role.middleware';
-import { duplicateProject } from '../controllers';
+import {
+  duplicateArea,
+  duplicateIndexTask,
+  duplicateProject,
+  duplicateTask,
+  duplicateTask2,
+  duplicateTask3,
+} from '../controllers';
 
 const router = Router();
 router.use(authenticateHandler);
@@ -13,7 +20,12 @@ router.use(authenticateHandler);
 router.use(_employee_role);
 //MODERATOR ROLE
 router.use(_mod_role);
-router.get('/project/:id', duplicateProject);
+router.post('/project/:id', duplicateProject);
+router.post('/area/:id', duplicateArea);
+router.post('/indextask/:id', duplicateIndexTask);
+router.post('/task/:id', duplicateTask);
+router.post('/task2/:id', duplicateTask2);
+router.post('/task3/:id', duplicateTask3);
 //ADMIN ROLE
 router.use(_admin_role);
 
