@@ -44,13 +44,13 @@ class DuplicatesServices {
         if (subtask.files.length !== 0) {
           const newFiles = await Promise.all(
             subtask.files.map(async file => {
-              const { dir, id, ...data } = file;
+              const { dir, id, subTasksId, ...data } = file;
               if (file.type === 'MATERIAL') {
                 const newDir = await PathServices.pathSubTask(
                   _subtask_id,
                   file.type
                 );
-                return { dir: newDir, ...data };
+                return { dir: newDir, subTasksId: _subtask_id, ...data };
               }
               return file;
             })
