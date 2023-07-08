@@ -12,6 +12,7 @@ import speacilitiesRouter from './specialities.routes';
 import filesRouter from './files.routes';
 import reportsRouter from './reports.routes';
 import feedbacksRouter from './feedbacks.routes';
+import duplicatesRouter from './duplicates.routes';
 export {
   userRouter,
   authRouter,
@@ -27,4 +28,5 @@ export {
   filesRouter,
   reportsRouter,
   feedbacksRouter,
+  duplicatesRouter,
 };

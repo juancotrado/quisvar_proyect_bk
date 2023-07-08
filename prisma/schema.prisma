@@ -69,8 +69,8 @@ model WorkAreas {
   projectId  Int
   item       String       @default("")
   indexTasks IndexTasks[]
-  user       Users?       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  project    Projects     @relation(fields: [projectId], references: [id])
+  user       Users?       @relation(fields: [userId], references: [id])
+  project    Projects     @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model IndexTasks {
@@ -170,7 +170,7 @@ model Feedback {
   status     Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  subTasks   SubTasks @relation(fields: [subTasksId], references: [id])
+  subTasks   SubTasks @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
   subTasksId Int
 }
 
@@ -181,7 +181,7 @@ model Files {
   dir        String?
   user       Users     @relation(fields: [userId], references: [id], onUpdate: Cascade)
   type       FileTypes
-  subTasks   SubTasks  @relation(fields: [subTasksId], references: [id])
+  subTasks   SubTasks  @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
   subTasksId Int
   feedbackId Int?
   feedback   Feedback? @relation(fields: [feedbackId], references: [id])

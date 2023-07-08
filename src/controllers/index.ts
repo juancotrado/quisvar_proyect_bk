@@ -72,6 +72,7 @@ import {
 } from './task_3.controllers';
 import { showListReportByUser } from './reports.controllers';
 import { createFeedback, findFeedbacks } from './feedbacks.controllers';
+import { duplicateProject } from './duplicates.controllers';
 // User Controllers
 export {
   showUsers,
@@ -146,3 +147,6 @@ export { showListReportByUser };
 
 //FeedBack Controllers
 export { createFeedback, findFeedbacks };
+
+//Duplicates Controllers
+export { duplicateProject };
