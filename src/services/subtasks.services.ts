@@ -193,8 +193,15 @@ class SubTasksServices {
     const subTask = await prisma.subTasks.findUnique({ where: { id } });
     if (!subTask) throw new AppError('Oops!,ID invalido', 400);
     if (status === 'DONE') {
+      // const files = await prisma.files.findMany({
+      //   where: { subTasksId: id, type: 'REVIEW', feedback: { comment: {} } },
+      // });
       const files = await prisma.files.findMany({
-        where: { subTasksId: id, type: 'REVIEW', feedback: { is: null } },
+        where: {
+          subTasksId: id,
+          type: 'REVIEW',
+          feedback: { comment: { equals: null } },
+        },
       });
       const oldDir = await PathServices.pathSubTask(id, 'REVIEW');
       const newDir = await PathServices.pathSubTask(id, 'SUCCESSFUL');
