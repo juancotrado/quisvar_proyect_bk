@@ -13,6 +13,8 @@ import filesRouter from './files.routes';
 import reportsRouter from './reports.routes';
 import feedbacksRouter from './feedbacks.routes';
 import duplicatesRouter from './duplicates.routes';
+import archiverRouter from './archiver.routes';
+
 export {
   userRouter,
   authRouter,
@@ -29,4 +31,5 @@ export {
   reportsRouter,
   feedbacksRouter,
   duplicatesRouter,
+  archiverRouter,
 };
