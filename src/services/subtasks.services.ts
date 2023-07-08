@@ -11,32 +11,14 @@ import TasksServices from './tasks.services';
 import PathServices from './paths.services';
 import Task_2_Services from './task_2.services';
 import Task_3_Services from './task_3.services';
+import Queries from '../utils/queries';
 class SubTasksServices {
   static async find(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findSubTask = await prisma.subTasks.findUnique({
       where: { id },
       include: {
-        files: {
-          include: {
-            user: {
-              select: {
-                profile: {
-                  select: { id: true, firstName: true, lastName: true },
-                },
-              },
-            },
-          },
-        },
-        users: {
-          select: {
-            user: {
-              select: {
-                profile: true,
-              },
-            },
-          },
-        },
+        ...Queries.includeSubtask,
         task: {
           select: {
             name: true,
@@ -122,24 +104,7 @@ class SubTasksServices {
             },
           },
         },
-        include: {
-          files: {
-            include: {
-              user: {
-                select: {
-                  profile: {
-                    select: { id: true, firstName: true, lastName: true },
-                  },
-                },
-              },
-            },
-          },
-          users: {
-            select: {
-              user: { select: { id: true, profile: true } },
-            },
-          },
-        },
+        include: Queries.includeSubtask,
       });
     }
     if (option == 'apply') {
@@ -161,24 +126,7 @@ class SubTasksServices {
             },
           },
         },
-        include: {
-          files: {
-            include: {
-              user: {
-                select: {
-                  profile: {
-                    select: { id: true, firstName: true, lastName: true },
-                  },
-                },
-              },
-            },
-          },
-          users: {
-            select: {
-              user: { select: { id: true, profile: true } },
-            },
-          },
-        },
+        include: Queries.includeSubtask,
       });
     }
     if (option == 'review') {
@@ -188,24 +136,7 @@ class SubTasksServices {
           status: 'INREVIEW',
           hasPDF: false,
         },
-        include: {
-          files: {
-            include: {
-              user: {
-                select: {
-                  profile: {
-                    select: { id: true, firstName: true, lastName: true },
-                  },
-                },
-              },
-            },
-          },
-          users: {
-            select: {
-              user: { select: { id: true, profile: true } },
-            },
-          },
-        },
+        include: Queries.includeSubtask,
       });
     }
     throw new AppError('Oops!, Necesitamos un status para esta consulta', 400);
@@ -240,28 +171,7 @@ class SubTasksServices {
     const updateStatusPDF = await prisma.subTasks.update({
       where: { id },
       data: { hasPDF },
-      include: {
-        files: {
-          include: {
-            user: {
-              select: {
-                profile: {
-                  select: { id: true, firstName: true, lastName: true },
-                },
-              },
-            },
-          },
-        },
-        users: {
-          select: {
-            user: {
-              select: {
-                profile: true,
-              },
-            },
-          },
-        },
-      },
+      include: Queries.includeSubtask,
     });
     return updateStatusPDF;
   }
@@ -278,25 +188,7 @@ class SubTasksServices {
         status,
         percentage,
       },
-      include: {
-        files: {
-          include: {
-            user: {
-              select: {
-                profile: {
-                  select: { id: true, firstName: true, lastName: true },
-                },
-              },
-            },
-          },
-        },
-        users: {
-          select: {
-            user: { select: { id: true, profile: true } },
-          },
-        },
-        _count: true,
-      },
+      include: Queries.includeSubtask,
     });
     const subTask = await prisma.subTasks.findUnique({ where: { id } });
     if (!subTask) throw new AppError('Oops!,ID invalido', 400);
@@ -327,24 +219,7 @@ class SubTasksServices {
             },
           },
         },
-        include: {
-          files: {
-            include: {
-              user: {
-                select: {
-                  profile: {
-                    select: { id: true, firstName: true, lastName: true },
-                  },
-                },
-              },
-            },
-          },
-          users: {
-            select: {
-              user: { select: { id: true, profile: true } },
-            },
-          },
-        },
+        include: Queries.includeSubtask,
       });
     }
     if (status === 'UNRESOLVED') {
@@ -360,24 +235,7 @@ class SubTasksServices {
             },
           },
         },
-        include: {
-          files: {
-            include: {
-              user: {
-                select: {
-                  profile: {
-                    select: { id: true, firstName: true, lastName: true },
-                  },
-                },
-              },
-            },
-          },
-          users: {
-            select: {
-              user: { select: { id: true, profile: true } },
-            },
-          },
-        },
+        include: Queries.includeSubtask,
       });
     }
     return updateTaskStatus;
@@ -519,28 +377,7 @@ class SubTasksServices {
           },
         },
       },
-      include: {
-        files: {
-          include: {
-            user: {
-              select: {
-                profile: {
-                  select: { id: true, firstName: true, lastName: true },
-                },
-              },
-            },
-          },
-        },
-        users: {
-          select: {
-            user: {
-              select: {
-                profile: true,
-              },
-            },
-          },
-        },
-      },
+      include: Queries.includeSubtask,
     });
     // }
     // );

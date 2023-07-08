@@ -2,6 +2,7 @@ import { IndexTasks, SubTasks, Tasks, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import PathServices from './paths.services';
 import { renameDir } from '../utils/fileSystem';
+import Queries from '../utils/queries';
 class TasksServices {
   static async find(id: Tasks['id'], status?: SubTasks['status']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
@@ -14,28 +15,7 @@ class TasksServices {
           where: {
             status,
           },
-          include: {
-            files: {
-              include: {
-                user: {
-                  select: {
-                    profile: {
-                      select: { id: true, firstName: true, lastName: true },
-                    },
-                  },
-                },
-              },
-            },
-            users: {
-              select: {
-                user: {
-                  select: {
-                    profile: true,
-                  },
-                },
-              },
-            },
-          },
+          include: Queries.includeSubtask,
         },
       },
     });

@@ -4,6 +4,7 @@ import AppError from '../utils/appError';
 import fs from 'fs';
 import { renameDir } from '../utils/fileSystem';
 import PathServices from './paths.services';
+import Queries from '../utils/queries';
 class IndexTasksServices {
   static async find(id: IndexTasks['id']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
@@ -36,35 +37,7 @@ class IndexTasksServices {
           where: {
             status,
           },
-          include: {
-            feedBacks: {
-              include: {
-                files: true,
-              },
-            },
-            files: {
-              include: {
-                user: {
-                  select: {
-                    profile: {
-                      select: { id: true, firstName: true, lastName: true },
-                    },
-                  },
-                },
-              },
-            },
-            users: {
-              select: {
-                assignedAt: true,
-                untilDate: true,
-                user: {
-                  select: {
-                    profile: true,
-                  },
-                },
-              },
-            },
-          },
+          include: Queries.includeSubtask,
         },
       },
     });
