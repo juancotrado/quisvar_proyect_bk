@@ -37,14 +37,14 @@ class DuplicatesServices {
       where: { [type]: idNew },
       select: { id: true, item: true },
     });
-    if (listSubtasks.length > 0) {
+    if (listSubtasks.length !== 0) {
       listSubtasks.forEach(async subtask => {
         const findSubTask = getIdSubTaks.filter(s => s.item == subtask.item);
         const _subtask_id = findSubTask[0].id;
-        if (subtask.files.length > 0) {
+        if (subtask.files.length !== 0) {
           const newFiles = await Promise.all(
             subtask.files.map(async file => {
-              const { dir, ...data } = file;
+              const { dir, id, ...data } = file;
               if (file.type === 'MATERIAL') {
                 const newDir = await PathServices.pathSubTask(
                   _subtask_id,
