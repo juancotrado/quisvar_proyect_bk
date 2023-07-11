@@ -6,12 +6,13 @@ import {
   prisma,
 } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-import fs from 'fs';
+import fs, { copyFileSync } from 'fs';
 import TasksServices from './tasks.services';
 import PathServices from './paths.services';
 import Task_2_Services from './task_2.services';
 import Task_3_Services from './task_3.services';
 import Queries from '../utils/queries';
+import { copyFile } from 'fs/promises';
 class SubTasksServices {
   static async find(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
@@ -129,7 +130,6 @@ class SubTasksServices {
       });
       const today = new Date().getTime();
       const hours = (getHours ? getHours.hours : 0) * 60 * 60 * 1000;
-      console.log('==>', hours);
       return await prisma.subTasks.update({
         where: { id },
         data: {
@@ -220,15 +220,28 @@ class SubTasksServices {
       });
       const oldDir = await PathServices.pathSubTask(id, 'REVIEW');
       const newDir = await PathServices.pathSubTask(id, 'SUCCESSFUL');
-
+      const modelDir = await PathServices.pathSubTask(id, 'MATERIAL');
       files.forEach(async file => {
         const ext = file.name.split('.').at(-1);
         const newFileName = subTask.item + '.' + subTask.name + '.' + ext;
+        await prisma.files.create({
+          data: {
+            name: file.name,
+            dir: modelDir,
+            type: 'MATERIAL',
+            userId: file.userId,
+            subTasksId: file.subTasksId,
+          },
+        });
         await prisma.files.update({
           where: { id: file.id },
           data: { type: 'SUCCESSFUL', name: newFileName, dir: newDir },
         });
-        fs.renameSync(`${oldDir}/${file.name}`, `${newDir}/${newFileName}`);
+        copyFile(`${oldDir}/${file.name}`, `${modelDir}/${file.name}`).then(
+          () => {
+            fs.renameSync(`${oldDir}/${file.name}`, `${newDir}/${newFileName}`);
+          }
+        );
       });
     }
     if (status === 'PROCESS') {
