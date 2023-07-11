@@ -1,3 +1,4 @@
+import { mkdir, mkdirSync } from 'fs';
 import AppError from '../utils/appError';
 import {
   IndexTasks,
@@ -11,64 +12,6 @@ import {
 import PathServices from './paths.services';
 
 class DuplicatesServices {
-  static async duplicateSubTask(
-    idOld: number,
-    idNew: number,
-    type: 'indexTaskId' | 'taskId' | 'task_2_Id' | 'task_3_Id'
-  ) {
-    const listSubtasks = await prisma.subTasks.findMany({
-      where: { [type]: idOld },
-      select: {
-        id: true,
-        hours: true,
-        item: true,
-        name: true,
-        price: true,
-        files: {
-          where: {
-            AND: [
-              { type: 'MATERIAL' },
-              // { type: 'SUCCESSFUL' }
-            ],
-          },
-        },
-      },
-    });
-    const newListSubTasks = listSubtasks.map(data => {
-      const { files, id, ..._data } = data;
-      return { [type]: idNew, ..._data };
-    });
-    const newSubTaks = await prisma.subTasks.createMany({
-      data: newListSubTasks,
-    });
-    const getIdSubTaks = await prisma.subTasks.findMany({
-      where: { [type]: idNew },
-      select: { id: true, item: true },
-    });
-    if (listSubtasks.length !== 0) {
-      listSubtasks.forEach(async subtask => {
-        const findSubTask = getIdSubTaks.filter(s => s.item == subtask.item);
-        const _subtask_id = findSubTask[0].id;
-        if (subtask.files.length !== 0) {
-          const newFiles = await Promise.all(
-            subtask.files.map(async file => {
-              const { dir, id, subTasksId, ...data } = file;
-              if (file.type === 'MATERIAL') {
-                const newDir = await PathServices.pathSubTask(
-                  _subtask_id,
-                  file.type
-                );
-                return { dir: newDir, subTasksId: _subtask_id, ...data };
-              }
-              return file;
-            })
-          );
-          await prisma.files.createMany({ data: newFiles });
-        }
-      });
-    }
-    return newSubTaks;
-  }
   static async proyect(id: Projects['id']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const getProyect = await prisma.projects.findUnique({
@@ -364,6 +307,12 @@ class DuplicatesServices {
     });
     if (!createNewTask3)
       throw new AppError('No se pudo Duplicar la tarea 2', 400);
+    await this.duplicateSubTask(
+      id,
+      createNewTask3.id,
+      'task_3_Id',
+      createNewTask3.item
+    );
     // await this.duplicateTask2(id, createNewTask3.id, newTask3.item);
     return { oldName: newTask3.name, ...createNewTask3 };
   }
@@ -417,6 +366,8 @@ class DuplicatesServices {
       const findIndexTask = getIdIndexAreas.filter(
         a => a.item.slice(-1) == indexTask.item.slice(-1)
       );
+      const _path = await PathServices.pathIndexTask(findIndexTask[0].id);
+      if (_path) mkdirSync(_path);
       await this.duplicateSubTask(
         indexTask.id,
         findIndexTask[0].id,
@@ -453,6 +404,8 @@ class DuplicatesServices {
       const findTask = getIdTaks.filter(
         a => a.item.slice(-1) == task.item.slice(-1)
       );
+      const _path = await PathServices.pathTask(findTask[0].id);
+      if (_path) mkdirSync(_path);
       await this.duplicateSubTask(task.id, findTask[0].id, 'taskId');
       await this.duplicateTask2(task.id, findTask[0].id, findTask[0].item);
     });
@@ -481,6 +434,8 @@ class DuplicatesServices {
       const findTask2 = getIdTasks2.filter(
         a => a.item.slice(-1) == task2.item.slice(-1)
       );
+      const _path = await PathServices.pathTask2(findTask2[0].id);
+      if (_path) mkdirSync(_path);
       await this.duplicateSubTask(task2.id, findTask2[0].id, 'task_2_Id');
       await this.duplicateTask3(task2.id, findTask2[0].id, findTask2[0].item);
     });
@@ -500,6 +455,12 @@ class DuplicatesServices {
       const newItem = itemTask2 ? itemTask2 + item.slice(-2) : item;
       return { task_2_Id: task_2_Id_New, item: newItem, ...data };
     });
+    // const pathList = await Promise.all(
+    //   getTasks3.map(async _task3 => {
+    //     const path = await PathServices.pathTask3(_task3.id);
+    //     return path;
+    //   })
+    // );
     await prisma.task_lvl_3.createMany({ data: newListTask3 });
     const getIdTasks3 = await prisma.task_lvl_3.findMany({
       where: { task_2_Id: task_2_Id_New },
@@ -509,8 +470,77 @@ class DuplicatesServices {
       const findTask3 = getIdTasks3.filter(
         a => a.item.slice(-1) == task3.item.slice(-1)
       );
-      await this.duplicateSubTask(task3.id, findTask3[0].id, 'task_3_Id');
+      const _path = await PathServices.pathTask3(findTask3[0].id);
+      if (_path) mkdirSync(_path);
+      await this.duplicateSubTask(
+        task3.id,
+        findTask3[0].id,
+        'task_3_Id',
+        itemTask2
+      );
     });
+  }
+  static async duplicateSubTask(
+    idOld: number,
+    idNew: number,
+    type: 'indexTaskId' | 'taskId' | 'task_2_Id' | 'task_3_Id',
+    itemTask?: string
+  ) {
+    const listSubtasks = await prisma.subTasks.findMany({
+      where: { [type]: idOld },
+      select: {
+        id: true,
+        hours: true,
+        item: true,
+        name: true,
+        price: true,
+        files: {
+          where: {
+            AND: [
+              { type: 'MATERIAL' },
+              // { type: 'SUCCESSFUL' }
+            ],
+          },
+        },
+      },
+    });
+    const newListSubTasks = listSubtasks.map(data => {
+      const { files, id, item, ..._data } = data;
+      const newItem = itemTask ? itemTask + item.slice(-2) : item;
+      return { [type]: idNew, item: newItem, ..._data };
+    });
+    const newSubTaks = await prisma.subTasks.createMany({
+      data: newListSubTasks,
+    });
+    const getIdSubTaks = await prisma.subTasks.findMany({
+      where: { [type]: idNew },
+      select: { id: true, item: true },
+    });
+    if (listSubtasks.length !== 0) {
+      listSubtasks.forEach(async subtask => {
+        const findSubTask = getIdSubTaks.filter(
+          s => s.item.slice(-1) == subtask.item.slice(-1)
+        );
+        const _subtask_id = findSubTask[0].id;
+        if (subtask.files.length !== 0) {
+          const newFiles = await Promise.all(
+            subtask.files.map(async file => {
+              const { dir, id, subTasksId, ...data } = file;
+              if (file.type === 'MATERIAL') {
+                const newDir = await PathServices.pathSubTask(
+                  _subtask_id,
+                  file.type
+                );
+                return { dir: newDir, subTasksId: _subtask_id, ...data };
+              }
+              return file;
+            })
+          );
+          await prisma.files.createMany({ data: newFiles });
+        }
+      });
+    }
+    return newSubTaks;
   }
 }
 

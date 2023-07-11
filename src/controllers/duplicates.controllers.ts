@@ -5,7 +5,7 @@ import {
   _materialPath,
   _reviewPath,
 } from '../services';
-import { cpSync } from 'fs';
+import { cpSync, mkdirSync } from 'fs';
 
 export const duplicateProject = async (
   req: Request,
@@ -52,6 +52,7 @@ export const duplicateArea = async (
     const duplicate = await DuplicatesServices.area(_work_area_id);
     const oldPath = await PathServices.pathArea(_work_area_id);
     const newPath = await PathServices.pathArea(duplicate.id);
+    if (duplicate) mkdirSync(newPath);
     res.status(201).json({ oldPath, newPath });
   } catch (error) {
     next(error);
@@ -69,6 +70,7 @@ export const duplicateIndexTask = async (
     const duplicate = await DuplicatesServices.indexTask(_index_task_id);
     const oldPath = await PathServices.pathIndexTask(_index_task_id);
     const newPath = await PathServices.pathIndexTask(duplicate.id);
+    if (duplicate) mkdirSync(newPath);
     res.status(201).json({ oldPath, newPath });
   } catch (error) {
     next(error);
@@ -85,6 +87,7 @@ export const duplicateTask = async (
     const duplicate = await DuplicatesServices.task(_task_id);
     const oldPath = await PathServices.pathTask(_task_id);
     const newPath = await PathServices.pathTask(duplicate.id);
+    if (duplicate) mkdirSync(newPath);
     res.status(201).json({ oldPath, newPath });
   } catch (error) {
     next(error);
@@ -101,6 +104,7 @@ export const duplicateTask2 = async (
     const duplicate = await DuplicatesServices.task2(_task_2_id);
     const oldPath = await PathServices.pathTask2(_task_2_id);
     const newPath = await PathServices.pathTask2(duplicate.id);
+    if (duplicate) mkdirSync(newPath);
     res.status(201).json({ oldPath, newPath });
   } catch (error) {
     next(error);
@@ -117,6 +121,7 @@ export const duplicateTask3 = async (
     const duplicate = await DuplicatesServices.task3(_task_3_id);
     const oldPath = await PathServices.pathTask3(_task_3_id);
     const newPath = await PathServices.pathTask3(duplicate.id);
+    if (duplicate) mkdirSync(newPath);
     res.status(201).json({ oldPath, newPath });
   } catch (error) {
     next(error);
