@@ -14,17 +14,10 @@ import {
   _admin_role,
   _mod_role,
 } from '../middlewares/role.middleware';
-import taskVerify from '../middlewares/user.middleware';
-import {
-  statusVerify,
-  validSubtaskByIdAndStatus,
-  validTaskById,
-} from '../middlewares/subtask.middleware';
-import { upload } from '../middlewares/upload.middleware';
+import { validSubtaskByIdAndStatus } from '../middlewares/subtask.middleware';
 import {
   assignUserBySubtask,
   deleteFileSubTask,
-  uploadFileSubTask,
 } from '../controllers/subtasks.controllers';
 
 const router = Router();

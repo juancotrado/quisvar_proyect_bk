@@ -33,9 +33,12 @@ class Sockets {
         const room = this.roomPlace(subTask);
         this.io.to(room).emit('server:create-subTask', subTask);
       });
-      socket.on('client:delete-subTask', (subTask: SubTasks) => {
-        const room = this.roomPlace(subTask);
-        this.io.to(room).emit('server:delete-subTask', subTask);
+      socket.on('client:delete-subTask', (subTasks: SubTasks[]) => {
+        const room = this.roomPlace(subTasks[0]);
+        if (!subTasks[0].id) {
+          return this.io.to(room).emit('server:delete-subTask', []);
+        }
+        this.io.to(room).emit('server:delete-subTask', subTasks);
       });
       socket.on('disconnect', () => {
         console.log('User disconected ==>', socket.id);

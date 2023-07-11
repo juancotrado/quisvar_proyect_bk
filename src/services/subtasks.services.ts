@@ -30,6 +30,21 @@ class SubTasksServices {
     return findSubTask;
   }
 
+  static async findMany() {
+    const findSubTasks = await prisma.subTasks.findMany({
+      include: {
+        ...Queries.includeSubtask,
+        task: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+    if (!findSubTasks) throw new AppError('No Hay ninguna tarea', 404);
+    return findSubTasks;
+  }
+
   static async create({
     name,
     price,
@@ -254,7 +269,7 @@ class SubTasksServices {
     if (!subTask) throw new AppError(`No se pudo encontrar la subtarea`, 404);
     if (subTask.indexTaskId) {
       const { indexTaskId } = subTask;
-      const deleteTask = await prisma.subTasks.delete({
+      const subtask = await prisma.subTasks.delete({
         where: { id },
       });
       const getSubTasks = await prisma.subTasks.findMany({
@@ -263,13 +278,16 @@ class SubTasksServices {
           indexTask: { select: { item: true } },
         },
       });
-      getSubTasks.forEach(async (subTask, index) => {
-        await prisma.subTasks.update({
-          where: { id: subTask.id },
-          data: { item: `${subTask.indexTask?.item}.${index + 1}` },
-        });
-      });
-      return deleteTask;
+      const subtaskUpdate = await Promise.all(
+        getSubTasks.map(async (subTask, index) => {
+          return await prisma.subTasks.update({
+            where: { id: subTask.id },
+            data: { item: `${subTask.indexTask?.item}.${index + 1}` },
+          });
+        })
+      );
+
+      return subtaskUpdate;
     }
     if (subTask.taskId) {
       const { taskId } = subTask;
@@ -282,13 +300,15 @@ class SubTasksServices {
           task: { select: { item: true } },
         },
       });
-      getSubTasks.forEach(async (subTask, index) => {
-        await prisma.subTasks.update({
-          where: { id: subTask.id },
-          data: { item: `${subTask.task?.item}.${index + 1}` },
-        });
-      });
-      return deleteTask;
+      const subTasksUpdate = await Promise.all(
+        getSubTasks.map(async (subTask, index) => {
+          return await prisma.subTasks.update({
+            where: { id: subTask.id },
+            data: { item: `${subTask.task?.item}.${index + 1}` },
+          });
+        })
+      );
+      return subTasksUpdate;
     }
     if (subTask.task_2_Id) {
       const { task_2_Id } = subTask;
@@ -301,13 +321,15 @@ class SubTasksServices {
           task_lvl_2: { select: { item: true } },
         },
       });
-      getSubTasks.forEach(async (subTask, index) => {
-        await prisma.subTasks.update({
-          where: { id: subTask.id },
-          data: { item: `${subTask.task_lvl_2?.item}.${index + 1}` },
-        });
-      });
-      return deleteTask;
+      const subTasksUpdate = await Promise.all(
+        getSubTasks.map(async (subTask, index) => {
+          return await prisma.subTasks.update({
+            where: { id: subTask.id },
+            data: { item: `${subTask.task_lvl_2?.item}.${index + 1}` },
+          });
+        })
+      );
+      return subTasksUpdate;
     }
     if (subTask.task_3_Id) {
       const { task_3_Id } = subTask;
@@ -320,13 +342,16 @@ class SubTasksServices {
           task_lvl_3: { select: { item: true } },
         },
       });
-      getSubTasks.forEach(async (subTask, index) => {
-        await prisma.subTasks.update({
-          where: { id: subTask.id },
-          data: { item: `${subTask.task_lvl_3?.item}.${index + 1}` },
-        });
-      });
-      return deleteTask;
+      console.log({ getSubTasks });
+      const subTasksUpdate = await Promise.all(
+        getSubTasks.map(async (subTask, index) => {
+          return await prisma.subTasks.update({
+            where: { id: subTask.id },
+            data: { item: `${subTask.task_lvl_3?.item}.${index + 1}` },
+          });
+        })
+      );
+      return subTasksUpdate;
     }
     throw new AppError(`No se pudo eliminar la subtarea`, 400);
   }
