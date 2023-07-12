@@ -26,6 +26,7 @@ class DuplicatesServices {
         unique: true,
         specialityId: true,
         CUI: true,
+        stageId: true,
       },
     });
     if (!getProyect)
@@ -35,9 +36,17 @@ class DuplicatesServices {
       );
 
     const { ..._project } = getProyect;
-    const newProject = { ..._project, name: _project.name + '(copia)' };
+    const newProject = {
+      ..._project,
+      name: _project.name + '(copia)',
+    };
+
     const createProject = await prisma.projects.create({
       data: newProject,
+    });
+    await prisma.projects.update({
+      where: { id: createProject.id },
+      data: { group: { create: { name: createProject.name } } },
     });
     if (!createProject)
       throw new AppError('No se pudo Duplicar el proyecto', 400);

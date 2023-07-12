@@ -2,6 +2,7 @@ import {
   Profiles,
   Projects,
   Specialities,
+  Stages,
   UserRole,
   Users,
 } from '@prisma/client';
@@ -22,7 +23,7 @@ export type projectPick = Pick<
   | 'CUI'
 > & { userId: Users['id'] } & {
   specialityId: Specialities['id'];
-};
+} & { stageId: Stages['id'] };
 
 export interface userHash {
   password: string;

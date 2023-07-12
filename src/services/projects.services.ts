@@ -1,4 +1,10 @@
-import { Projects, Specialities, Users, prisma } from '../utils/prisma.server';
+import {
+  Projects,
+  Specialities,
+  Stages,
+  Users,
+  prisma,
+} from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import { projectPick } from '../utils/format.server';
 import { _dirPath } from '.';
@@ -46,7 +52,10 @@ class ProjectsServices {
   }
   static async findShort(id: Projects['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const findProject = await prisma.projects.findUnique({ where: { id } });
+    const findProject = await prisma.projects.findUnique({
+      where: { id },
+      include: { stage: { select: { id: true, name: true } } },
+    });
     if (!findProject)
       throw new AppError('No se pudo encontrar los proyectos registrados', 404);
     return findProject;
@@ -61,6 +70,7 @@ class ProjectsServices {
     unique,
     specialityId,
     CUI,
+    stageId,
   }: Required<projectPick>) {
     const newProject = await prisma.projects.create({
       data: {
@@ -71,6 +81,9 @@ class ProjectsServices {
         untilDate,
         typeSpeciality,
         CUI,
+        stage: {
+          connect: { id: stageId },
+        },
         speciality: {
           connect: {
             id: specialityId,
@@ -80,6 +93,16 @@ class ProjectsServices {
           connect: {
             id: userId,
           },
+        },
+        group: {
+          create: {
+            name,
+          },
+        },
+      },
+      include: {
+        stage: {
+          select: { id: true, name: true },
         },
       },
     });
@@ -104,6 +127,7 @@ class ProjectsServices {
       name,
       description,
       startDate,
+      stageId,
       untilDate,
       status,
       userId,
@@ -111,7 +135,7 @@ class ProjectsServices {
       typeSpeciality,
     }: Projects & { userId: Users['id'] } & {
       specialityId: Specialities['id'];
-    }
+    } & { stageId: Stages['id'] }
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateProject = await prisma.projects.update({
@@ -124,31 +148,32 @@ class ProjectsServices {
         typeSpeciality,
         CUI,
         status,
-        // speciality: {
-        //   connect: {
-        //     id: specialityId,
-        //   },
-        // },
+        stage: { connect: { id: stageId } },
         moderator: {
           connect: { id: userId },
         },
       },
+      include: { stage: { select: { id: true, name: true } } },
     });
     return updateProject;
   }
 
   static async delete(id: Projects['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const { unique } = await this.findShort(id);
+    const { unique, groupId } = await this.findShort(id);
     if (unique) {
       await prisma.workAreas.deleteMany({
         where: { projectId: id },
       });
     }
-
     const deleteProject = await prisma.projects.delete({
       where: { id },
+      include: { stage: { select: { id: true, name: true } } },
     });
+    const countProjects = await prisma.projects.count({ where: { groupId } });
+    if (groupId && countProjects == 0) {
+      await prisma.groupProjects.delete({ where: { id: groupId } });
+    }
     return deleteProject;
   }
 }

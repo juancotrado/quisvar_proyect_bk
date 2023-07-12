@@ -44,22 +44,40 @@ model Specialities {
 }
 
 model Projects {
-  id             Int          @id @default(autoincrement())
-  name           String       @unique()
+  id             Int            @id @default(autoincrement())
+  name           String         @unique()
   typeSpeciality String
   description    String?
   CUI            String?
-  startDate      DateTime     @default(now())
+  startDate      DateTime       @default(now())
   untilDate      DateTime
-  status         Boolean      @default(false)
-  unique         Boolean      @default(false)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  status         Boolean        @default(false)
+  unique         Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
   userId         Int
-  moderator      Users        @relation(fields: [userId], references: [id])
-  areas          WorkAreas[]
-  speciality     Specialities @relation(fields: [specialityId], references: [id], onDelete: Cascade)
+  moderator      Users          @relation(fields: [userId], references: [id])
+  speciality     Specialities   @relation(fields: [specialityId], references: [id], onDelete: Cascade)
   specialityId   Int
+  areas          WorkAreas[]
+  group          GroupProjects? @relation(fields: [groupId], references: [id])
+  groupId        Int?
+  stage          Stages?        @relation(fields: [stageId], references: [id])
+  stageId        Int?
+}
+
+model Stages {
+  id        Int        @id @default(autoincrement())
+  name      String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  projects  Projects[]
+}
+
+model GroupProjects {
+  id       Int        @id @default(autoincrement())
+  name     String?
+  projects Projects[]
 }
 
 model WorkAreas {
@@ -71,6 +89,7 @@ model WorkAreas {
   indexTasks IndexTasks[]
   user       Users?       @relation(fields: [userId], references: [id])
   project    Projects     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  stageId    Int?
 }
 
 model IndexTasks {
@@ -131,6 +150,7 @@ model SubTasks {
   status      TaskRole      @default(UNRESOLVED)
   item        String        @default("")
   name        String
+  description String?
   percentage  Int           @default(0)
   price       Decimal       @db.Money
   hours       Float
@@ -158,6 +178,7 @@ model TaskOnUsers {
   user       Users    @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   subtask    SubTasks @relation(fields: [subtaskId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   assignedAt DateTime @default(now())
+  percentage Int?     @default(0)
   untilDate  DateTime @default(now())
 
   @@id([subtaskId, userId])

@@ -287,6 +287,7 @@ class SubTasksServices {
       });
       const getSubTasks = await prisma.subTasks.findMany({
         where: { indexTaskId },
+        orderBy: { id: 'asc' },
         include: {
           indexTask: { select: { item: true } },
         },
@@ -309,6 +310,7 @@ class SubTasksServices {
       });
       const getSubTasks = await prisma.subTasks.findMany({
         where: { taskId },
+        orderBy: { id: 'asc' },
         include: {
           task: { select: { item: true } },
         },
@@ -330,6 +332,7 @@ class SubTasksServices {
       });
       const getSubTasks = await prisma.subTasks.findMany({
         where: { task_2_Id },
+        orderBy: { id: 'asc' },
         include: {
           task_lvl_2: { select: { item: true } },
         },
@@ -351,11 +354,11 @@ class SubTasksServices {
       });
       const getSubTasks = await prisma.subTasks.findMany({
         where: { task_3_Id },
+        orderBy: { id: 'asc' },
         include: {
           task_lvl_3: { select: { item: true } },
         },
       });
-      console.log({ getSubTasks });
       const subTasksUpdate = await Promise.all(
         getSubTasks.map(async (subTask, index) => {
           return await prisma.subTasks.update({

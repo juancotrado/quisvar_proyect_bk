@@ -45,13 +45,15 @@ export const createProject = async (
     const { body } = req;
     const query = await ProjectsServices.create(body);
     const path = await PathServices.pathProject(query.id);
+    const projectName = query.stage
+      ? query.name + '-' + query.stage.name
+      : query.name;
     if (query) {
       mkdirSync(path);
-      mkdirSync(`./file_model/${query.name}`);
-      mkdirSync(`./file_review/${query.name}`);
+      mkdirSync(`./${_materialPath}/${projectName}`);
+      mkdirSync(`./${_reviewPath}/${projectName}`);
       if (query.unique) {
         const pathArea = await PathServices.pathArea(query.workAreaId);
-        console.log(pathArea);
         mkdirSync(pathArea);
       }
     }
@@ -74,16 +76,22 @@ export const updateProject = async (
     const oldDir = await PathServices.pathProject(_project_id);
     const project = await ProjectsServices.findShort(_project_id);
     const query = await ProjectsServices.update(_project_id, body);
-    const newDir = setNewPath(oldDir, query.name);
+    const oldNameProject = project.stage
+      ? project.name + '-' + project.stage.name
+      : project.name;
+    const nameProject = query.stage
+      ? query.name + '-' + query.stage.name
+      : query.name;
+    const newDir = setNewPath(oldDir, nameProject);
     if (query) {
       renameDir(oldDir, newDir);
       renameDir(
-        `./${_materialPath}/${project.name}`,
-        `./${_materialPath}/${query.name}`
+        `./${_materialPath}/${oldNameProject}`,
+        `./${_materialPath}/${nameProject}`
       );
       renameDir(
-        `./${_reviewPath}/${project.name}`,
-        `./${_reviewPath}/${query.name}`
+        `./${_reviewPath}/${oldNameProject}`,
+        `./${_reviewPath}/${nameProject}`
       );
     }
     res.status(200).json(query);
@@ -102,10 +110,13 @@ export const deleteProject = async (
     const project_id = parseInt(id);
     const path = await PathServices.pathProject(project_id);
     const query = await ProjectsServices.delete(project_id);
+    const nameProject = query.stage
+      ? query.name + '-' + query.stage.name
+      : query.name;
     if (query) {
       rmSync(path, { recursive: true });
-      rmSync(`${_materialPath}/${query.name}`, { recursive: true });
-      rmSync(`${_reviewPath}/${query.name}`, { recursive: true });
+      rmSync(`${_materialPath}/${nameProject}`, { recursive: true });
+      rmSync(`${_reviewPath}/${nameProject}`, { recursive: true });
     }
     res.status(204).json(query);
   } catch (error) {
