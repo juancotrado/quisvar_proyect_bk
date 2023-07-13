@@ -178,7 +178,7 @@ model TaskOnUsers {
   user       Users    @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   subtask    SubTasks @relation(fields: [subtaskId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   assignedAt DateTime @default(now())
-  percentage Int?     @default(0)
+  percentage Int      @default(0)
   untilDate  DateTime @default(now())
 
   @@id([subtaskId, userId])

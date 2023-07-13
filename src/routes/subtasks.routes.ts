@@ -18,6 +18,7 @@ import { validSubtaskByIdAndStatus } from '../middlewares/subtask.middleware';
 import {
   assignUserBySubtask,
   deleteFileSubTask,
+  updatePercentage,
 } from '../controllers/subtasks.controllers';
 
 const router = Router();
@@ -32,6 +33,7 @@ router.patch('/asigned/:id', assignedSubTask);
 router.delete('/deleteFile/:id/:filename', deleteFileSubTask);
 router.patch('/status/:id', updateStatusSubTask);
 router.patch('/pdf/:id', updateStatusSubTask);
+router.patch('/percentage/:id', updatePercentage);
 
 //MOD ROLE
 router.use(_mod_role);

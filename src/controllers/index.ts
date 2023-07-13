@@ -46,6 +46,7 @@ import {
   assignedSubTask,
   updateStatusSubTask,
   updateStatusPDF,
+  updatePercentage,
 } from './subtasks.controllers';
 import {
   showProfile,
@@ -142,6 +143,7 @@ export {
   assignedSubTask,
   updateStatusSubTask,
   updateStatusPDF,
+  updatePercentage,
 };
 //Profile Controllers
 export { showProfile, downloadProfile, updateProfile };

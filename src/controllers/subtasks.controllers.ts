@@ -150,6 +150,22 @@ export const updateStatusPDF = async (
   }
 };
 
+export const updatePercentage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const { body } = req;
+    const _subtask_id = parseInt(id);
+    const query = await SubTasksServices.updatePercentage(_subtask_id, body);
+    res.status(201).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteFileSubTask = async (
   req: Request,
   res: Response,

@@ -396,6 +396,27 @@ class SubTasksServices {
     return uploadFile;
   }
 
+  static async updatePercentage(
+    subtaskId: SubTasks['id'],
+    data: { userId: Users['id']; percentage: number }[]
+  ) {
+    if (!subtaskId) throw new AppError('Opps!, ID invalido', 400);
+    const setPercentage = await Promise.all(
+      data.map(async value => {
+        const { percentage, userId } = value;
+        if (percentage > 100 || percentage < 0)
+          throw new AppError('Ingresar valores desde 0 a 100', 400);
+        return await prisma.taskOnUsers.update({
+          where: { subtaskId_userId: { subtaskId, userId } },
+          data: {
+            percentage,
+          },
+        });
+      })
+    );
+    return setPercentage;
+  }
+
   static async assignUserBySubtask(
     userData: { id: number; name: string }[],
     id: SubTasks['id']
