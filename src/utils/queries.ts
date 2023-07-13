@@ -1,8 +1,20 @@
+import { SubTasks } from '@prisma/client';
+
 class Queries {
   static includeSubtask = {
     feedBacks: {
       include: {
-        files: true,
+        files: {
+          include: {
+            user: {
+              select: {
+                profile: {
+                  select: { id: true, firstName: true, lastName: true },
+                },
+              },
+            },
+          },
+        },
       },
     },
     files: {
@@ -18,10 +30,12 @@ class Queries {
     },
     users: {
       select: {
+        percentage: true,
         assignedAt: true,
         untilDate: true,
         user: {
           select: {
+            id: true,
             profile: true,
           },
         },
