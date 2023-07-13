@@ -1,5 +1,5 @@
 import AppError from '../utils/appError';
-import { Users, prisma } from '../utils/prisma.server';
+import { Projects, Users, prisma } from '../utils/prisma.server';
 
 class ReportsServices {
   static async getReportByUser(
@@ -162,6 +162,89 @@ class ReportsServices {
       project => project.subtasks.length !== 0
     );
     return filterProjects;
+  }
+  static async index(id: Projects['id']) {
+    if (!id) throw new AppError('No se pudo encontrar el proyecto', 404);
+    const getIndex = await prisma.projects.findUnique({
+      where: { id },
+      select: {
+        CUI: true,
+        typeSpeciality: true,
+        name: true,
+        description: true,
+        location: true,
+        startDate: true,
+        untilDate: true,
+        moderator: {
+          select: { profile: { select: { firstName: true, lastName: true } } },
+        },
+        stage: { select: { id: true, name: true } },
+        areas: {
+          select: {
+            id: true,
+            item: true,
+            name: true,
+            indexTasks: {
+              select: {
+                id: true,
+                item: true,
+                name: true,
+                subTasks: {
+                  select: {
+                    id: true,
+                    item: true,
+                    name: true,
+                  },
+                },
+                tasks: {
+                  select: {
+                    id: true,
+                    item: true,
+                    name: true,
+                    subTasks: {
+                      select: {
+                        id: true,
+                        item: true,
+                        name: true,
+                      },
+                    },
+                    tasks_2: {
+                      select: {
+                        id: true,
+                        item: true,
+                        name: true,
+                        subTasks: {
+                          select: {
+                            id: true,
+                            item: true,
+                            name: true,
+                          },
+                        },
+                        tasks_3: {
+                          select: {
+                            id: true,
+                            item: true,
+                            name: true,
+                            subTasks: {
+                              select: {
+                                id: true,
+                                item: true,
+                                name: true,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return getIndex;
   }
 }
 export default ReportsServices;

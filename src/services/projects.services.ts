@@ -69,9 +69,10 @@ class ProjectsServices {
     typeSpeciality,
     unique,
     specialityId,
-    CUI,
     stageId,
-  }: Required<projectPick>) {
+    CUI,
+    location,
+  }: projectPick) {
     const newProject = await prisma.projects.create({
       data: {
         name,
@@ -81,24 +82,10 @@ class ProjectsServices {
         untilDate,
         typeSpeciality,
         CUI,
-        stage: {
-          connect: { id: stageId },
-        },
-        speciality: {
-          connect: {
-            id: specialityId,
-          },
-        },
-        moderator: {
-          connect: {
-            id: userId,
-          },
-        },
-        group: {
-          create: {
-            name,
-          },
-        },
+        specialityId,
+        userId,
+        location,
+        stageId,
       },
       include: {
         stage: {
@@ -106,6 +93,12 @@ class ProjectsServices {
         },
       },
     });
+    if (newProject) {
+      await prisma.projects.update({
+        where: { id: newProject.id },
+        data: { group: { create: { name: newProject.name } } },
+      });
+    }
     if (newProject.unique) {
       const area = await prisma.workAreas.create({
         data: {
@@ -152,6 +145,7 @@ class ProjectsServices {
         moderator: {
           connect: { id: userId },
         },
+        group: { update: { name } },
       },
       include: { stage: { select: { id: true, name: true } } },
     });

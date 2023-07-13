@@ -48,6 +48,7 @@ model Projects {
   name           String         @unique()
   typeSpeciality String
   description    String?
+  location       String?
   CUI            String?
   startDate      DateTime       @default(now())
   untilDate      DateTime

@@ -14,6 +14,7 @@ import Task_3_Services from './task_3.services';
 import ReportsServices from './reports.services';
 import FeedBackServices from './feedbacks.services';
 import DuplicatesServices from './duplicates.services';
+import StageServices from './stages.services';
 export {
   UsersServices,
   TasksServices,
@@ -31,6 +32,7 @@ export {
   ReportsServices,
   FeedBackServices,
   DuplicatesServices,
+  StageServices,
 };
 export const _dirPath = './uploads';
 export const _materialPath = './file_model';
