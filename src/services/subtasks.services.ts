@@ -221,9 +221,10 @@ class SubTasksServices {
       const oldDir = await PathServices.pathSubTask(id, 'REVIEW');
       const newDir = await PathServices.pathSubTask(id, 'SUCCESSFUL');
       const modelDir = await PathServices.pathSubTask(id, 'MATERIAL');
-      files.forEach(async file => {
+      files.forEach(async (file, index) => {
         const ext = file.name.split('.').at(-1);
-        const newFileName = subTask.item + '.' + subTask.name + '.' + ext;
+        const newFileName =
+          subTask.item + '.' + subTask.name + (index + 1) + '.' + ext;
         await prisma.files.create({
           data: {
             name: file.name,

@@ -71,7 +71,7 @@ import {
   deleteTaskLvl_3,
   updateTaskLvl_3,
 } from './task_3.controllers';
-import { showListReportByUser } from './reports.controllers';
+import { generateIndex, showListReportByUser } from './reports.controllers';
 import { createFeedback, findFeedbacks } from './feedbacks.controllers';
 import {
   duplicateArea,
@@ -81,6 +81,7 @@ import {
   duplicateTask2,
   duplicateTask3,
 } from './duplicates.controllers';
+import { showListStages } from './stages.controllers';
 // User Controllers
 export {
   showUsers,
@@ -152,7 +153,7 @@ export { showProfile, downloadProfile, updateProfile };
 export { uploadFile, deleteFile, uploadFiles };
 
 //Reports Controllers
-export { showListReportByUser };
+export { showListReportByUser, generateIndex };
 
 //FeedBack Controllers
 export { createFeedback, findFeedbacks };
@@ -166,3 +167,6 @@ export {
   duplicateTask2,
   duplicateTask3,
 };
+
+//Stages Controllers
+export { showListStages };

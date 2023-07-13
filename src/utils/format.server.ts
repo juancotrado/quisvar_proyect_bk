@@ -21,6 +21,8 @@ export type projectPick = Pick<
   | 'typeSpeciality'
   | 'unique'
   | 'CUI'
+  | 'stageId'
+  | 'location'
 > & { userId: Users['id'] } & {
   specialityId: Specialities['id'];
 } & { stageId: Stages['id'] };

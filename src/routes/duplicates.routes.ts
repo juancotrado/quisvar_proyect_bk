@@ -22,10 +22,10 @@ router.use(_employee_role);
 router.use(_mod_role);
 router.post('/project/:id', duplicateProject);
 router.post('/area/:id', duplicateArea);
-router.post('/indextask/:id', duplicateIndexTask);
-router.post('/task/:id', duplicateTask);
-router.post('/task2/:id', duplicateTask2);
-router.post('/task3/:id', duplicateTask3);
+router.post('/indextasks/:id', duplicateIndexTask);
+router.post('/tasks/:id', duplicateTask);
+router.post('/tasks2/:id', duplicateTask2);
+router.post('/tasks3/:id', duplicateTask3);
 //ADMIN ROLE
 router.use(_admin_role);
 

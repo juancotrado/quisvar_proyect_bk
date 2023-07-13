@@ -14,6 +14,7 @@ import reportsRouter from './reports.routes';
 import feedbacksRouter from './feedbacks.routes';
 import duplicatesRouter from './duplicates.routes';
 import archiverRouter from './archiver.routes';
+import stagesRouter from './stages.routes';
 
 export {
   userRouter,
@@ -32,4 +33,5 @@ export {
   feedbacksRouter,
   duplicatesRouter,
   archiverRouter,
+  stagesRouter,
 };
