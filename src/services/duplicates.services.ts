@@ -1,4 +1,4 @@
-import { mkdir, mkdirSync } from 'fs';
+import { copyFile, copyFileSync, mkdir, mkdirSync } from 'fs';
 import AppError from '../utils/appError';
 import {
   IndexTasks,
@@ -222,6 +222,12 @@ class DuplicatesServices {
     });
     if (!createNewIndexTask)
       throw new AppError('No se pudo Duplicar el área', 400);
+    await this.duplicateSubTask(
+      id,
+      createNewIndexTask.id,
+      'indexTaskId',
+      newIndexTask.item
+    );
     await this.duplicateTask(id, createNewIndexTask.id, newIndexTask.item);
     return { oldName: getIndexTask.name, ...createNewIndexTask };
   }
@@ -253,6 +259,7 @@ class DuplicatesServices {
       data: newTask,
     });
     if (!createNewTask) throw new AppError('No se pudo Duplicar la tarea', 400);
+    await this.duplicateSubTask(id, createNewTask.id, 'taskId', newTask.item);
     await this.duplicateTask2(id, createNewTask.id, newTask.item);
     return { oldName: newTask.name, ...createNewTask };
   }
@@ -285,6 +292,12 @@ class DuplicatesServices {
     });
     if (!createNewTask2)
       throw new AppError('No se pudo Duplicar la tarea 2', 400);
+    await this.duplicateSubTask(
+      id,
+      createNewTask2.id,
+      'task_2_Id',
+      newTask2.item
+    );
     await this.duplicateTask3(id, createNewTask2.id, newTask2.item);
     return { oldName: newTask2.name, ...createNewTask2 };
   }
@@ -535,13 +548,22 @@ class DuplicatesServices {
         if (subtask.files.length !== 0) {
           const newFiles = await Promise.all(
             subtask.files.map(async file => {
-              const { dir, id, subTasksId, ...data } = file;
+              const { dir, id, subTasksId, name, ...data } = file;
+              const newName = itemTask
+                ? name.replace(subtask.item.slice(0, -2), itemTask)
+                : name;
               if (file.type === 'MATERIAL') {
                 const newDir = await PathServices.pathSubTask(
                   _subtask_id,
                   file.type
                 );
-                return { dir: newDir, subTasksId: _subtask_id, ...data };
+                copyFileSync(`${dir}/${name}`, `${newDir}/${newName}`);
+                return {
+                  dir: newDir,
+                  subTasksId: _subtask_id,
+                  name: newName,
+                  ...data,
+                };
               }
               return file;
             })
