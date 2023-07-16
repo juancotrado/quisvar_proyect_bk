@@ -221,7 +221,7 @@ class SubTasksServices {
       const oldDir = await PathServices.pathSubTask(id, 'REVIEW');
       const newDir = await PathServices.pathSubTask(id, 'SUCCESSFUL');
       const modelDir = await PathServices.pathSubTask(id, 'MATERIAL');
-      files.forEach(async (file, index) => {
+      const filesPromises = files.map(async (file, index) => {
         const ext = file.name.split('.').at(-1);
         const newFileName =
           subTask.item + '.' + subTask.name + (index + 1) + '.' + ext;
@@ -243,6 +243,11 @@ class SubTasksServices {
             fs.renameSync(`${oldDir}/${file.name}`, `${newDir}/${newFileName}`);
           }
         );
+      });
+      await Promise.all(filesPromises);
+      return await prisma.subTasks.findUnique({
+        where: { id },
+        include: Queries.includeSubtask,
       });
     }
     if (status === 'PROCESS') {
