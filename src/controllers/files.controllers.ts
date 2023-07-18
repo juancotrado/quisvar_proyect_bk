@@ -13,7 +13,6 @@ export const uploadFile = async (
     const userInfo: UserType = res.locals.userInfo;
     const status = req.query.status as Files['type'];
     const _subtask_id = parseInt(id);
-    console.log(req.files);
     if (!req.file) return;
     const { filename } = req.file;
     await FilesServices.create(_subtask_id, filename, status, userInfo.id);

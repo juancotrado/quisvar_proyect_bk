@@ -5,7 +5,7 @@ import path from 'path';
 import { FilesServices, PathServices } from '../services';
 import AppError from '../utils/appError';
 
-const MAX_SIZE = Infinity;
+const MAX_SIZE = 1024 * 1000 * 1000 * 1000;
 const FILE_TYPES = ['.rar', '.zip'];
 
 const storage = multer.diskStorage({
