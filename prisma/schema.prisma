@@ -58,7 +58,7 @@ model Projects {
   updatedAt      DateTime       @updatedAt
   userId         Int
   moderator      Users          @relation(fields: [userId], references: [id])
-  speciality     Specialities   @relation(fields: [specialityId], references: [id], onDelete: Cascade)
+  speciality     Specialities   @relation(fields: [specialityId], references: [id])
   specialityId   Int
   areas          WorkAreas[]
   group          GroupProjects? @relation(fields: [groupId], references: [id])
