@@ -81,7 +81,12 @@ import {
   duplicateTask2,
   duplicateTask3,
 } from './duplicates.controllers';
-import { showListStages } from './stages.controllers';
+import {
+  createStage,
+  deleteStage,
+  showListStages,
+  updateStage,
+} from './stages.controllers';
 // User Controllers
 export {
   showUsers,
@@ -169,4 +174,4 @@ export {
 };
 
 //Stages Controllers
-export { showListStages };
+export { showListStages, createStage, updateStage, deleteStage };

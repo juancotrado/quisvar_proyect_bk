@@ -7,17 +7,25 @@ import {
 } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import { projectPick } from '../utils/format.server';
-import { _dirPath } from '.';
+import { PathServices, ReportsServices, _dirPath } from '.';
 
 class ProjectsServices {
   static async getAll() {
     try {
-      const getProjects = await prisma.projects.findMany({
-        orderBy: { createdAt: 'desc' },
+      const getListProjects = await prisma.groupProjects.findMany({
+        include: {
+          projects: {
+            orderBy: { createdAt: 'desc' },
+            include: { stage: true },
+          },
+        },
       });
-      if (getProjects.length == 0)
-        throw new AppError('No se pudo encontrar las areas de trabajo', 404);
-      return getProjects;
+      // const getProjects = await prisma.projects.findMany({
+      //   orderBy: { createdAt: 'desc' },
+      // });
+      // if (getProjects.length == 0)
+      //   throw new AppError('No se pudo encontrar las areas de trabajo', 404);
+      return getListProjects;
     } catch (error) {
       throw error;
     }
@@ -152,6 +160,34 @@ class ProjectsServices {
         group: { update: { name } },
       },
       include: { stage: { select: { id: true, name: true } } },
+    });
+    const listSubtaks = await ReportsServices.getSubTasksByProyect(id);
+    listSubtaks.forEach(async subtask => {
+      const { files } = subtask;
+      const model = files.filter(file => file.type === 'MATERIAL');
+      const review = files.filter(file => file.type === 'REVIEW');
+      const uploads = files.filter(file => file.type === 'SUCCESSFUL');
+      if (model.length !== 0) {
+        const dir = await PathServices.pathSubTask(subtask.id, 'MATERIAL');
+        await prisma.files.updateMany({
+          where: { subTasks: { id: subtask.id }, type: 'MATERIAL' },
+          data: { dir },
+        });
+      }
+      if (review.length !== 0) {
+        const dir = await PathServices.pathSubTask(subtask.id, 'REVIEW');
+        await prisma.files.updateMany({
+          where: { subTasks: { id: subtask.id }, type: 'MATERIAL' },
+          data: { dir },
+        });
+      }
+      if (uploads.length !== 0) {
+        const dir = await PathServices.pathSubTask(subtask.id, 'SUCCESSFUL');
+        await prisma.files.updateMany({
+          where: { subTasks: { id: subtask.id }, type: 'MATERIAL' },
+          data: { dir },
+        });
+      }
     });
     return updateProject;
   }

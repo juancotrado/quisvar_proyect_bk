@@ -163,6 +163,36 @@ class ReportsServices {
     );
     return filterProjects;
   }
+  static async getSubTasksByProyect(projectId: Projects['id']) {
+    const findSubtasks = await prisma.subTasks.findMany({
+      where: {
+        OR: [
+          {
+            task_lvl_3: {
+              task_2: { task: { indexTask: { workArea: { projectId } } } },
+            },
+          },
+          {
+            indexTask: { workArea: { projectId } },
+          },
+          {
+            task_lvl_2: { task: { indexTask: { workArea: { projectId } } } },
+          },
+          {
+            task: { indexTask: { workArea: { projectId } } },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        status: true,
+        files: {
+          select: { id: true, dir: true, type: true, subTasksId: true },
+        },
+      },
+    });
+    return findSubtasks;
+  }
   static async index(id: Projects['id']) {
     if (!id) throw new AppError('No se pudo encontrar el proyecto', 404);
     const getIndex = await prisma.projects.findUnique({

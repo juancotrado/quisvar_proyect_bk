@@ -123,10 +123,8 @@ export const assignUserBySubtask = async (
   try {
     const { id } = req.params;
     const { body } = req;
-    console.log(body, id);
     // if (!req.file) return;
     // const { filename } = req.file;
-
     const query = await SubTasksServices.assignUserBySubtask(body, +id);
     res.status(200).json(query);
   } catch (error) {

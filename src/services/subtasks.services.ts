@@ -279,6 +279,12 @@ class SubTasksServices {
         include: Queries.includeSubtask,
       });
     }
+    if (status === 'LIQUIDATION') {
+      return await prisma.subTasks.findUnique({
+        where: { id },
+        include: Queries.includeSubtask,
+      });
+    }
     return updateTaskStatus;
   }
 
