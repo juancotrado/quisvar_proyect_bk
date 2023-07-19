@@ -74,6 +74,7 @@ import {
 import { generateIndex, showListReportByUser } from './reports.controllers';
 import { createFeedback, findFeedbacks } from './feedbacks.controllers';
 import {
+  addNewStage,
   duplicateArea,
   duplicateIndexTask,
   duplicateProject,
@@ -174,4 +175,4 @@ export {
 };
 
 //Stages Controllers
-export { showListStages, createStage, updateStage, deleteStage };
+export { showListStages, createStage, updateStage, deleteStage, addNewStage };

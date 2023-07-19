@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  addNewStage,
   createStage,
   deleteStage,
   showListStages,
@@ -16,6 +17,7 @@ router.get('/', showListStages);
 //MOD ROLE
 router.use(_mod_role);
 router.post('/', createStage);
+router.post('/new/:id', addNewStage);
 router.patch('/:id', updateStage);
 router.delete('/:id', deleteStage);
 export default router;

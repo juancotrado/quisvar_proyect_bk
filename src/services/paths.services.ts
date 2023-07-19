@@ -379,8 +379,8 @@ class PathServices {
       const indexTaskPath = parsePath(indexTask.item, indexTask.name);
       // const subTaskPath = parsePath(subTask.item, subTask.name);
       const path = pathProject + areaPath + indexTaskPath;
-      if (type === 'MATERIAL') return _materialPath + '/' + project.name;
-      if (type === 'REVIEW') return _reviewPath + '/' + project.name;
+      if (type === 'MATERIAL') return _materialPath + '/' + projectName;
+      if (type === 'REVIEW') return _reviewPath + '/' + projectName;
       return path;
     }
     if (subTask.task) {
@@ -399,8 +399,8 @@ class PathServices {
       const taskPath = parsePath(task.item, task.name);
 
       const path = pathProject + areaPath + indexTaskPath + taskPath;
-      if (type === 'MATERIAL') return _materialPath + '/' + project.name;
-      if (type === 'REVIEW') return _reviewPath + '/' + project.name;
+      if (type === 'MATERIAL') return _materialPath + '/' + projectName;
+      if (type === 'REVIEW') return _reviewPath + '/' + projectName;
       return path;
     }
     if (subTask.task_lvl_2) {
@@ -422,8 +422,8 @@ class PathServices {
 
       const path =
         pathProject + areaPath + indexTaskPath + taskPath + taskLvl2Path;
-      if (type === 'MATERIAL') return _materialPath + '/' + project.name;
-      if (type === 'REVIEW') return _reviewPath + '/' + project.name;
+      if (type === 'MATERIAL') return _materialPath + '/' + projectName;
+      if (type === 'REVIEW') return _reviewPath + '/' + projectName;
       return path;
     }
     if (subTask.task_lvl_3) {
@@ -452,8 +452,8 @@ class PathServices {
         taskPath +
         taskLvl2Path +
         taskLvl3Path;
-      if (type === 'MATERIAL') return _materialPath + '/' + project.name;
-      if (type === 'REVIEW') return _reviewPath + '/' + project.name;
+      if (type === 'MATERIAL') return _materialPath + '/' + projectName;
+      if (type === 'REVIEW') return _reviewPath + '/' + projectName;
       return path;
     }
     throw new AppError('No se pudo encontrar la ruta', 404);

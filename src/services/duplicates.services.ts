@@ -3,6 +3,7 @@ import AppError from '../utils/appError';
 import {
   IndexTasks,
   Projects,
+  Stages,
   Task_lvl_2,
   Task_lvl_3,
   Tasks,
@@ -12,7 +13,7 @@ import {
 import PathServices from './paths.services';
 
 class DuplicatesServices {
-  static async proyect(id: Projects['id']) {
+  static async project(id: Projects['id'], newStageId?: Stages['id']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const getProyect = await prisma.projects.findUnique({
       where: { id },
@@ -28,6 +29,10 @@ class DuplicatesServices {
         specialityId: true,
         CUI: true,
         stageId: true,
+        groupId: true,
+        stage: {
+          select: { name: true },
+        },
       },
     });
     if (!getProyect)
@@ -35,20 +40,33 @@ class DuplicatesServices {
         'No se pudo encontrar el proyecto para duplicado',
         404
       );
-
-    const { ..._project } = getProyect;
-    const newProject = {
+    const { stage, groupId, ..._project } = getProyect;
+    let newProject = {
       ..._project,
       name: _project.name + '(copia)',
     };
-
+    if (newStageId) {
+      newProject = {
+        ..._project,
+        stageId: newStageId,
+        name: _project.name + newStageId,
+      };
+    }
     const createProject = await prisma.projects.create({
       data: newProject,
+      include: { stage: { select: { name: true } } },
     });
-    await prisma.projects.update({
-      where: { id: createProject.id },
-      data: { group: { create: { name: createProject.name } } },
-    });
+    if (newStageId) {
+      await prisma.projects.update({
+        where: { id: createProject.id },
+        data: { groupId },
+      });
+    } else {
+      await prisma.projects.update({
+        where: { id: createProject.id },
+        data: { group: { create: { name: createProject.name } } },
+      });
+    }
     if (!createProject)
       throw new AppError('No se pudo Duplicar el proyecto', 400);
     // await this.duplicateArea(id, createProject.id);
@@ -165,7 +183,13 @@ class DuplicatesServices {
       });
     });
 
-    return { oldName: getProyect.name, ...createProject };
+    return {
+      oldName: stage ? getProyect.name + '-' + stage.name : getProyect.name,
+      newName: createProject.stage
+        ? createProject.name + '-' + createProject.stage.name
+        : createProject.name,
+      ...createProject,
+    };
   }
   static async area(id: WorkAreas['id']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);

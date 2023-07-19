@@ -36,6 +36,7 @@ class SpecialitiesServices {
                 name: true,
               },
             },
+            stage: { select: { id: true, name: true } },
             moderator: {
               select: {
                 id: true,
@@ -53,12 +54,22 @@ class SpecialitiesServices {
         },
       },
     });
+    const groupProjects = await prisma.groupProjects.findMany({
+      select: { id: true },
+    });
     if (!findSpeciality)
       throw new AppError(
         'No se pudo encontrar el registro de especialidades',
         404
       );
-    return findSpeciality;
+    const { projects, ...speciality } = findSpeciality;
+    const groups = groupProjects
+      .map(_project => ({
+        id: _project.id,
+        projects: projects.filter(p => p.groupId == _project.id),
+      }))
+      .filter(p => p.projects.length);
+    return { ...speciality, groups };
   }
 
   static async create({ name }: Specialities) {

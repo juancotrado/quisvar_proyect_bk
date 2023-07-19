@@ -1,5 +1,5 @@
 import AppError from '../utils/appError';
-import { Stages, prisma } from '../utils/prisma.server';
+import { Projects, Stages, prisma } from '../utils/prisma.server';
 
 class StageServices {
   static async findMany() {
@@ -16,6 +16,7 @@ class StageServices {
     //   );
     return findStages;
   }
+  static async createStageFromProject({ stageId }: Projects) {}
   static async create({ name }: Stages) {
     const createStage = await prisma.stages.create({
       data: {
