@@ -50,6 +50,7 @@ class SpecialitiesServices {
                 name: true,
               },
             },
+            specialists: true,
             stage: { select: { id: true, name: true } },
             moderator: {
               select: {
