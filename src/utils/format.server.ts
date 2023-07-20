@@ -23,9 +23,15 @@ export type projectPick = Pick<
   | 'CUI'
   | 'stageId'
   | 'location'
+  | 'company'
+  | 'department'
+  | 'province'
+  | 'district'
 > & { userId: Users['id'] } & {
   specialityId: Specialities['id'];
-} & { stageId: Stages['id'] };
+} & { stageId: Stages['id'] } & {
+  specialists: { career: string; name: string; phone: string; zip: number }[];
+};
 
 export interface userHash {
   password: string;

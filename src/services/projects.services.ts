@@ -80,6 +80,11 @@ class ProjectsServices {
     stageId,
     CUI,
     location,
+    company,
+    department,
+    district,
+    province,
+    specialists,
   }: projectPick) {
     const newProject = await prisma.projects.create({
       data: {
@@ -94,6 +99,13 @@ class ProjectsServices {
         userId,
         location,
         stageId,
+        company,
+        department,
+        district,
+        province,
+        specialists: {
+          createMany: { data: specialists },
+        },
       },
       include: {
         stage: {
@@ -135,9 +147,21 @@ class ProjectsServices {
       userId,
       CUI,
       typeSpeciality,
+      company,
+      department,
+      district,
+      province,
+      specialists,
     }: Projects & { userId: Users['id'] } & {
       specialityId: Specialities['id'];
-    } & { stageId: Stages['id'] }
+    } & { stageId: Stages['id'] } & {
+      specialists: {
+        career: string;
+        name: string;
+        phone: string;
+        zip: number;
+      }[];
+    }
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const getNameProject = await prisma.projects.findUnique({
@@ -157,6 +181,13 @@ class ProjectsServices {
         CUI,
         location,
         status,
+        company,
+        department,
+        district,
+        province,
+        specialists: {
+          updateMany: { where: { projectsId: id }, data: specialists },
+        },
         // stageId,
         // userId,
         stage: { connect: { id: stageId } },

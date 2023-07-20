@@ -4,16 +4,30 @@ import AppError from '../utils/appError';
 class SpecialitiesServices {
   static async getAll() {
     try {
-      const getSpecialities = await prisma.specialities.findMany({
-        orderBy: { name: 'asc' },
+      const getSpecialities = await prisma.sector.findMany({
         include: {
-          _count: {
-            select: {
-              projects: true,
+          specialities: {
+            orderBy: { name: 'asc' },
+            include: {
+              _count: {
+                select: {
+                  projects: true,
+                },
+              },
             },
           },
         },
       });
+      // const getSpecialities = await prisma.specialities.findMany({
+      //   orderBy: { name: 'asc' },
+      //   include: {
+      //     _count: {
+      //       select: {
+      //         projects: true,
+      //       },
+      //     },
+      //   },
+      // });
       if (getSpecialities.length == 0)
         throw new AppError('No se pudo encontrar las areas de trabajo', 404);
       return getSpecialities;
@@ -72,18 +86,18 @@ class SpecialitiesServices {
     return { ...speciality, groups };
   }
 
-  static async create({ name }: Specialities) {
+  static async create({ name, cod }: Specialities) {
     const newSpeciality = await prisma.specialities.create({
-      data: { name },
+      data: { name, cod },
     });
     return newSpeciality;
   }
 
-  static async update(id: Specialities['id'], { name }: Specialities) {
+  static async update(id: Specialities['id'], { name, cod }: Specialities) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateSpeciality = await prisma.specialities.update({
       where: { id },
-      data: { name },
+      data: { name, cod },
     });
     return updateSpeciality;
   }
