@@ -50,7 +50,14 @@ class SpecialitiesServices {
                 name: true,
               },
             },
-            specialists: true,
+            specialists: {
+              select: {
+                career: true,
+                name: true,
+                phone: true,
+                zip: true,
+              },
+            },
             stage: { select: { id: true, name: true } },
             moderator: {
               select: {

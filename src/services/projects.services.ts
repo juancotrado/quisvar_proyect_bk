@@ -86,6 +86,8 @@ class ProjectsServices {
     province,
     specialists,
   }: projectPick) {
+    console.log(specialists);
+
     const newProject = await prisma.projects.create({
       data: {
         name,
@@ -186,7 +188,9 @@ class ProjectsServices {
         district,
         province,
         specialists: {
-          updateMany: { where: { projectsId: id }, data: specialists },
+          deleteMany: { projectsId: id },
+          createMany: { data: specialists },
+          // updateMany: { where: { projectsId: id }, data: specialists }
         },
         // stageId,
         // userId,
