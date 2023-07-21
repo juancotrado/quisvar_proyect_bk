@@ -1,5 +1,3 @@
-import { SubTasks } from '@prisma/client';
-
 class Queries {
   static includeSubtask = {
     feedBacks: {
@@ -38,6 +36,29 @@ class Queries {
             id: true,
             profile: true,
           },
+        },
+      },
+    },
+  };
+  static selectSpecialist = {
+    select: {
+      career: true,
+      name: true,
+      phone: true,
+      cip: true,
+      dni: true,
+      pdf: true,
+    },
+  };
+  static selectProfileUser = {
+    select: {
+      id: true,
+      profile: {
+        select: {
+          firstName: true,
+          lastName: true,
+          dni: true,
+          phone: true,
         },
       },
     },

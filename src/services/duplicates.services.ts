@@ -20,7 +20,6 @@ class DuplicatesServices {
       select: {
         name: true,
         description: true,
-        location: true,
         untilDate: true,
         userId: true,
         startDate: true,

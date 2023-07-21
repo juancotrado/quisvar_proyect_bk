@@ -44,7 +44,6 @@ type dataType = {
   typeSpeciality: string;
   name: string;
   description: string | null;
-  location: string | null;
   startDate: Date;
   untilDate: Date;
   areas: Areas[];

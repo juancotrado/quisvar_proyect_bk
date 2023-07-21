@@ -196,7 +196,6 @@ class WorkAreasServices {
             name: true,
             description: true,
             unique: true,
-            location: true,
           },
         },
         user: {

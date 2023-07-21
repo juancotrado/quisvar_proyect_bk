@@ -6,7 +6,11 @@ import {
   prisma,
 } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-import { projectPick } from '../utils/format.server';
+import {
+  PersonBussinessType,
+  UpdateProjectPick,
+  projectPick,
+} from '../utils/format.server';
 import { PathServices, ReportsServices, _dirPath } from '.';
 
 class ProjectsServices {
@@ -79,15 +83,14 @@ class ProjectsServices {
     specialityId,
     stageId,
     CUI,
-    location,
-    company,
     department,
     district,
     province,
-    specialists,
+    listSpecialists,
   }: projectPick) {
-    console.log(specialists);
-
+    const specialists = listSpecialists
+      ? { createMany: { data: listSpecialists } }
+      : {};
     const newProject = await prisma.projects.create({
       data: {
         name,
@@ -99,15 +102,27 @@ class ProjectsServices {
         CUI,
         specialityId,
         userId,
-        location,
         stageId,
-        company,
         department,
         district,
         province,
-        specialists: {
-          createMany: { data: specialists },
-        },
+        specialists,
+        // company: { create: { manager: '', name: '', ruc: '' } },
+        // consortium: {
+        //   create: {
+        //     manager: '',
+        //     name: '',
+        //     companies: {
+        //       createMany: {
+        //         data: [
+        //           { manager: '', name: '', ruc: '', percentage: 0 },
+        //           { manager: '', name: '', ruc: '', percentage: 0 },
+        //           { manager: '', name: '', ruc: '', percentage: 0 },
+        //         ],
+        //       },
+        //     },
+        //   },
+        // },
       },
       include: {
         stage: {
@@ -142,28 +157,17 @@ class ProjectsServices {
       name,
       description,
       startDate,
+      typeSpeciality,
       stageId,
-      location,
       untilDate,
       status,
       userId,
       CUI,
-      typeSpeciality,
-      company,
       department,
-      district,
       province,
-      specialists,
-    }: Projects & { userId: Users['id'] } & {
-      specialityId: Specialities['id'];
-    } & { stageId: Stages['id'] } & {
-      specialists: {
-        career: string;
-        name: string;
-        phone: string;
-        zip: number;
-      }[];
-    }
+      district,
+      listSpecialists,
+    }: UpdateProjectPick
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const getNameProject = await prisma.projects.findUnique({
@@ -181,19 +185,14 @@ class ProjectsServices {
         untilDate,
         typeSpeciality,
         CUI,
-        location,
         status,
-        company,
         department,
         district,
         province,
         specialists: {
           deleteMany: { projectsId: id },
-          createMany: { data: specialists },
-          // updateMany: { where: { projectsId: id }, data: specialists }
+          createMany: { data: listSpecialists },
         },
-        // stageId,
-        // userId,
         stage: { connect: { id: stageId } },
         moderator: {
           connect: { id: userId },

@@ -1,5 +1,6 @@
 import { Specialities, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
+import Queries from '../utils/queries';
 
 class SpecialitiesServices {
   static async getAll() {
@@ -50,28 +51,9 @@ class SpecialitiesServices {
                 name: true,
               },
             },
-            specialists: {
-              select: {
-                career: true,
-                name: true,
-                phone: true,
-                zip: true,
-              },
-            },
+            specialists: Queries.selectSpecialist,
             stage: { select: { id: true, name: true } },
-            moderator: {
-              select: {
-                id: true,
-                profile: {
-                  select: {
-                    firstName: true,
-                    lastName: true,
-                    dni: true,
-                    phone: true,
-                  },
-                },
-              },
-            },
+            moderator: Queries.selectProfileUser,
           },
         },
       },

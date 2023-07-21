@@ -55,9 +55,11 @@ model Specialities {
 model PersonBussiness {
   id         Int       @id @default(autoincrement())
   name       String
+  dni        String    @db.VarChar(8)
+  cip        Int
   career     String
-  zip        Int
   phone      String
+  pdf        String
   Projects   Projects? @relation(fields: [projectsId], references: [id])
   projectsId Int?
 }
@@ -67,8 +69,8 @@ model Projects {
   name           String            @unique()
   typeSpeciality String
   description    String?
-  location       String?
-  company        String?
+  company        Company?
+  consortium     Consortium?
   department     String?
   province       String?
   district       String?
@@ -89,6 +91,27 @@ model Projects {
   groupId        Int?
   stage          Stages?           @relation(fields: [stageId], references: [id])
   stageId        Int?
+}
+
+model Consortium {
+  id        Int       @id @default(autoincrement())
+  name      String
+  manager   String
+  companies Company[]
+  projectId Int       @unique
+  project   Projects  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Company {
+  id           Int         @id @default(autoincrement())
+  name         String
+  ruc          String
+  manager      String
+  percentage   Int         @default(100)
+  Consortium   Consortium? @relation(fields: [consortiumId], references: [id])
+  consortiumId Int?
+  projectId    Int?        @unique
+  project      Projects?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model Stages {

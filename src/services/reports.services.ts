@@ -202,7 +202,6 @@ class ReportsServices {
         typeSpeciality: true,
         name: true,
         description: true,
-        location: true,
         startDate: true,
         untilDate: true,
         moderator: {

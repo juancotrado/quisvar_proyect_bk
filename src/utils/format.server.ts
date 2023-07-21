@@ -1,4 +1,5 @@
 import {
+  PersonBussiness,
   Profiles,
   Projects,
   Specialities,
@@ -6,6 +7,7 @@ import {
   UserRole,
   Users,
 } from '@prisma/client';
+import { ellipseAnnotation } from 'pdfkit';
 
 export type userProfilePick = Pick<
   Users & Profiles,
@@ -16,23 +18,27 @@ export type projectPick = Pick<
   Projects,
   | 'name'
   | 'description'
-  | 'untilDate'
   | 'startDate'
+  | 'untilDate'
   | 'typeSpeciality'
+  | 'stageId'
   | 'unique'
   | 'CUI'
-  | 'stageId'
-  | 'location'
-  | 'company'
   | 'department'
   | 'province'
   | 'district'
-> & { userId: Users['id'] } & {
+> & {
+  userId: Users['id'];
   specialityId: Specialities['id'];
-} & { stageId: Stages['id'] } & {
-  specialists: { career: string; name: string; phone: string; zip: number }[];
+  stageId: Stages['id'];
+  listSpecialists: PersonBussinessType[];
 };
 
+export type UpdateProjectPick = Omit<projectPick, 'unique'> & {
+  status: Projects['status'];
+};
+
+export type PersonBussinessType = Omit<PersonBussiness, 'id' | 'projectsId'>;
 export interface userHash {
   password: string;
   id: number;
