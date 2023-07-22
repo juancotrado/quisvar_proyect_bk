@@ -174,6 +174,10 @@ class ProjectsServices {
       where: { id },
       select: { name: true },
     });
+    const specialists = {
+      deleteMany: { projectsId: id },
+      createMany: { data: listSpecialists },
+    };
     if (!getNameProject)
       throw new AppError('Oops!,No se pudo encontrar el projecto', 400);
     const updateProject = await prisma.projects.update({
@@ -189,10 +193,7 @@ class ProjectsServices {
         department,
         district,
         province,
-        specialists: {
-          deleteMany: { projectsId: id },
-          createMany: { data: listSpecialists },
-        },
+        specialists: specialists,
         stage: { connect: { id: stageId } },
         moderator: {
           connect: { id: userId },

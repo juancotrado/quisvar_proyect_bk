@@ -63,5 +63,22 @@ class Queries {
       },
     },
   };
+  static selectCompany = {
+    select: {
+      id: true,
+      name: true,
+      manager: true,
+      percentage: true,
+      ruc: true,
+    },
+  };
+  static selectConsortium = {
+    select: {
+      id: true,
+      manager: true,
+      name: true,
+      companies: this.selectCompany,
+    },
+  };
 }
 export default Queries;
