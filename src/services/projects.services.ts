@@ -86,10 +86,26 @@ class ProjectsServices {
     department,
     district,
     province,
-    listSpecialists,
+    specialistsInfo,
+    companyInfo,
+    consortiumInfo,
   }: projectPick) {
-    const specialists = listSpecialists
-      ? { createMany: { data: listSpecialists } }
+    const specialists = specialistsInfo
+      ? { createMany: { data: specialistsInfo } }
+      : {};
+    const company = companyInfo ? { create: companyInfo } : {};
+    const consortium = consortiumInfo
+      ? {
+          create: {
+            manager: consortiumInfo.manager,
+            name: consortiumInfo.name,
+            companies: {
+              createMany: {
+                data: consortiumInfo.companies,
+              },
+            },
+          },
+        }
       : {};
     const newProject = await prisma.projects.create({
       data: {
@@ -107,22 +123,8 @@ class ProjectsServices {
         district,
         province,
         specialists,
-        // company: { create: { manager: '', name: '', ruc: '' } },
-        // consortium: {
-        //   create: {
-        //     manager: '',
-        //     name: '',
-        //     companies: {
-        //       createMany: {
-        //         data: [
-        //           { manager: '', name: '', ruc: '', percentage: 0 },
-        //           { manager: '', name: '', ruc: '', percentage: 0 },
-        //           { manager: '', name: '', ruc: '', percentage: 0 },
-        //         ],
-        //       },
-        //     },
-        //   },
-        // },
+        company,
+        consortium,
       },
       include: {
         stage: {
@@ -166,7 +168,9 @@ class ProjectsServices {
       department,
       province,
       district,
-      listSpecialists,
+      specialistsInfo,
+      companyInfo,
+      consortiumInfo,
     }: UpdateProjectPick
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
@@ -174,10 +178,32 @@ class ProjectsServices {
       where: { id },
       select: { name: true },
     });
-    const specialists = {
-      deleteMany: { projectsId: id },
-      createMany: { data: listSpecialists },
-    };
+    const specialists = specialistsInfo
+      ? {
+          deleteMany: { projectsId: id },
+          createMany: { data: specialistsInfo },
+        }
+      : {};
+    const company = companyInfo
+      ? {
+          delete: true,
+          create: companyInfo,
+        }
+      : {};
+    const consortium = consortiumInfo
+      ? {
+          delete: true,
+          create: {
+            manager: consortiumInfo.manager,
+            name: consortiumInfo.name,
+            companies: {
+              createMany: {
+                data: consortiumInfo.companies,
+              },
+            },
+          },
+        }
+      : {};
     if (!getNameProject)
       throw new AppError('Oops!,No se pudo encontrar el projecto', 400);
     const updateProject = await prisma.projects.update({
@@ -193,7 +219,9 @@ class ProjectsServices {
         department,
         district,
         province,
-        specialists: specialists,
+        specialists,
+        company,
+        consortium,
         stage: { connect: { id: stageId } },
         moderator: {
           connect: { id: userId },

@@ -1,4 +1,6 @@
 import {
+  Company,
+  Consortium,
   PersonBussiness,
   Profiles,
   Projects,
@@ -7,6 +9,7 @@ import {
   UserRole,
   Users,
 } from '@prisma/client';
+import { type } from 'os';
 import { ellipseAnnotation } from 'pdfkit';
 
 export type userProfilePick = Pick<
@@ -31,7 +34,9 @@ export type projectPick = Pick<
   userId: Users['id'];
   specialityId: Specialities['id'];
   stageId: Stages['id'];
-  listSpecialists: PersonBussinessType[];
+  specialistsInfo: PersonBussinessType[];
+  companyInfo: CompanyType;
+  consortiumInfo: ConsortiumType;
 };
 
 export type UpdateProjectPick = Omit<projectPick, 'unique'> & {
@@ -39,6 +44,11 @@ export type UpdateProjectPick = Omit<projectPick, 'unique'> & {
 };
 
 export type PersonBussinessType = Omit<PersonBussiness, 'id' | 'projectsId'>;
+export type CompanyType = Omit<Company, 'id' | 'projectsId' | 'consortiumId'>;
+export type ConsortiumPick = Omit<Consortium, 'id' | 'projectId'>;
+export interface ConsortiumType extends ConsortiumPick {
+  companies: CompanyType;
+}
 export interface userHash {
   password: string;
   id: number;

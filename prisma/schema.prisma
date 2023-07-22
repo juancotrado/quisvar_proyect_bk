@@ -59,7 +59,7 @@ model PersonBussiness {
   cip        Int
   career     String
   phone      String
-  pdf        String
+  pdf        String?
   Projects   Projects? @relation(fields: [projectsId], references: [id])
   projectsId Int?
 }
