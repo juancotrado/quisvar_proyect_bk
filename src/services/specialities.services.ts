@@ -5,20 +5,7 @@ import Queries from '../utils/queries';
 class SpecialitiesServices {
   static async getAll() {
     try {
-      const getSpecialities = await prisma.sector.findMany({
-        include: {
-          specialities: {
-            orderBy: { name: 'asc' },
-            include: {
-              _count: {
-                select: {
-                  projects: true,
-                },
-              },
-            },
-          },
-        },
-      });
+      const getSpecialities: string[] = [];
       // const getSpecialities = await prisma.specialities.findMany({
       //   orderBy: { name: 'asc' },
       //   include: {
@@ -42,40 +29,41 @@ class SpecialitiesServices {
     const findSpeciality = await prisma.specialities.findUnique({
       where: { id },
       include: {
-        projects: {
-          orderBy: { name: 'asc' },
-          include: {
-            areas: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-            specialists: Queries.selectSpecialist,
-            company: Queries.selectCompany,
-            consortium: Queries.selectConsortium,
-            stage: { select: { id: true, name: true } },
-            moderator: Queries.selectProfileUser,
-          },
-        },
+        // projects: {
+        //   orderBy: { name: 'asc' },
+        //   include: {
+        //     areas: {
+        //       select: {
+        //         id: true,
+        //         name: true,
+        //       },
+        //     },
+        //     specialists: Queries.selectSpecialist,
+        //     company: Queries.selectCompany,
+        //     consortium: Queries.selectConsortium,
+        //     stage: { select: { id: true, name: true } },
+        //     moderator: Queries.selectProfileUser,
+        //   },
+        // },
       },
     });
-    const groupProjects = await prisma.groupProjects.findMany({
-      select: { id: true },
-    });
-    if (!findSpeciality)
-      throw new AppError(
-        'No se pudo encontrar el registro de especialidades',
-        404
-      );
-    const { projects, ...speciality } = findSpeciality;
-    const groups = groupProjects
-      .map(_project => ({
-        id: _project.id,
-        projects: projects.filter(p => p.groupId == _project.id),
-      }))
-      .filter(p => p.projects.length);
-    return { ...speciality, groups };
+    // const groupProjects = await prisma.groupProjects.findMany({
+    //   select: { id: true },
+    // });
+    // if (!findSpeciality)
+    //   throw new AppError(
+    //     'No se pudo encontrar el registro de especialidades',
+    //     404
+    //   );
+    // const { projects, ...speciality } = findSpeciality;
+    // const groups = groupProjects
+    //   .map(_project => ({
+    //     id: _project.id,
+    //     projects: projects.filter(p => p.groupId == _project.id),
+    //   }))
+    //   .filter(p => p.projects.length);
+    // return { ...speciality, groups };
+    return findSpeciality;
   }
 
   static async create({ name, cod, sectorId }: Specialities) {

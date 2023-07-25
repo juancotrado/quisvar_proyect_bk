@@ -199,7 +199,6 @@ class ReportsServices {
       where: { id },
       select: {
         CUI: true,
-        typeSpeciality: true,
         name: true,
         description: true,
         startDate: true,

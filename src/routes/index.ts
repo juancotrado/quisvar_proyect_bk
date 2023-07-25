@@ -15,7 +15,8 @@ import feedbacksRouter from './feedbacks.routes';
 import duplicatesRouter from './duplicates.routes';
 import archiverRouter from './archiver.routes';
 import stagesRouter from './stages.routes';
-
+import sectorRouter from './sector.routes';
+import typeSpecialityRouter from './typeSpecialities.routes';
 export {
   userRouter,
   authRouter,
@@ -34,4 +35,6 @@ export {
   duplicatesRouter,
   archiverRouter,
   stagesRouter,
+  sectorRouter,
+  typeSpecialityRouter,
 };

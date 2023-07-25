@@ -23,7 +23,6 @@ export type projectPick = Pick<
   | 'description'
   | 'startDate'
   | 'untilDate'
-  | 'typeSpeciality'
   | 'stageId'
   | 'unique'
   | 'CUI'

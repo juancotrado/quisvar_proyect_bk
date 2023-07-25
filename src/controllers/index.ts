@@ -88,6 +88,18 @@ import {
   showListStages,
   updateStage,
 } from './stages.controllers';
+import {
+  createSector,
+  deleteSector,
+  showSectors,
+  updateSector,
+} from './sector.controllers';
+import {
+  createTypeSpeciality,
+  deleteTypeSpeciality,
+  showTypeSpeciality,
+  updateTypeSpeciality,
+} from './typeSpecialities.controllers';
 // User Controllers
 export {
   showUsers,
@@ -176,3 +188,14 @@ export {
 
 //Stages Controllers
 export { showListStages, createStage, updateStage, deleteStage, addNewStage };
+
+//Sector Controllers
+export { showSectors, createSector, updateSector, deleteSector };
+
+//TypeSpeciality Controllers
+export {
+  showTypeSpeciality,
+  createTypeSpeciality,
+  updateTypeSpeciality,
+  deleteTypeSpeciality,
+};

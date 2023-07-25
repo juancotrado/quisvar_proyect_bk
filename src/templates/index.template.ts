@@ -41,7 +41,6 @@ type Areas = {
 
 type dataType = {
   CUI: string | null;
-  typeSpeciality: string;
   name: string;
   description: string | null;
   startDate: Date;

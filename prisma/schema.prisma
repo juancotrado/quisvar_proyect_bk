@@ -44,12 +44,20 @@ model Sector {
 }
 
 model Specialities {
-  id       Int        @id @default(autoincrement())
-  name     String
-  cod      String?
-  projects Projects[]
-  Sector   Sector?    @relation(fields: [sectorId], references: [id])
-  sectorId Int?
+  id               Int                @id @default(autoincrement())
+  name             String
+  cod              String?
+  typeSpecialities TypeSpecialities[]
+  Sector           Sector?            @relation(fields: [sectorId], references: [id])
+  sectorId         Int?
+}
+
+model TypeSpecialities {
+  id             Int           @id @default(autoincrement())
+  name           String
+  projects       Projects[]
+  Specialities   Specialities? @relation(fields: [specialitiesId], references: [id])
+  specialitiesId Int?
 }
 
 model PersonBussiness {
@@ -65,32 +73,31 @@ model PersonBussiness {
 }
 
 model Projects {
-  id             Int               @id @default(autoincrement())
-  name           String            @unique()
-  typeSpeciality String
-  description    String?
-  company        Company?
-  consortium     Consortium?
-  department     String?
-  province       String?
-  district       String?
-  specialists    PersonBussiness[]
-  CUI            String?
-  startDate      DateTime          @default(now())
-  untilDate      DateTime
-  status         Boolean           @default(false)
-  unique         Boolean           @default(false)
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  userId         Int
-  moderator      Users             @relation(fields: [userId], references: [id])
-  speciality     Specialities      @relation(fields: [specialityId], references: [id])
-  specialityId   Int
-  areas          WorkAreas[]
-  group          GroupProjects?    @relation(fields: [groupId], references: [id])
-  groupId        Int?
-  stage          Stages?           @relation(fields: [stageId], references: [id])
-  stageId        Int?
+  id               Int               @id @default(autoincrement())
+  name             String            @unique()
+  description      String?
+  company          Company?
+  consortium       Consortium?
+  department       String?
+  province         String?
+  district         String?
+  specialists      PersonBussiness[]
+  CUI              String?
+  startDate        DateTime          @default(now())
+  untilDate        DateTime
+  status           Boolean           @default(false)
+  unique           Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  userId           Int
+  moderator        Users             @relation(fields: [userId], references: [id])
+  typeSpeciality   TypeSpecialities? @relation(fields: [typeSpecialityId], references: [id])
+  typeSpecialityId Int?
+  areas            WorkAreas[]
+  group            GroupProjects?    @relation(fields: [groupId], references: [id])
+  groupId          Int?
+  stage            Stages?           @relation(fields: [stageId], references: [id])
+  stageId          Int?
 }
 
 model Consortium {

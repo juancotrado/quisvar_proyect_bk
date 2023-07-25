@@ -22,6 +22,8 @@ import {
   duplicatesRouter,
   archiverRouter,
   stagesRouter,
+  typeSpecialityRouter,
+  sectorRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -54,6 +56,8 @@ class Server {
     duplicates: `/${process.env.ROUTE}/duplicates`,
     archiver: `/${process.env.ROUTE}/archiver`,
     stages: `/${process.env.ROUTE}/stages`,
+    typespecialities: `/${process.env.ROUTE}/typespecialities`,
+    sector: `/${process.env.ROUTE}/sector`,
   };
 
   constructor() {
@@ -99,6 +103,8 @@ class Server {
     this.app.use(this.path.duplicates, duplicatesRouter);
     this.app.use(this.path.archiver, archiverRouter);
     this.app.use(this.path.stages, stagesRouter);
+    this.app.use(this.path.typespecialities, typeSpecialityRouter);
+    this.app.use(this.path.sector, sectorRouter);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)

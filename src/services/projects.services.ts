@@ -78,9 +78,7 @@ class ProjectsServices {
     untilDate,
     userId,
     startDate,
-    typeSpeciality,
     unique,
-    specialityId,
     stageId,
     CUI,
     department,
@@ -114,9 +112,7 @@ class ProjectsServices {
         startDate,
         unique,
         untilDate,
-        typeSpeciality,
         CUI,
-        specialityId,
         userId,
         stageId,
         department,
@@ -159,7 +155,6 @@ class ProjectsServices {
       name,
       description,
       startDate,
-      typeSpeciality,
       stageId,
       untilDate,
       status,
@@ -213,7 +208,6 @@ class ProjectsServices {
         description,
         startDate,
         untilDate,
-        typeSpeciality,
         CUI,
         status,
         department,
@@ -247,14 +241,14 @@ class ProjectsServices {
         if (review.length !== 0) {
           const dir = await PathServices.pathSubTask(subtask.id, 'REVIEW');
           await prisma.files.updateMany({
-            where: { subTasks: { id: subtask.id }, type: 'MATERIAL' },
+            where: { subTasks: { id: subtask.id }, type: 'REVIEW' },
             data: { dir },
           });
         }
         if (uploads.length !== 0) {
           const dir = await PathServices.pathSubTask(subtask.id, 'SUCCESSFUL');
           await prisma.files.updateMany({
-            where: { subTasks: { id: subtask.id }, type: 'MATERIAL' },
+            where: { subTasks: { id: subtask.id }, type: 'SUCCESSFUL' },
             data: { dir },
           });
         }
