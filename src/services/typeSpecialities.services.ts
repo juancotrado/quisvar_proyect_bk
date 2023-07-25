@@ -45,9 +45,9 @@ class TypeSpecialitiesServices {
     return { ...speciality, groups };
   }
 
-  static async create({ name }: TypeSpecialities) {
+  static async create({ name, specialitiesId }: TypeSpecialities) {
     const newTypeSpeciality = await prisma.typeSpecialities.create({
-      data: { name },
+      data: { name, specialitiesId },
     });
     return newTypeSpeciality;
   }
