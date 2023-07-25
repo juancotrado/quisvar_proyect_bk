@@ -46,7 +46,7 @@ class TypeSpecialitiesServices {
   }
 
   static async create({ name }: TypeSpecialities) {
-    const newTypeSpeciality = await prisma.specialities.create({
+    const newTypeSpeciality = await prisma.typeSpecialities.create({
       data: { name },
     });
     return newTypeSpeciality;
@@ -54,7 +54,7 @@ class TypeSpecialitiesServices {
 
   static async update(id: TypeSpecialities['id'], { name }: TypeSpecialities) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const updateTypeSpeciality = await prisma.specialities.update({
+    const updateTypeSpeciality = await prisma.typeSpecialities.update({
       where: { id },
       data: { name },
     });
@@ -63,7 +63,7 @@ class TypeSpecialitiesServices {
 
   static async delete(id: TypeSpecialities['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const deleteTypeSpeciality = await prisma.specialities.delete({
+    const deleteTypeSpeciality = await prisma.typeSpecialities.delete({
       where: { id },
     });
     return deleteTypeSpeciality;
