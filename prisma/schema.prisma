@@ -50,6 +50,7 @@ model Specialities {
   typeSpecialities TypeSpecialities[]
   Sector           Sector?            @relation(fields: [sectorId], references: [id])
   sectorId         Int?
+  createdAt   DateTime      @default(now())
 }
 
 model TypeSpecialities {
