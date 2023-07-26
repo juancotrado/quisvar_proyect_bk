@@ -6,6 +6,7 @@ import {
   Projects,
   Specialities,
   Stages,
+  TypeSpecialities,
   UserRole,
   Users,
 } from '@prisma/client';
@@ -31,7 +32,7 @@ export type projectPick = Pick<
   | 'district'
 > & {
   userId: Users['id'];
-  specialityId: Specialities['id'];
+  typeSpecialityId: TypeSpecialities['id'];
   stageId: Stages['id'];
   specialistsInfo: PersonBussinessType[];
   companyInfo: CompanyType;

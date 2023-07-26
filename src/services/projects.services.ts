@@ -87,6 +87,7 @@ class ProjectsServices {
     specialistsInfo,
     companyInfo,
     consortiumInfo,
+    typeSpecialityId,
   }: projectPick) {
     const specialists = specialistsInfo
       ? { createMany: { data: specialistsInfo } }
@@ -121,6 +122,7 @@ class ProjectsServices {
         specialists,
         company,
         consortium,
+        typeSpecialityId,
       },
       include: {
         stage: {
@@ -166,6 +168,7 @@ class ProjectsServices {
       specialistsInfo,
       companyInfo,
       consortiumInfo,
+      typeSpecialityId,
     }: UpdateProjectPick
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
