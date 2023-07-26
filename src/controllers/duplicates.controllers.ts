@@ -54,6 +54,7 @@ export const addNewStage = async (
     const duplicate = await DuplicatesServices.project(_project_id, _stage_id);
     const oldPath = await PathServices.pathProject(_project_id);
     const newPath = await PathServices.pathProject(duplicate.id);
+    console.log(oldPath, newPath);
     if (duplicate) {
       cpSync(oldPath, newPath, { recursive: true });
       cpSync(

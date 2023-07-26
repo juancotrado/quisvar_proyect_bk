@@ -25,6 +25,7 @@ class DuplicatesServices {
         startDate: true,
         unique: true,
         CUI: true,
+        typeSpecialityId: true,
         stageId: true,
         groupId: true,
         stage: {
