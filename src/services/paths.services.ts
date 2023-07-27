@@ -375,7 +375,8 @@ class PathServices {
         ? project.name + '-' + project.stage.name
         : project.name;
       const pathProject = _dirPath + '/' + projectName;
-      const areaPath = parsePath(workArea.item, workArea.name);
+      let areaPath = parsePath(workArea.item, workArea.name);
+      if (project.unique) areaPath = '/' + workArea.name;
       const indexTaskPath = parsePath(indexTask.item, indexTask.name);
       // const subTaskPath = parsePath(subTask.item, subTask.name);
       const path = pathProject + areaPath + indexTaskPath;
