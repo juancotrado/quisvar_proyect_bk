@@ -23,6 +23,7 @@ class ReportsServices {
             hours: true,
             status: true,
             description: true,
+            price: true,
             name: true,
             indexTask: {
               select: {
