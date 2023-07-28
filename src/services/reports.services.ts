@@ -173,7 +173,10 @@ class ReportsServices {
         subtask => subtask.project?.id === project.id
       );
       const newSubTask = subtasks.map(
-        ({ project, indexTask, task, task_lvl_2, task_lvl_3, ...a }) => a
+        ({ project, indexTask, task, task_lvl_2, task_lvl_3, ...a }) => ({
+          ...a,
+          liquidation: a.status === 'LIQUIDATION' ? 30 : 100,
+        })
       );
 
       return { ...project, subtasks: newSubTask };
