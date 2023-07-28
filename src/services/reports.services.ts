@@ -12,11 +12,18 @@ class ReportsServices {
       where: {
         assignedAt: { gte: initialDate, lte: untilDate },
         userId,
-        subtask: { status: 'DONE' },
+        subtask: { OR: [{ status: 'DONE' }, { status: 'LIQUIDATION' }] },
       },
-      include: {
+      select: {
+        percentage: true,
+        untilDate: true,
         subtask: {
-          include: {
+          select: {
+            item: true,
+            hours: true,
+            status: true,
+            description: true,
+            name: true,
             indexTask: {
               select: {
                 id: true,
@@ -52,6 +59,8 @@ class ReportsServices {
                             name: true,
                             description: true,
                             CUI: true,
+                            district: true,
+                            stage: { select: { name: true } },
                           },
                         },
                       },
@@ -128,35 +137,46 @@ class ReportsServices {
       },
     });
     const projectList = await prisma.projects.findMany({
-      select: { id: true, name: true, CUI: true, description: true },
+      select: {
+        id: true,
+        name: true,
+        CUI: true,
+        description: true,
+        district: true,
+        stage: { select: { name: true } },
+      },
     });
     if (!reportList) new AppError('no se pudo encontrar los registros', 404);
-    const newReport = reportList.map(({ subtask }) => {
+    const newReport = reportList.map(({ subtask, ...data }) => {
       let project;
-      let workArea;
+      // let workArea;
       if (subtask.indexTask) {
         project = subtask.indexTask.workArea.project;
-        workArea = subtask.indexTask.workArea;
+        // workArea = subtask.indexTask.workArea;
       }
       if (subtask.task) {
         project = subtask.task.indexTask.workArea.project;
-        workArea = subtask.task.indexTask.workArea;
+        // workArea = subtask.task.indexTask.workArea;
       }
       if (subtask.task_lvl_2) {
         project = subtask.task_lvl_2.task.indexTask.workArea.project;
-        workArea = subtask.task_lvl_2.task.indexTask.workArea;
+        // workArea = subtask.task_lvl_2.task.indexTask.workArea;
       }
       if (subtask.task_lvl_3) {
         project = subtask.task_lvl_3.task_2.task.indexTask.workArea.project;
-        workArea = subtask.task_lvl_3.task_2.task.indexTask.workArea;
+        // workArea = subtask.task_lvl_3.task_2.task.indexTask.workArea;
       }
-      return { ...subtask, project, workArea };
+      return { ...data, ...subtask, project };
     });
     const newReportByList = projectList.map(project => {
       const subtasks = newReport.filter(
         subtask => subtask.project?.id === project.id
       );
-      return { ...project, subtasks };
+      const newSubTask = subtasks.map(
+        ({ project, indexTask, task, task_lvl_2, task_lvl_3, ...a }) => a
+      );
+
+      return { ...project, subtasks: newSubTask };
     });
     const filterProjects = newReportByList.filter(
       project => project.subtasks.length !== 0
