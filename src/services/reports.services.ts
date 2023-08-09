@@ -18,6 +18,7 @@ class ReportsServices {
       select: {
         percentage: true,
         untilDate: true,
+        assignedAt: true,
         subtask: {
           select: {
             item: true,
