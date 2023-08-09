@@ -80,5 +80,21 @@ class Queries {
       companies: this.selectCompany,
     },
   };
+  static selectSubtaskDetails = {
+    select: {
+      id: true,
+      item: true,
+      name: true,
+      description: true,
+      price: true,
+      status: true,
+      users: {
+        select: {
+          percentage: true,
+          user: this.selectProfileUser,
+        },
+      },
+    },
+  };
 }
 export default Queries;

@@ -5,14 +5,15 @@ class ReportsServices {
   static async getReportByUser(
     userId: Users['id'],
     initialDate: Date,
-    untilDate: Date
+    untilDate: Date,
+    status: 'DONE' | 'LIQUIDATION'
   ) {
     if (!userId) throw new AppError('Oops!, ID invalido', 400);
     const reportList = await prisma.taskOnUsers.findMany({
       where: {
         assignedAt: { gte: initialDate, lte: untilDate },
         userId,
-        subtask: { OR: [{ status: 'DONE' }, { status: 'LIQUIDATION' }] },
+        subtask: { status },
       },
       select: {
         percentage: true,

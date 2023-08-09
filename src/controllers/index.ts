@@ -37,6 +37,7 @@ import {
   createProject,
   updateProject,
   showProject,
+  showProjectByPrice,
 } from './projects.controllers';
 import {
   createSubTask,
@@ -137,6 +138,7 @@ export {
   deleteProject,
   createProject,
   updateProject,
+  showProjectByPrice,
 };
 //IndexTask Controllers
 export {

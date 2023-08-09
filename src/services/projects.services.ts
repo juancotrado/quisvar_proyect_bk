@@ -1,17 +1,15 @@
-import {
-  Projects,
-  Specialities,
-  Stages,
-  Users,
-  prisma,
-} from '../utils/prisma.server';
+import { Projects, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-import {
-  PersonBussinessType,
-  UpdateProjectPick,
-  projectPick,
-} from '../utils/format.server';
+import { UpdateProjectPick, projectPick } from '../utils/format.server';
 import { PathServices, ReportsServices, _dirPath } from '.';
+import Queries from '../utils/queries';
+import {
+  getDetailsSubtask,
+  getQuantityDetail,
+  priceTotalArea,
+  priceTotalIndexTask,
+  sumValues,
+} from '../utils/tools';
 
 class ProjectsServices {
   static async getAll() {
@@ -35,6 +33,63 @@ class ProjectsServices {
     }
   }
 
+  static async getByPrice(id: Projects['id']) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const findProject = await prisma.projects.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        areas: {
+          select: {
+            id: true,
+            item: true,
+            name: true,
+            indexTasks: {
+              select: {
+                id: true,
+                item: true,
+                name: true,
+                subTasks: Queries.selectSubtaskDetails,
+                tasks: {
+                  select: {
+                    id: true,
+                    item: true,
+                    name: true,
+                    subTasks: Queries.selectSubtaskDetails,
+                    tasks_2: {
+                      select: {
+                        id: true,
+                        item: true,
+                        name: true,
+                        subTasks: Queries.selectSubtaskDetails,
+                        tasks_3: {
+                          select: {
+                            id: true,
+                            item: true,
+                            name: true,
+                            subTasks: Queries.selectSubtaskDetails,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!findProject)
+      throw new AppError('Oops!,No se pudo encontrar el proyecto', 404);
+    const areas = priceTotalArea(findProject.areas);
+    const price = sumValues(areas, 'price');
+    const spending = sumValues(areas, 'spending');
+    const balance = price - spending;
+    const taskInfo = getQuantityDetail(areas);
+    return { price, spending, balance, taskInfo, ...findProject, areas };
+  }
   static async find(id: Projects['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findProject = await prisma.projects.findUnique({

@@ -16,6 +16,7 @@ export const showListReportByUser = async (
     const { id } = userInfo;
     const initial = req.query.initial as string;
     const until = req.query.until as string;
+    const status = req.query.status as 'DONE' | 'LIQUIDATION';
     const startDate = new Date(initial);
     const untilDate = new Date(until);
     if (!startDate || !untilDate)
@@ -23,7 +24,8 @@ export const showListReportByUser = async (
     const query = await ReportsServices.getReportByUser(
       id,
       startDate,
-      untilDate
+      untilDate,
+      status
     );
     res.status(200).json(query);
   } catch (error) {
