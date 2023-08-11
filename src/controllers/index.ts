@@ -98,6 +98,7 @@ import {
 import {
   createTypeSpeciality,
   deleteTypeSpeciality,
+  showTypeSpecialities,
   showTypeSpeciality,
   updateTypeSpeciality,
 } from './typeSpecialities.controllers';
@@ -200,4 +201,5 @@ export {
   createTypeSpeciality,
   updateTypeSpeciality,
   deleteTypeSpeciality,
+  showTypeSpecialities,
 };

@@ -49,13 +49,14 @@ class SubTasksServices {
   static async create({
     name,
     price,
+    description,
     hours,
     indexTaskId,
     taskId,
     task_2_Id,
     task_3_Id,
   }: SubTasks) {
-    let data = { name, price, hours };
+    let data = { name, price, hours, description };
     if (indexTaskId) {
       const indexTask = await TasksServices.findIndexTask(indexTaskId);
       const quantityIndexTask = await prisma.subTasks.count({
@@ -159,7 +160,7 @@ class SubTasksServices {
 
   static async update(
     id: SubTasks['id'],
-    { name, hours, price, percentage }: SubTasks
+    { name, hours, price, description, percentage }: SubTasks
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateTask = await prisma.subTasks.update({
@@ -169,6 +170,7 @@ class SubTasksServices {
         hours,
         price,
         percentage,
+        description,
       },
       include: {
         users: {

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createTypeSpeciality,
   deleteTypeSpeciality,
+  showTypeSpecialities,
   showTypeSpeciality,
   updateTypeSpeciality,
 } from '../controllers';
@@ -12,7 +13,7 @@ const router = Router();
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);
-// router.get('/', showSectors);
+router.get('/', showTypeSpecialities);
 router.get('/:id', showTypeSpeciality);
 //MOD ROLE
 router.use(_mod_role);

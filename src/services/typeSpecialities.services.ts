@@ -4,7 +4,19 @@ import AppError from '../utils/appError';
 import Queries from '../utils/queries';
 
 class TypeSpecialitiesServices {
-  static getAll() {}
+  static async getAll() {
+    const getTypesSpecialities = await prisma.typeSpecialities.findMany({
+      orderBy: { name: 'asc' },
+      include: {
+        _count: {
+          select: {
+            projects: true,
+          },
+        },
+      },
+    });
+    return getTypesSpecialities;
+  }
   static async find(id: TypeSpecialities['id']) {
     const findTypeSpeciality = await prisma.typeSpecialities.findUnique({
       where: { id },
