@@ -10,7 +10,20 @@ class ReportsServices {
     status: 'DONE' | 'LIQUIDATION'
   ) {
     if (!userId) throw new AppError('Oops!, ID invalido', 400);
-    const user = await prisma.users.findUnique({ where: { id: userId } });
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        profile: {
+          select: {
+            firstName: true,
+            lastName: true,
+            dni: true,
+            phone: true,
+          },
+        },
+      },
+    });
     const reportList = await prisma.taskOnUsers.findMany({
       where: {
         assignedAt: { gte: initialDate, lte: untilDate },
@@ -21,7 +34,6 @@ class ReportsServices {
         percentage: true,
         untilDate: true,
         assignedAt: true,
-        user: Queries.selectProfileUser,
         subtask: {
           select: {
             item: true,
@@ -185,12 +197,13 @@ class ReportsServices {
         })
       );
 
-      return { ...project, user, subtasks: newSubTask };
+      return { ...project, subtasks: newSubTask };
     });
     const filterProjects = newReportByList.filter(
       project => project.subtasks.length !== 0
     );
-    return filterProjects;
+    // return filterProjects;
+    return { user, subtask: filterProjects };
   }
   static async getSubTasksByProyect(projectId: Projects['id']) {
     const findSubtasks = await prisma.subTasks.findMany({
