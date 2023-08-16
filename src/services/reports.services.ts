@@ -1,5 +1,6 @@
 import AppError from '../utils/appError';
 import { Projects, Users, prisma } from '../utils/prisma.server';
+import Queries from '../utils/queries';
 
 class ReportsServices {
   static async getReportByUser(
@@ -9,6 +10,7 @@ class ReportsServices {
     status: 'DONE' | 'LIQUIDATION'
   ) {
     if (!userId) throw new AppError('Oops!, ID invalido', 400);
+    const user = await prisma.users.findUnique({ where: { id: userId } });
     const reportList = await prisma.taskOnUsers.findMany({
       where: {
         assignedAt: { gte: initialDate, lte: untilDate },
@@ -19,6 +21,7 @@ class ReportsServices {
         percentage: true,
         untilDate: true,
         assignedAt: true,
+        user: Queries.selectProfileUser,
         subtask: {
           select: {
             item: true,
@@ -182,7 +185,7 @@ class ReportsServices {
         })
       );
 
-      return { ...project, subtasks: newSubTask };
+      return { ...project, user, subtasks: newSubTask };
     });
     const filterProjects = newReportByList.filter(
       project => project.subtasks.length !== 0
