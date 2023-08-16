@@ -10,7 +10,7 @@ router.get('/index/:id', generateIndex);
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);
-router.get('/user', showListReportByUser);
+router.get('/user/:id', showListReportByUser);
 //ADMIN ROLE
 router.use(_admin_role);
 

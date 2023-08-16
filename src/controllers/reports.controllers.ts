@@ -10,10 +10,10 @@ export const showListReportByUser = async (
   next: NextFunction
 ) => {
   try {
-    // const { id } = req.params;
-    // const _user_id = parseInt(id);
-    const userInfo: UserType = res.locals.userInfo;
-    const { id } = userInfo;
+    const { id } = req.params;
+    const _user_id = parseInt(id);
+    // const userInfo: UserType = res.locals.userInfo;
+    // const { id } = userInfo;
     const initial = req.query.initial as string;
     const until = req.query.until as string;
     const status = req.query.status as 'DONE' | 'LIQUIDATION';
@@ -22,7 +22,7 @@ export const showListReportByUser = async (
     if (!startDate || !untilDate)
       throw new AppError('Ingrese Fechas validas', 400);
     const query = await ReportsServices.getReportByUser(
-      id,
+      _user_id,
       startDate,
       untilDate,
       status
