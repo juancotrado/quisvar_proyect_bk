@@ -40,6 +40,12 @@ class ProjectsServices {
       select: {
         id: true,
         name: true,
+        moderator: Queries.selectProfileUser,
+        untilDate: true,
+        startDate: true,
+        district: true,
+        department: true,
+        province: true,
         areas: {
           select: {
             id: true,
