@@ -4,17 +4,26 @@ import AppError from '../utils/appError';
 
 class ProfileServices {
   static async update(
-    userId: Users['id'],
-    { firstName, lastName, phone }: Profiles
+    id: Users['id'],
+    { firstName, lastName, phone, dni }: Profiles,
+    email: Users['email']
   ) {
-    if (!userId) throw new AppError('Oops!,ID invalido', 400);
-    const updateProfile = await prisma.profiles.update({
-      where: {
-        userId,
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const updateUser = await prisma.users.update({
+      where: { id },
+      data: {
+        email,
+        profile: {
+          update: {
+            firstName,
+            lastName,
+            phone,
+            dni,
+          },
+        },
       },
-      data: { firstName, lastName, phone },
     });
-    return updateProfile;
+    return updateUser;
   }
 }
 

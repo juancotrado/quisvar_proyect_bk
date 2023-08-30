@@ -9,7 +9,8 @@ import {
   uploadFile,
   uploadFiles,
 } from '../controllers';
-import { upload } from '../middlewares/upload.middleware';
+import { upload, uploadContrac } from '../middlewares/upload.middleware';
+import { uploadFileContract } from '../controllers/files.controllers';
 
 const router = Router();
 // router.get('/download', downloadProfile);
@@ -17,6 +18,11 @@ router.get('/');
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);
+router.post(
+  '/uploadContract/:id',
+  uploadContrac.single('contract'),
+  uploadFileContract
+);
 router.post('/upload/:id', upload.single('file'), uploadFile);
 router.post('/uploads/:id', upload.array('files'), uploadFiles);
 router.delete('/remove/:id', deleteFile);

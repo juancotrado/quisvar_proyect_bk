@@ -22,6 +22,20 @@ export const uploadFile = async (
     next(error);
   }
 };
+export const uploadFileContract = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    if (!req.file) return;
+    const { filename } = req.file;
+    res.status(201).json({ id, filename });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const uploadFiles = async (
   req: Request,

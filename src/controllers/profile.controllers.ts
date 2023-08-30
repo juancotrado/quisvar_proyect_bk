@@ -58,10 +58,9 @@ export const updateProfile = async (
   next: NextFunction
 ) => {
   try {
-    const { body } = req;
+    const { email, ...profile } = req.body;
     const { id } = req.params;
-    const _id = parseInt(id);
-    const query = await ProfileServices.update(_id, body);
+    const query = await ProfileServices.update(+id, profile, email);
     res.status(201).json(query);
   } catch (error) {
     next(error);

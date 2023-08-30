@@ -26,14 +26,6 @@ const storage = multer.diskStorage({
       const _subtask_id = parseInt(id);
       const { item, name } = await FilesServices.getSubTask(_subtask_id);
       const uniqueSuffix = Date.now();
-      // if (typeSubTask === 'REVIEW') {
-      //   const files = await FilesServices.findBySubTask(
-      //     _subtask_id,
-      //     typeSubTask
-      //   );
-      //   const filesList = files.map(f => '.' + f.name.split('.').at(-1));
-      //   if (filesList.includes(extName)) throw new Error();
-      // }
       callback(
         null,
         item + '.' + name + '@' + uniqueSuffix + '$' + file.originalname
@@ -44,26 +36,27 @@ const storage = multer.diskStorage({
         ''
       );
     }
-    // callback(null, _subtask_id + '-' + uniqueSuffix + '@' + file.originalname);
   },
 });
-
-const checkFileType = (
-  req: Request,
-  file: Express.Multer.File,
-  callback: multer.FileFilterCallback
-) => {
-  const extName = path.extname(file.originalname);
-  if (FILE_TYPES.includes(extName)) return callback(null, true);
-  return callback(new Error('Suba el archivo con la extension solicitada!'));
-};
-
+const storageContract = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, '/public/contracts');
+  },
+  filename: function (req, file, cb) {
+    const { id } = req.params;
+    console.log(file);
+    const { originalname } = file;
+    cb(null, id + originalname);
+  },
+});
 export const upload = multer({
   storage: storage,
   limits: { fileSize: MAX_SIZE },
-  // fileFilter: checkFileType,
 });
 
+export const uploadContrac = multer({
+  storage: storageContract,
+});
 export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
   try {
     res.status(200).json({ message: 'Archivo subido exitosamente' });
