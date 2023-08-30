@@ -47,29 +47,35 @@ class ProjectsServices {
         department: true,
         province: true,
         areas: {
+          orderBy: { item: 'asc' },
           select: {
+            user: Queries.selectProfileUser,
             id: true,
             item: true,
             name: true,
             indexTasks: {
+              orderBy: { item: 'asc' },
               select: {
                 id: true,
                 item: true,
                 name: true,
                 subTasks: Queries.selectSubtaskDetails,
                 tasks: {
+                  orderBy: { item: 'asc' },
                   select: {
                     id: true,
                     item: true,
                     name: true,
                     subTasks: Queries.selectSubtaskDetails,
                     tasks_2: {
+                      orderBy: { item: 'asc' },
                       select: {
                         id: true,
                         item: true,
                         name: true,
                         subTasks: Queries.selectSubtaskDetails,
                         tasks_3: {
+                          orderBy: { item: 'asc' },
                           select: {
                             id: true,
                             item: true,
