@@ -448,7 +448,6 @@ class SubTasksServices {
     const today = new Date().getTime();
     const hours = (getHours ? getHours.hours : 0) * 60 * 60 * 1000;
     const assignedAt = new Date(new Date().setHours(new Date().getHours() - 5));
-    console.log(assignedAt);
     // const assignUserBySubtaskPromises = userData.map(async user => {
     return await prisma.subTasks.update({
       where: { id },
