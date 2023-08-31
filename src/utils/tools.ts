@@ -12,15 +12,17 @@ export const sumValues = (list: any[], label: string) => {
   return list.reduce((a: number, c) => a + +c[label], 0);
 };
 
-export const parseSubTasks = (listSubtask: PickSubtask[]) => {
+export const parseSubTasks = (
+  listSubtask: PickSubtask[],
+  _percentage: number
+) => {
   return listSubtask.map(subtask => {
     const percentage = sumValues(subtask.users, 'percentage');
     const spending =
       subtask.status === 'LIQUIDATION'
         ? subtask.price
         : subtask.status === 'DONE'
-        ? // ? (+subtask.price * 30) / 100
-          parseFloat(((+subtask.price * 30) / 100).toFixed(2))
+        ? parseFloat(((+subtask.price * _percentage) / 100).toFixed(2))
         : 0;
     const balance = +subtask.price - +spending;
     return {
@@ -32,9 +34,9 @@ export const parseSubTasks = (listSubtask: PickSubtask[]) => {
   });
 };
 
-export const priceTotalArea = (list: PriceAreaTask[]) => {
+export const priceTotalArea = (list: PriceAreaTask[], percentage: number) => {
   return list.map(area => {
-    const indexTasks = priceTotalIndexTask(area.indexTasks);
+    const indexTasks = priceTotalIndexTask(area.indexTasks, percentage);
     const price = sumValues(indexTasks, 'price');
     const spending = sumValues(indexTasks, 'spending');
     const balance = price - spending;
@@ -43,10 +45,13 @@ export const priceTotalArea = (list: PriceAreaTask[]) => {
   });
 };
 
-export const priceTotalIndexTask = (list: PriceIndexTask[]) => {
+export const priceTotalIndexTask = (
+  list: PriceIndexTask[],
+  percentage: number
+) => {
   return list.map(indextask => {
-    const subTasks = parseSubTasks(indextask.subTasks);
-    const tasks = priceTotalTask(indextask.tasks);
+    const subTasks = parseSubTasks(indextask.subTasks, percentage);
+    const tasks = priceTotalTask(indextask.tasks, percentage);
     const price =
       sumValues(indextask.subTasks, 'price') + sumValues(tasks, 'price');
     const spending =
@@ -65,10 +70,10 @@ export const priceTotalIndexTask = (list: PriceIndexTask[]) => {
   });
 };
 
-export const priceTotalTask = (list: PriceTask[]) => {
+export const priceTotalTask = (list: PriceTask[], percentage: number) => {
   return list.map(task => {
-    const subTasks = parseSubTasks(task.subTasks);
-    const tasks_2 = priceTotalTaskLvl2(task.tasks_2);
+    const subTasks = parseSubTasks(task.subTasks, percentage);
+    const tasks_2 = priceTotalTaskLvl2(task.tasks_2, percentage);
     const price =
       sumValues(task.subTasks, 'price') + sumValues(tasks_2, 'price');
     const spending =
@@ -79,10 +84,13 @@ export const priceTotalTask = (list: PriceTask[]) => {
   });
 };
 
-export const priceTotalTaskLvl2 = (list: PriceTaskLvl2[]) => {
+export const priceTotalTaskLvl2 = (
+  list: PriceTaskLvl2[],
+  percentage: number
+) => {
   return list.map(task_lvl_2 => {
-    const subTasks = parseSubTasks(task_lvl_2.subTasks);
-    const tasks_3 = priceTotalTaskLvl3(task_lvl_2.tasks_3);
+    const subTasks = parseSubTasks(task_lvl_2.subTasks, percentage);
+    const tasks_3 = priceTotalTaskLvl3(task_lvl_2.tasks_3, percentage);
     const price =
       sumValues(task_lvl_2.subTasks, 'price') + sumValues(tasks_3, 'price');
     const spending =
@@ -101,10 +109,13 @@ export const priceTotalTaskLvl2 = (list: PriceTaskLvl2[]) => {
   });
 };
 
-export const priceTotalTaskLvl3 = (list: PriceTaskLvl3[]) => {
+export const priceTotalTaskLvl3 = (
+  list: PriceTaskLvl3[],
+  percentage: number
+) => {
   return list.map(task_lvl_3 => {
     const price = sumValues(task_lvl_3.subTasks, 'price');
-    const subTasks = parseSubTasks(task_lvl_3.subTasks);
+    const subTasks = parseSubTasks(task_lvl_3.subTasks, percentage);
     const spending = sumValues(subTasks, 'spending');
     const taskInfo = getDetailsSubtask(subTasks);
     const balance = price - spending;
