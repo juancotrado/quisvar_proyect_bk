@@ -131,6 +131,9 @@ class SubTasksServices {
       });
       const today = new Date().getTime();
       const hours = (getHours ? getHours.hours : 0) * 60 * 60 * 1000;
+      const assignedAt = new Date(
+        new Date().setHours(new Date().getHours() - 5)
+      );
       return await prisma.subTasks.update({
         where: { id },
         data: {
@@ -138,9 +141,7 @@ class SubTasksServices {
           users: {
             create: {
               userId,
-              assignedAt: new Date(
-                new Date().setHours(new Date().getHours() - 5)
-              ),
+              assignedAt,
               untilDate: new Date(today + hours),
             },
           },
@@ -446,6 +447,8 @@ class SubTasksServices {
     });
     const today = new Date().getTime();
     const hours = (getHours ? getHours.hours : 0) * 60 * 60 * 1000;
+    const assignedAt = new Date(new Date().setHours(new Date().getHours() - 5));
+    console.log(assignedAt);
     // const assignUserBySubtaskPromises = userData.map(async user => {
     return await prisma.subTasks.update({
       where: { id },
@@ -456,6 +459,7 @@ class SubTasksServices {
           updateMany: {
             data: {
               untilDate: new Date(today + hours),
+              assignedAt,
             },
             where: {
               subtaskId: id,

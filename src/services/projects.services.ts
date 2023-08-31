@@ -33,13 +33,14 @@ class ProjectsServices {
     }
   }
 
-  static async getByPrice(id: Projects['id'], percentage: number) {
+  static async getByPrice(id: Projects['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findProject = await prisma.projects.findUnique({
       where: { id },
       select: {
         id: true,
         name: true,
+        percentage: true,
         moderator: Queries.selectProfileUser,
         untilDate: true,
         startDate: true,
@@ -95,7 +96,7 @@ class ProjectsServices {
     });
     if (!findProject)
       throw new AppError('Oops!,No se pudo encontrar el proyecto', 404);
-    const areas = priceTotalArea(findProject.areas, percentage);
+    const areas = priceTotalArea(findProject.areas, findProject.percentage);
     const price = sumValues(areas, 'price');
     const spending = sumValues(areas, 'spending');
     const balance = price - spending;

@@ -29,9 +29,7 @@ export const showProjectByPrice = async (
   try {
     const { id } = req.params;
     const project_id = parseInt(id);
-    const { percentage } = req.query;
-    const _percentage = parseInt(percentage as string);
-    const query = await ProjectsServices.getByPrice(project_id, _percentage);
+    const query = await ProjectsServices.getByPrice(project_id);
     res.status(200).json(query);
   } catch (error) {
     next(error);
