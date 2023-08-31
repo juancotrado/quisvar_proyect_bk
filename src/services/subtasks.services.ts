@@ -138,6 +138,9 @@ class SubTasksServices {
           users: {
             create: {
               userId,
+              assignedAt: new Date(
+                new Date().setHours(new Date().getHours() - 5)
+              ),
               untilDate: new Date(today + hours),
             },
           },

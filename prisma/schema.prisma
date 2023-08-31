@@ -50,7 +50,7 @@ model Specialities {
   typeSpecialities TypeSpecialities[]
   Sector           Sector?            @relation(fields: [sectorId], references: [id])
   sectorId         Int?
-  createdAt   DateTime      @default(now())
+  createdAt        DateTime           @default(now())
 }
 
 model TypeSpecialities {
@@ -79,6 +79,7 @@ model Projects {
   description      String?
   company          Company?
   consortium       Consortium?
+  percentage       Int               @default(30)
   department       String?
   province         String?
   district         String?
