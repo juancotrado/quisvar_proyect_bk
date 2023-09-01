@@ -4,6 +4,7 @@ import multer from 'multer';
 import path from 'path';
 import { FilesServices, PathServices } from '../services';
 import AppError from '../utils/appError';
+import { existsSync, mkdirSync } from 'fs';
 
 const MAX_SIZE = 1024 * 1000 * 1000 * 1000;
 const FILE_TYPES = ['.rar', '.zip'];
@@ -38,25 +39,32 @@ const storage = multer.diskStorage({
     }
   },
 });
-const storageContract = multer.diskStorage({
+const storageFileUser = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '/public/contracts');
+    const { isContract } = req.query;
+    const uploadPath = `public/${isContract === 'true' ? 'contracts' : 'cvs'}`;
+    if (!existsSync(uploadPath)) {
+      mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     const { id } = req.params;
-    console.log(file);
     const { originalname } = file;
-    cb(null, id + originalname);
+    const typeFile = originalname.split('.').pop();
+    cb(null, id + '.' + typeFile);
   },
 });
+
 export const upload = multer({
   storage: storage,
   limits: { fileSize: MAX_SIZE },
 });
 
-export const uploadContrac = multer({
-  storage: storageContract,
+export const uploadFileUser = multer({
+  storage: storageFileUser,
 });
+
 export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
   try {
     res.status(200).json({ message: 'Archivo subido exitosamente' });

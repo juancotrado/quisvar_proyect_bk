@@ -280,6 +280,19 @@ class UsersServices {
     });
     return updateUser;
   }
+  static async updateStatusFile(
+    id: Users['id'],
+    data: { [file: string]: boolean }
+  ) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    console.log(data);
+    const updateUser = await prisma.users.update({
+      where: { id },
+      data,
+    });
+    console.log(updateUser);
+    return updateUser;
+  }
 
   static async delete(id: Users['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);

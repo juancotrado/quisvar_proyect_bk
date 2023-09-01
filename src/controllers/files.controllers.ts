@@ -1,8 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import { FilesServices, PathServices, SubTasksServices } from '../services';
+import {
+  FilesServices,
+  PathServices,
+  SubTasksServices,
+  UsersServices,
+} from '../services';
 import { Files } from '@prisma/client';
 import { UserType } from '../middlewares/auth.middleware';
-
+import AppError from '../utils/appError';
+import { unlinkSync } from 'fs';
 export const uploadFile = async (
   req: Request,
   res: Response,
@@ -22,21 +28,39 @@ export const uploadFile = async (
     next(error);
   }
 };
-export const uploadFileContract = async (
+export const uploadUserFile = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const { id } = req.params;
-    if (!req.file) return;
-    const { filename } = req.file;
-    res.status(201).json({ id, filename });
+    const { isContract } = req.query;
+    if (!req.file)
+      throw new AppError('Oops!, no se pudo subir el contrato', 400);
+    const body = { [isContract === 'true' ? 'hasContract' : 'hasCv']: true };
+    const query = await UsersServices.updateStatusFile(+id, body);
+    res.status(201).json(query);
   } catch (error) {
     next(error);
   }
 };
-
+export const deleteUserFile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const isContract = req.query.isContract === 'true';
+    const body = { [isContract ? 'hasContract' : 'hasCv']: false };
+    const query = await UsersServices.updateStatusFile(+id, body);
+    unlinkSync(`public/${isContract ? 'contracts' : 'cvs'}/${id}.pdf`);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 export const uploadFiles = async (
   req: Request,
   res: Response,
