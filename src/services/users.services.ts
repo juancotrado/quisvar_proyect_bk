@@ -237,6 +237,9 @@ class UsersServices {
     lastName,
     dni,
     phone,
+    degree,
+    job,
+    description,
   }: userProfilePick) {
     const passwordHash = await bcrypt.hash(password, 10);
     const findUserByDNI = await prisma.profiles.findUnique({
@@ -253,6 +256,9 @@ class UsersServices {
             lastName,
             dni,
             phone,
+            degree,
+            job,
+            description,
           },
         },
       },

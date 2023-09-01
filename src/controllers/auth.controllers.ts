@@ -21,3 +21,18 @@ export const login = async (
     next(error);
   }
 };
+
+export const recoverPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = req;
+    const { id } = req.params;
+    const result = await authServices.updatePassword(+id, body);
+    res.status(201).json(result);
+  } catch (error) {
+    next(error);
+  }
+};

@@ -1,4 +1,4 @@
-import { Users, prisma } from '../utils/prisma.server';
+import { Profiles, Users, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
@@ -9,9 +9,12 @@ dotenv.config();
 const secret = process.env.SECRET;
 
 export class authServices {
-  static async auth({ email, password }: Pick<Users, 'email' | 'password'>) {
-    const user = await prisma.users.findUnique({
-      where: { email },
+  static async auth({
+    password,
+    dni,
+  }: Pick<Users, 'password'> & { dni: Profiles['dni'] }) {
+    const user = await prisma.users.findFirst({
+      where: { profile: { dni } },
       select: {
         id: true,
         role: true,
@@ -39,6 +42,16 @@ export class authServices {
       const token = jwt.sign(data, secret, { algorithm: 'HS512' });
       return token;
     }
+  }
+
+  static async updatePassword(id: Users['id'], { password }: Users) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const passwordHash = await bcrypt.hash(password, 10);
+    const updatePassword = await prisma.users.update({
+      where: { id },
+      data: { password: passwordHash },
+    });
+    return updatePassword;
   }
 }
 export default authServices;

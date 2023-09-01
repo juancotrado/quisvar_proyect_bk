@@ -1,11 +1,10 @@
 import { Profiles, Users } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-
 class ProfileServices {
   static async update(
     id: Users['id'],
-    { firstName, lastName, phone, dni }: Profiles,
+    { firstName, lastName, phone, dni, degree, job, description }: Profiles,
     email: Users['email']
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
@@ -19,6 +18,9 @@ class ProfileServices {
             lastName,
             phone,
             dni,
+            degree,
+            job,
+            description,
           },
         },
       },

@@ -7,7 +7,7 @@ import {
   showTaskByUser,
   showSubTasksByUser,
 } from './users.controllers';
-import { login } from './auth.controllers';
+import { login, recoverPassword } from './auth.controllers';
 import {
   createIndexTask,
   deleteIndexTasks,
@@ -113,8 +113,7 @@ export {
   showSubTasksByUser,
 };
 //Auth Controllers
-export { login };
-//Specialities Controllers
+export { login, recoverPassword };
 export {
   showSpecialities,
   createSpeciality,

@@ -13,7 +13,7 @@ datasource db {
 
 model Users {
   id        Int           @id @default(autoincrement())
-  status    Boolean       @default(true)
+  status    Boolean       @default(false)
   role      UserRole      @default(EMPLOYEE)
   password  String
   email     String        @unique
@@ -27,14 +27,17 @@ model Users {
 }
 
 model Profiles {
-  id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
-  dni       String   @unique @db.VarChar(8)
-  phone     String?  @unique
-  updatedAt DateTime @updatedAt
-  userId    Int      @unique
-  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          Int      @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  dni         String   @unique @db.VarChar(8)
+  phone       String?  @unique
+  updatedAt   DateTime @updatedAt
+  degree      String?
+  job         String?
+  description String?
+  userId      Int      @unique
+  user        Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Sector {
@@ -267,9 +270,12 @@ model Files {
 }
 
 enum UserRole {
+  SUPER_ADMIN
   ADMIN
-  EMPLOYEE
+  ASSISTANT
+  SUPER_MOD
   MOD
+  EMPLOYEE
 }
 
 enum TaskRole {

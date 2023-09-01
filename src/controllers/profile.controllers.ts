@@ -46,7 +46,6 @@ export const uploadProfile = async (
   next: NextFunction
 ) => {
   try {
-    console.log(req);
   } catch (error) {
     next(error);
   }

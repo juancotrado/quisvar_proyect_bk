@@ -15,7 +15,15 @@ import { ellipseAnnotation } from 'pdfkit';
 
 export type userProfilePick = Pick<
   Users & Profiles,
-  'email' | 'password' | 'firstName' | 'dni' | 'phone' | 'lastName'
+  | 'email'
+  | 'password'
+  | 'firstName'
+  | 'dni'
+  | 'phone'
+  | 'lastName'
+  | 'job'
+  | 'degree'
+  | 'description'
 >;
 
 export type projectPick = Pick<
@@ -30,6 +38,7 @@ export type projectPick = Pick<
   | 'department'
   | 'province'
   | 'district'
+  | 'percentage'
 > & {
   userId: Users['id'];
   typeSpecialityId: TypeSpecialities['id'];

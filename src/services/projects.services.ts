@@ -154,6 +154,7 @@ class ProjectsServices {
     province,
     specialistsInfo,
     companyInfo,
+    percentage,
     consortiumInfo,
     typeSpecialityId,
   }: projectPick) {
@@ -191,6 +192,7 @@ class ProjectsServices {
         company,
         consortium,
         typeSpecialityId,
+        percentage,
       },
       include: {
         stage: {
@@ -236,6 +238,7 @@ class ProjectsServices {
       specialistsInfo,
       companyInfo,
       consortiumInfo,
+      percentage,
       typeSpecialityId,
     }: UpdateProjectPick
   ) {
@@ -287,6 +290,7 @@ class ProjectsServices {
         specialists,
         company,
         consortium,
+        percentage,
         stage: { connect: { id: stageId } },
         moderator: {
           connect: { id: userId },
