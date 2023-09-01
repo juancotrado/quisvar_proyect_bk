@@ -12,18 +12,20 @@ datasource db {
 }
 
 model Users {
-  id        Int           @id @default(autoincrement())
-  status    Boolean       @default(false)
-  role      UserRole      @default(EMPLOYEE)
-  password  String
-  email     String        @unique
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  profile   Profiles?
-  area      WorkAreas[]
-  project   Projects[]
-  subTasks  TaskOnUsers[]
-  files     Files[]
+  id          Int           @id @default(autoincrement())
+  status      Boolean       @default(false)
+  role        UserRole      @default(EMPLOYEE)
+  password    String
+  email       String        @unique
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  profile     Profiles?
+  area        WorkAreas[]
+  project     Projects[]
+  subTasks    TaskOnUsers[]
+  hasContract Boolean       @default(false)
+  hasCv       Boolean       @default(false)
+  files       Files[]
 }
 
 model Profiles {
