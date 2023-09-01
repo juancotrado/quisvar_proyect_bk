@@ -186,24 +186,92 @@ model Task_lvl_2 {
 }
 
 model Task_lvl_3 {
+  id        Int          @id @default(autoincrement())
+  name      String
+  unique    Boolean      @default(false)
+  item      String       @default("")
+  task_2_Id Int
+  task_2    Task_lvl_2   @relation(fields: [task_2_Id], references: [id], onDelete: Cascade)
+  tasks_4   Task_lvl_4[]
+  subTasks  SubTasks[]
+}
+
+model Task_lvl_4 {
+  id        Int          @id @default(autoincrement())
+  name      String
+  unique    Boolean      @default(false)
+  item      String       @default("")
+  task_3_Id Int
+  task_3    Task_lvl_3   @relation(fields: [task_3_Id], references: [id], onDelete: Cascade)
+  tasks_5   Task_lvl_5[]
+  subTasks  SubTasks[]
+}
+
+model Task_lvl_5 {
+  id        Int          @id @default(autoincrement())
+  name      String
+  unique    Boolean      @default(false)
+  item      String       @default("")
+  task_4_Id Int
+  task_4    Task_lvl_4   @relation(fields: [task_4_Id], references: [id], onDelete: Cascade)
+  tasks_6   Task_lvl_6[]
+  subTasks  SubTasks[]
+}
+
+model Task_lvl_6 {
+  id        Int          @id @default(autoincrement())
+  name      String
+  unique    Boolean      @default(false)
+  item      String       @default("")
+  task_5_Id Int
+  task_5    Task_lvl_5   @relation(fields: [task_5_Id], references: [id], onDelete: Cascade)
+  tasks_7   Task_lvl_7[]
+  subTasks  SubTasks[]
+}
+
+model Task_lvl_7 {
+  id        Int          @id @default(autoincrement())
+  name      String
+  unique    Boolean      @default(false)
+  item      String       @default("")
+  task_6_Id Int
+  task_6    Task_lvl_6   @relation(fields: [task_6_Id], references: [id], onDelete: Cascade)
+  tasks_8   Task_lvl_8[]
+  subTasks  SubTasks[]
+}
+
+model Task_lvl_8 {
+  id        Int          @id @default(autoincrement())
+  name      String
+  unique    Boolean      @default(false)
+  item      String       @default("")
+  task_7_Id Int
+  task_7    Task_lvl_7   @relation(fields: [task_7_Id], references: [id], onDelete: Cascade)
+  tasks_9   Task_lvl_9[]
+  subTasks  SubTasks[]
+}
+
+model Task_lvl_9 {
+  id        Int           @id @default(autoincrement())
+  name      String
+  unique    Boolean       @default(false)
+  item      String        @default("")
+  task_8_Id Int
+  task_8    Task_lvl_8    @relation(fields: [task_8_Id], references: [id], onDelete: Cascade)
+  tasks_10  Task_lvl_10[]
+  subTasks  SubTasks[]
+}
+
+model Task_lvl_10 {
   id        Int        @id @default(autoincrement())
   name      String
   unique    Boolean    @default(false)
   item      String     @default("")
-  task_2_Id Int
-  task_2    Task_lvl_2 @relation(fields: [task_2_Id], references: [id], onDelete: Cascade)
-  // tasks     Task_lvl_4[]
+  task_9_Id Int
+  task_9    Task_lvl_9 @relation(fields: [task_9_Id], references: [id], onDelete: Cascade)
+  // tasks_6    Task_lvl_6[]
   subTasks  SubTasks[]
 }
-
-// model Task_lvl_4 {
-//   id        Int        @id @default(autoincrement())
-//   name      String
-//   item      String     @default("")
-//   task_3_Id Int
-//   task_3    Task_lvl_3 @relation(fields: [task_3_Id], references: [id])
-//   subTasks  SubTasks[]
-// }
 
 model SubTasks {
   id          Int           @id @default(autoincrement())
@@ -223,12 +291,26 @@ model SubTasks {
   indexTaskId Int?
   task_2_Id   Int?
   task_3_Id   Int?
+  task_4_Id   Int?
+  task_5_Id   Int?
+  task_6_Id   Int?
+  task_7_Id   Int?
+  task_8_Id   Int?
+  task_9_Id   Int?
+  task_10_Id  Int?
   hasPDF      Boolean       @default(false)
   // task_4_Id   Int?
   indexTask   IndexTasks?   @relation(fields: [indexTaskId], references: [id], onDelete: Cascade)
   task        Tasks?        @relation(fields: [taskId], references: [id], onDelete: Cascade)
   task_lvl_2  Task_lvl_2?   @relation(fields: [task_2_Id], references: [id], onDelete: Cascade)
   task_lvl_3  Task_lvl_3?   @relation(fields: [task_3_Id], references: [id], onDelete: Cascade)
+  task_lvl_4  Task_lvl_4?   @relation(fields: [task_4_Id], references: [id], onDelete: Cascade)
+  task_lvl_5  Task_lvl_5?   @relation(fields: [task_5_Id], references: [id], onDelete: Cascade)
+  task_lvl_6  Task_lvl_6?   @relation(fields: [task_6_Id], references: [id], onDelete: Cascade)
+  task_lvl_7  Task_lvl_7?   @relation(fields: [task_7_Id], references: [id], onDelete: Cascade)
+  task_lvl_8  Task_lvl_8?   @relation(fields: [task_8_Id], references: [id], onDelete: Cascade)
+  task_lvl_9  Task_lvl_9?   @relation(fields: [task_9_Id], references: [id], onDelete: Cascade)
+  task_lvl_10 Task_lvl_10?  @relation(fields: [task_10_Id], references: [id], onDelete: Cascade)
   // Task_lvl_4  Task_lvl_4?   @relation(fields: [task_4_Id], references: [id])
 }
 
