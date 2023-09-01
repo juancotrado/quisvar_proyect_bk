@@ -55,6 +55,18 @@ const storageFileUser = multer.diskStorage({
     cb(null, id + '.' + typeFile);
   },
 });
+const storageGeneralFiles = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = `public/general`;
+    if (!existsSync(uploadPath)) {
+      mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '$' + file.originalname);
+  },
+});
 
 export const upload = multer({
   storage: storage,
@@ -63,6 +75,9 @@ export const upload = multer({
 
 export const uploadFileUser = multer({
   storage: storageFileUser,
+});
+export const uploadGeneralFiles = multer({
+  storage: storageGeneralFiles,
 });
 
 export const uploadFile = (req: Request, res: Response, next: NextFunction) => {

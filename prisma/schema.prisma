@@ -28,6 +28,12 @@ model Users {
   files       Files[]
 }
 
+model GeneralFiles {
+  id   Int     @id @default(autoincrement())
+  name String  @unique
+  dir  String?
+}
+
 model Profiles {
   id          Int      @id @default(autoincrement())
   firstName   String

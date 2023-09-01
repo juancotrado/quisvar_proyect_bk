@@ -45,6 +45,37 @@ export const uploadUserFile = async (
     next(error);
   }
 };
+export const showFilesGeneral = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const query = await FilesServices.getAllGeneralFile();
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const uploadFilesGeneral = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!req.file)
+      throw new AppError('Oops!, no se pudo subir el contrato', 400);
+    const body = {
+      id: 0,
+      dir: `general/${req.file.filename}`,
+      name: req.file.originalname,
+    };
+    const query = await FilesServices.createGeneralFile(body);
+    res.status(201).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 export const deleteUserFile = async (
   req: Request,
   res: Response,
@@ -98,6 +129,20 @@ export const deleteFile = async (
     const _file_id = parseInt(id);
     const fileDelete = await FilesServices.delete(_file_id);
     const query = await SubTasksServices.find(fileDelete.subTasksId);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteFilesGeneral = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const query = await FilesServices.deleteGeneralFile(+id);
+    unlinkSync(`public/${query.dir}`);
     res.status(200).json(query);
   } catch (error) {
     next(error);

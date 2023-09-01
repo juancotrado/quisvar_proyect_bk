@@ -2,6 +2,7 @@ import AppError from '../utils/appError';
 import {
   FileTypes,
   Files,
+  GeneralFiles,
   SubTasks,
   Users,
   prisma,
@@ -62,6 +63,26 @@ class FilesServices {
     return newFile;
   }
 
+  static async getAllGeneralFile() {
+    const generalsFiles = await prisma.generalFiles.findMany();
+    return generalsFiles;
+  }
+  static async createGeneralFile({ dir, name }: GeneralFiles) {
+    const newGeneralFile = await prisma.generalFiles.create({
+      data: {
+        dir,
+        name,
+      },
+    });
+    return newGeneralFile;
+  }
+  static async deleteGeneralFile(id: GeneralFiles['id']) {
+    if (!id) throw new AppError('Oops!,id invalido', 400);
+    const deleteGeneralFile = await prisma.generalFiles.delete({
+      where: { id },
+    });
+    return deleteGeneralFile;
+  }
   static async getSubTask(id: SubTasks['id']) {
     if (!id) throw new AppError('Opps!, id invalido', 400);
     const subTask = await prisma.subTasks.findFirst({

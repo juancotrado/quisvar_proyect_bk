@@ -9,9 +9,16 @@ import {
   uploadFile,
   uploadFiles,
 } from '../controllers';
-import { upload, uploadFileUser } from '../middlewares/upload.middleware';
 import {
+  upload,
+  uploadFileUser,
+  uploadGeneralFiles,
+} from '../middlewares/upload.middleware';
+import {
+  deleteFilesGeneral,
   deleteUserFile,
+  showFilesGeneral,
+  uploadFilesGeneral,
   uploadUserFile,
 } from '../controllers/files.controllers';
 
@@ -27,6 +34,14 @@ router.post(
   uploadUserFile
 );
 router.delete('/removeFileUser/:id', deleteUserFile);
+
+router.post(
+  '/uploadGeneralFiles',
+  uploadGeneralFiles.single('generalFile'),
+  uploadFilesGeneral
+);
+router.get('/generalFiles', showFilesGeneral);
+router.delete('/generalFiles/:id', deleteFilesGeneral);
 router.post('/upload/:id', upload.single('file'), uploadFile);
 router.post('/uploads/:id', upload.array('files'), uploadFiles);
 router.delete('/remove/:id', deleteFile);
