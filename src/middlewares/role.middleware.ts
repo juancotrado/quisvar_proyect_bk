@@ -13,6 +13,19 @@ const roleHandler =
     next();
   };
 
-export const _admin_role = roleHandler(['ADMIN']);
-export const _mod_role = roleHandler(['ADMIN', 'MOD']);
-export const _employee_role = roleHandler(['ADMIN', 'MOD', 'EMPLOYEE']);
+export const _admin_role = roleHandler(['SUPER_ADMIN', 'ADMIN', 'ASSISTANT']);
+export const _mod_role = roleHandler([
+  'SUPER_ADMIN',
+  'ADMIN',
+  'ASSISTANT',
+  'SUPER_MOD',
+  'MOD',
+]);
+export const _employee_role = roleHandler([
+  'SUPER_ADMIN',
+  'ADMIN',
+  'ASSISTANT',
+  'SUPER_MOD',
+  'MOD',
+  'EMPLOYEE',
+]);
