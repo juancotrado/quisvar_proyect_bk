@@ -33,7 +33,7 @@ router.post(
   uploadFileUser.single('fileUser'),
   uploadUserFile
 );
-router.delete('/removeFileUser/:id', deleteUserFile);
+router.delete('/removeFileUser/:id/:filename', deleteUserFile);
 
 router.post(
   '/uploadGeneralFiles',

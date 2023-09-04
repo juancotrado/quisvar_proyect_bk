@@ -48,11 +48,9 @@ const storageFileUser = multer.diskStorage({
     }
     cb(null, uploadPath);
   },
-  filename: function (req, file, cb) {
-    const { id } = req.params;
-    const { originalname } = file;
-    const typeFile = originalname.split('.').pop();
-    cb(null, id + '.' + typeFile);
+  filename: function (req, files, cb) {
+    const { originalname } = files;
+    cb(null, Date.now() + '$$' + originalname);
   },
 });
 const storageGeneralFiles = multer.diskStorage({

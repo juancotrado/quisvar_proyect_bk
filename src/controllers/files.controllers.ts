@@ -38,7 +38,9 @@ export const uploadUserFile = async (
     const { isContract } = req.query;
     if (!req.file)
       throw new AppError('Oops!, no se pudo subir el contrato', 400);
-    const body = { [isContract === 'true' ? 'hasContract' : 'hasCv']: true };
+    const body = {
+      [isContract === 'true' ? 'contract' : 'cv']: req.file.filename,
+    };
     const query = await UsersServices.updateStatusFile(+id, body);
     res.status(201).json(query);
   } catch (error) {
@@ -83,10 +85,11 @@ export const deleteUserFile = async (
 ) => {
   try {
     const { id } = req.params;
+    const { filename } = req.params;
     const isContract = req.query.isContract === 'true';
-    const body = { [isContract ? 'hasContract' : 'hasCv']: false };
+    const body = { [isContract ? 'contract' : 'cv']: null };
+    unlinkSync(`public/${isContract ? 'contracts' : 'cvs'}/${filename}`);
     const query = await UsersServices.updateStatusFile(+id, body);
-    unlinkSync(`public/${isContract ? 'contracts' : 'cvs'}/${id}.pdf`);
     res.status(200).json(query);
   } catch (error) {
     next(error);

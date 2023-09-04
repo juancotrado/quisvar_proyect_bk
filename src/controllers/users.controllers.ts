@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { UsersServices } from '../services';
 import { userProfilePick } from '../utils/format.server';
 import { UserType } from '../middlewares/auth.middleware';
+import AppError from '../utils/appError';
 
 export const showUsers = async (
   req: Request,
@@ -69,7 +70,12 @@ export const createUser = async (
 ) => {
   try {
     const body: userProfilePick = req.body;
-    const query = await UsersServices.create(body);
+    if (!req.file)
+      throw new AppError('Oops!, no se pudo subir el contrato', 400);
+    const query = await UsersServices.create({
+      ...body,
+      cv: req.file.filename,
+    });
     res.status(201).json(query);
   } catch (error) {
     next(error);
