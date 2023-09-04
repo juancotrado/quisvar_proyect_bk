@@ -6,7 +6,9 @@ import {
   PriceTask,
   PriceTaskLvl2,
   PriceTaskLvl3,
+  TypeTables,
 } from 'types/types';
+import { prisma } from './prisma.server';
 
 export const sumValues = (list: any[], label: string) => {
   return list.reduce((a: number, c) => a + +c[label], 0);
@@ -170,4 +172,12 @@ const quantityTaskByArea = (status: TaskRole, listTask: any[] | undefined) => {
   const total_quantity: number =
     (listTask && listTask.reduce((a, c) => a + c.taskInfo[status], 0)) || 0;
   return total_quantity;
+};
+
+const updateBlockFiles = async (id: number, type: TypeTables) => {
+  if (type === 'indexTasks')
+    await prisma[type].findMany({
+      where: { id },
+      select: { id: true, item: true, name: true },
+    });
 };

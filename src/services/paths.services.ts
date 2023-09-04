@@ -1,463 +1,185 @@
+import { StageParse } from 'types/types';
 import { _dirPath, _materialPath, _reviewPath } from '.';
 import AppError from '../utils/appError';
-import { parsePath } from '../utils/fileSystem';
+import { parsePath, parseProjectName } from '../utils/fileSystem';
 import { Files, SubTasks, prisma } from '../utils/prisma.server';
 
-class PathServices {
-  static async pathProject(id: number) {
+class StageInfo {
+  static async findProject(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const project = await prisma.projects.findUnique({
       where: { id },
-      include: { stage: { select: { id: true, name: true } } },
+      select: {
+        id: true,
+        name: true,
+        stage: { select: { id: true, name: true } },
+      },
     });
     if (!project)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
-    const projectName = project.stage
-      ? project.name + '-' + project.stage.name
-      : project.name;
-    const path = _dirPath + '/' + projectName;
-    return path;
+    return project;
   }
-  static async pathArea(id: number) {
+
+  static async findArea(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const area = await prisma.workAreas.findUnique({
       where: { id },
       select: {
         name: true,
         item: true,
-        project: {
-          select: {
-            name: true,
-            unique: true,
-            stage: { select: { id: true, name: true } },
-          },
-        },
+        projectId: true,
       },
     });
     if (!area)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
-    const projectName = area.project.stage
-      ? area.project.name + '-' + area.project.stage.name
-      : area.project.name;
-    const projectPath = _dirPath + '/' + projectName;
-    let areaPath = '/' + area.item + '.' + area.name;
-    if (area.project.unique) areaPath = '/' + area.name;
-    const path = projectPath + areaPath;
-    return path;
+    const project = await this.findProject(area.projectId);
+    const projectPath = await PathServices.pathProject(area.projectId);
+    return { ...area, project, projectPath };
   }
-  static async pathIndexTask(id: number) {
+
+  static async findIndexTask(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const task = await prisma.indexTasks.findUnique({
+    const index_task = await prisma.indexTasks.findUnique({
       where: { id },
       select: {
         name: true,
         item: true,
-        workArea: {
-          select: {
-            item: true,
-            name: true,
-            project: {
-              select: {
-                name: true,
-                unique: true,
-                stage: { select: { id: true, name: true } },
-              },
-            },
-          },
-        },
+        workAreaId: true,
       },
     });
-    if (!task)
+    if (!index_task)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
-    const projectName = task.workArea.project.stage
-      ? task.workArea.project.name + '-' + task.workArea.project.stage.name
-      : task.workArea.project.name;
-    const projectPath = _dirPath + '/' + projectName;
-    let areaPath = '/' + task.workArea.item + '.' + task.workArea.name;
-    if (task.workArea.project.unique) areaPath = '/' + task.workArea.name;
-    const indexTaskPath = '/' + task.item + '.' + task.name;
-    const path = projectPath + areaPath + indexTaskPath;
-    return path;
+    const area = await this.findArea(index_task.workAreaId);
+    const areaPath = await PathServices.pathArea(index_task.workAreaId);
+    return { ...index_task, area, areaPath };
   }
-  static async pathTask(id: number) {
+
+  static async findTask(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const task = await prisma.tasks.findUnique({
       where: { id },
       select: {
         name: true,
         item: true,
-        indexTask: {
-          select: {
-            name: true,
-            item: true,
-            workArea: {
-              select: {
-                item: true,
-                name: true,
-                project: {
-                  select: {
-                    name: true,
-                    unique: true,
-                    stage: { select: { id: true, name: true } },
-                  },
-                },
-              },
-            },
-          },
-        },
+        indexTaskId: true,
       },
     });
     if (!task)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
-    const projectName = task.indexTask.workArea.project.stage
-      ? task.indexTask.workArea.project.name +
-        '-' +
-        task.indexTask.workArea.project.stage.name
-      : task.indexTask.workArea.project.name;
-    const projectPath = _dirPath + '/' + projectName;
-    let areaPath =
-      '/' + task.indexTask.workArea.item + '.' + task.indexTask.workArea.name;
-    if (task.indexTask.workArea.project.unique)
-      areaPath = '/' + task.indexTask.workArea.name;
-    const indexTaskPath = '/' + task.indexTask.item + '.' + task.indexTask.name;
-    const taskPath = '/' + task.item + '.' + task.name;
-    const path = projectPath + areaPath + indexTaskPath + taskPath;
-    return path;
+    const indexTask = await this.findIndexTask(task.indexTaskId);
+    const indexTaskPath = await PathServices.pathIndexTask(task.indexTaskId);
+    return { ...task, indexTask, indexTaskPath };
   }
 
-  static async pathTask2(id: number) {
+  static async findTask_2(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const task_2 = await prisma.task_lvl_2.findUnique({
       where: { id },
       select: {
         name: true,
         item: true,
-        task: {
-          select: {
-            name: true,
-            item: true,
-            indexTask: {
-              select: {
-                name: true,
-                item: true,
-                workArea: {
-                  select: {
-                    item: true,
-                    name: true,
-                    project: {
-                      select: {
-                        name: true,
-                        unique: true,
-                        stage: { select: { id: true, name: true } },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
+        taskId: true,
       },
     });
     if (!task_2)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
-    const { task } = task_2;
-    const { indexTask } = task;
-    const { workArea } = indexTask;
-    const { project } = workArea;
-    const projectName = project.stage
-      ? project.name + '-' + project.stage.name
-      : project.name;
-    const projectPath = _dirPath + '/' + projectName;
-    let areaPath = parsePath(workArea.item, workArea.name);
-    if (project.unique) areaPath = '/' + workArea.name;
-    const indexTaskPath = parsePath(indexTask.item, indexTask.name);
-    const taskPath = parsePath(task.item, task.name);
-    const task_2Path = parsePath(task_2.item, task_2.name);
-    const path = projectPath + areaPath + indexTaskPath + taskPath + task_2Path;
-    return path;
+    const task = await this.findTask(task_2.taskId);
+    const taskPath = await PathServices.pathTask(task_2.taskId);
+    return { ...task_2, task, taskPath };
   }
 
-  static async pathTask3(id: number) {
+  static async findTask_3(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const task_3 = await prisma.task_lvl_3.findUnique({
       where: { id },
       select: {
         name: true,
         item: true,
-        task_2: {
-          select: {
-            name: true,
-            item: true,
-            task: {
-              select: {
-                name: true,
-                item: true,
-                indexTask: {
-                  select: {
-                    name: true,
-                    item: true,
-                    workArea: {
-                      select: {
-                        item: true,
-                        name: true,
-                        project: {
-                          select: {
-                            name: true,
-                            unique: true,
-                            stage: { select: { id: true, name: true } },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
+        task_2_Id: true,
       },
     });
     if (!task_3)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
-    const { task_2 } = task_3;
-    const { task } = task_2;
-    const { indexTask } = task;
-    const { workArea } = indexTask;
-    const { project } = workArea;
-    const projectName = project.stage
-      ? project.name + '-' + project.stage.name
-      : project.name;
-    const projectPath = _dirPath + '/' + projectName;
-    let areaPath = parsePath(workArea.item, workArea.name);
-    if (project.unique) areaPath = '/' + workArea.name;
-    const indexTaskPath = parsePath(indexTask.item, indexTask.name);
-    const taskPath = parsePath(task.item, task.name);
-    const task_2Path = parsePath(task_2.item, task_2.name);
-    const task_3Path = parsePath(task_3.item, task_3.name);
-    const path =
-      projectPath +
-      areaPath +
-      indexTaskPath +
-      taskPath +
-      task_2Path +
-      task_3Path;
-    return path;
+    const task_2 = await this.findTask_2(task_3.task_2_Id);
+    const task_2Path = await PathServices.pathTask2(task_2.taskId);
+    return { ...task_3, task_2, task_2Path };
   }
-
-  static async pathSubTask(id: SubTasks['id'], type: Files['type']) {
+  static async findSubTask(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const subTask = await prisma.subTasks.findUnique({
       where: { id },
-      select: {
-        item: true,
-        name: true,
-        indexTask: {
-          select: {
-            item: true,
-            name: true,
-            workArea: {
-              select: {
-                item: true,
-                name: true,
-                project: {
-                  select: {
-                    name: true,
-                    unique: true,
-                    stage: { select: { id: true, name: true } },
-                  },
-                },
-              },
-            },
-          },
-        },
-        task: {
-          select: {
-            item: true,
-            name: true,
-            indexTask: {
-              select: {
-                item: true,
-                name: true,
-                workArea: {
-                  select: {
-                    item: true,
-                    name: true,
-                    project: {
-                      select: {
-                        name: true,
-                        unique: true,
-                        stage: { select: { id: true, name: true } },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        task_lvl_2: {
-          select: {
-            name: true,
-            item: true,
-            task: {
-              select: {
-                item: true,
-                name: true,
-                indexTask: {
-                  select: {
-                    item: true,
-                    name: true,
-                    workArea: {
-                      select: {
-                        item: true,
-                        name: true,
-                        project: {
-                          select: {
-                            name: true,
-                            unique: true,
-                            stage: { select: { id: true, name: true } },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        task_lvl_3: {
-          select: {
-            item: true,
-            name: true,
-            task_2: {
-              select: {
-                name: true,
-                item: true,
-                task: {
-                  select: {
-                    item: true,
-                    name: true,
-                    indexTask: {
-                      select: {
-                        item: true,
-                        name: true,
-                        workArea: {
-                          select: {
-                            item: true,
-                            name: true,
-                            project: {
-                              select: {
-                                name: true,
-                                unique: true,
-                                stage: { select: { id: true, name: true } },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
     });
-    if (!subTask) throw new AppError('No existe la subtarea', 404);
-    if (subTask.indexTask) {
-      const { indexTask } = subTask;
-      const { workArea } = indexTask;
-      const { project } = workArea;
-      const projectName = project.stage
-        ? project.name + '-' + project.stage.name
-        : project.name;
-      const pathProject = _dirPath + '/' + projectName;
-      let areaPath = parsePath(workArea.item, workArea.name);
-      if (project.unique) areaPath = '/' + workArea.name;
-      const indexTaskPath = parsePath(indexTask.item, indexTask.name);
-      // const subTaskPath = parsePath(subTask.item, subTask.name);
-      const path = pathProject + areaPath + indexTaskPath;
-      if (type === 'MATERIAL') return _materialPath + '/' + projectName;
-      if (type === 'REVIEW') return _reviewPath + '/' + projectName;
-      return path;
+    if (!subTask)
+      throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
+    const { item, name, status } = subTask;
+    if (subTask.indexTaskId) {
+      const { indexTaskId } = subTask;
+      const rootPathTask = await PathServices.pathIndexTask(indexTaskId);
+      return { id, item, name, rootPathTask };
     }
-    if (subTask.task) {
-      const { task } = subTask;
-      const { indexTask } = task;
-      const { workArea } = indexTask;
-      const { project } = workArea;
-
-      const projectName = project.stage
-        ? project.name + '-' + project.stage.name
-        : project.name;
-      const pathProject = _dirPath + '/' + projectName;
-      let areaPath = parsePath(workArea.item, workArea.name);
-      if (project.unique) areaPath = '/' + workArea.name;
-      const indexTaskPath = parsePath(indexTask.item, indexTask.name);
-      const taskPath = parsePath(task.item, task.name);
-
-      const path = pathProject + areaPath + indexTaskPath + taskPath;
-      if (type === 'MATERIAL') return _materialPath + '/' + projectName;
-      if (type === 'REVIEW') return _reviewPath + '/' + projectName;
-      return path;
+    if (subTask.taskId) {
+      const { taskId } = subTask;
+      const rootPathTask = await PathServices.pathTask(taskId);
+      return { id, item, name, rootPathTask };
     }
-    if (subTask.task_lvl_2) {
-      const { task_lvl_2 } = subTask;
-      const { task } = task_lvl_2;
-      const { indexTask } = task;
-      const { workArea } = indexTask;
-      const { project } = workArea;
-
-      const projectName = project.stage
-        ? project.name + '-' + project.stage.name
-        : project.name;
-      const pathProject = _dirPath + '/' + projectName;
-      let areaPath = parsePath(workArea.item, workArea.name);
-      if (project.unique) areaPath = '/' + workArea.name;
-      const indexTaskPath = parsePath(indexTask.item, indexTask.name);
-      const taskPath = parsePath(task.item, task.name);
-      const taskLvl2Path = parsePath(task_lvl_2.item, task_lvl_2.name);
-
-      const path =
-        pathProject + areaPath + indexTaskPath + taskPath + taskLvl2Path;
-      if (type === 'MATERIAL') return _materialPath + '/' + projectName;
-      if (type === 'REVIEW') return _reviewPath + '/' + projectName;
-      return path;
+    if (subTask.task_2_Id) {
+      const { task_2_Id } = subTask;
+      const rootPathTask = await PathServices.pathTask2(task_2_Id);
+      return { id, item, name, rootPathTask };
     }
-    if (subTask.task_lvl_3) {
-      const { task_lvl_3 } = subTask;
-      const { task_2 } = task_lvl_3;
-      const { task } = task_2;
-      const { indexTask } = task;
-      const { workArea } = indexTask;
-      const { project } = workArea;
-
-      const projectName = project.stage
-        ? project.name + '-' + project.stage.name
-        : project.name;
-      const pathProject = _dirPath + '/' + projectName;
-      let areaPath = parsePath(workArea.item, workArea.name);
-      if (project.unique) areaPath = '/' + workArea.name;
-      const indexTaskPath = parsePath(indexTask.item, indexTask.name);
-      const taskPath = parsePath(task.item, task.name);
-      const taskLvl2Path = parsePath(task_2.item, task_2.name);
-      const taskLvl3Path = parsePath(task_lvl_3.item, task_lvl_3.name);
-
-      const path =
-        pathProject +
-        areaPath +
-        indexTaskPath +
-        taskPath +
-        taskLvl2Path +
-        taskLvl3Path;
-      if (type === 'MATERIAL') return _materialPath + '/' + projectName;
-      if (type === 'REVIEW') return _reviewPath + '/' + projectName;
-      return path;
+    if (subTask.task_3_Id) {
+      const { task_3_Id } = subTask;
+      const rootPathTask = await PathServices.pathTask3(task_3_Id);
+      return { id, item, name, rootPathTask };
     }
-    throw new AppError('No se pudo encontrar la ruta', 404);
+    // return { id, item, name, rootPathTask: '' };
+    throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
+  }
+}
+
+class PathServices {
+  static async pathProject(id: number) {
+    const { stage, name } = await StageInfo.findProject(id);
+    const projectName = parseProjectName(stage, name);
+    return _dirPath + '/' + projectName;
+  }
+
+  static async pathArea(id: number) {
+    const { item, name, projectPath } = await StageInfo.findArea(id);
+    const areaPath = parsePath(item, name);
+    return projectPath + areaPath;
+  }
+
+  static async pathIndexTask(id: number) {
+    const { item, name, areaPath } = await StageInfo.findIndexTask(id);
+    const indexTaskPath = parsePath(item, name);
+    return areaPath + indexTaskPath;
+  }
+
+  static async pathTask(id: number) {
+    const { item, name, indexTaskPath } = await StageInfo.findTask(id);
+    const taskPath = parsePath(item, name);
+    return indexTaskPath + taskPath;
+  }
+
+  static async pathTask2(id: number) {
+    const { item, name, taskPath } = await StageInfo.findTask_2(id);
+    const task_2Path = parsePath(item, name);
+    return taskPath + task_2Path;
+  }
+
+  static async pathTask3(id: number) {
+    const { item, name, task_2Path } = await StageInfo.findTask_3(id);
+    const task_3Path = parsePath(item, name);
+    return task_2Path + task_3Path;
+  }
+
+  static async pathSubTask(id: SubTasks['id'], type: Files['type']) {
+    const { rootPathTask } = await StageInfo.findSubTask(id);
+    const projectDir = rootPathTask.split('/').at(3);
+    if (type === 'MATERIAL') return _materialPath + '/' + projectDir;
+    if (type === 'REVIEW') return _reviewPath + '/' + projectDir;
+    return rootPathTask;
   }
 }
 

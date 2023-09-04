@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { StageParse } from 'types/types';
 export const renameDir = (oldDir: string, newDir: string) => {
   if (oldDir !== newDir) {
     const subDir = fs
@@ -22,4 +23,8 @@ export const setNewPath = (oldDir: string, path: string) => {
 
 export const parsePath = (item: string, name: string) => {
   return '/' + item + '.' + name;
+};
+
+export const parseProjectName = (stage: StageParse, name: string) => {
+  return stage ? name + '-' + stage.name : name;
 };

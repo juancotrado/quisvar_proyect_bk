@@ -19,6 +19,11 @@ export type PickSubtask = Pick<
   'id' | 'name' | 'item' | 'description' | 'price' | 'status'
 > & { users: User[] };
 
+export type StageParse = {
+  name: string;
+  id: number;
+} | null;
+
 export type User = {
   percentage: number;
   user: {
@@ -50,3 +55,17 @@ export type PriceTaskLvl2 = Pick<Task_lvl_2, 'id' | 'name' | 'item'> & {
 export type PriceTaskLvl3 = Pick<Task_lvl_3, 'id' | 'name' | 'item'> & {
   subTasks: PickSubtask[];
 };
+
+export type TypeTables =
+  | 'indexTasks'
+  | 'workAreas'
+  | 'tasks'
+  | 'task_lvl_2'
+  | 'task_lvl_3'
+  | 'task_lvl_4'
+  | 'task_lvl_5'
+  | 'task_lvl_6'
+  | 'task_lvl_7'
+  | 'task_lvl_8'
+  | 'task_lvl_9'
+  | 'task_lvl_10';

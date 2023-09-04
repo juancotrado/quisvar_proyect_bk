@@ -73,9 +73,9 @@ class Server {
     this.routes();
   }
   middlewares() {
-    this.app.use('/static', express.static('uploads'));
-    this.app.use('/models', express.static('file_model'));
-    this.app.use('/review', express.static('file_review'));
+    this.app.use('/static', express.static('uploads/projects'));
+    this.app.use('/models', express.static('uploads/models'));
+    this.app.use('/review', express.static('uploads/reviews'));
     this.app.use('/file-user', express.static('public'));
     this.app.use(cors());
     this.app.use(express.json());

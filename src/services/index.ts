@@ -38,6 +38,6 @@ export {
   SectorServices,
   TypeSpecialitiesServices,
 };
-export const _dirPath = './uploads';
-export const _materialPath = './file_model';
-export const _reviewPath = './file_review';
+export const _dirPath = './uploads/projects';
+export const _materialPath = './uploads/models';
+export const _reviewPath = './uploads/reviews';
