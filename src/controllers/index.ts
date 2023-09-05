@@ -102,6 +102,7 @@ import {
   showTypeSpeciality,
   updateTypeSpeciality,
 } from './typeSpecialities.controllers';
+import { createLevel, deleteLevel, updateLevel } from './levels.controllers';
 // User Controllers
 export {
   showUsers,
@@ -202,3 +203,6 @@ export {
   deleteTypeSpeciality,
   showTypeSpecialities,
 };
+
+//levels Controllers
+export { createLevel, updateLevel, deleteLevel };

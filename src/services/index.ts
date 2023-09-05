@@ -17,6 +17,8 @@ import DuplicatesServices from './duplicates.services';
 import StageServices from './stages.services';
 import SectorServices from './sector.services';
 import TypeSpecialitiesServices from './typeSpecialities.services';
+import LevelsServices from './levels.services';
+import PathLevelServices from './path_levels.services';
 export {
   UsersServices,
   TasksServices,
@@ -37,6 +39,8 @@ export {
   StageServices,
   SectorServices,
   TypeSpecialitiesServices,
+  LevelsServices,
+  PathLevelServices,
 };
 export const _dirPath = './uploads/projects';
 export const _materialPath = './uploads/models';

@@ -12,20 +12,26 @@ datasource db {
 }
 
 model Users {
-  id          Int           @id @default(autoincrement())
-  status      Boolean       @default(false)
-  role        UserRole      @default(EMPLOYEE)
-  password    String
-  email       String        @unique
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  profile     Profiles?
-  area        WorkAreas[]
-  project     Projects[]
-  subTasks    TaskOnUsers[]
-  hasContract Boolean       @default(false)
-  hasCv       Boolean       @default(false)
-  files       Files[]
+  id        Int           @id @default(autoincrement())
+  status    Boolean       @default(false)
+  role      UserRole      @default(EMPLOYEE)
+  password  String
+  email     String        @unique
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  profile   Profiles?
+  area      WorkAreas[]
+  project   Projects[]
+  subTasks  TaskOnUsers[]
+  contract  String?
+  cv        String?
+  files     Files[]
+}
+
+model GeneralFiles {
+  id   Int     @id @default(autoincrement())
+  name String  @unique
+  dir  String?
 }
 
 model Profiles {
@@ -105,6 +111,7 @@ model Projects {
   groupId          Int?
   stage            Stages?           @relation(fields: [stageId], references: [id])
   stageId          Int?
+  levels           Levels[]
 }
 
 model Consortium {
@@ -140,6 +147,19 @@ model GroupProjects {
   id       Int        @id @default(autoincrement())
   name     String?
   projects Projects[]
+}
+
+model Levels {
+  id         Int        @id @default(autoincrement())
+  rootId     Int
+  rootLevel  Int
+  item       String
+  unique     Boolean    @default(false)
+  name       String
+  level      Int        @default(0)
+  subTasks   SubTasks[]
+  projects   Projects?  @relation(fields: [projectsId], references: [id])
+  projectsId Int?
 }
 
 model WorkAreas {
@@ -300,6 +320,7 @@ model SubTasks {
   task_8_Id   Int?
   task_9_Id   Int?
   task_10_Id  Int?
+  levels_Id   Int?
   hasPDF      Boolean       @default(false)
   // task_4_Id   Int?
   indexTask   IndexTasks?   @relation(fields: [indexTaskId], references: [id], onDelete: Cascade)
@@ -313,6 +334,7 @@ model SubTasks {
   task_lvl_8  Task_lvl_8?   @relation(fields: [task_8_Id], references: [id], onDelete: Cascade)
   task_lvl_9  Task_lvl_9?   @relation(fields: [task_9_Id], references: [id], onDelete: Cascade)
   task_lvl_10 Task_lvl_10?  @relation(fields: [task_10_Id], references: [id], onDelete: Cascade)
+  levels      Levels?       @relation(fields: [levels_Id], references: [id])
   // Task_lvl_4  Task_lvl_4?   @relation(fields: [task_4_Id], references: [id])
 }
 

@@ -17,6 +17,7 @@ import archiverRouter from './archiver.routes';
 import stagesRouter from './stages.routes';
 import sectorRouter from './sector.routes';
 import typeSpecialityRouter from './typeSpecialities.routes';
+import levelsRouter from './levels.routes';
 export {
   userRouter,
   authRouter,
@@ -37,4 +38,5 @@ export {
   stagesRouter,
   sectorRouter,
   typeSpecialityRouter,
+  levelsRouter,
 };
