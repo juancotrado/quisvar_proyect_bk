@@ -70,7 +70,7 @@ class LevelsServices {
         rootLevel,
         level: rootLevel + 1,
         unique,
-        projects: { connect: { id: projectsId } },
+        stages: { connect: { id: projectsId } },
       },
     });
     return newLevel;

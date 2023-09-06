@@ -11,7 +11,20 @@ class StageInfo {
       select: {
         id: true,
         name: true,
-        stage: { select: { id: true, name: true } },
+      },
+    });
+    if (!project)
+      throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
+    return project;
+  }
+  static async findStage(id: number) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const project = await prisma.stages.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        projects: { select: { id: true, name: true } },
       },
     });
     if (!project)
@@ -31,9 +44,11 @@ class StageInfo {
 
 class PathLevelServices {
   static async pathProject(id: number) {
-    const { stage, name } = await StageInfo.findProject(id);
-    const projectName = parseProjectName(stage, name);
-    return _dirPath + '/' + projectName;
+    const { name } = await StageInfo.findProject(id);
+    return _dirPath + '/' + name;
+  }
+  static async pathStage(id: number) {
+    const {} = await StageInfo.findStage(id);
   }
   static async pathLevel(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
