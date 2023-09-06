@@ -27,9 +27,10 @@ model Users {
 }
 
 model GeneralFiles {
-  id   Int     @id @default(autoincrement())
-  name String  @unique
-  dir  String?
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  dir       String?
+  createdAt DateTime @default(now())
 }
 
 model Profiles {
