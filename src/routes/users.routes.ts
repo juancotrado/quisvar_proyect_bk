@@ -29,7 +29,7 @@ router.use(_mod_role);
 router.get('/:id', showUser);
 //ADMIN ROLE
 router.use(_admin_role);
-router.post('/', uploadFileUser.single('fileUser'), createUser);
+router.post('/', uploadFileUser.array('fileUser'), createUser);
 router.patch('/:id', updateUser);
 router.delete('/:id', deleteUser);
 export default router;

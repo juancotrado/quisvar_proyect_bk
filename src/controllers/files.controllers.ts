@@ -9,6 +9,7 @@ import { Files } from '@prisma/client';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
 import { unlinkSync } from 'fs';
+import { TypeFileUser } from 'types/types';
 export const uploadFile = async (
   req: Request,
   res: Response,
@@ -35,11 +36,11 @@ export const uploadUserFile = async (
 ) => {
   try {
     const { id } = req.params;
-    const { isContract } = req.query;
+    const typeFileUser = req.query.typeFile as TypeFileUser;
     if (!req.file)
       throw new AppError('Oops!, no se pudo subir el contrato', 400);
     const body = {
-      [isContract === 'true' ? 'contract' : 'cv']: req.file.filename,
+      [typeFileUser]: req.file.filename,
     };
     const query = await UsersServices.updateStatusFile(+id, body);
     res.status(201).json(query);
@@ -86,9 +87,10 @@ export const deleteUserFile = async (
   try {
     const { id } = req.params;
     const { filename } = req.params;
-    const isContract = req.query.isContract === 'true';
-    const body = { [isContract ? 'contract' : 'cv']: null };
-    unlinkSync(`public/${isContract ? 'contracts' : 'cvs'}/${filename}`);
+    const typeFileUser = req.query.typeFile as TypeFileUser;
+
+    const body = { [typeFileUser]: null };
+    unlinkSync(`public/${typeFileUser}/${filename}`);
     const query = await UsersServices.updateStatusFile(+id, body);
     res.status(200).json(query);
   } catch (error) {

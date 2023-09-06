@@ -5,6 +5,7 @@ import path from 'path';
 import { FilesServices, PathServices } from '../services';
 import AppError from '../utils/appError';
 import { existsSync, mkdirSync } from 'fs';
+import { TypeFileUser } from 'types/types';
 
 const MAX_SIZE = 1024 * 1000 * 1000 * 1000;
 const FILE_TYPES = ['.rar', '.zip'];
@@ -41,8 +42,8 @@ const storage = multer.diskStorage({
 });
 const storageFileUser = multer.diskStorage({
   destination: function (req, file, cb) {
-    const { isContract } = req.query;
-    const uploadPath = `public/${isContract === 'true' ? 'contracts' : 'cvs'}`;
+    const typeFileUser = req.query.typeFile as TypeFileUser;
+    const uploadPath = `public/${typeFileUser}`;
     if (!existsSync(uploadPath)) {
       mkdirSync(uploadPath, { recursive: true });
     }

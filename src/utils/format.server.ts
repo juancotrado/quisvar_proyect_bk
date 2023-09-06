@@ -25,6 +25,7 @@ export type userProfilePick = Pick<
   | 'degree'
   | 'description'
   | 'cv'
+  | 'declaration'
 >;
 
 export type projectPick = Pick<
