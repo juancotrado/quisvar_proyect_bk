@@ -78,7 +78,6 @@ class ReportsServices {
                             description: true,
                             CUI: true,
                             district: true,
-                            stage: { select: { name: true } },
                           },
                         },
                       },
@@ -161,7 +160,6 @@ class ReportsServices {
         CUI: true,
         description: true,
         district: true,
-        stage: { select: { name: true } },
       },
     });
     if (!reportList) new AppError('no se pudo encontrar los registros', 404);
@@ -248,7 +246,6 @@ class ReportsServices {
         moderator: {
           select: { profile: { select: { firstName: true, lastName: true } } },
         },
-        stage: { select: { id: true, name: true } },
         areas: {
           select: {
             id: true,

@@ -16,7 +16,6 @@ class StageServices {
     //   );
     return findStages;
   }
-  static async createStageFromProject({ stageId }: Projects) {}
   static async create({ name }: Stages) {
     const createStage = await prisma.stages.create({
       data: {

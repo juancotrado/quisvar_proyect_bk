@@ -21,7 +21,6 @@ class SectorServices {
                     specialists: Queries.selectSpecialist,
                     company: Queries.selectCompany,
                     consortium: Queries.selectConsortium,
-                    stage: { select: { id: true, name: true } },
                     moderator: Queries.selectProfileUser,
                   },
                 },

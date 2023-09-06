@@ -26,11 +26,8 @@ class DuplicatesServices {
         unique: true,
         CUI: true,
         typeSpecialityId: true,
-        stageId: true,
+
         groupId: true,
-        stage: {
-          select: { name: true },
-        },
       },
     });
     if (!getProyect)
@@ -38,7 +35,7 @@ class DuplicatesServices {
         'No se pudo encontrar el proyecto para duplicado',
         404
       );
-    const { stage, groupId, ..._project } = getProyect;
+    const { groupId, ..._project } = getProyect;
     let newProject = {
       ..._project,
       name: _project.name + '(copia)',
@@ -46,13 +43,12 @@ class DuplicatesServices {
     if (newStageId) {
       newProject = {
         ..._project,
-        stageId: newStageId,
+
         name: _project.name + newStageId,
       };
     }
     const createProject = await prisma.projects.create({
       data: newProject,
-      include: { stage: { select: { name: true } } },
     });
     if (newStageId) {
       await prisma.projects.update({
@@ -182,10 +178,8 @@ class DuplicatesServices {
     });
 
     return {
-      oldName: stage ? getProyect.name + '-' + stage.name : getProyect.name,
-      newName: createProject.stage
-        ? createProject.name + '-' + createProject.stage.name
-        : createProject.name,
+      oldName: getProyect.name,
+      newName: createProject.name,
       ...createProject,
     };
   }
