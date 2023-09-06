@@ -12,7 +12,6 @@ class StageInfo {
       select: {
         id: true,
         name: true,
-        stage: { select: { id: true, name: true } },
       },
     });
     if (!project)
@@ -139,9 +138,8 @@ class StageInfo {
 
 class PathServices {
   static async pathProject(id: number) {
-    const { stage, name } = await StageInfo.findProject(id);
-    const projectName = parseProjectName(stage, name);
-    return _dirPath + '/' + projectName;
+    const { name } = await StageInfo.findProject(id);
+    return _dirPath + '/';
   }
 
   static async pathArea(id: number) {

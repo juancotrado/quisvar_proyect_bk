@@ -1,13 +1,9 @@
 import { Router } from 'express';
 import {
-  createIndexTask,
-  deleteIndexTasks,
-  showIndexTask,
-  showSubtasksByIndexTask,
-  updatIndexTask,
   createLevel,
   updateLevel,
   deleteLevel,
+  showLevel,
 } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 
@@ -22,7 +18,7 @@ router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);
 // router.patch('/status/:id', updateTaskStatus);
-// router.get('/:id', showSubtasksByIndexTask);
+router.get('/:id', showLevel);
 // router.get('/:id/subtasks', showSubtasksByIndexTask);
 // router.patch('/:id', taskVerify, assignedTask);
 //MOD ROLE

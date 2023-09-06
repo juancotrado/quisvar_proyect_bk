@@ -3,6 +3,21 @@ import { LevelsServices, PathLevelServices } from '../services';
 import { mkdirSync, rmSync } from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
 
+export const showLevel = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _task_id = parseInt(id);
+    const query = await LevelsServices.find(_task_id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createLevel = async (
   req: Request,
   res: Response,

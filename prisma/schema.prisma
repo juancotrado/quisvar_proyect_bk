@@ -102,15 +102,14 @@ model Projects {
   userId           Int
   typeSpecialityId Int?
   groupId          Int?
-  stageId          Int?
   company          Company?
   consortium       Consortium?
   specialists      PersonBussiness[]
   group            GroupProjects?    @relation(fields: [groupId], references: [id])
-  stage            Stages?           @relation(fields: [stageId], references: [id])
   typeSpeciality   TypeSpecialities? @relation(fields: [typeSpecialityId], references: [id])
   moderator        Users             @relation(fields: [userId], references: [id])
   areas            WorkAreas[]
+  stages           Stages[]
 }
 
 model Consortium {
@@ -135,12 +134,13 @@ model Company {
 }
 
 model Stages {
-  id        Int        @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  projects  Projects[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   levels    Levels[]
+  project   Projects? @relation(fields: [projectId], references: [id])
+  projectId Int?
 }
 
 model GroupProjects {
@@ -156,7 +156,6 @@ model Levels {
   level      Int        @default(0)
   rootLevel  Int
   unique     Boolean    @default(false)
-  projectsId Int?
   stagesId   Int?
   userId     Int?
   rootId     Int

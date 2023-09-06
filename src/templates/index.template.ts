@@ -47,7 +47,6 @@ type dataType = {
   untilDate: Date;
   areas: Areas[];
   moderator: { profile: { firstName: string; lastName: string } | null };
-  stage: { id: number; name: string } | null;
 } | null;
 export const indexTemplate = (
   dataCallback: any,

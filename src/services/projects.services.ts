@@ -18,7 +18,6 @@ class ProjectsServices {
         include: {
           projects: {
             orderBy: { createdAt: 'desc' },
-            include: { stage: true },
           },
         },
       });
@@ -134,7 +133,6 @@ class ProjectsServices {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findProject = await prisma.projects.findUnique({
       where: { id },
-      include: { stage: { select: { id: true, name: true } } },
     });
     if (!findProject)
       throw new AppError('No se pudo encontrar los proyectos registrados', 404);
@@ -184,7 +182,6 @@ class ProjectsServices {
         untilDate,
         CUI,
         userId,
-        stageId,
         department,
         district,
         province,
@@ -193,11 +190,6 @@ class ProjectsServices {
         consortium,
         typeSpecialityId,
         percentage,
-      },
-      include: {
-        stage: {
-          select: { id: true, name: true },
-        },
       },
     });
     if (newProject) {
@@ -291,13 +283,11 @@ class ProjectsServices {
         company,
         consortium,
         percentage,
-        stage: { connect: { id: stageId } },
         moderator: {
           connect: { id: userId },
         },
         group: { update: { name } },
       },
-      include: { stage: { select: { id: true, name: true } } },
     });
     if (getNameProject.name !== updateProject.name) {
       const listSubtaks = await ReportsServices.getSubTasksByProyect(id);
@@ -342,7 +332,6 @@ class ProjectsServices {
     }
     const deleteProject = await prisma.projects.delete({
       where: { id },
-      include: { stage: { select: { id: true, name: true } } },
     });
     const countProjects = await prisma.projects.count({ where: { groupId } });
     if (groupId && countProjects == 0) {

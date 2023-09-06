@@ -12,11 +12,21 @@ import {
 class LevelsServices {
   static async find(id: Levels['id']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
+    const findLevel = await this.findList(id);
+    // const findLevel = await prisma.levels.findUnique({ where: { id } });
+    // if (!findLevel)
+    //   throw new AppError('No se pudieron encontrar el nivel', 404);
+    return findLevel;
+  }
+
+  static async findShort(id: Levels['id']) {
+    if (!id) throw new AppError('Oops!, ID invalido', 400);
     const findLevel = await prisma.levels.findUnique({ where: { id } });
     if (!findLevel)
       throw new AppError('No se pudieron encontrar el nivel', 404);
     return findLevel;
   }
+
   static async findDuplicate(name: string, id: number, type: 'ROOT' | 'ID') {
     let rootId;
     rootId = id;
@@ -48,15 +58,8 @@ class LevelsServices {
     };
   }
 
-  static async create({
-    item,
-    name,
-    level,
-    projectsId,
-    rootId,
-    unique,
-  }: Levels) {
-    if (!projectsId) throw new AppError('Oops!,ID invalido', 400);
+  static async create({ item, name, level, stagesId, rootId, unique }: Levels) {
+    if (!stagesId) throw new AppError('Oops!,ID invalido', 400);
     const isDuplicated = await this.findDuplicate(name, rootId, 'ROOT');
     const { duplicated, rootItem, quantity, rootLevel } = isDuplicated;
     if (duplicated) throw new AppError('Error al crear, Nombre existente', 404);
@@ -70,11 +73,12 @@ class LevelsServices {
         rootLevel,
         level: rootLevel + 1,
         unique,
-        stages: { connect: { id: projectsId } },
+        stages: { connect: { id: stagesId } },
       },
     });
     return newLevel;
   }
+
   static async update(id: Levels['id'], { name, unique }: Levels) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const { duplicated } = await this.findDuplicate(name, id, 'ID');
@@ -85,9 +89,10 @@ class LevelsServices {
     });
     return updateLevel;
   }
+
   static async delete(id: Levels['id']) {
     if (!id) throw new AppError('Oops!,ID invalido?', 400);
-    const { rootId, item } = await this.find(id);
+    const { rootId, item } = await this.findShort(id);
     const newDir = await PathLevelServices.pathLevel(id);
     const dirLevel = setNewPath(newDir, '').slice(0, -1);
     const deleteLevel = await prisma.levels.delete({ where: { id } });
