@@ -87,6 +87,7 @@ import {
   createStage,
   deleteStage,
   showListStages,
+  showStage,
   updateStage,
 } from './stages.controllers';
 import {
@@ -195,8 +196,14 @@ export {
 };
 
 //Stages Controllers
-export { showListStages, createStage, updateStage, deleteStage, addNewStage };
-
+export {
+  showListStages,
+  createStage,
+  updateStage,
+  deleteStage,
+  showStage,
+  addNewStage,
+};
 //Sector Controllers
 export { showSectors, createSector, updateSector, deleteSector };
 

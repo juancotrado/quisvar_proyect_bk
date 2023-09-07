@@ -4,6 +4,7 @@ import {
   createStage,
   deleteStage,
   showListStages,
+  showStage,
   updateStage,
 } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
@@ -14,6 +15,7 @@ router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);
 router.get('/', showListStages);
+router.get('/:id', showStage);
 //MOD ROLE
 router.use(_mod_role);
 router.post('/', createStage);

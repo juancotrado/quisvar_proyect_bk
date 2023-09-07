@@ -65,12 +65,7 @@ export const createProject = async (
       mkdirSync(path);
       mkdirSync(`./${_materialPath}/${projectName}`);
       mkdirSync(`./${_reviewPath}/${projectName}`);
-      if (query.unique) {
-        const pathArea = await PathServices.pathArea(query.workAreaId);
-        mkdirSync(pathArea);
-      }
     }
-
     res.status(201).json(query);
   } catch (error) {
     console.log(error);

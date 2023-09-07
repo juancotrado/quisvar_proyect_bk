@@ -8,14 +8,27 @@ import {
   renameDir,
   setNewPath,
 } from '../utils/fileSystem';
+import Queries from '../utils/queries';
+import {
+  getDetailsSubtask,
+  percentageSubTasks,
+  sumValues,
+} from '../utils/tools';
 
 class LevelsServices {
   static async find(id: Levels['id']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
-    const findLevel = await this.findList(id);
-    // const findLevel = await prisma.levels.findUnique({ where: { id } });
-    // if (!findLevel)
-    //   throw new AppError('No se pudieron encontrar el nivel', 404);
+    const findProject = await prisma.levels.findUnique({
+      where: { id },
+      select: {
+        stages: { select: { project: { select: { percentage: true } } } },
+      },
+    });
+    if (!findProject || !findProject.stages)
+      throw new AppError('Oops!, proyecto invalido', 400);
+    const { project } = findProject.stages;
+    if (!project) throw new AppError('Oops!, proyecto invalido', 400);
+    const findLevel = await this.findList(id, project.percentage);
     return findLevel;
   }
 
@@ -148,16 +161,50 @@ class LevelsServices {
     return result;
   }
 
-  static async findList(rootId: Levels['rootId']) {
+  static async findList(rootId: Levels['rootId'], percentage: number) {
     const findList = await prisma.levels.findMany({
       where: { rootId },
-      select: { id: true, item: true, name: true, rootId: true },
+      select: {
+        id: true,
+        item: true,
+        name: true,
+        rootId: true,
+        subTasks: {
+          select: {
+            id: true,
+            name: true,
+            item: true,
+            description: true,
+            price: true,
+            status: true,
+            users: {
+              select: { percentage: true, user: Queries.selectProfileUser },
+            },
+          },
+        },
+      },
     });
     if (findList.length === 0) return [];
-    const newListTask = findList.map(async level => {
-      const nextLevel: typeof findList = await this.findList(level.id);
-      if (nextLevel.length !== 0) return { ...level, nextLevel };
-      return level;
+    const newListTask = findList.map(async ({ subTasks, ...level }) => {
+      const nextLevel: typeof findList = await this.findList(
+        level.id,
+        percentage
+      );
+      const subtasks = percentageSubTasks(subTasks, percentage);
+      const details = getDetailsSubtask(subTasks);
+      const price = sumValues(subtasks, 'price');
+      const spending = sumValues(subtasks, 'spending');
+      const balance = price - spending;
+      const newLevel = {
+        ...level,
+        spending,
+        balance,
+        price,
+        details,
+        subTasks: subtasks,
+      };
+      if (nextLevel.length !== 0) return { ...newLevel, nextLevel };
+      return { ...newLevel };
     });
     const result = await Promise.all(newListTask);
     return result;

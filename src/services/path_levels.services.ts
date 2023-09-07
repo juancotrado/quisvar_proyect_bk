@@ -1,4 +1,4 @@
-import { _dirPath } from '.';
+import { _dirPath, _materialPath, _reviewPath } from '.';
 import AppError from '../utils/appError';
 import { parsePath, parseProjectName } from '../utils/fileSystem';
 import { prisma } from '../utils/prisma.server';
@@ -43,14 +43,16 @@ class StageInfo {
 }
 
 class PathLevelServices {
-  static async pathProject(id: number) {
+  static async pathProject(id: number, type: 'MODEL' | 'REVIEW' | 'UPLOADS') {
     const { name } = await StageInfo.findProject(id);
+    if (type === 'MODEL') return _materialPath + '/' + name;
+    if (type === 'REVIEW') return _reviewPath + '/' + name;
     return _dirPath + '/' + name;
   }
-  static async pathStage(id: number) {
+  static async pathStage(id: number, type: 'MODEL' | 'REVIEW' | 'UPLOADS') {
     const { name, project } = await StageInfo.findStage(id);
     if (!project) throw new AppError('Oops!,ID no encontrado', 400);
-    const pathProject = await this.pathProject(project.id);
+    const pathProject = await this.pathProject(project.id, type);
     return pathProject + '/' + name;
   }
   static async pathLevel(id: number) {
@@ -59,7 +61,7 @@ class PathLevelServices {
     if (!findLevel) throw new AppError('Oops!,No hay el directorio', 404);
     const { stagesId } = findLevel;
     if (!stagesId) throw new AppError('Oops!,No hay el directorio', 404);
-    const projectPath = await this.pathStage(stagesId);
+    const projectPath = await this.pathStage(stagesId, 'UPLOADS');
     const path = await StageInfo.getValues(id);
     return projectPath + '/' + path;
   }

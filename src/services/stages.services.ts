@@ -1,5 +1,6 @@
 import AppError from '../utils/appError';
 import { Projects, Stages, prisma } from '../utils/prisma.server';
+import LevelsServices from './levels.services';
 
 class StageServices {
   static async findMany() {
@@ -9,31 +10,45 @@ class StageServices {
         name: true,
       },
     });
-    // if (findStages.length == 0)
-    //   throw new AppError(
-    //     'No se pudo encontrar la lista, porque esta vacia',
-    //     404
-    //   );
     return findStages;
   }
-  static async create({ name }: Stages) {
-    const createStage = await prisma.stages.create({
-      data: {
-        name,
+  static async find(id: Stages['id']) {
+    if (!id) throw new AppError('Oops!, ID invalido', 400);
+    const findStage = await prisma.stages.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        levels: { where: { rootId: 0, stagesId: id } },
       },
+    });
+    if (!findStage)
+      throw new AppError('Oops!,No se pudo encontrar la etapa', 400);
+    const newFindStage = findStage.levels.map(async level => {
+      const nextLevel = await LevelsServices.find(level.id);
+      if (nextLevel.length !== 0) return { ...level, nextLevel };
+      return level;
+    });
+    const result = await Promise.all(newFindStage);
+    return result;
+  }
+
+  static async create({ name, projectId }: Stages) {
+    const createStage = await prisma.stages.create({
+      data: { name, projectId },
     });
     return createStage;
   }
+
   static async update(id: Stages['id'], { name }: Stages) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const updateStage = await prisma.stages.update({
       where: { id },
-      data: {
-        name,
-      },
+      data: { name },
     });
     return updateStage;
   }
+
   static async delete(id: Stages['id']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const deleteStage = await prisma.stages.delete({

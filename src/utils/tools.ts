@@ -1,4 +1,4 @@
-import { TaskRole } from '@prisma/client';
+import { SubTasks, TaskRole } from '@prisma/client';
 import {
   PickSubtask,
   PriceAreaTask,
@@ -11,10 +11,34 @@ import {
 import { prisma } from './prisma.server';
 
 export const sumValues = (list: any[], label: string) => {
-  return list.reduce((a: number, c) => a + +c[label], 0);
+  const sum = list.reduce((a: number, c) => a + +c[label], 0);
+  if (Number.isNaN(sum)) return 0;
+  return sum;
 };
 
 export const parseSubTasks = (
+  listSubtask: PickSubtask[],
+  _percentage: number
+) => {
+  return listSubtask.map(subtask => {
+    const percentage = sumValues(subtask.users, 'percentage');
+    const spending =
+      subtask.status === 'LIQUIDATION'
+        ? subtask.price
+        : subtask.status === 'DONE'
+        ? parseFloat(((+subtask.price * _percentage) / 100).toFixed(2))
+        : 0;
+    const balance = +subtask.price - +spending;
+    return {
+      percentage,
+      spending,
+      balance,
+      ...subtask,
+    };
+  });
+};
+
+export const percentageSubTasks = (
   listSubtask: PickSubtask[],
   _percentage: number
 ) => {
@@ -172,12 +196,4 @@ const quantityTaskByArea = (status: TaskRole, listTask: any[] | undefined) => {
   const total_quantity: number =
     (listTask && listTask.reduce((a, c) => a + c.taskInfo[status], 0)) || 0;
   return total_quantity;
-};
-
-const updateBlockFiles = async (id: number, type: TypeTables) => {
-  if (type === 'indexTasks')
-    await prisma[type].findMany({
-      where: { id },
-      select: { id: true, item: true, name: true },
-    });
 };

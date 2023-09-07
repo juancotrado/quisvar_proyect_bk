@@ -21,6 +21,7 @@ class ProjectsServices {
           },
         },
       });
+
       // const getProjects = await prisma.projects.findMany({
       //   orderBy: { createdAt: 'desc' },
       // });
@@ -109,20 +110,8 @@ class ProjectsServices {
         id,
       },
       include: {
-        moderator: {
-          select: {
-            profile: true,
-          },
-        },
-        areas: {
-          orderBy: {
-            name: 'asc',
-          },
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        moderator: Queries.selectProfileUser,
+        stages: true,
       },
     });
     if (!findProject)
