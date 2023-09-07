@@ -1,5 +1,6 @@
 import AppError from '../utils/appError';
 import { Sector, Specialities, prisma } from '../utils/prisma.server';
+import Queries from '../utils/queries';
 
 class SectorServices {
   static async getAll() {
@@ -9,6 +10,20 @@ class SectorServices {
           include: {
             typeSpecialities: {
               include: {
+                projects: {
+                  include: {
+                    areas: {
+                      select: {
+                        id: true,
+                        name: true,
+                      },
+                    },
+                    specialists: Queries.selectSpecialist,
+                    company: Queries.selectCompany,
+                    consortium: Queries.selectConsortium,
+                    moderator: Queries.selectProfileUser,
+                  },
+                },
                 _count: {
                   select: {
                     projects: true,

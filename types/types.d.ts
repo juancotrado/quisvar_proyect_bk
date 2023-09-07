@@ -13,6 +13,7 @@ export type CheckRoleType = (
   res: Response,
   next: NextFunction
 ) => void;
+export type TypeFileUser = 'contract' | 'cv' | 'declaration';
 
 export type PickSubtask = Pick<
   SubTasks,

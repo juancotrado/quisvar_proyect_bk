@@ -14,6 +14,7 @@ import {
   _mod_role,
   _employee_role,
 } from '../middlewares/role.middleware';
+import { uploadFileUser } from '../middlewares/upload.middleware';
 
 const router = Router();
 
@@ -28,7 +29,7 @@ router.use(_mod_role);
 router.get('/:id', showUser);
 //ADMIN ROLE
 router.use(_admin_role);
-router.post('/', createUser);
+router.post('/', uploadFileUser.array('fileUser'), createUser);
 router.patch('/:id', updateUser);
 router.delete('/:id', deleteUser);
 export default router;

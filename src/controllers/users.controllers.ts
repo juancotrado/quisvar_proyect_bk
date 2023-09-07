@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import { UsersServices } from '../services';
 import { userProfilePick } from '../utils/format.server';
 import { UserType } from '../middlewares/auth.middleware';
+import AppError from '../utils/appError';
+import mv from 'mv';
 
 export const showUsers = async (
   req: Request,
@@ -68,8 +70,21 @@ export const createUser = async (
   next: NextFunction
 ) => {
   try {
+    if (!req.files)
+      throw new AppError('Oops!, no se pudo subir los archivos', 400);
+    const [cv, declaration] = req.files as Express.Multer.File[];
     const body: userProfilePick = req.body;
-    const query = await UsersServices.create(body);
+    const query = await UsersServices.create({
+      ...body,
+      cv: cv.filename,
+      declaration: declaration.filename,
+    });
+    mv(
+      `public/cv/${declaration.filename}`,
+      `public/declaration/${declaration.filename}`,
+      { mkdirp: true },
+      next
+    );
     res.status(201).json(query);
   } catch (error) {
     next(error);

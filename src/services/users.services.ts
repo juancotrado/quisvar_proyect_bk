@@ -240,6 +240,8 @@ class UsersServices {
     degree,
     job,
     description,
+    cv,
+    declaration,
   }: userProfilePick) {
     const passwordHash = await bcrypt.hash(password, 10);
     const findUserByDNI = await prisma.profiles.findUnique({
@@ -250,6 +252,8 @@ class UsersServices {
       data: {
         email,
         password: passwordHash,
+        cv,
+        declaration,
         profile: {
           create: {
             firstName,
@@ -282,10 +286,9 @@ class UsersServices {
   }
   static async updateStatusFile(
     id: Users['id'],
-    data: { [file: string]: boolean }
+    data: { [file: string]: null | string }
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    console.log(data);
     const updateUser = await prisma.users.update({
       where: { id },
       data,

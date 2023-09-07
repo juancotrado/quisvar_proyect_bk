@@ -230,16 +230,16 @@ model SubTasks {
   hours       Float
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
-  indexTaskId Int?
   taskId      Int?
+  indexTaskId Int?
   task_2_Id   Int?
   task_3_Id   Int?
   hasPDF      Boolean       @default(false)
   levels_Id   Int?
   feedBacks   Feedback[]
   files       Files[]
-  levels      Levels?       @relation(fields: [levels_Id], references: [id])
   indexTask   IndexTasks?   @relation(fields: [indexTaskId], references: [id], onDelete: Cascade)
+  Levels      Levels?       @relation(fields: [levels_Id], references: [id])
   task        Tasks?        @relation(fields: [taskId], references: [id], onDelete: Cascade)
   task_lvl_2  Task_lvl_2?   @relation(fields: [task_2_Id], references: [id], onDelete: Cascade)
   task_lvl_3  Task_lvl_3?   @relation(fields: [task_3_Id], references: [id], onDelete: Cascade)
@@ -282,6 +282,7 @@ model Files {
   subTasks   SubTasks  @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
   user       Users     @relation(fields: [userId], references: [id])
 }
+
 
 enum UserRole {
   SUPER_ADMIN

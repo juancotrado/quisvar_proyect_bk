@@ -9,6 +9,7 @@ import { Files } from '@prisma/client';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
 import { unlinkSync } from 'fs';
+import { TypeFileUser } from 'types/types';
 export const uploadFile = async (
   req: Request,
   res: Response,
@@ -35,11 +36,45 @@ export const uploadUserFile = async (
 ) => {
   try {
     const { id } = req.params;
-    const { isContract } = req.query;
+    const typeFileUser = req.query.typeFile as TypeFileUser;
     if (!req.file)
       throw new AppError('Oops!, no se pudo subir el contrato', 400);
-    const body = { [isContract === 'true' ? 'hasContract' : 'hasCv']: true };
+    const body = {
+      [typeFileUser]: req.file.filename,
+    };
     const query = await UsersServices.updateStatusFile(+id, body);
+    res.status(201).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const showFilesGeneral = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const query = await FilesServices.getAllGeneralFile();
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const uploadFilesGeneral = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!req.file)
+      throw new AppError('Oops!, no se pudo subir el contrato', 400);
+    const body = {
+      id: 0,
+      dir: `general/${req.file.filename}`,
+      name: req.file.originalname,
+      createdAt: new Date(),
+    };
+    const query = await FilesServices.createGeneralFile(body);
     res.status(201).json(query);
   } catch (error) {
     next(error);
@@ -52,10 +87,12 @@ export const deleteUserFile = async (
 ) => {
   try {
     const { id } = req.params;
-    const isContract = req.query.isContract === 'true';
-    const body = { [isContract ? 'hasContract' : 'hasCv']: false };
+    const { filename } = req.params;
+    const typeFileUser = req.query.typeFile as TypeFileUser;
+
+    const body = { [typeFileUser]: null };
+    unlinkSync(`public/${typeFileUser}/${filename}`);
     const query = await UsersServices.updateStatusFile(+id, body);
-    unlinkSync(`public/${isContract ? 'contracts' : 'cvs'}/${id}.pdf`);
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -98,6 +135,20 @@ export const deleteFile = async (
     const _file_id = parseInt(id);
     const fileDelete = await FilesServices.delete(_file_id);
     const query = await SubTasksServices.find(fileDelete.subTasksId);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteFilesGeneral = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const query = await FilesServices.deleteGeneralFile(+id);
+    unlinkSync(`public/${query.dir}`);
     res.status(200).json(query);
   } catch (error) {
     next(error);

@@ -79,6 +79,7 @@ class Server {
     this.app.use('/models', express.static('uploads/models'));
     this.app.use('/review', express.static('uploads/reviews'));
     this.app.use('/file-user', express.static('public'));
+    this.app.use('/general', express.static('public/general'));
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(morgan('dev'));

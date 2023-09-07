@@ -5,6 +5,7 @@ import path from 'path';
 import { FilesServices, PathServices } from '../services';
 import AppError from '../utils/appError';
 import { existsSync, mkdirSync } from 'fs';
+import { TypeFileUser } from 'types/types';
 
 const MAX_SIZE = 1024 * 1000 * 1000 * 1000;
 const FILE_TYPES = ['.rar', '.zip'];
@@ -41,18 +42,28 @@ const storage = multer.diskStorage({
 });
 const storageFileUser = multer.diskStorage({
   destination: function (req, file, cb) {
-    const { isContract } = req.query;
-    const uploadPath = `public/${isContract === 'true' ? 'contracts' : 'cvs'}`;
+    const typeFileUser = req.query.typeFile as TypeFileUser;
+    const uploadPath = `public/${typeFileUser}`;
+    if (!existsSync(uploadPath)) {
+      mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: function (req, files, cb) {
+    const { originalname } = files;
+    cb(null, Date.now() + '$$' + originalname);
+  },
+});
+const storageGeneralFiles = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = `public/general`;
     if (!existsSync(uploadPath)) {
       mkdirSync(uploadPath, { recursive: true });
     }
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
-    const { id } = req.params;
-    const { originalname } = file;
-    const typeFile = originalname.split('.').pop();
-    cb(null, id + '.' + typeFile);
+    cb(null, Date.now() + '$' + file.originalname);
   },
 });
 
@@ -63,6 +74,9 @@ export const upload = multer({
 
 export const uploadFileUser = multer({
   storage: storageFileUser,
+});
+export const uploadGeneralFiles = multer({
+  storage: storageGeneralFiles,
 });
 
 export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
