@@ -293,7 +293,6 @@ class UsersServices {
       where: { id },
       data,
     });
-    console.log(updateUser);
     return updateUser;
   }
 

@@ -139,7 +139,7 @@ model Stages {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   levels    Levels[]
-  project   Projects? @relation(fields: [projectId], references: [id])
+  project   Projects? @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId Int?
 }
 
@@ -150,18 +150,18 @@ model GroupProjects {
 }
 
 model Levels {
-  id         Int        @id @default(autoincrement())
-  item       String
-  name       String
-  level      Int        @default(0)
-  rootLevel  Int
-  unique     Boolean    @default(false)
-  stagesId   Int?
-  userId     Int?
-  rootId     Int
-  subTasks   SubTasks[]
-  user       Users?     @relation(fields: [userId], references: [id])
-  stages     Stages?    @relation(fields: [stagesId], references: [id])
+  id        Int        @id @default(autoincrement())
+  item      String
+  name      String
+  level     Int        @default(0)
+  rootLevel Int
+  unique    Boolean    @default(false)
+  stagesId  Int?
+  userId    Int?
+  rootId    Int
+  subTasks  SubTasks[]
+  user      Users?     @relation(fields: [userId], references: [id])
+  stages    Stages?    @relation(fields: [stagesId], references: [id], onDelete: Cascade)
 }
 
 model WorkAreas {
@@ -282,7 +282,6 @@ model Files {
   subTasks   SubTasks  @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
   user       Users     @relation(fields: [userId], references: [id])
 }
-
 
 enum UserRole {
   SUPER_ADMIN

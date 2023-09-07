@@ -7,6 +7,7 @@ import {
   WorkAreas,
 } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
+import { type } from 'os';
 
 export type CheckRoleType = (
   req: Request,
@@ -70,3 +71,5 @@ export type TypeTables =
   | 'task_lvl_8'
   | 'task_lvl_9'
   | 'task_lvl_10';
+
+export type ProjectDir = 'MODEL' | 'REVIEW' | 'UPLOADS';

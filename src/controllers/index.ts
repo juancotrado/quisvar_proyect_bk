@@ -76,12 +76,9 @@ import { generateIndex, showListReportByUser } from './reports.controllers';
 import { createFeedback, findFeedbacks } from './feedbacks.controllers';
 import {
   addNewStage,
-  duplicateArea,
-  duplicateIndexTask,
+  duplicateLevels,
   duplicateProject,
-  duplicateTask,
-  duplicateTask2,
-  duplicateTask3,
+  duplicateStages,
 } from './duplicates.controllers';
 import {
   createStage,
@@ -186,14 +183,7 @@ export { showListReportByUser, generateIndex };
 export { createFeedback, findFeedbacks };
 
 //Duplicates Controllers
-export {
-  duplicateProject,
-  duplicateArea,
-  duplicateIndexTask,
-  duplicateTask,
-  duplicateTask2,
-  duplicateTask3,
-};
+export { duplicateProject, duplicateLevels };
 
 //Stages Controllers
 export {
@@ -203,6 +193,7 @@ export {
   deleteStage,
   showStage,
   addNewStage,
+  duplicateStages,
 };
 //Sector Controllers
 export { showSectors, createSector, updateSector, deleteSector };

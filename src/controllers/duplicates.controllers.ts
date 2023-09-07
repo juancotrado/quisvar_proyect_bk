@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import {
   DuplicatesServices,
+  PathLevelServices,
   PathServices,
   _materialPath,
   _reviewPath,
@@ -16,26 +17,25 @@ export const duplicateProject = async (
     const { id } = req.params;
     const _project_id = parseInt(id);
     const duplicate = await DuplicatesServices.project(_project_id);
-    const oldPath = await PathServices.pathProject(_project_id);
-    const newPath = await PathServices.pathProject(duplicate.id);
-    if (duplicate) {
-      cpSync(oldPath, newPath, { recursive: true });
-      cpSync(
-        `${_materialPath}/${duplicate.oldName}`,
-        `${_materialPath}/${duplicate.newName}`,
-        {
-          recursive: true,
-        }
-      );
-      cpSync(
-        `${_reviewPath}/${duplicate.oldName}`,
-        `${_reviewPath}/${duplicate.newName}`,
-        {
-          recursive: true,
-        }
-      );
-    }
-    res.status(201).json({ oldPath, newPath });
+    // const newPath = await PathServices.pathProject(duplicate.id);
+    // if (duplicate) {
+    //   cpSync(oldPath, newPath, { recursive: true });
+    //   cpSync(
+    //     `${_materialPath}/${duplicate.oldName}`,
+    //     `${_materialPath}/${duplicate.newName}`,
+    //     {
+    //       recursive: true,
+    //     }
+    //   );
+    //   cpSync(
+    //     `${_reviewPath}/${duplicate.oldName}`,
+    //     `${_reviewPath}/${duplicate.newName}`,
+    //     {
+    //       recursive: true,
+    //     }
+    //   );
+    // }
+    res.status(201).json(duplicate);
   } catch (error) {
     next(error);
   }
@@ -47,119 +47,65 @@ export const addNewStage = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const { stage } = req.body;
-    const _project_id = parseInt(id);
-    const _stage_id = parseInt(stage);
-    const duplicate = await DuplicatesServices.project(_project_id, _stage_id);
-    const oldPath = await PathServices.pathProject(_project_id);
-    const newPath = await PathServices.pathProject(duplicate.id);
-    console.log(oldPath, newPath);
-    if (duplicate) {
-      cpSync(oldPath, newPath, { recursive: true });
-      cpSync(
-        `${_materialPath}/${duplicate.oldName}`,
-        `${_materialPath}/${duplicate.newName}`,
-        {
-          recursive: true,
-        }
-      );
-      cpSync(
-        `${_reviewPath}/${duplicate.oldName}`,
-        `${_reviewPath}/${duplicate.newName}`,
-        {
-          recursive: true,
-        }
-      );
-    }
-    res.status(201).json({ oldPath, newPath });
+    // const { id } = req.params;
+    // const { stage } = req.body;
+    // const _project_id = parseInt(id);
+    // const _stage_id = parseInt(stage);
+    // const duplicate = await DuplicatesServices.project(_project_id, _stage_id);
+    // const oldPath = await PathServices.pathProject(_project_id);
+    // const newPath = await PathServices.pathProject(duplicate.id);
+    // console.log(oldPath, newPath);
+    // if (duplicate) {
+    //   cpSync(oldPath, newPath, { recursive: true });
+    //   cpSync(
+    //     `${_materialPath}/${duplicate.oldName}`,
+    //     `${_materialPath}/${duplicate.newName}`,
+    //     {
+    //       recursive: true,
+    //     }
+    //   );
+    //   cpSync(
+    //     `${_reviewPath}/${duplicate.oldName}`,
+    //     `${_reviewPath}/${duplicate.newName}`,
+    //     {
+    //       recursive: true,
+    //     }
+    //   );
+    // }
+    // res.status(201).json({ oldPath, newPath });
+    res.status(201).json({ status: true });
   } catch (error) {
     next(error);
   }
 };
 
-export const duplicateArea = async (
+export const duplicateStages = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const { id } = req.params;
-    const _work_area_id = parseInt(id);
-    const duplicate = await DuplicatesServices.area(_work_area_id);
-    const oldPath = await PathServices.pathArea(_work_area_id);
-    const newPath = await PathServices.pathArea(duplicate.id);
-    if (duplicate) mkdirSync(newPath);
-    res.status(201).json({ oldPath, newPath });
+    const _stage_id = parseInt(id);
+    const duplicate = await DuplicatesServices.stage(_stage_id);
+    res.status(201).json(duplicate);
   } catch (error) {
     next(error);
   }
 };
 
-export const duplicateIndexTask = async (
+export const duplicateLevels = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const { id } = req.params;
-    const _index_task_id = parseInt(id);
-    const duplicate = await DuplicatesServices.indexTask(_index_task_id);
-    const oldPath = await PathServices.pathIndexTask(_index_task_id);
-    const newPath = await PathServices.pathIndexTask(duplicate.id);
-    if (duplicate) mkdirSync(newPath);
-    res.status(201).json({ oldPath, newPath });
-  } catch (error) {
-    next(error);
-  }
-};
-export const duplicateTask = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const _task_id = parseInt(id);
-    const duplicate = await DuplicatesServices.task(_task_id);
-    const oldPath = await PathServices.pathTask(_task_id);
-    const newPath = await PathServices.pathTask(duplicate.id);
-    if (duplicate) mkdirSync(newPath);
-    res.status(201).json({ oldPath, newPath });
-  } catch (error) {
-    next(error);
-  }
-};
-export const duplicateTask2 = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const _task_2_id = parseInt(id);
-    const duplicate = await DuplicatesServices.task2(_task_2_id);
-    const oldPath = await PathServices.pathTask2(_task_2_id);
-    const newPath = await PathServices.pathTask2(duplicate.id);
-    if (duplicate) mkdirSync(newPath);
-    res.status(201).json({ oldPath, newPath });
-  } catch (error) {
-    next(error);
-  }
-};
-export const duplicateTask3 = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const _task_3_id = parseInt(id);
-    const duplicate = await DuplicatesServices.task3(_task_3_id);
-    const oldPath = await PathServices.pathTask3(_task_3_id);
-    const newPath = await PathServices.pathTask3(duplicate.id);
-    if (duplicate) mkdirSync(newPath);
-    res.status(201).json({ oldPath, newPath });
+    const _level_id = parseInt(id);
+    // const oldDir = await PathLevelServices.pathLevel(_level_id);
+    const duplicate = await DuplicatesServices.level(_level_id);
+    // if (duplicate) mkdirSync(newPath);
+    res.status(201).json(duplicate);
   } catch (error) {
     next(error);
   }

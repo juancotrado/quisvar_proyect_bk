@@ -164,11 +164,7 @@ class LevelsServices {
   static async findList(rootId: Levels['rootId'], percentage: number) {
     const findList = await prisma.levels.findMany({
       where: { rootId },
-      select: {
-        id: true,
-        item: true,
-        name: true,
-        rootId: true,
+      include: {
         subTasks: {
           select: {
             id: true,

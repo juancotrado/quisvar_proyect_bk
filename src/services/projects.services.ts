@@ -208,7 +208,6 @@ class ProjectsServices {
       name,
       description,
       startDate,
-      stageId,
       untilDate,
       status,
       userId,
@@ -220,7 +219,6 @@ class ProjectsServices {
       companyInfo,
       consortiumInfo,
       percentage,
-      typeSpecialityId,
     }: UpdateProjectPick
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);

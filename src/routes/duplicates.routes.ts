@@ -6,12 +6,9 @@ import {
   _mod_role,
 } from '../middlewares/role.middleware';
 import {
-  duplicateArea,
-  duplicateIndexTask,
+  duplicateLevels,
   duplicateProject,
-  duplicateTask,
-  duplicateTask2,
-  duplicateTask3,
+  duplicateStages,
 } from '../controllers';
 
 const router = Router();
@@ -21,11 +18,8 @@ router.use(_employee_role);
 //MODERATOR ROLE
 router.use(_mod_role);
 router.post('/project/:id', duplicateProject);
-router.post('/area/:id', duplicateArea);
-router.post('/indextasks/:id', duplicateIndexTask);
-router.post('/tasks/:id', duplicateTask);
-router.post('/tasks2/:id', duplicateTask2);
-router.post('/tasks3/:id', duplicateTask3);
+router.post('/stage/:id', duplicateStages);
+router.post('/level/:id', duplicateLevels);
 //ADMIN ROLE
 router.use(_admin_role);
 

@@ -65,7 +65,7 @@ class Queries {
   };
   static selectCompany = {
     select: {
-      id: true,
+      // id: true,
       name: true,
       manager: true,
       percentage: true,
@@ -74,7 +74,7 @@ class Queries {
   };
   static selectConsortium = {
     select: {
-      id: true,
+      // id: true,
       manager: true,
       name: true,
       companies: this.selectCompany,
@@ -93,6 +93,18 @@ class Queries {
           percentage: true,
           user: this.selectProfileUser,
         },
+      },
+    },
+  };
+  static selectDuplicateLevelSubtasks = {
+    select: {
+      id: true,
+      hours: true,
+      item: true,
+      name: true,
+      price: true,
+      files: {
+        where: { type: 'MATERIAL' },
       },
     },
   };
