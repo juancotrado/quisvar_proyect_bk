@@ -46,63 +46,52 @@ class SubTasksServices {
     return findSubTasks;
   }
 
+  static async findDuplicate(name: string, id: number, type: 'ROOT' | 'ID') {
+    let levels_Id, rootItem;
+    if (type === 'ID') {
+      const getLevelId = await prisma.subTasks.findUnique({
+        where: { id },
+        select: { levels_Id: true, item: true },
+      });
+      if (!getLevelId)
+        throw new AppError('No se pudo encontrar el índice', 404);
+      levels_Id = getLevelId.levels_Id;
+      rootItem = getLevelId.item;
+    }
+    const findLevel = await prisma.subTasks.findUnique({
+      where: { id },
+      select: { item: true },
+    });
+    if (!findLevel) throw new AppError('No se pudo encontrar el índice', 404);
+    rootItem = findLevel.item;
+    const list = await prisma.subTasks.groupBy({
+      by: ['name'],
+      where: { levels_Id },
+    });
+
+    if (!list) throw new AppError('No se pudo encontrar la lista ', 404);
+    const duplicated = list.map(({ name }) => name).includes(name);
+    return { duplicated, levels_Id, rootItem };
+  }
   static async create({
     name,
     price,
     description,
     hours,
-    indexTaskId,
-    taskId,
-    task_2_Id,
-    task_3_Id,
+    levels_Id,
   }: SubTasks) {
-    let data = { name, price, hours, description };
-    if (indexTaskId) {
-      const indexTask = await TasksServices.findIndexTask(indexTaskId);
-      const quantityIndexTask = await prisma.subTasks.count({
-        where: { indexTaskId },
-      });
-      const item = indexTask.item + '.' + (quantityIndexTask + 1);
-      const newSub = { ...data, indexTaskId, item };
-      data = newSub;
-    }
-    if (taskId) {
-      const quantityTask = await prisma.subTasks.count({ where: { taskId } });
-      const task = await TasksServices.findShort(taskId);
-      const item = task.item + '.' + (quantityTask + 1);
-      const newSub = { ...data, taskId, item };
-      data = newSub;
-    }
-    if (task_2_Id) {
-      const quantityTask = await prisma.subTasks.count({
-        where: { task_2_Id },
-      });
-      const task_2 = await Task_2_Services.findShort(task_2_Id);
-      const item = task_2.item + '.' + (quantityTask + 1);
-      const newSub = { ...data, task_2_Id, item };
-      data = newSub;
-    }
-    if (task_3_Id) {
-      const task_3 = await Task_3_Services.findShort(task_3_Id);
-      const quantityTask = await prisma.subTasks.count({
-        where: { task_3_Id },
-      });
-      const item = task_3.item + '.' + (quantityTask + 1);
-      const newSub = { ...data, task_3_Id, item };
-      data = newSub;
-    }
-
-    const newTask = await prisma.subTasks.create({
+    if (!levels_Id) throw new AppError('Oops!,ID invalido', 400);
+    const isDuplicated = await this.findDuplicate(name, levels_Id, 'ROOT');
+    const { duplicated, rootItem } = isDuplicated;
+    if (!duplicated) throw new AppError('Error, Nombre existente', 404);
+    const quantity = await prisma.subTasks.count({ where: { levels_Id } });
+    const item = rootItem + '.' + (quantity + 1);
+    const data = { name, price, hours, description, levels_Id, item };
+    const newSubTask = await prisma.subTasks.create({
       data,
-      include: {
-        users: {
-          select: {
-            user: { select: { id: true, profile: true } },
-          },
-        },
-      },
+      include: { users: { select: { user: Queries.selectProfileUser } } },
     });
-    return newTask;
+    return newSubTask;
   }
 
   static async assigned(
@@ -177,11 +166,7 @@ class SubTasksServices {
         description,
       },
       include: {
-        users: {
-          select: {
-            user: { select: { id: true, profile: true } },
-          },
-        },
+        users: { select: { user: Queries.selectProfileUser } },
       },
     });
     return updateTask;
