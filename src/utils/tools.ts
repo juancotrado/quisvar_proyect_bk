@@ -1,5 +1,7 @@
-import { SubTasks, TaskRole } from '@prisma/client';
+import { Levels, SubTasks, TaskRole } from '@prisma/client';
 import {
+  Details,
+  Level,
   PickSubtask,
   PriceAreaTask,
   PriceIndexTask,
@@ -196,4 +198,45 @@ const quantityTaskByArea = (status: TaskRole, listTask: any[] | undefined) => {
   const total_quantity: number =
     (listTask && listTask.reduce((a, c) => a + c.taskInfo[status], 0)) || 0;
   return total_quantity;
+};
+
+export const calculateAndUpdateDataByLevel = (levels: Level[]) => {
+  levels.forEach(level => {
+    level.balance = calculateSumTotal(level, 'balance', null);
+    level.spending = calculateSumTotal(level, 'spending', null);
+    level.price = calculateSumTotal(level, 'price', null);
+    level.details.UNRESOLVED = calculateSumTotal(
+      level,
+      'details',
+      'UNRESOLVED'
+    );
+    level.details.PROCESS = calculateSumTotal(level, 'details', 'PROCESS');
+    level.details.INREVIEW = calculateSumTotal(level, 'details', 'INREVIEW');
+    level.details.DENIED = calculateSumTotal(level, 'details', 'DENIED');
+    level.details.LIQUIDATION = calculateSumTotal(
+      level,
+      'details',
+      'LIQUIDATION'
+    );
+    level.details.DONE = calculateSumTotal(level, 'details', 'DONE');
+    level.details.TOTAL = calculateSumTotal(level, 'details', 'TOTAL');
+    if (level.nextLevel && level.nextLevel.length > 0) {
+      calculateAndUpdateDataByLevel(level.nextLevel);
+    }
+  });
+  return levels;
+};
+const calculateSumTotal = (
+  level: Level,
+  type: keyof Level,
+  subType: keyof Details | null
+) => {
+  let sumaBalance = level[type] as number;
+  if (subType && type === 'details') sumaBalance = level[type][subType];
+  if (level.nextLevel && level.nextLevel.length > 0) {
+    for (const subLevel of level.nextLevel) {
+      sumaBalance += calculateSumTotal(subLevel, type, subType);
+    }
+  }
+  return sumaBalance;
 };

@@ -73,3 +73,29 @@ export type TypeTables =
   | 'task_lvl_10';
 
 export type ProjectDir = 'MODEL' | 'REVIEW' | 'UPLOADS';
+export interface Level {
+  id: number;
+  item: string;
+  name: string;
+  rootId: number;
+  spending: number;
+  balance: number;
+  price: number;
+  level: number;
+  rootLevel: number;
+  unique: boolean;
+  stagesId: number;
+  userId: null;
+  details: Details;
+  nextLevel?: Level[];
+}
+
+export interface Details {
+  UNRESOLVED: number;
+  PROCESS: number;
+  INREVIEW: number;
+  DENIED: number;
+  LIQUIDATION: number;
+  DONE: number;
+  TOTAL: number;
+}

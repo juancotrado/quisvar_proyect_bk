@@ -1,5 +1,7 @@
+import { Level } from 'types/types';
 import AppError from '../utils/appError';
 import { Projects, Stages, prisma } from '../utils/prisma.server';
+import { calculateAndUpdateDataByLevel } from '../utils/tools';
 import LevelsServices from './levels.services';
 
 class StageServices {
@@ -25,12 +27,27 @@ class StageServices {
     if (!findStage)
       throw new AppError('Oops!,No se pudo encontrar la etapa', 400);
     const newFindStage = findStage.levels.map(async level => {
+      const levelCopy = { ...level, nextLevel: {} };
       const nextLevel = await LevelsServices.find(level.id);
-      if (nextLevel.length !== 0) return { ...level, nextLevel };
-      return level;
+      if (Object.keys(levelCopy).length) levelCopy.nextLevel = nextLevel;
+      return {
+        ...levelCopy,
+        spending: 0,
+        balance: 0,
+        price: 0,
+        details: {
+          UNRESOLVED: 0,
+          PROCESS: 0,
+          INREVIEW: 0,
+          DENIED: 0,
+          DONE: 0,
+          LIQUIDATION: 0,
+          TOTAL: 0,
+        },
+      };
     });
-    const result = await Promise.all(newFindStage);
-    return result;
+    const result = (await Promise.all(newFindStage)) as Level[];
+    return calculateAndUpdateDataByLevel(result);
   }
 
   static async create({ name, projectId }: Stages) {
