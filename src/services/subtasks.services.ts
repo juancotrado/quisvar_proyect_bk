@@ -80,7 +80,8 @@ class SubTasksServices {
     hours,
     levels_Id,
   }: SubTasks) {
-    if (!levels_Id) throw new AppError('Oops!,ID invalido', 400);
+    if (!levels_Id)
+      throw new AppError('Oops!,se necesita el ID del nivel ', 400);
     const isDuplicated = await this.findDuplicate(name, levels_Id, 'ROOT');
     const { duplicated, rootItem } = isDuplicated;
     if (!duplicated) throw new AppError('Error, Nombre existente', 404);
@@ -153,18 +154,12 @@ class SubTasksServices {
 
   static async update(
     id: SubTasks['id'],
-    { name, hours, price, description, percentage }: SubTasks
+    data: Pick<SubTasks, 'name' | 'hours' | 'price' | 'description'>
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateTask = await prisma.subTasks.update({
       where: { id },
-      data: {
-        name,
-        hours,
-        price,
-        percentage,
-        description,
-      },
+      data,
       include: {
         users: { select: { user: Queries.selectProfileUser } },
       },
@@ -281,122 +276,23 @@ class SubTasksServices {
 
   static async delete(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const subTask = await prisma.subTasks.findUnique({ where: { id } });
-    if (!subTask) throw new AppError(`No se pudo encontrar la subtarea`, 404);
-    if (subTask.indexTaskId) {
-      const { indexTaskId } = subTask;
-      const subtask = await prisma.subTasks.delete({
-        where: { id },
-      });
-      const getSubTasks = await prisma.subTasks.findMany({
-        where: { indexTaskId },
-        orderBy: { id: 'asc' },
-        include: {
-          indexTask: { select: { item: true } },
-        },
-      });
-      const subtaskUpdate = await Promise.all(
-        getSubTasks.map(async (subTask, index) => {
-          return await prisma.subTasks.update({
-            where: { id: subTask.id },
-            data: { item: `${subTask.indexTask?.item}.${index + 1}` },
-          });
-        })
-      );
-
-      return subtaskUpdate;
-    }
-    if (subTask.taskId) {
-      const { taskId } = subTask;
-      const deleteTask = await prisma.subTasks.delete({
-        where: { id },
-      });
-      const getSubTasks = await prisma.subTasks.findMany({
-        where: { taskId },
-        orderBy: { id: 'asc' },
-        include: {
-          task: { select: { item: true } },
-        },
-      });
-      const subTasksUpdate = await Promise.all(
-        getSubTasks.map(async (subTask, index) => {
-          return await prisma.subTasks.update({
-            where: { id: subTask.id },
-            data: { item: `${subTask.task?.item}.${index + 1}` },
-          });
-        })
-      );
-      return subTasksUpdate;
-    }
-    if (subTask.task_2_Id) {
-      const { task_2_Id } = subTask;
-      const deleteTask = await prisma.subTasks.delete({
-        where: { id },
-      });
-      const getSubTasks = await prisma.subTasks.findMany({
-        where: { task_2_Id },
-        orderBy: { id: 'asc' },
-        include: {
-          task_lvl_2: { select: { item: true } },
-        },
-      });
-      const subTasksUpdate = await Promise.all(
-        getSubTasks.map(async (subTask, index) => {
-          return await prisma.subTasks.update({
-            where: { id: subTask.id },
-            data: { item: `${subTask.task_lvl_2?.item}.${index + 1}` },
-          });
-        })
-      );
-      return subTasksUpdate;
-    }
-    if (subTask.task_3_Id) {
-      const { task_3_Id } = subTask;
-      const deleteTask = await prisma.subTasks.delete({
-        where: { id },
-      });
-      const getSubTasks = await prisma.subTasks.findMany({
-        where: { task_3_Id },
-        orderBy: { id: 'asc' },
-        include: {
-          task_lvl_3: { select: { item: true } },
-        },
-      });
-      const subTasksUpdate = await Promise.all(
-        getSubTasks.map(async (subTask, index) => {
-          return await prisma.subTasks.update({
-            where: { id: subTask.id },
-            data: { item: `${subTask.task_lvl_3?.item}.${index + 1}` },
-          });
-        })
-      );
-      return subTasksUpdate;
-    }
-    throw new AppError(`No se pudo eliminar la subtarea`, 400);
-  }
-
-  static async upload(fileName: string, id: SubTasks['id']) {
-    if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const uploadFile = await prisma.subTasks.update({
+    const subTask = await prisma.subTasks.findUnique({
       where: { id },
-      data: {
-        // files: {
-        //   push: file,
-        // },
-      },
+    });
+    if (!subTask) throw new AppError(`No se pudo encontrar la subtarea`, 404);
+    const list = await prisma.subTasks.findMany({
+      where: { levels_Id: subTask.levels_Id },
+      orderBy: { item: 'asc' },
       include: {
-        users: {
-          select: {
-            user: {
-              select: {
-                profile: true,
-              },
-            },
-          },
-        },
+        Levels: { select: { item: true } },
       },
     });
-    return uploadFile;
+    const updateList = list.map(async ({ id, Levels }, i) => {
+      const item = Levels?.item + '.' + (i + 1);
+      return await prisma.subTasks.update({ where: { id }, data: { item } });
+    });
+    const result = await Promise.all(updateList);
+    return result;
   }
 
   static async updatePercentage(
