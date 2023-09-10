@@ -19,12 +19,15 @@ model Users {
   contract    String?
   cv          String?
   declaration String?
-  files       Files[]
   profile     Profiles?
+  supervisor  Supervisor?
+  files       Files[]
   project     Projects[]
   subTasks    TaskOnUsers[]
   area        WorkAreas[]
   Levels      Levels[]
+  reports     Reports[]
+  list        ListOnUsers[]
 }
 
 model GeneralFiles {
@@ -72,18 +75,6 @@ model TypeSpecialities {
   Specialities   Specialities? @relation(fields: [specialitiesId], references: [id])
 }
 
-model PersonBussiness {
-  id         Int       @id @default(autoincrement())
-  name       String
-  dni        String    @db.VarChar(8)
-  cip        Int
-  career     String
-  phone      String
-  pdf        String?
-  projectsId Int?
-  Projects   Projects? @relation(fields: [projectsId], references: [id])
-}
-
 model Projects {
   id               Int               @id @default(autoincrement())
   name             String            @unique
@@ -110,27 +101,6 @@ model Projects {
   moderator        Users             @relation(fields: [userId], references: [id])
   areas            WorkAreas[]
   stages           Stages[]
-}
-
-model Consortium {
-  id        Int       @id @default(autoincrement())
-  name      String
-  manager   String
-  projectId Int       @unique
-  companies Company[]
-  project   Projects  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-}
-
-model Company {
-  id           Int         @id @default(autoincrement())
-  name         String
-  ruc          String
-  manager      String
-  percentage   Int         @default(100)
-  consortiumId Int?
-  projectId    Int?        @unique
-  Consortium   Consortium? @relation(fields: [consortiumId], references: [id])
-  project      Projects?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model Stages {
@@ -162,6 +132,124 @@ model Levels {
   subTasks  SubTasks[]
   user      Users?     @relation(fields: [userId], references: [id])
   stages    Stages?    @relation(fields: [stagesId], references: [id], onDelete: Cascade)
+}
+
+model TaskOnUsers {
+  subtaskId  Int
+  userId     Int
+  assignedAt DateTime @default(now())
+  percentage Int      @default(0)
+  untilDate  DateTime @default(now())
+  subtask    SubTasks @relation(fields: [subtaskId], references: [id], onDelete: Cascade)
+  user       Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([subtaskId, userId])
+}
+
+model Feedback {
+  id         Int      @id @default(autoincrement())
+  comment    String?
+  status     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  subTasksId Int
+  subTasks   SubTasks @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
+  files      Files[]
+}
+
+model Files {
+  id         Int       @id @default(autoincrement())
+  name       String
+  userId     Int
+  dir        String?
+  type       FileTypes
+  subTasksId Int
+  feedbackId Int?
+  assignedAt DateTime  @default(now())
+  feedback   Feedback? @relation(fields: [feedbackId], references: [id])
+  subTasks   SubTasks  @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
+  user       Users     @relation(fields: [userId], references: [id])
+}
+
+model PersonBussiness {
+  id         Int       @id @default(autoincrement())
+  name       String
+  dni        String    @db.VarChar(8)
+  cip        Int
+  career     String
+  phone      String
+  pdf        String?
+  projectsId Int?
+  Projects   Projects? @relation(fields: [projectsId], references: [id])
+}
+
+model Consortium {
+  id        Int       @id @default(autoincrement())
+  name      String
+  manager   String
+  projectId Int       @unique
+  companies Company[]
+  project   Projects  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Company {
+  id           Int         @id @default(autoincrement())
+  name         String
+  ruc          String
+  manager      String
+  percentage   Int         @default(100)
+  consortiumId Int?
+  projectId    Int?        @unique
+  Consortium   Consortium? @relation(fields: [consortiumId], references: [id])
+  project      Projects?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Reports {
+  id          Int                   @id @default(autoincrement())
+  name        String
+  status      ReportStatus          @default(STEP_1)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  userId      Int?
+  user        Users?                @relation(fields: [userId], references: [id])
+  supervisors SupervisorOnReports[]
+}
+
+model List {
+  id        Int           @id @default(autoincrement())
+  title     String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  users     ListOnUsers[]
+}
+
+model ListOnUsers {
+  usersId    Int
+  listId     Int
+  user       Users       @relation(fields: [usersId], references: [id], onDelete: Cascade)
+  list       List        @relation(fields: [listId], references: [id], onDelete: Cascade)
+  status     ListDetails
+  assignedAt DateTime    @default(now())
+
+  @@id([usersId, listId])
+}
+
+model Supervisor {
+  id      Int                   @id @default(autoincrement())
+  type    SupervisorTypes
+  userId  Int                   @unique
+  user    Users                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reports SupervisorOnReports[]
+}
+
+model SupervisorOnReports {
+  supervisorId Int
+  reportId     Int
+  supervisor   Supervisor @relation(fields: [supervisorId], references: [id], onDelete: Cascade)
+  report       Reports    @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  assignedAt   DateTime   @default(now())
+
+  @@id([supervisorId, reportId])
 }
 
 model WorkAreas {
@@ -246,43 +334,6 @@ model SubTasks {
   users       TaskOnUsers[]
 }
 
-model TaskOnUsers {
-  subtaskId  Int
-  userId     Int
-  assignedAt DateTime @default(now())
-  percentage Int      @default(0)
-  untilDate  DateTime @default(now())
-  subtask    SubTasks @relation(fields: [subtaskId], references: [id], onDelete: Cascade)
-  user       Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([subtaskId, userId])
-}
-
-model Feedback {
-  id         Int      @id @default(autoincrement())
-  comment    String?
-  status     Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  subTasksId Int
-  subTasks   SubTasks @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
-  files      Files[]
-}
-
-model Files {
-  id         Int       @id @default(autoincrement())
-  name       String
-  userId     Int
-  dir        String?
-  type       FileTypes
-  subTasksId Int
-  feedbackId Int?
-  assignedAt DateTime  @default(now())
-  feedback   Feedback? @relation(fields: [feedbackId], references: [id])
-  subTasks   SubTasks  @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
-  user       Users     @relation(fields: [userId], references: [id])
-}
-
 enum UserRole {
   SUPER_ADMIN
   ADMIN
@@ -305,4 +356,27 @@ enum FileTypes {
   MATERIAL
   SUCCESSFUL
   REVIEW
+}
+
+enum ReportStatus {
+  STEP_1
+  STEP_2
+  STEP_3
+  STEP_4
+}
+
+enum SupervisorTypes {
+  ROLE_1
+  ROLE_2
+  ROLE_3
+  ROLE_4
+}
+
+enum ListDetails {
+  PUNTUAL
+  TARDE
+  SIMPLE
+  GRAVE
+  MUY_GRAVE
+  PERMISO
 }
