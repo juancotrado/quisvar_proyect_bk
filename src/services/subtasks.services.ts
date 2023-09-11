@@ -58,7 +58,7 @@ class SubTasksServices {
       levels_Id = getLevelId.levels_Id;
       rootItem = getLevelId.item;
     }
-    const findLevel = await prisma.subTasks.findUnique({
+    const findLevel = await prisma.levels.findUnique({
       where: { id },
       select: { item: true },
     });
@@ -68,7 +68,6 @@ class SubTasksServices {
       by: ['name'],
       where: { levels_Id },
     });
-
     if (!list) throw new AppError('No se pudo encontrar la lista ', 404);
     const duplicated = list.map(({ name }) => name).includes(name);
     return { duplicated, levels_Id, rootItem };
@@ -84,7 +83,7 @@ class SubTasksServices {
       throw new AppError('Oops!,se necesita el ID del nivel ', 400);
     const isDuplicated = await this.findDuplicate(name, levels_Id, 'ROOT');
     const { duplicated, rootItem } = isDuplicated;
-    if (!duplicated) throw new AppError('Error, Nombre existente', 404);
+    if (duplicated) throw new AppError('Error, Nombre existente', 404);
     const quantity = await prisma.subTasks.count({ where: { levels_Id } });
     const item = rootItem + '.' + (quantity + 1);
     const data = { name, price, hours, description, levels_Id, item };

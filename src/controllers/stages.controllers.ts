@@ -92,10 +92,10 @@ export const deleteStage = async (
   try {
     const { id } = req.params;
     const _stage_id = parseInt(id);
+    const modelPath = await PathLevelServices.pathStage(_stage_id, 'MODEL');
+    const reviewPath = await PathLevelServices.pathStage(_stage_id, 'REVIEW');
+    const uploadPath = await PathLevelServices.pathStage(_stage_id, 'UPLOADS');
     const query = await StageServices.delete(_stage_id);
-    const modelPath = await PathLevelServices.pathStage(query.id, 'MODEL');
-    const reviewPath = await PathLevelServices.pathStage(query.id, 'REVIEW');
-    const uploadPath = await PathLevelServices.pathStage(query.id, 'UPLOADS');
     if (query) {
       rmSync(modelPath, { recursive: true });
       rmSync(reviewPath, { recursive: true });
