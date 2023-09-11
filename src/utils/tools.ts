@@ -240,3 +240,27 @@ const calculateSumTotal = (
   }
   return sumaBalance;
 };
+
+export const LEVEL_DATA: Level = {
+  id: 0,
+  item: '',
+  name: '',
+  rootId: 0,
+  spending: 0,
+  balance: 0,
+  price: 0,
+  level: 0,
+  rootLevel: 0,
+  unique: false,
+  stagesId: 0,
+  userId: null,
+  details: {
+    UNRESOLVED: 0,
+    PROCESS: 0,
+    INREVIEW: 0,
+    DENIED: 0,
+    DONE: 0,
+    LIQUIDATION: 0,
+    TOTAL: 0,
+  },
+};

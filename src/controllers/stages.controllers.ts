@@ -24,7 +24,7 @@ export const showStage = async (
     const { id } = req.params;
     const _stage_id = parseInt(id);
     const query = await StageServices.find(_stage_id);
-    return res.status(200).json(query);
+    return res.status(200).json(query[0]);
   } catch (error) {
     next(error);
   }
