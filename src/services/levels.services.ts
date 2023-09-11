@@ -40,12 +40,7 @@ class LevelsServices {
     return findLevel;
   }
 
-  static async findDuplicate(
-    name: string,
-    id: number,
-    type: 'ROOT' | 'ID',
-    stagesId?: number
-  ) {
+  static async findDuplicate(name: string, id: number, type: 'ROOT' | 'ID') {
     let rootId;
     rootId = id;
     if (type === 'ID') {
@@ -56,15 +51,15 @@ class LevelsServices {
       if (!getRootId) throw new AppError('No se pudo encontrar el índice', 404);
       rootId = getRootId.rootId;
     }
-    const root = await prisma.levels.findUnique({
-      where: { id: rootId },
-      select: { name: true, item: true, level: true, stagesId: true },
-    });
     const getLevels = await prisma.levels.groupBy({
       by: ['name'],
-      where: { rootId, stagesId: root ? root.stagesId : stagesId },
+      where: { rootId },
     });
     if (!getLevels) throw new AppError('No se pudo encontrar la lista ', 404);
+    const root = await prisma.levels.findUnique({
+      where: { id: rootId },
+      select: { name: true, item: true, level: true },
+    });
     const duplicated = getLevels.map(({ name }) => name).includes(name);
     const quantity = getLevels.length;
     return {
@@ -78,12 +73,7 @@ class LevelsServices {
 
   static async create({ item, name, level, stagesId, rootId, unique }: Levels) {
     if (!stagesId) throw new AppError('Oops!,ID invalido', 400);
-    const isDuplicated = await this.findDuplicate(
-      name,
-      rootId,
-      'ROOT',
-      stagesId
-    );
+    const isDuplicated = await this.findDuplicate(name, rootId, 'ROOT');
     const { duplicated, rootItem, quantity, rootLevel } = isDuplicated;
     if (duplicated) throw new AppError('Error al crear, Nombre existente', 404);
     const newRootItem = rootItem ? rootItem + '.' : '';

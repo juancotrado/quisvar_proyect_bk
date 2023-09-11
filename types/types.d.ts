@@ -1,6 +1,7 @@
 import {
   IndexTasks,
   SubTasks,
+  Supervisor,
   Task_lvl_2,
   Task_lvl_3,
   Tasks,
@@ -99,3 +100,8 @@ export interface Details {
   DONE: number;
   TOTAL: number;
 }
+
+export type SupervisorPick = Pick<Supervisor, 'type'> & { userId: Users['id'] };
+export type updateReports = Pick<Reports, 'status'> & {
+  supervisorId: Supervisor['id'];
+};
