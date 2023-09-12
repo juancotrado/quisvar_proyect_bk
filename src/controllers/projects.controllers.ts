@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response, query } from 'express';
 import {
+  PathLevelServices,
   PathServices,
   ProjectsServices,
   _materialPath,
@@ -59,12 +60,13 @@ export const createProject = async (
   try {
     const { body } = req;
     const query = await ProjectsServices.create(body);
-    const path = await PathServices.pathProject(query.id);
+    const path = await PathLevelServices.pathProject(query.id, 'UPLOADS');
     const projectName = query.name;
+    console.log(query, path, projectName);
     if (query) {
       mkdirSync(path);
-      mkdirSync(`./${_materialPath}/${projectName}`);
-      mkdirSync(`./${_reviewPath}/${projectName}`);
+      mkdirSync(`${_materialPath}/${projectName}`);
+      mkdirSync(`${_reviewPath}/${projectName}`);
     }
     res.status(201).json(query);
   } catch (error) {
