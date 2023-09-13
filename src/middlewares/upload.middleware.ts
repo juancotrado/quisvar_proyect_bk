@@ -40,6 +40,7 @@ const storage = multer.diskStorage({
     }
   },
 });
+
 const storageFileUser = multer.diskStorage({
   destination: function (req, file, cb) {
     const typeFileUser = req.query.typeFile as TypeFileUser;
@@ -54,6 +55,7 @@ const storageFileUser = multer.diskStorage({
     cb(null, Date.now() + '$$' + originalname);
   },
 });
+
 const storageGeneralFiles = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadPath = `public/general`;
@@ -67,6 +69,31 @@ const storageGeneralFiles = multer.diskStorage({
   },
 });
 
+const storageReportUser = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = `public/reports`;
+    if (!existsSync(uploadPath)) {
+      mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: async (req, file, callback) => {
+    try {
+      const uniqueSuffix = Date.now();
+      const { originalname } = file;
+      if (!originalname.includes('.pdf') || originalname.includes('$'))
+        throw new Error();
+      const nameFile = uniqueSuffix + '$' + originalname;
+      callback(null, nameFile);
+    } catch (error) {
+      callback(
+        new AppError(`Oops! , archivo sin extension pdf o contiene "$"`, 404),
+        ''
+      );
+    }
+  },
+});
+
 export const upload = multer({
   storage: storage,
   limits: { fileSize: MAX_SIZE },
@@ -77,6 +104,10 @@ export const uploadFileUser = multer({
 });
 export const uploadGeneralFiles = multer({
   storage: storageGeneralFiles,
+});
+
+export const uploadReportUser = multer({
+  storage: storageReportUser,
 });
 
 export const uploadFile = (req: Request, res: Response, next: NextFunction) => {

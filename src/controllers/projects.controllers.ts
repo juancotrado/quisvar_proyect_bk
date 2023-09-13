@@ -15,16 +15,15 @@ const model = _materialPath;
 const review = _reviewPath;
 const editables = _editablePath;
 
-const createFolders = (path: string) => {
-  const exists = existsSync(path);
-  if (!exists) {
-    mkdirSync(`uploads/projects`);
-    mkdirSync(`uploads/models`);
-    mkdirSync(`uploads/reviews`);
-    mkdirSync(`uploads/editables`);
-    return exists;
-  }
-  return exists;
+const createFolders = () => {
+  const project = existsSync(`uploads/projects`);
+  const model = existsSync(`uploads/models`);
+  const review = existsSync(`uploads/reviews`);
+  const editables = existsSync(`uploads/editables`);
+  if (!project) mkdirSync(`uploads/projects`);
+  if (!model) mkdirSync(`uploads/models`);
+  if (!review) mkdirSync(`uploads/reviews`);
+  if (!editables) mkdirSync(`uploads/editables`);
 };
 
 export const showProjects = async (
@@ -65,7 +64,7 @@ export const createProject = async (
     const query = await ProjectsServices.create(body);
     const path = await PathLevelServices.pathProject(query.id, 'UPLOADS');
     const projectName = query.name;
-    createFolders(path);
+    createFolders();
     mkdirSync(path);
     mkdirSync(`${model}/${projectName}`);
     mkdirSync(`${review}/${projectName}`);

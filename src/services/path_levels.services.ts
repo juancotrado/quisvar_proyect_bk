@@ -1,3 +1,4 @@
+import { ProjectDir } from 'types/types';
 import { _dirPath, _materialPath, _reviewPath } from '.';
 import AppError from '../utils/appError';
 import { parsePath, parseProjectName } from '../utils/fileSystem';
@@ -43,13 +44,13 @@ class StageInfo {
 }
 
 class PathLevelServices {
-  static async pathProject(id: number, type: 'MODEL' | 'REVIEW' | 'UPLOADS') {
+  static async pathProject(id: number, type: ProjectDir) {
     const { name } = await StageInfo.findProject(id);
     if (type === 'MODEL') return _materialPath + '/' + name;
     if (type === 'REVIEW') return _reviewPath + '/' + name;
     return _dirPath + '/' + name;
   }
-  static async pathStage(id: number, type: 'MODEL' | 'REVIEW' | 'UPLOADS') {
+  static async pathStage(id: number, type: ProjectDir) {
     const { name, project } = await StageInfo.findStage(id);
     if (!project) throw new AppError('Oops!,ID no encontrado', 400);
     const pathProject = await this.pathProject(project.id, type);

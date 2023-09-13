@@ -104,13 +104,13 @@ model Projects {
 }
 
 model Stages {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   name      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   levels    Levels[]
-  project   Projects? @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId Int?
+  project   Projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId Int
 }
 
 model GroupProjects {
@@ -125,7 +125,8 @@ model Levels {
   name      String
   level     Int        @default(0)
   rootLevel Int
-  unique    Boolean    @default(false)
+  isProject Boolean    @default(false)
+  isArea    Boolean    @default(false)
   stagesId  Int?
   userId    Int?
   rootId    Int
@@ -207,7 +208,8 @@ model Company {
 model Reports {
   id          Int                   @id @default(autoincrement())
   name        String
-  status      ReportStatus          @default(STEP_1)
+  status      ReportStatus          @default(PROCESS)
+  stage       ReportStage           @default(STEP_1)
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @updatedAt
   userId      Int?
@@ -245,6 +247,7 @@ model Supervisor {
 model SupervisorOnReports {
   supervisorId Int
   reportId     Int
+  comments     String?
   supervisor   Supervisor @relation(fields: [supervisorId], references: [id], onDelete: Cascade)
   report       Reports    @relation(fields: [reportId], references: [id], onDelete: Cascade)
   assignedAt   DateTime   @default(now())
@@ -359,10 +362,17 @@ enum FileTypes {
 }
 
 enum ReportStatus {
+  DECLINE
+  PROCESS
+  DONE
+}
+
+enum ReportStage {
   STEP_1
   STEP_2
   STEP_3
   STEP_4
+  STEP_5
 }
 
 enum SupervisorTypes {

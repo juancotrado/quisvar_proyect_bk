@@ -71,7 +71,7 @@ class LevelsServices {
     };
   }
 
-  static async create({ item, name, level, stagesId, rootId, unique }: Levels) {
+  static async create({ item, name, stagesId, rootId }: Levels) {
     if (!stagesId) throw new AppError('Oops!,ID invalido', 400);
     const isDuplicated = await this.findDuplicate(name, rootId, 'ROOT');
     const { duplicated, rootItem, quantity, rootLevel } = isDuplicated;
@@ -85,20 +85,19 @@ class LevelsServices {
         name,
         rootLevel,
         level: rootLevel + 1,
-        unique,
         stages: { connect: { id: stagesId } },
       },
     });
     return newLevel;
   }
 
-  static async update(id: Levels['id'], { name, unique }: Levels) {
+  static async update(id: Levels['id'], { name }: Levels) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const { duplicated } = await this.findDuplicate(name, id, 'ID');
     if (duplicated) throw new AppError('Error al crear, Nombre existente', 404);
     const updateLevel = await prisma.levels.update({
       where: { id },
-      data: { name, unique },
+      data: { name },
     });
     return updateLevel;
   }

@@ -34,7 +34,6 @@ export type projectPick = Pick<
   | 'description'
   | 'startDate'
   | 'untilDate'
-  | 'stageId'
   | 'unique'
   | 'CUI'
   | 'department'
@@ -44,13 +43,16 @@ export type projectPick = Pick<
 > & {
   userId: Users['id'];
   typeSpecialityId: TypeSpecialities['id'];
-  stageId: Stages['id'];
   specialistsInfo: PersonBussinessType[];
   companyInfo: CompanyType;
   consortiumInfo: ConsortiumType;
+  stageName?: string;
 };
 
-export type UpdateProjectPick = Omit<projectPick, 'unique'> & {
+export type UpdateProjectPick = Omit<
+  projectPick,
+  'typeSpecialityId' | 'unique' | 'stageName'
+> & {
   status: Projects['status'];
 };
 

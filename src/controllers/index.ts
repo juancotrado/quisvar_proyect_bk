@@ -37,7 +37,6 @@ import {
   createProject,
   updateProject,
   showProject,
-  showProjectByPrice,
 } from './projects.controllers';
 import {
   createSubTask,
@@ -106,6 +105,10 @@ import {
   showLevel,
   updateLevel,
 } from './levels.controllers';
+import {
+  createReportByUser,
+  showReportsBySupervisor,
+} from './humanResource.controllers';
 // User Controllers
 export {
   showUsers,
@@ -142,7 +145,6 @@ export {
   deleteProject,
   createProject,
   updateProject,
-  showProjectByPrice,
 };
 //IndexTask Controllers
 export {
@@ -209,3 +211,6 @@ export {
 
 //levels Controllers
 export { createLevel, updateLevel, deleteLevel, showLevel };
+
+//human Resource Controllers
+export { createReportByUser, showReportsBySupervisor };

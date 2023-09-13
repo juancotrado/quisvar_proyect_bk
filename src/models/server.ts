@@ -25,6 +25,7 @@ import {
   typeSpecialityRouter,
   sectorRouter,
   levelsRouter,
+  humanRscRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -60,6 +61,7 @@ class Server {
     typespecialities: `/${process.env.ROUTE}/typespecialities`,
     sector: `/${process.env.ROUTE}/sector`,
     levels: `/${process.env.ROUTE}/levels`,
+    resource: `/${process.env.ROUTE}/resource`,
   };
 
   constructor() {
@@ -80,6 +82,7 @@ class Server {
     this.app.use('/review', express.static('uploads/reviews'));
     this.app.use('/file-user', express.static('public'));
     this.app.use('/general', express.static('public/general'));
+    this.app.use('/reports', express.static('public/reports'));
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(morgan('dev'));
@@ -110,6 +113,7 @@ class Server {
     this.app.use(this.path.typespecialities, typeSpecialityRouter);
     this.app.use(this.path.sector, sectorRouter);
     this.app.use(this.path.levels, levelsRouter);
+    this.app.use(this.path.resource, humanRscRouter);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)

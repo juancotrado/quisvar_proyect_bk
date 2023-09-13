@@ -19,6 +19,7 @@ import SectorServices from './sector.services';
 import TypeSpecialitiesServices from './typeSpecialities.services';
 import LevelsServices from './levels.services';
 import PathLevelServices from './path_levels.services';
+import ResourceHumanServices from './resourceHuman.services';
 export {
   UsersServices,
   TasksServices,
@@ -41,7 +42,10 @@ export {
   TypeSpecialitiesServices,
   LevelsServices,
   PathLevelServices,
+  ResourceHumanServices,
 };
-export const _dirPath = './uploads/projects';
-export const _materialPath = './uploads/models';
-export const _reviewPath = './uploads/reviews';
+export const rootPath = './uploads';
+export const _dirPath = `${rootPath}/projects`;
+export const _materialPath = `${rootPath}/models`;
+export const _reviewPath = `${rootPath}/reviews`;
+export const _editablePath = `${rootPath}/editables`;

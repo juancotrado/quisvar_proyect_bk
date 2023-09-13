@@ -73,7 +73,7 @@ export type TypeTables =
   | 'task_lvl_9'
   | 'task_lvl_10';
 
-export type ProjectDir = 'MODEL' | 'REVIEW' | 'UPLOADS';
+export type ProjectDir = 'MODEL' | 'REVIEW' | 'UPLOADS' | 'EDITABLES';
 export interface Level {
   id: number;
   item: string;
@@ -81,10 +81,11 @@ export interface Level {
   rootId: number;
   spending: number;
   balance: number;
+  isProject: boolean;
+  isArea: boolean;
   price: number;
   level: number;
   rootLevel: number;
-  unique: boolean;
   stagesId: number;
   userId: null;
   details: Details;
@@ -102,6 +103,13 @@ export interface Details {
 }
 
 export type SupervisorPick = Pick<Supervisor, 'type'> & { userId: Users['id'] };
-export type updateReports = Pick<Reports, 'status'> & {
+export type updateReports = Pick<Reports, 'status' | 'stage'> & {
   supervisorId: Supervisor['id'];
+  comments: string;
+};
+
+export type ReportByUserPick = {
+  userId: Users['id'];
+  name: string;
+  supervisorId: number;
 };

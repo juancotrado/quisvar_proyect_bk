@@ -226,6 +226,7 @@ export const calculateAndUpdateDataByLevel = (levels: Level[]) => {
   });
   return levels;
 };
+
 const calculateSumTotal = (
   level: Level,
   type: keyof Level,
@@ -251,8 +252,9 @@ export const LEVEL_DATA: Level = {
   price: 0,
   level: 0,
   rootLevel: 0,
-  unique: false,
   stagesId: 0,
+  isArea: false,
+  isProject: false,
   userId: null,
   details: {
     UNRESOLVED: 0,

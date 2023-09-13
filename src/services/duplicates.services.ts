@@ -126,7 +126,7 @@ class DuplicatesServices {
         name: newName,
         rootLevel: findLevel.rootLevel,
         level: findLevel.level,
-        unique: findLevel.unique,
+        // unique: findLevel.unique,
         stagesId: stageId ? stageId : findLevel.stagesId,
       },
     });
@@ -164,7 +164,7 @@ class DuplicatesServices {
           name: level.name,
           rootLevel: level.rootLevel,
           level: level.level,
-          unique: level.unique,
+          // unique: level.unique,
           stagesId: stageId ? stageId : level.stagesId,
         },
       });
