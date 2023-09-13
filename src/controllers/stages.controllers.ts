@@ -1,7 +1,31 @@
 import { Response, Request, NextFunction } from 'express';
-import { PathLevelServices, StageServices } from '../services';
+import {
+  PathLevelServices,
+  StageServices,
+  _dirPath,
+  _editablePath,
+  _materialPath,
+  _reviewPath,
+} from '../services';
 import { mkdirSync, rmSync } from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
+
+const dir = _dirPath;
+const model = _materialPath;
+const review = _reviewPath;
+const editables = _editablePath;
+
+const createfiles = (list: string[], rootPath: string) => {
+  list.forEach(path => mkdirSync(`${path}/${rootPath}`));
+};
+
+const uploadFiles = (list: string[], oldPath: string, newPath: string) => {
+  list.forEach(path => renameDir(`${path}/${oldPath}`, `${path}/${newPath}`));
+};
+
+const deleteFiles = (list: string[], rootPath: string) => {
+  list.forEach(path => rmSync(`${path}/${rootPath}`, { recursive: true }));
+};
 
 export const showListStages = async (
   req: Request,
@@ -9,7 +33,7 @@ export const showListStages = async (
   next: NextFunction
 ) => {
   try {
-    const query = await StageServices.findMany();
+    const query = await StageServices.findMany(1);
     return res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -37,15 +61,10 @@ export const createStage = async (
 ) => {
   try {
     const { body } = req;
-    const query = await StageServices.create(body);
-    const modelPath = await PathLevelServices.pathStage(query.id, 'MODEL');
-    const reviewPath = await PathLevelServices.pathStage(query.id, 'REVIEW');
-    const uploadPath = await PathLevelServices.pathStage(query.id, 'UPLOADS');
-    if (query) {
-      mkdirSync(modelPath);
-      mkdirSync(reviewPath);
-      mkdirSync(uploadPath);
-    }
+    const { project, ...query } = await StageServices.create(body);
+    const { name } = project;
+    const path = name + '/' + query.name;
+    if (query) createfiles([model, dir, review, editables], path);
     return res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -60,25 +79,11 @@ export const updateStage = async (
     const { id } = req.params;
     const { body } = req;
     const _stage_id = parseInt(id);
-    const oldModelPath = await PathLevelServices.pathStage(_stage_id, 'MODEL');
-    const oldReviewPath = await PathLevelServices.pathStage(
-      _stage_id,
-      'REVIEW'
-    );
-    const oldUpLoadPath = await PathLevelServices.pathStage(
-      _stage_id,
-      'UPLOADS'
-    );
-
-    const query = await StageServices.update(_stage_id, body);
-    const newModelPath = setNewPath(oldModelPath, query.name);
-    const newReviewPath = setNewPath(oldReviewPath, query.name);
-    const newUpLoadPath = setNewPath(oldUpLoadPath, query.name);
-    if (query) {
-      renameDir(oldModelPath, newModelPath);
-      renameDir(oldReviewPath, newReviewPath);
-      renameDir(oldUpLoadPath, newUpLoadPath);
-    }
+    const oldStage = await StageServices.findShort(_stage_id);
+    const { project, ...query } = await StageServices.update(_stage_id, body);
+    const oldStagePath = project.name + '/' + oldStage.name;
+    const newStagePath = project.name + '/' + query.name;
+    uploadFiles([model, dir, review, editables], oldStagePath, newStagePath);
     return res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -92,15 +97,9 @@ export const deleteStage = async (
   try {
     const { id } = req.params;
     const _stage_id = parseInt(id);
-    const modelPath = await PathLevelServices.pathStage(_stage_id, 'MODEL');
-    const reviewPath = await PathLevelServices.pathStage(_stage_id, 'REVIEW');
-    const uploadPath = await PathLevelServices.pathStage(_stage_id, 'UPLOADS');
-    const query = await StageServices.delete(_stage_id);
-    if (query) {
-      rmSync(modelPath, { recursive: true });
-      rmSync(reviewPath, { recursive: true });
-      rmSync(uploadPath, { recursive: true });
-    }
+    const { project, ...query } = await StageServices.delete(_stage_id);
+    const path = project.name + '/' + query.name;
+    if (query) deleteFiles([model, dir, review, editables], path);
     res.status(200).json(query);
   } catch (error) {
     next(error);
