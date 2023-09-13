@@ -3,11 +3,29 @@ import {
   PathLevelServices,
   PathServices,
   ProjectsServices,
+  _editablePath,
   _materialPath,
   _reviewPath,
 } from '../services';
-import { rmSync, mkdirSync } from 'fs';
+import { rmSync, mkdirSync, existsSync, renameSync } from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
+import AppError from '../utils/appError';
+
+const model = _materialPath;
+const review = _reviewPath;
+const editables = _editablePath;
+
+const createFolders = (path: string) => {
+  const exists = existsSync(path);
+  if (!exists) {
+    mkdirSync(`uploads/projects`);
+    mkdirSync(`uploads/models`);
+    mkdirSync(`uploads/reviews`);
+    mkdirSync(`uploads/editables`);
+    return exists;
+  }
+  return exists;
+};
 
 export const showProjects = async (
   req: Request,
@@ -16,21 +34,6 @@ export const showProjects = async (
 ) => {
   try {
     const query = await ProjectsServices.getAll();
-    res.status(200).json(query);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const showProjectByPrice = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const project_id = parseInt(id);
-    const query = await ProjectsServices.getByPrice(project_id);
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -62,15 +65,13 @@ export const createProject = async (
     const query = await ProjectsServices.create(body);
     const path = await PathLevelServices.pathProject(query.id, 'UPLOADS');
     const projectName = query.name;
-    console.log(query, path, projectName);
-    if (query) {
-      mkdirSync(path);
-      mkdirSync(`${_materialPath}/${projectName}`);
-      mkdirSync(`${_reviewPath}/${projectName}`);
-    }
+    createFolders(path);
+    mkdirSync(path);
+    mkdirSync(`${model}/${projectName}`);
+    mkdirSync(`${review}/${projectName}`);
+    mkdirSync(`${editables}/${projectName}`);
     res.status(201).json(query);
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -84,22 +85,18 @@ export const updateProject = async (
     const { body } = req;
     const { id } = req.params;
     const _project_id = parseInt(id);
-    const oldDir = await PathServices.pathProject(_project_id);
-    const project = await ProjectsServices.findShort(_project_id);
+    const oldDir = await PathLevelServices.pathProject(_project_id, 'UPLOADS');
+    if (!existsSync(oldDir))
+      throw new AppError('No se pudo editar el projecto', 400);
+    const oldName = oldDir.split('/').at(-1);
     const query = await ProjectsServices.update(_project_id, body);
-    const oldNameProject = project.name;
-    const nameProject = query.name;
-    const newDir = setNewPath(oldDir, nameProject);
+    const { name } = query;
+    const newDir = setNewPath(oldDir, name);
     if (query) {
       renameDir(oldDir, newDir);
-      renameDir(
-        `./${_materialPath}/${oldNameProject}`,
-        `./${_materialPath}/${nameProject}`
-      );
-      renameDir(
-        `./${_reviewPath}/${oldNameProject}`,
-        `./${_reviewPath}/${nameProject}`
-      );
+      renameDir(`${model}/${oldName}`, `${model}/${name}`);
+      renameDir(`${review}/${oldName}`, `${review}/${name}`);
+      renameDir(`${editables}/${oldName}`, `${editables}/${name}`);
     }
     res.status(200).json(query);
   } catch (error) {
@@ -115,15 +112,12 @@ export const deleteProject = async (
   try {
     const { id } = req.params;
     const project_id = parseInt(id);
-    const path = await PathServices.pathProject(project_id);
-    const query = await ProjectsServices.delete(project_id);
-    const nameProject = query.name;
-    if (query) {
-      rmSync(path, { recursive: true });
-      rmSync(`${_materialPath}/${nameProject}`, { recursive: true });
-      rmSync(`${_reviewPath}/${nameProject}`, { recursive: true });
-    }
-    res.status(204).json(query);
+    const { name, path, ...query } = await ProjectsServices.delete(project_id);
+    rmSync(path, { recursive: true });
+    rmSync(`${model}/${name}`, { recursive: true });
+    rmSync(`${review}/${name}`, { recursive: true });
+    rmSync(`${editables}/${name}`, { recursive: true });
+    res.status(204).json({ name, path, ...query });
   } catch (error) {
     next(error);
   }
