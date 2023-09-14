@@ -10,9 +10,12 @@ import {
 } from '../utils/fileSystem';
 import Queries from '../utils/queries';
 import {
+  existRootLevelPath,
+  filterLevelList,
   getDetailsSubtask,
   getRootItem,
   getRootPath,
+  parseRootItem,
   percentageSubTasks,
   sumValues,
 } from '../utils/tools';
@@ -45,6 +48,8 @@ class LevelsServices {
     let rootId, stagesId;
     rootId = id;
     stagesId = stageId;
+    if (name.includes('projects'))
+      throw new AppError('Error palabra reservada', 404);
     if (type === 'ID') {
       const getId = await prisma.levels.findUnique({ where: { id } });
       if (!getId) throw new AppError('No se pudo encontrar el índice', 404);
@@ -71,13 +76,14 @@ class LevelsServices {
   }
 
   static async create({ name, stagesId, rootId, isProject, userId }: Levels) {
+    await existRootLevelPath(rootId, stagesId);
     const getDuplicate = await this.duplicate(rootId, stagesId, name, 'ROOT');
     const { duplicated, quantity } = getDuplicate;
     if (duplicated) throw new AppError('Error al crear, Nombre existente', 404);
     const root = await this.findRoot(rootId);
     const { rootItem, rootLevel, project, include } = root;
     const stages = { connect: { id: stagesId } };
-    const isArea = project;
+    const isArea = project || include;
     const level = rootLevel + 1;
     const isInclude = project || include;
     const newRootItem = rootItem ? rootItem + '.' : '';
@@ -103,63 +109,81 @@ class LevelsServices {
   }
 
   static async delete(id: Levels['id']) {
+    //------------------------------------------------------------------------
     const { rootPath, ...level } = await getRootPath(id);
     const { rootId, stagesId, _item } = level;
-    const deleteLevel = await prisma.levels.findUnique({ where: { id } });
     // const deleteLevel = await prisma.levels.delete({ where: { id } });
-    if (!deleteLevel)
-      throw new AppError('No se pudieron encontrar el nivel', 404); //delete
+    const deleteLevel = await prisma.levels.findUnique({ where: { id } });
+    if (!deleteLevel) throw new AppError('errpr', 404);
     if (!_item) return rootPath + parsePath(deleteLevel.item, deleteLevel.name);
+    //------------------------------------------------------------------------
     const getList = await prisma.levels.findMany({
-      where: { rootId, stagesId },
-      orderBy: { id: 'asc' },
+      where: {
+        stagesId,
+        level: { gt: level.rootLevel },
+        item: { gt: _item },
+      },
+      orderBy: { item: 'asc' },
     });
-    //########################################################
-    const newListLevel = getList.map(async ({ id, item, name }, i) => {
-      const { rootItem, lastItem } = getRootItem(deleteLevel.item);
-      // const parseItem = (+(_deleteItem ? _deleteItem : 0) + i).toString();
-      // const newItem = (rootItem ? rootItem + '.' : '') + parseItem;
-      // const updateLevel = await prisma.levels.update({
-      //   where: { id },
-      //   data: { item: newItem },
-      // });
-      // const oldDir = dirLevel + parsePathLevel(item, name);
-      // const newDir =
-      //   dirLevel + parsePathLevel(updateLevel.item, updateLevel.name);
-      // renameDir(oldDir, newDir);
-      //######################################################
+    const { findList, list } = filterLevelList(
+      getList,
+      rootId,
+      level.rootLevel
+    );
+    // //------------------------------------------------------------------------
+    // const getList = await prisma.levels.findMany({
+    //   where: { rootId, stagesId, item: { gt: _item } },
+    //   orderBy: { id: 'asc' },
+    // });
+    const newListLevel = findList.map(async ({ id, item, name, level }, i) => {
+      const newItem = parseRootItem(deleteLevel.item, i);
+      await prisma.levels.update({ where: { id }, data: { item: newItem } });
+      const oldDir = rootPath + parsePathLevel(item, name);
+      const newDir = rootPath + parsePathLevel(newItem, name);
+      renameDir(oldDir, newDir);
+      await this.updateBlock(list, level, id, newDir, newItem);
       // await this.updateByBlock(id, updateLevel.item);
     });
-    // const deleteDirLevel =
-    //   dirLevel + parsePathLevel(deleteLevel.item, deleteLevel.name);
-    // const result = await Promise.all(newListLevel).then(() => deleteDirLevel);
-    return getList;
+    // //------------------------------------------------------------------------
+    const { item, name } = deleteLevel;
+    const deleteDir = rootPath + parsePath(item, name);
+    const result = await Promise.all(newListLevel).then(() => deleteDir);
+    return result;
   }
 
-  static async updateByBlock(rootId: Levels['rootId'], rootItem: string) {
-    const findList = await prisma.levels.findMany({
-      where: { rootId },
-      select: { id: true, item: true, name: true, rootId: true },
-    });
+  static async updateBlock(
+    _list: Levels[],
+    _rootLevel: number,
+    _rootId: number,
+    rootPath: string,
+    rootItem: string
+  ) {
+    const { findList, list } = filterLevelList(_list, _rootId, _rootLevel);
     if (findList.length === 0) return [];
-    const newListTask = findList.map(async ({ id, item, ...data }) => {
-      const getItem = item.split('.').at(-1);
-      const newItem = (rootItem ? rootItem + '.' : '') + getItem;
-      const oldDir = await PathLevelServices.pathLevel(id);
+    const newList = findList.map(async value => {
+      const { level, id, item, name } = value;
+      const { lastItem } = getRootItem(item);
+      const newItem = (rootItem ? rootItem + '.' : '') + lastItem;
+      const oldPath = rootPath + parsePath(item, name);
       const updateLevel = await prisma.levels.update({
         where: { id },
         data: { item: newItem },
       });
-      const path = updateLevel.item + updateLevel.name;
-      const newDir = setNewPath(oldDir, path);
-      renameDir(oldDir, newDir);
-      const nextLevel: typeof findList = await this.updateByBlock(id, newItem);
-      if (nextLevel.length !== 0) {
-        return { id, item, ...data, nextLevel };
-      }
-      return { id, item, ...data };
+      const newPath = rootPath + parsePath(updateLevel.item, name);
+      // const newPath = rootPath + parsePath(newItem, name);
+      const path = newPath;
+      renameDir(oldPath, newPath);
+      const nextLevel: Levels[] = await this.updateBlock(
+        list,
+        level,
+        id,
+        path,
+        newItem
+      );
+      if (nextLevel.length === 0) return { oldPath, newPath, ...value };
+      return { oldPath, newPath, ...value, nextLevel };
     });
-    const result = await Promise.all(newListTask);
+    const result = await Promise.all(newList);
     return result;
   }
 

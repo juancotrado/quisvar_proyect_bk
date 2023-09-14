@@ -14,6 +14,7 @@ import {
 import { prisma } from './prisma.server';
 import AppError from './appError';
 import { PathLevelServices } from '../services';
+import { existsSync } from 'fs';
 
 export const sumValues = (list: any[], label: string) => {
   const sum = list.reduce((a: number, c) => a + +c[label], 0);
@@ -276,10 +277,16 @@ export const getRootPath = async (id: number) => {
   const findLevel = await prisma.levels.findUnique({ where: { id } });
   if (!findLevel) throw new AppError('No se pudieron encontrar el nivel', 404);
   const { rootId, stagesId, item, ...level } = findLevel;
+  const rootPath = await existRootLevelPath(rootId, stagesId);
+  return { rootId, stagesId, rootPath, _item: item, ...level };
+};
+
+export const existRootLevelPath = async (rootId: number, stagesId: number) => {
   const rootPath = rootId
     ? await PathLevelServices.pathLevel(rootId)
     : await PathLevelServices.pathStage(stagesId, 'UPLOADS');
-  return { rootId, stagesId, rootPath, _item: item, ...level };
+  if (!existsSync(rootPath)) throw new AppError('Ops!,carpeta no existe', 404);
+  return rootPath;
 };
 
 export const getRootItem = (item: string) => {
@@ -287,4 +294,23 @@ export const getRootItem = (item: string) => {
   const rootItem = values.slice(0, -1).join('.');
   const lastItem = values.at(-1) || '';
   return { rootItem, lastItem };
+};
+
+export const parseRootItem = (item: string, index: number) => {
+  const { rootItem, lastItem } = getRootItem(item);
+  const quantity = +lastItem + index;
+  const newRootItem = rootItem ? rootItem + '.' : '';
+  const newItem = newRootItem + quantity;
+  return newItem;
+};
+export const filterLevelList = (
+  rootList: Levels[],
+  _rootId: number,
+  _rootLevel: number
+) => {
+  const findList = rootList.filter(
+    ({ rootId, rootLevel }) => rootId === _rootId && rootLevel === _rootLevel
+  );
+  const list = rootList.filter(value => !findList.includes(value));
+  return { findList, list };
 };

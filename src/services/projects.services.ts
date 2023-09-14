@@ -62,9 +62,7 @@ class ProjectsServices {
       consortium,
       stages,
     };
-    const newProject = await prisma.projects.create({
-      data,
-    });
+    const newProject = await prisma.projects.create({ data });
     return newProject;
   }
 

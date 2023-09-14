@@ -70,7 +70,7 @@ export const deleteLevel = async (
     const { id } = req.params;
     const _task_id = parseInt(id);
     const query = await LevelsServices.delete(_task_id);
-    // if (query) rmSync(query, { recursive: true });
+    if (query) rmSync(query, { recursive: true });
     res.status(200).json(query);
   } catch (error) {
     next(error);
