@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { SubTasksServices } from '../services';
+import { StageServices, SubTasksServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
 
 export const showSubTask = async (
@@ -107,12 +107,13 @@ export const assignUserBySubtask = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
+    const { id, stageId } = req.params;
     const { body } = req;
-    // if (!req.file) return;
-    // const { filename } = req.file;
-    const query = await SubTasksServices.assignUserBySubtask(body, +id);
-    res.status(200).json(query);
+    const task = await SubTasksServices.assignUserBySubtask(body, +id);
+    const project = await StageServices.find(+stageId);
+    res
+      .status(200)
+      .json({ task, project: { ...project[0], stagesId: stageId } });
   } catch (error) {
     next(error);
   }

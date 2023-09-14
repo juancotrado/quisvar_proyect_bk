@@ -39,7 +39,7 @@ router.patch('/percentage/:id', updatePercentage);
 router.use(_mod_role);
 router.post('/', createSubTask);
 router.patch('/:id', updateSubTask);
-router.patch('/assignUser/:id', assignUserBySubtask);
+router.patch('/assignUser/:id/:stageId', assignUserBySubtask);
 router.delete('/:id', validSubtaskByIdAndStatus, deleteSubTasks);
 
 export default router;
