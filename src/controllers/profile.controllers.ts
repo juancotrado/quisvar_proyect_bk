@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ProfileServices, UsersServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
-import path from 'path';
-import { slice } from 'pdfkit/js/data';
 
 export const showProfile = async (
   req: Request,

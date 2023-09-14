@@ -1,6 +1,7 @@
 import { Levels, SubTasks, TaskRole } from '@prisma/client';
 import {
   Details,
+  DuplicateLevel,
   Level,
   PickSubtask,
   PriceAreaTask,
@@ -11,6 +12,8 @@ import {
   TypeTables,
 } from 'types/types';
 import { prisma } from './prisma.server';
+import AppError from './appError';
+import { PathLevelServices } from '../services';
 
 export const sumValues = (list: any[], label: string) => {
   const sum = list.reduce((a: number, c) => a + +c[label], 0);
@@ -253,6 +256,7 @@ export const LEVEL_DATA: Level = {
   level: 0,
   rootLevel: 0,
   stagesId: 0,
+  isInclude: false,
   isArea: false,
   isProject: false,
   userId: null,
@@ -265,4 +269,22 @@ export const LEVEL_DATA: Level = {
     LIQUIDATION: 0,
     TOTAL: 0,
   },
+};
+
+export const getRootPath = async (id: number) => {
+  if (!id) throw new AppError('Oops!, ID invalido', 400);
+  const findLevel = await prisma.levels.findUnique({ where: { id } });
+  if (!findLevel) throw new AppError('No se pudieron encontrar el nivel', 404);
+  const { rootId, stagesId, item, ...level } = findLevel;
+  const rootPath = rootId
+    ? await PathLevelServices.pathLevel(rootId)
+    : await PathLevelServices.pathStage(stagesId, 'UPLOADS');
+  return { rootId, stagesId, rootPath, _item: item, ...level };
+};
+
+export const getRootItem = (item: string) => {
+  const values = item.split('.');
+  const rootItem = values.slice(0, -1).join('.');
+  const lastItem = values.at(-1) || '';
+  return { rootItem, lastItem };
 };

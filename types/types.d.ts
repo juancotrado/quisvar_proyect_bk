@@ -82,6 +82,7 @@ export interface Level {
   spending: number;
   balance: number;
   isProject: boolean;
+  isInclude: boolean;
   isArea: boolean;
   price: number;
   level: number;
@@ -113,3 +114,10 @@ export type ReportByUserPick = {
   name: string;
   supervisorId: number;
 };
+
+export interface DuplicateLevel {
+  name: string;
+  id: number;
+  stagesId: number;
+  type: 'ROOT' | 'ID';
+}

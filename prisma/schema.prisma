@@ -127,12 +127,13 @@ model Levels {
   rootLevel Int
   isProject Boolean    @default(false)
   isArea    Boolean    @default(false)
-  stagesId  Int?
+  isInclude Boolean    @default(false)
+  stagesId  Int
   userId    Int?
   rootId    Int
   subTasks  SubTasks[]
   user      Users?     @relation(fields: [userId], references: [id])
-  stages    Stages?    @relation(fields: [stagesId], references: [id], onDelete: Cascade)
+  stages    Stages     @relation(fields: [stagesId], references: [id], onDelete: Cascade)
 }
 
 model TaskOnUsers {

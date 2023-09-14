@@ -69,6 +69,7 @@ class StageServices {
         level: 0,
         rootLevel: 0,
         stagesId: 0,
+        isInclude: false,
         userId: null,
         isArea: false,
         isProject: false,

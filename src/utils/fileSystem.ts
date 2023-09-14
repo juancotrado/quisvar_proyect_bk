@@ -22,7 +22,7 @@ export const setNewPath = (oldDir: string, path: string) => {
 };
 
 export const parsePath = (item: string, name: string) => {
-  return '/' + item + '.' + name;
+  return '/' + item + name;
 };
 export const parsePathLevel = (item: string, name: string) => {
   return '/' + item + name;
