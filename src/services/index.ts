@@ -20,6 +20,7 @@ import TypeSpecialitiesServices from './typeSpecialities.services';
 import LevelsServices from './levels.services';
 import PathLevelServices from './path_levels.services';
 import ResourceHumanServices from './resourceHuman.services';
+import ListServices from './list.services';
 export {
   UsersServices,
   TasksServices,
@@ -43,6 +44,7 @@ export {
   LevelsServices,
   PathLevelServices,
   ResourceHumanServices,
+  ListServices,
 };
 export const rootPath = './uploads';
 export const _dirPath = `${rootPath}/projects`;

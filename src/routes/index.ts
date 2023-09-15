@@ -19,6 +19,7 @@ import sectorRouter from './sector.routes';
 import typeSpecialityRouter from './typeSpecialities.routes';
 import levelsRouter from './levels.routes';
 import humanRscRouter from './humanResource.routes';
+import listRouter from './list.routes';
 export {
   userRouter,
   authRouter,
@@ -41,4 +42,5 @@ export {
   typeSpecialityRouter,
   levelsRouter,
   humanRscRouter,
+  listRouter,
 };
