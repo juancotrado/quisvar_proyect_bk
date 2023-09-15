@@ -1,7 +1,7 @@
 import { Projects, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import { UpdateProjectPick, projectPick } from '../utils/format.server';
-import { PathLevelServices, _dirPath } from '.';
+import { PathServices, _dirPath } from '.';
 import Queries from '../utils/queries';
 import { existsSync } from 'fs';
 
@@ -62,9 +62,7 @@ class ProjectsServices {
       consortium,
       stages,
     };
-    const newProject = await prisma.projects.create({
-      data,
-    });
+    const newProject = await prisma.projects.create({ data });
     return newProject;
   }
 
@@ -106,7 +104,7 @@ class ProjectsServices {
 
   static async delete(id: Projects['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const path = await PathLevelServices.pathProject(id, 'UPLOADS');
+    const path = await PathServices.project(id, 'UPLOADS');
     if (!existsSync(path))
       throw new AppError('No se pudo eliminar el projecto', 400);
     const deleteProject = await prisma.projects.delete({ where: { id } });

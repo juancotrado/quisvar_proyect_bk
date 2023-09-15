@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { SubTasksServices } from '../services';
+import { StageServices, SubTasksServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
 
 export const showSubTask = async (
@@ -107,32 +107,37 @@ export const assignUserBySubtask = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
+    const { id, stageId } = req.params;
     const { body } = req;
-    // if (!req.file) return;
-    // const { filename } = req.file;
-    const query = await SubTasksServices.assignUserBySubtask(body, +id);
-    res.status(200).json(query);
+    const task = await SubTasksServices.assignUserBySubtask(body, +id);
+    const project = await StageServices.find(+stageId);
+    res.status(200).json({
+      task,
+      project: {
+        // ...project[0],
+        stagesId: stageId,
+      },
+    });
   } catch (error) {
     next(error);
   }
 };
 
-export const updateStatusPDF = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const pdf = req.query.pdf == 'true';
-    const _subtask_id = parseInt(id);
-    const query = await SubTasksServices.updateHasPDF(_subtask_id, pdf);
-    return query;
-  } catch (error) {
-    next(error);
-  }
-};
+// export const updateStatusPDF = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const { id } = req.params;
+//     const pdf = req.query.pdf == 'true';
+//     const _subtask_id = parseInt(id);
+//     const query = await SubTasksServices.updateHasPDF(_subtask_id, pdf);
+//     return query;
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 export const updatePercentage = async (
   req: Request,
@@ -145,21 +150,6 @@ export const updatePercentage = async (
     const _subtask_id = parseInt(id);
     const query = await SubTasksServices.updatePercentage(_subtask_id, body);
     res.status(201).json(query);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const deleteFileSubTask = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const { filename } = req.params;
-    const query = await SubTasksServices.deleteFile(filename, +id);
-    res.status(200).json(query);
   } catch (error) {
     next(error);
   }

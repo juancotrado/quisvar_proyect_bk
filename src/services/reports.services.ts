@@ -37,118 +37,118 @@ class ReportsServices {
         subtask: {
           select: {
             item: true,
-            hours: true,
+            days: true,
             status: true,
             description: true,
             price: true,
             name: true,
-            indexTask: {
-              select: {
-                id: true,
-                workArea: {
-                  select: {
-                    id: true,
-                    name: true,
-                    project: {
-                      select: {
-                        id: true,
-                        name: true,
-                        description: true,
-                        CUI: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            task: {
-              select: {
-                id: true,
-                indexTask: {
-                  select: {
-                    id: true,
-                    workArea: {
-                      select: {
-                        id: true,
-                        name: true,
-                        project: {
-                          select: {
-                            id: true,
-                            name: true,
-                            description: true,
-                            CUI: true,
-                            district: true,
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            task_lvl_2: {
-              select: {
-                id: true,
-                task: {
-                  select: {
-                    id: true,
-                    indexTask: {
-                      select: {
-                        id: true,
-                        workArea: {
-                          select: {
-                            id: true,
-                            name: true,
-                            project: {
-                              select: {
-                                id: true,
-                                name: true,
-                                description: true,
-                                CUI: true,
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            task_lvl_3: {
-              select: {
-                id: true,
-                task_2: {
-                  select: {
-                    id: true,
-                    task: {
-                      select: {
-                        id: true,
-                        indexTask: {
-                          select: {
-                            id: true,
-                            workArea: {
-                              select: {
-                                id: true,
-                                name: true,
-                                project: {
-                                  select: {
-                                    id: true,
-                                    name: true,
-                                    description: true,
-                                    CUI: true,
-                                  },
-                                },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
+            // indexTask: {
+            //   select: {
+            //     id: true,
+            //     workArea: {
+            //       select: {
+            //         id: true,
+            //         name: true,
+            //         project: {
+            //           select: {
+            //             id: true,
+            //             name: true,
+            //             description: true,
+            //             CUI: true,
+            //           },
+            //         },
+            //       },
+            //     },
+            //   },
+            // },
+            // task: {
+            //   select: {
+            //     id: true,
+            //     indexTask: {
+            //       select: {
+            //         id: true,
+            //         workArea: {
+            //           select: {
+            //             id: true,
+            //             name: true,
+            //             project: {
+            //               select: {
+            //                 id: true,
+            //                 name: true,
+            //                 description: true,
+            //                 CUI: true,
+            //                 district: true,
+            //               },
+            //             },
+            //           },
+            //         },
+            //       },
+            //     },
+            //   },
+            // },
+            // task_lvl_2: {
+            //   select: {
+            //     id: true,
+            //     task: {
+            //       select: {
+            //         id: true,
+            //         indexTask: {
+            //           select: {
+            //             id: true,
+            //             workArea: {
+            //               select: {
+            //                 id: true,
+            //                 name: true,
+            //                 project: {
+            //                   select: {
+            //                     id: true,
+            //                     name: true,
+            //                     description: true,
+            //                     CUI: true,
+            //                   },
+            //                 },
+            //               },
+            //             },
+            //           },
+            //         },
+            //       },
+            //     },
+            //   },
+            // },
+            // task_lvl_3: {
+            //   select: {
+            //     id: true,
+            //     task_2: {
+            //       select: {
+            //         id: true,
+            //         task: {
+            //           select: {
+            //             id: true,
+            //             indexTask: {
+            //               select: {
+            //                 id: true,
+            //                 workArea: {
+            //                   select: {
+            //                     id: true,
+            //                     name: true,
+            //                     project: {
+            //                       select: {
+            //                         id: true,
+            //                         name: true,
+            //                         description: true,
+            //                         CUI: true,
+            //                       },
+            //                     },
+            //                   },
+            //                 },
+            //               },
+            //             },
+            //           },
+            //         },
+            //       },
+            //     },
+            //   },
+            // },
           },
         },
       },
@@ -163,39 +163,37 @@ class ReportsServices {
       },
     });
     if (!reportList) new AppError('no se pudo encontrar los registros', 404);
-    const newReport = reportList.map(({ subtask, ...data }) => {
+    const newReport = reportList.map(({ ...data }) => {
       let project;
       // let workArea;
-      if (subtask.indexTask) {
-        project = subtask.indexTask.workArea.project;
-        // workArea = subtask.indexTask.workArea;
-      }
-      if (subtask.task) {
-        project = subtask.task.indexTask.workArea.project;
-        // workArea = subtask.task.indexTask.workArea;
-      }
-      if (subtask.task_lvl_2) {
-        project = subtask.task_lvl_2.task.indexTask.workArea.project;
-        // workArea = subtask.task_lvl_2.task.indexTask.workArea;
-      }
-      if (subtask.task_lvl_3) {
-        project = subtask.task_lvl_3.task_2.task.indexTask.workArea.project;
-        // workArea = subtask.task_lvl_3.task_2.task.indexTask.workArea;
-      }
-      return { ...data, ...subtask, project };
+      // if (subtask.indexTask) {
+      //   project = subtask.indexTask.workArea.project;
+      //   // workArea = subtask.indexTask.workArea;
+      // }
+      // if (subtask.task) {
+      //   project = subtask.task.indexTask.workArea.project;
+      //   // workArea = subtask.task.indexTask.workArea;
+      // }
+      // if (subtask.task_lvl_2) {
+      //   project = subtask.task_lvl_2.task.indexTask.workArea.project;
+      //   // workArea = subtask.task_lvl_2.task.indexTask.workArea;
+      // }
+      // if (subtask.task_lvl_3) {
+      //   project = subtask.task_lvl_3.task_2.task.indexTask.workArea.project;
+      //   // workArea = subtask.task_lvl_3.task_2.task.indexTask.workArea;
+      // }
+      return { ...data, subtask: [], project };
     });
     const newReportByList = projectList.map(project => {
-      const subtasks = newReport.filter(
-        subtask => subtask.project?.id === project.id
-      );
-      const newSubTask = subtasks.map(
-        ({ project, indexTask, task, task_lvl_2, task_lvl_3, ...a }) => ({
-          ...a,
-          liquidation: a.status === 'LIQUIDATION' ? 30 : 100,
-        })
-      );
+      // const subtasks = newReport.filter(
+      //   subtask => subtask.project?.id === project.id
+      // );
+      // const newSubTask = subtasks.map(({ project, ...a }) => ({
+      //   ...a,
+      //   // liquidation: a.status === 'LIQUIDATION' ? 30 : 100,
+      // }));
 
-      return { ...project, subtasks: newSubTask };
+      return { ...project, subtasks: [] };
     });
     const filterProjects = newReportByList.filter(
       project => project.subtasks.length !== 0
@@ -206,22 +204,22 @@ class ReportsServices {
   static async getSubTasksByProyect(projectId: Projects['id']) {
     const findSubtasks = await prisma.subTasks.findMany({
       where: {
-        OR: [
-          {
-            task_lvl_3: {
-              task_2: { task: { indexTask: { workArea: { projectId } } } },
-            },
-          },
-          {
-            indexTask: { workArea: { projectId } },
-          },
-          {
-            task_lvl_2: { task: { indexTask: { workArea: { projectId } } } },
-          },
-          {
-            task: { indexTask: { workArea: { projectId } } },
-          },
-        ],
+        // OR: [
+        //   {
+        //     task_lvl_3: {
+        //       task_2: { task: { indexTask: { workArea: { projectId } } } },
+        //     },
+        //   },
+        //   {
+        //     indexTask: { workArea: { projectId } },
+        //   },
+        //   {
+        //     task_lvl_2: { task: { indexTask: { workArea: { projectId } } } },
+        //   },
+        //   {
+        //     task: { indexTask: { workArea: { projectId } } },
+        //   },
+        // ],
       },
       select: {
         id: true,
@@ -256,49 +254,49 @@ class ReportsServices {
                 id: true,
                 item: true,
                 name: true,
-                subTasks: {
-                  select: {
-                    id: true,
-                    item: true,
-                    name: true,
-                  },
-                },
+                // subTasks: {
+                //   select: {
+                //     id: true,
+                //     item: true,
+                //     name: true,
+                //   },
+                // },
                 tasks: {
                   select: {
                     id: true,
                     item: true,
                     name: true,
-                    subTasks: {
-                      select: {
-                        id: true,
-                        item: true,
-                        name: true,
-                      },
-                    },
+                    // subTasks: {
+                    //   select: {
+                    //     id: true,
+                    //     item: true,
+                    //     name: true,
+                    //   },
+                    // },
                     tasks_2: {
                       select: {
                         id: true,
                         item: true,
                         name: true,
-                        subTasks: {
-                          select: {
-                            id: true,
-                            item: true,
-                            name: true,
-                          },
-                        },
+                        // subTasks: {
+                        //   select: {
+                        //     id: true,
+                        //     item: true,
+                        //     name: true,
+                        //   },
+                        // },
                         tasks_3: {
                           select: {
                             id: true,
                             item: true,
                             name: true,
-                            subTasks: {
-                              select: {
-                                id: true,
-                                item: true,
-                                name: true,
-                              },
-                            },
+                            // subTasks: {
+                            //   select: {
+                            //     id: true,
+                            //     item: true,
+                            //     name: true,
+                            //   },
+                            // },
                           },
                         },
                       },

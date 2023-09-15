@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
       const { id } = req.params;
       const _subtask_id = parseInt(id);
       const status = req.query.status as Files['type'];
-      const path = await PathServices.pathSubTask(_subtask_id, status);
+      const path = await PathServices.subTask(_subtask_id, status);
       callback(null, path);
     } catch (error) {
       callback(new AppError(`No se pudo encontrar la ruta`, 404), '');
@@ -24,14 +24,13 @@ const storage = multer.diskStorage({
   },
   filename: async (req, file, callback) => {
     try {
-      const { id } = req.params;
-      const _subtask_id = parseInt(id);
-      const { item, name } = await FilesServices.getSubTask(_subtask_id);
+      // const { id } = req.params;
+      // const _subtask_id = parseInt(id);
+      // const { item, name } = await FilesServices.getSubTask(_subtask_id);
       const uniqueSuffix = Date.now();
-      callback(
-        null,
-        item + '.' + name + '@' + uniqueSuffix + '$' + file.originalname
-      );
+      const { originalname } = file;
+      if (originalname.includes('$')) throw new Error();
+      callback(null, uniqueSuffix + '$' + file.originalname);
     } catch (error) {
       callback(
         new AppError(`Oops! , envie archivos con extension no repetida`, 404),

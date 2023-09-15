@@ -50,7 +50,7 @@ class FilesServices {
       where: { id: subTasksId },
     });
     if (!subTask) throw new AppError(`no se pudo encontrar la subtarea`, 404);
-    const dir = await PathServices.pathSubTask(subTasksId, 'REVIEW');
+    const dir = await PathServices.subTask(subTasksId, 'REVIEW');
     const newFile = await prisma.files.create({
       data: {
         dir,
@@ -97,15 +97,12 @@ class FilesServices {
     const getFile = await prisma.files.findUnique({ where: { id } });
     const deleteFile = await prisma.files.delete({ where: { id } });
     if (!getFile) throw new AppError('No se pudo encontrar el archivo', 404);
-    if (getFile.type === 'SUCCESSFUL')
+    if (getFile.type === 'MODEL')
       throw new AppError(
         'No se puede eliminar archivo, porque se marco como hecho',
         400
       );
-    const path = await PathServices.pathSubTask(
-      getFile.subTasksId,
-      getFile.type
-    );
+    const path = await PathServices.subTask(getFile.subTasksId, getFile.type);
     fs.unlinkSync(`${path}/${getFile.name}`);
     return deleteFile;
   }

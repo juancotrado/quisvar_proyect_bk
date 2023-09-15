@@ -45,11 +45,11 @@ export const generateIndex = async (
       'Content-Type': 'application/pdf',
       'Content-Disposition': `inline;filename=index/${_project_id}.pdf`,
     });
-    indexTemplate(
-      (chunk: any) => stream.write(chunk),
-      () => stream.end(),
-      query
-    );
+    // indexTemplate(
+    //   (chunk: any) => stream.write(chunk),
+    //   () => stream.end(),
+    //   query
+    // );
     // res.status(200).json(query);
   } catch (error) {
     next(error);

@@ -4,19 +4,15 @@ import * as dotenv from 'dotenv';
 import { prisma } from '../utils/prisma.server';
 import { Server as WebSocketServer } from 'socket.io';
 import http from 'http';
+
 import {
   userRouter,
-  taskRouter,
   authRouter,
-  workareasRouter,
   projectRouter,
   subTaskRouter,
-  indexTasksRouter,
   profileRouter,
   speacilitiesRouter,
   filesRouter,
-  taskLvl_2Router,
-  taskLvl_3Router,
   reportsRouter,
   feedbacksRouter,
   duplicatesRouter,
@@ -33,6 +29,7 @@ import globalErrorHandler from '../middlewares/error.middleware';
 import morgan from 'morgan';
 import Sockets from './sockets';
 import { verifySecretEnv } from '../middlewares/auth.middleware';
+import TimerCron from './timer';
 
 dotenv.config();
 class Server {
@@ -47,11 +44,6 @@ class Server {
     profile: `/${process.env.ROUTE}/profile`,
     specialities: `/${process.env.ROUTE}/specialities`,
     projects: `/${process.env.ROUTE}/projects`,
-    workareas: `/${process.env.ROUTE}/workareas`,
-    indextasks: `/${process.env.ROUTE}/indextasks`,
-    tasks: `/${process.env.ROUTE}/tasks`,
-    tasks2: `/${process.env.ROUTE}/tasks2`,
-    tasks3: `/${process.env.ROUTE}/tasks3`,
     subtasks: `/${process.env.ROUTE}/subtasks`,
     files: `/${process.env.ROUTE}/files`,
     reports: `/${process.env.ROUTE}/reports`,
@@ -69,6 +61,7 @@ class Server {
   constructor() {
     this.app = express();
     this.httpServer = http.createServer(this.app);
+    this.conectionCron();
     this.io = new WebSocketServer(this.httpServer, {
       cors: {
         origin: '*',
@@ -78,6 +71,7 @@ class Server {
     this.middlewares();
     this.routes();
   }
+
   middlewares() {
     this.app.use('/static', express.static('uploads/projects'));
     this.app.use('/models', express.static('uploads/models'));
@@ -90,7 +84,9 @@ class Server {
     this.app.use(morgan('dev'));
     this.app.use(verifySecretEnv);
   }
-
+  conectionCron() {
+    new TimerCron();
+  }
   conectionWebSockect() {
     new Sockets(this.io);
   }
@@ -100,11 +96,6 @@ class Server {
     this.app.use(this.path.profile, profileRouter);
     this.app.use(this.path.projects, projectRouter);
     this.app.use(this.path.specialities, speacilitiesRouter);
-    this.app.use(this.path.workareas, workareasRouter);
-    this.app.use(this.path.indextasks, indexTasksRouter);
-    this.app.use(this.path.tasks, taskRouter);
-    this.app.use(this.path.tasks2, taskLvl_2Router);
-    this.app.use(this.path.tasks3, taskLvl_3Router);
     this.app.use(this.path.subtasks, subTaskRouter);
     this.app.use(this.path.files, filesRouter);
     this.app.use(this.path.reports, reportsRouter);

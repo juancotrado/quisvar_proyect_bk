@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { LevelsServices, PathLevelServices } from '../services';
+import { LevelsServices, PathServices } from '../services';
 import { mkdirSync, rmSync } from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
 
@@ -26,7 +26,7 @@ export const createLevel = async (
   try {
     const { body } = req;
     const query = await LevelsServices.create(body);
-    const path = await PathLevelServices.pathLevel(query.id);
+    const path = await PathServices.level(query.id);
     const editablePath = path.replace('projects', 'editables');
     if (query) {
       mkdirSync(path);
@@ -70,7 +70,7 @@ export const deleteLevel = async (
     const { id } = req.params;
     const _task_id = parseInt(id);
     const query = await LevelsServices.delete(_task_id);
-    // if (query) rmSync(query, { recursive: true });
+    if (query) rmSync(query, { recursive: true });
     res.status(200).json(query);
   } catch (error) {
     next(error);

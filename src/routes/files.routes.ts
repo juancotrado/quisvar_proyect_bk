@@ -2,13 +2,7 @@ import { Router } from 'express';
 
 import authenticateHandler from '../middlewares/auth.middleware';
 import { _employee_role, _admin_role } from '../middlewares/role.middleware';
-import {
-  deleteFile,
-  showProfile,
-  updateProfile,
-  uploadFile,
-  uploadFiles,
-} from '../controllers';
+import { deleteFile, uploadFile, uploadFiles } from '../controllers';
 import {
   upload,
   uploadFileUser,

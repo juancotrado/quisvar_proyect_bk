@@ -2,6 +2,7 @@ import { Levels, SubTasks, TaskRole } from '@prisma/client';
 import {
   Details,
   DuplicateLevel,
+  GetFilterLevels,
   Level,
   PickSubtask,
   PriceAreaTask,
@@ -9,11 +10,11 @@ import {
   PriceTask,
   PriceTaskLvl2,
   PriceTaskLvl3,
-  TypeTables,
 } from 'types/types';
 import { prisma } from './prisma.server';
 import AppError from './appError';
-import { PathLevelServices } from '../services';
+import { PathServices } from '../services';
+import { existsSync } from 'fs';
 
 export const sumValues = (list: any[], label: string) => {
   const sum = list.reduce((a: number, c) => a + +c[label], 0);
@@ -205,24 +206,25 @@ const quantityTaskByArea = (status: TaskRole, listTask: any[] | undefined) => {
 
 export const calculateAndUpdateDataByLevel = (levels: Level[]) => {
   levels.forEach(level => {
-    level.balance = calculateSumTotal(level, 'balance', null);
-    level.spending = calculateSumTotal(level, 'spending', null);
-    level.price = calculateSumTotal(level, 'price', null);
-    level.details.UNRESOLVED = calculateSumTotal(
-      level,
-      'details',
-      'UNRESOLVED'
-    );
-    level.details.PROCESS = calculateSumTotal(level, 'details', 'PROCESS');
-    level.details.INREVIEW = calculateSumTotal(level, 'details', 'INREVIEW');
-    level.details.DENIED = calculateSumTotal(level, 'details', 'DENIED');
-    level.details.LIQUIDATION = calculateSumTotal(
-      level,
-      'details',
-      'LIQUIDATION'
-    );
-    level.details.DONE = calculateSumTotal(level, 'details', 'DONE');
-    level.details.TOTAL = calculateSumTotal(level, 'details', 'TOTAL');
+    level.balance = calculateSumTotal(level, 'balance');
+    level.spending = calculateSumTotal(level, 'spending');
+    level.price = calculateSumTotal(level, 'price');
+    level.days = calculateSumTotal(level, 'days');
+    // level.details.UNRESOLVED = calculateSumTotal(
+    //   level,
+    //   'details',
+    //   'UNRESOLVED'
+    // );
+    // level.details.PROCESS = calculateSumTotal(level, 'details', 'PROCESS');
+    // level.details.INREVIEW = calculateSumTotal(level, 'details', 'INREVIEW');
+    // level.details.DENIED = calculateSumTotal(level, 'details', 'DENIED');
+    // level.details.LIQUIDATION = calculateSumTotal(
+    //   level,
+    //   'details',
+    //   'LIQUIDATION'
+    // );
+    // level.details.DONE = calculateSumTotal(level, 'details', 'DONE');
+    // level.details.TOTAL = calculateSumTotal(level, 'details', 'TOTAL');
     if (level.nextLevel && level.nextLevel.length > 0) {
       calculateAndUpdateDataByLevel(level.nextLevel);
     }
@@ -232,54 +234,60 @@ export const calculateAndUpdateDataByLevel = (levels: Level[]) => {
 
 const calculateSumTotal = (
   level: Level,
-  type: keyof Level,
-  subType: keyof Details | null
+  type: keyof Level
+  // subType: keyof Details | null
 ) => {
   let sumaBalance = level[type] as number;
-  if (subType && type === 'details') sumaBalance = level[type][subType];
+  // if (subType && type === 'details') sumaBalance = level[type][subType];
   if (level.nextLevel && level.nextLevel.length > 0) {
     for (const subLevel of level.nextLevel) {
-      sumaBalance += calculateSumTotal(subLevel, type, subType);
+      sumaBalance += calculateSumTotal(subLevel, type);
     }
   }
   return sumaBalance;
 };
 
-export const LEVEL_DATA: Level = {
-  id: 0,
-  item: '',
-  name: '',
-  rootId: 0,
-  spending: 0,
-  balance: 0,
-  price: 0,
-  level: 0,
-  rootLevel: 0,
-  stagesId: 0,
-  isInclude: false,
-  isArea: false,
-  isProject: false,
-  userId: null,
-  details: {
-    UNRESOLVED: 0,
-    PROCESS: 0,
-    INREVIEW: 0,
-    DENIED: 0,
-    DONE: 0,
-    LIQUIDATION: 0,
-    TOTAL: 0,
-  },
-};
+// export const LEVEL_DATA: Level = {
+//   id: 0,
+//   item: '',
+//   name: '',
+//   rootId: 0,
+//   spending: 0,
+//   balance: 0,
+//   price: 0,
+//   level: 0,
+//   rootLevel: 0,
+//   stagesId: 0,
+//   isInclude: false,
+//   isArea: false,
+//   isProject: false,
+//   userId: null,
+//   // details: {
+//   //   UNRESOLVED: 0,
+//   //   PROCESS: 0,
+//   //   INREVIEW: 0,
+//   //   DENIED: 0,
+//   //   DONE: 0,
+//   //   LIQUIDATION: 0,
+//   //   TOTAL: 0,
+//   // },
+// };
 
 export const getRootPath = async (id: number) => {
   if (!id) throw new AppError('Oops!, ID invalido', 400);
   const findLevel = await prisma.levels.findUnique({ where: { id } });
   if (!findLevel) throw new AppError('No se pudieron encontrar el nivel', 404);
   const { rootId, stagesId, item, ...level } = findLevel;
-  const rootPath = rootId
-    ? await PathLevelServices.pathLevel(rootId)
-    : await PathLevelServices.pathStage(stagesId, 'UPLOADS');
+  const rootPath = await existRootLevelPath(rootId, stagesId);
   return { rootId, stagesId, rootPath, _item: item, ...level };
+};
+
+export const existRootLevelPath = async (rootId: number, stagesId: number) => {
+  const rootPath = rootId
+    ? await PathServices.level(rootId)
+    : await PathServices.stage(stagesId, 'UPLOADS');
+  if (!existsSync(rootPath)) throw new AppError('Ops!,carpeta no existe', 404);
+  return rootPath;
 };
 
 export const getRootItem = (item: string) => {
@@ -287,4 +295,90 @@ export const getRootItem = (item: string) => {
   const rootItem = values.slice(0, -1).join('.');
   const lastItem = values.at(-1) || '';
   return { rootItem, lastItem };
+};
+
+export const parseRootItem = (item: string, index: number) => {
+  const { rootItem, lastItem } = getRootItem(item);
+  const quantity = +lastItem + index;
+  const newRootItem = rootItem ? rootItem + '.' : '';
+  const newItem = newRootItem + quantity;
+  return newItem;
+};
+export const filterLevelList = (
+  rootList: Levels[],
+  _rootId: number,
+  _rootLevel: number
+) => {
+  const findList = rootList.filter(
+    ({ rootId, rootLevel }) => rootId === _rootId && rootLevel === _rootLevel
+  );
+  const list = rootList.filter(value => !findList.includes(value));
+  return { findList, list };
+};
+
+export const getFilterListLevels = (
+  rootList: GetFilterLevels[],
+  _rootId: number,
+  _rootLevel: number
+) => {
+  const findList = rootList.filter(
+    ({ rootId, rootLevel }) => rootId === _rootId && rootLevel === _rootLevel
+  );
+  const list = rootList.filter(value => !findList.includes(value));
+  return { findList, list };
+};
+
+export const sumSubtaksByStage = (
+  list: (Levels & {
+    subTasks: SubTasks[];
+  })[]
+) => {
+  const totalvalues = list.map(level => {
+    const UNRESOLVED = level.subTasks.filter(
+      ({ status }) => status === 'UNRESOLVED'
+    ).length;
+    const PROCESS = level.subTasks.filter(
+      ({ status }) => status === 'PROCESS'
+    ).length;
+    const INREVIEW = level.subTasks.filter(
+      ({ status }) => status === 'INREVIEW'
+    ).length;
+    const DENIED = level.subTasks.filter(
+      ({ status }) => status === 'DENIED'
+    ).length;
+    const DONE = level.subTasks.filter(
+      ({ status }) => status === 'DONE'
+    ).length;
+    const LIQUIDATION = level.subTasks.filter(
+      ({ status }) => status === 'LIQUIDATION'
+    ).length;
+    return { UNRESOLVED, PROCESS, INREVIEW, DENIED, DONE, LIQUIDATION };
+  });
+  const UNRESOLVED = sumValues(totalvalues, 'UNRESOLVED');
+  const PROCESS = sumValues(totalvalues, 'PROCESS');
+  const INREVIEW = sumValues(totalvalues, 'INREVIEW');
+  const DENIED = sumValues(totalvalues, 'DENIED');
+  const DONE = sumValues(totalvalues, 'DONE');
+  const LIQUIDATION = sumValues(totalvalues, 'LIQUIDATION');
+  return { UNRESOLVED, PROCESS, INREVIEW, DENIED, DONE, LIQUIDATION };
+};
+
+export const sumPriceByStage = (
+  list: (Levels & {
+    subTasks: SubTasks[];
+  })[]
+) => {
+  const totalvalues = list.map(level => {
+    const price = sumValues(level.subTasks, 'price');
+    const days = sumValues(level.subTasks, 'days');
+    const spending = sumValues(level.subTasks, 'spending');
+    const balance = price - spending;
+    return { price, spending, balance, days };
+  });
+  const price = sumValues(totalvalues, 'price');
+  const days = sumValues(totalvalues, 'days');
+  const spending = sumValues(totalvalues, 'spending');
+  const balance = price - spending;
+  const details = sumSubtaksByStage(list);
+  return { days, price, spending, balance, details };
 };

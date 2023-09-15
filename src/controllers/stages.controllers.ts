@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from 'express';
 import {
-  PathLevelServices,
+  PathServices,
   StageServices,
   _dirPath,
   _editablePath,
@@ -8,7 +8,7 @@ import {
   _reviewPath,
 } from '../services';
 import { mkdirSync, rmSync } from 'fs';
-import { renameDir, setNewPath } from '../utils/fileSystem';
+import { renameDir } from '../utils/fileSystem';
 
 const dir = _dirPath;
 const model = _materialPath;
@@ -48,7 +48,7 @@ export const showStage = async (
     const { id } = req.params;
     const _stage_id = parseInt(id);
     const query = await StageServices.find(_stage_id);
-    return res.status(200).json(query[0]);
+    return res.status(200).json(query);
   } catch (error) {
     next(error);
   }
