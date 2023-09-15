@@ -53,7 +53,7 @@ class FilesServices {
     const dir = await PathServices.subTask(subTasksId, 'REVIEW');
     const newFile = await prisma.files.create({
       data: {
-        // dir,
+        dir,
         type,
         subTasksId,
         name: filename,

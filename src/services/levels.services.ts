@@ -82,7 +82,7 @@ class LevelsServices {
     const root = await this.findRoot(rootId);
     const { rootItem, rootLevel, project, include } = root;
     const stages = { connect: { id: stagesId } };
-    const isArea = project || include;
+    const isArea = project;
     const level = rootLevel + 1;
     const isInclude = project || include;
     const newRootItem = rootItem ? rootItem + '.' : '';

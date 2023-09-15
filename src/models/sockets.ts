@@ -1,5 +1,4 @@
 import { SubTasks } from '@prisma/client';
-import { NextFunction } from 'express';
 import { Server as WebSocketServer } from 'socket.io';
 import { Level } from 'types/types';
 // import { TasksServices } from '../services';
@@ -15,14 +14,14 @@ class Sockets {
     this.socketEvents();
   }
   roomPlace(subTask: SubTasks) {
-    // const room = subTask.indexTaskId
+    const room = subTask.levels_Id;
     //   ? subTask.indexTaskId + 'indextask'
     //   : subTask.taskId
     //   ? subTask.taskId + 'task'
     //   : subTask.task_2_Id
     //   ? subTask.task_2_Id + 'task2'
     //   : subTask.task_3_Id + 'task3';
-    const room = 'level';
+    // const room = 'level';
     return room;
   }
   socketEvents() {

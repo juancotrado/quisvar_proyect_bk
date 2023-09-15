@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import { prisma } from '../utils/prisma.server';
 import { Server as WebSocketServer } from 'socket.io';
 import http from 'http';
+
 import {
   userRouter,
   authRouter,
@@ -27,6 +28,7 @@ import globalErrorHandler from '../middlewares/error.middleware';
 import morgan from 'morgan';
 import Sockets from './sockets';
 import { verifySecretEnv } from '../middlewares/auth.middleware';
+import TimerCron from './timer';
 
 dotenv.config();
 class Server {
@@ -57,6 +59,7 @@ class Server {
   constructor() {
     this.app = express();
     this.httpServer = http.createServer(this.app);
+    this.conectionCron();
     this.io = new WebSocketServer(this.httpServer, {
       cors: {
         origin: '*',
@@ -66,6 +69,7 @@ class Server {
     this.middlewares();
     this.routes();
   }
+
   middlewares() {
     this.app.use('/static', express.static('uploads/projects'));
     this.app.use('/models', express.static('uploads/models'));
@@ -78,7 +82,9 @@ class Server {
     this.app.use(morgan('dev'));
     this.app.use(verifySecretEnv);
   }
-
+  conectionCron() {
+    new TimerCron();
+  }
   conectionWebSockect() {
     new Sockets(this.io);
   }

@@ -1,19 +1,22 @@
 import { SubTasks, Users, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-import fs, { copyFileSync } from 'fs';
+import fs, { copyFileSync, renameSync } from 'fs';
 import PathServices from './paths.services';
 import Queries from '../utils/queries';
 import { copyFile } from 'fs/promises';
+import { getRootItem } from '../utils/tools';
 class SubTasksServices {
+  static GMT = 60 * 60 * 1000;
+  static today = new Date().getTime();
   static async find(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findSubTask = await prisma.subTasks.findUnique({
       where: { id },
-      include: {
-        // ...Queries.includeSubtask,
-        // task: {
-        // },
-      },
+      // include: {
+      //   // ...Queries.includeSubtask,
+      //   // task: {
+      //   // },
+      // },
     });
     if (!findSubTask) throw new AppError('No se pudo encontrar la tares ', 404);
     return findSubTask;
@@ -68,58 +71,37 @@ class SubTasksServices {
     });
     return newSubTask;
   }
-
   static async assigned(
-    id: SubTasks['id'],
+    subtaskId: SubTasks['id'],
     userId: Users['id'],
     option: 'decline' | 'apply' | 'review'
   ) {
     if (option == 'decline') {
+      const status = 'UNRESOLVED';
       return await prisma.subTasks.update({
-        where: { id },
-        data: {
-          status: 'UNRESOLVED',
-          users: {
-            deleteMany: {
-              subtaskId: id,
-            },
-          },
-        },
+        where: { id: subtaskId },
+        data: { status, users: { deleteMany: { subtaskId } } },
         include: Queries.includeSubtask,
       });
     }
     if (option == 'apply') {
-      const getHours = await prisma.subTasks.findUnique({
-        where: { id },
-        select: { days: true },
-      });
-      const today = new Date().getTime();
-      const hours = (getHours ? getHours.days : 0) * 60 * 60 * 1000;
-      const assignedAt = new Date(
-        new Date().setHours(new Date().getHours() - 5)
-      );
+      const status = 'PROCESS';
+      const { days } = await this.find(subtaskId);
+      const hours = days * this.GMT;
+      const untilDate = new Date(this.today + hours);
       return await prisma.subTasks.update({
-        where: { id },
+        where: { id: subtaskId },
         data: {
-          status: 'PROCESS',
-          users: {
-            create: {
-              userId,
-              assignedAt,
-              untilDate: new Date(today + hours),
-            },
-          },
+          status,
+          users: { create: { userId, untilDate } },
         },
         include: Queries.includeSubtask,
       });
     }
     if (option == 'review') {
       return prisma.subTasks.update({
-        where: { id },
-        data: {
-          status: 'INREVIEW',
-          hasPDF: false,
-        },
+        where: { id: subtaskId },
+        data: { status: 'INREVIEW' },
         include: Queries.includeSubtask,
       });
     }
@@ -159,17 +141,13 @@ class SubTasksServices {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateTaskStatus = await prisma.subTasks.update({
       where: { id },
-      data: {
-        status,
-      },
+      data: { status },
       include: Queries.includeSubtask,
     });
-    const subTask = await prisma.subTasks.findUnique({ where: { id } });
-    if (!subTask) throw new AppError('Oops!,ID invalido', 400);
+    const { item, name } = updateTaskStatus;
+    const { lastItem } = getRootItem(item);
     if (status === 'DONE') {
-      // const files = await prisma.files.findMany({
-      //   where: { subTasksId: id, type: 'REVIEW', feedback: { comment: {} } },
-      // });
+      const path = await PathServices.subTask(id, 'UPLOADS');
       const files = await prisma.files.findMany({
         where: {
           subTasksId: id,
@@ -177,68 +155,31 @@ class SubTasksServices {
           feedback: { comment: { equals: null } },
         },
       });
-      const oldDir = await PathServices.subTask(id, 'REVIEW');
-      const newDir = await PathServices.subTask(id, 'UPLOADS');
-      const modelDir = await PathServices.subTask(id, 'MODEL');
-      const filesPromises = files.map(async (file, index) => {
+      const reviewPath = path.replace('projects', 'reviews');
+      const dir = reviewPath.split('/').slice(0, 5).join('/');
+      const _files = files.map(async (file, index) => {
         const ext = file.name.split('.').at(-1);
-        const newFileName =
-          subTask.item + '.' + subTask.name + (index + 1) + '.' + ext;
-        await prisma.files.create({
-          data: {
-            name: file.name,
-            // dir: modelDir,
-            type: 'MODEL',
-            userId: file.userId,
-            subTasksId: file.subTasksId,
-          },
-        });
+        const _name = lastItem + name + (index + 1) + '.' + ext;
         await prisma.files.update({
           where: { id: file.id },
-          data: {
-            type: 'UPLOADS',
-            name: newFileName,
-            //  dir: newDir
-          },
+          data: { type: 'UPLOADS', name: _name, dir },
         });
-        copyFile(`${oldDir}/${file.name}`, `${modelDir}/${file.name}`).then(
-          () => {
-            fs.renameSync(`${oldDir}/${file.name}`, `${newDir}/${newFileName}`);
-          }
-        );
+        renameSync(`${path}/${file.name}`, `${dir}/${_name}`);
       });
-      await Promise.all(filesPromises);
-      return await prisma.subTasks.findUnique({
-        where: { id },
-        include: Queries.includeSubtask,
-      });
+      return await Promise.all(_files).then(() => updateTaskStatus);
     }
     if (status === 'PROCESS') {
       return await prisma.subTasks.update({
         where: { id },
-        data: {
-          users: {
-            create: {
-              userId: user.id,
-            },
-          },
-        },
+        data: { users: { create: { userId: user.id } } },
         include: Queries.includeSubtask,
       });
     }
     if (status === 'UNRESOLVED') {
+      const subtaskId_userId = { subtaskId: id, userId: user.id };
       return await prisma.subTasks.update({
         where: { id },
-        data: {
-          users: {
-            delete: {
-              subtaskId_userId: {
-                subtaskId: id,
-                userId: user.id,
-              },
-            },
-          },
-        },
+        data: { users: { delete: { subtaskId_userId } } },
         include: Queries.includeSubtask,
       });
     }
@@ -253,19 +194,15 @@ class SubTasksServices {
 
   static async delete(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const subTask = await prisma.subTasks.findUnique({
-      where: { id },
-    });
+    const subTask = await prisma.subTasks.findUnique({ where: { id } });
     if (!subTask) throw new AppError(`No se pudo encontrar la subtarea`, 404);
     const list = await prisma.subTasks.findMany({
-      where: { levels_Id: subTask.levels_Id },
+      where: { levels_Id: subTask.levels_Id, item: { gte: subTask.item } },
       orderBy: { item: 'asc' },
-      include: {
-        Levels: { select: { item: true } },
-      },
+      include: { Levels: { select: { item: true } } },
     });
     const updateList = list.map(async ({ id, Levels }, i) => {
-      const item = Levels?.item + '.' + (i + 1);
+      const item = Levels.item + '.' + (i + 1);
       return await prisma.subTasks.update({ where: { id }, data: { item } });
     });
     const result = await Promise.all(updateList);
@@ -295,38 +232,25 @@ class SubTasksServices {
   ) {
     const newUserData = userData.map(user => ({ userId: user.id }));
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const getHours = await prisma.subTasks.findUnique({
-      where: { id },
-      select: { days: true },
-    });
-    // const GMT = 60 * 60 * 1000;
-    // const today = new Date().getTime();
-    // const hours = (getHours ? getHours.days : 0) * GMT;
-    // const assignedAt = new Date(new Date().setHours(new Date().getHours() - 5));
-    // const assignUserBySubtaskPromises = userData.map(async user => {
-    return await prisma.subTasks.update({
-      where: { id },
-      data: {
-        status: 'PROCESS',
-        users: {
-          create: newUserData,
-          updateMany: {
-            data: {
-              // untilDate: new Date(today + hours),
-              // assignedAt,
-            },
-            where: {
-              subtaskId: id,
-            },
+
+    const { days } = await this.find(id);
+    const hours = days * this.GMT;
+    const untilDate = new Date(this.today + hours);
+    const assignedUsers = userData.map(async user => {
+      return await prisma.subTasks.update({
+        where: { id },
+        data: {
+          status: 'PROCESS',
+          users: {
+            create: newUserData,
+            updateMany: { data: { untilDate }, where: { subtaskId: id } },
           },
         },
-      },
-      include: Queries.includeSubtask,
+        include: Queries.includeSubtask,
+      });
     });
-    // }
-    // );
-    // await Promise.all(assignUserBySubtaskPromises);
-    // return assignUserBySubtaskPromises[assignUserBySubtaskPromises.length - 1];
+    await Promise.all(assignedUsers);
+    return assignedUsers[assignedUsers.length - 1];
   }
 }
 export default SubTasksServices;
