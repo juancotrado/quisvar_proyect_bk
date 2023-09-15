@@ -111,26 +111,7 @@ class StageInfo {
     if (!subTask)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
     const { item, name, status } = subTask;
-    if (subTask.indexTaskId) {
-      const { indexTaskId } = subTask;
-      const rootPathTask = await PathServices.pathIndexTask(indexTaskId);
-      return { id, item, name, rootPathTask };
-    }
-    if (subTask.taskId) {
-      const { taskId } = subTask;
-      const rootPathTask = await PathServices.pathTask(taskId);
-      return { id, item, name, rootPathTask };
-    }
-    if (subTask.task_2_Id) {
-      const { task_2_Id } = subTask;
-      const rootPathTask = await PathServices.pathTask2(task_2_Id);
-      return { id, item, name, rootPathTask };
-    }
-    if (subTask.task_3_Id) {
-      const { task_3_Id } = subTask;
-      const rootPathTask = await PathServices.pathTask3(task_3_Id);
-      return { id, item, name, rootPathTask };
-    }
+
     // return { id, item, name, rootPathTask: '' };
     throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
   }
@@ -173,8 +154,9 @@ class PathServices {
   }
 
   static async pathSubTask(id: SubTasks['id'], type: Files['type']) {
-    const { rootPathTask } = await StageInfo.findSubTask(id);
-    const projectDir = rootPathTask.split('/').at(3);
+    const rootPathTask = await StageInfo.findSubTask(id);
+    const projectDir = rootPathTask;
+    // .split('/').at(3);
     if (type === 'MATERIAL') return _materialPath + '/' + projectDir;
     if (type === 'REVIEW') return _reviewPath + '/' + projectDir;
     return rootPathTask;

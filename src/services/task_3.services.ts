@@ -13,9 +13,6 @@ class Task_3_Services {
       select: {
         id: true,
         name: true,
-        subTasks: {
-          include: Queries.includeSubtask,
-        },
       },
     });
     return findTaskLvl3;

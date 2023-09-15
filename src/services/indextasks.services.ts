@@ -32,12 +32,6 @@ class IndexTasksServices {
       select: {
         id: true,
         name: true,
-        subTasks: {
-          where: {
-            status,
-          },
-          include: Queries.includeSubtask,
-        },
       },
     });
     if (!findTask) throw new AppError('No se pudo encontrar la tarea ', 404);

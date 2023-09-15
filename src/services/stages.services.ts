@@ -1,7 +1,18 @@
-import { Level } from 'types/types';
+import { GetFilterLevels, Level } from 'types/types';
 import AppError from '../utils/appError';
-import { Projects, Stages, prisma } from '../utils/prisma.server';
-import { calculateAndUpdateDataByLevel } from '../utils/tools';
+import {
+  Levels,
+  Projects,
+  Stages,
+  SubTasks,
+  prisma,
+} from '../utils/prisma.server';
+import {
+  calculateAndUpdateDataByLevel,
+  sumPriceByStage,
+  sumSubtaksByStage,
+  sumValues,
+} from '../utils/tools';
 import LevelsServices from './levels.services';
 import { existsSync } from 'fs';
 import PathLevelServices from './path_levels.services';
@@ -24,69 +35,71 @@ class StageServices {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const findStage = await prisma.stages.findUnique({
       where: { id },
-      select: {
-        id: true,
-        name: true,
-        levels: { where: { rootId: 0, stagesId: id } },
-        project: {
-          select: {
-            name: true,
-          },
-        },
-      },
+      include: { project: { select: { name: true } } },
     });
     if (!findStage)
       throw new AppError('Oops!,No se pudo encontrar la etapa', 400);
-    const newFindStage = findStage.levels.map(async level => {
-      const levelCopy = { ...level, nextLevel: {} };
-      const nextLevel = await LevelsServices.find(level.id);
-      if (Object.keys(levelCopy).length) levelCopy.nextLevel = nextLevel;
-      return {
-        ...levelCopy,
-        spending: 0,
-        balance: 0,
-        price: 0,
-        details: {
-          UNRESOLVED: 0,
-          PROCESS: 0,
-          INREVIEW: 0,
-          DENIED: 0,
-          DONE: 0,
-          LIQUIDATION: 0,
-          TOTAL: 0,
-        },
-      };
+    const { name, project } = findStage;
+    const projectName = project.name;
+    const getList = await prisma.levels.findMany({
+      where: { stagesId: id },
+      orderBy: { item: 'asc' },
+      include: { subTasks: true },
     });
-    const result = (await Promise.all(newFindStage)) as Level[];
-    const transformData: Level[] = [
-      {
-        id: 0,
-        item: '',
-        rootId: 0,
-        spending: 0,
-        balance: 0,
-        price: 0,
-        level: 0,
-        rootLevel: 0,
-        stagesId: 0,
-        isInclude: false,
-        userId: null,
-        isArea: false,
-        isProject: false,
-        details: {
-          UNRESOLVED: 0,
-          PROCESS: 0,
-          INREVIEW: 0,
-          DENIED: 0,
-          DONE: 0,
-          LIQUIDATION: 0,
-          TOTAL: 0,
-        },
-        name: findStage.project?.name || 'lEVEL',
-        nextLevel: result,
-      },
-    ];
-    return calculateAndUpdateDataByLevel(transformData);
+    const list = LevelsServices.findList(getList, 0, 0);
+    const nextLevel = calculateAndUpdateDataByLevel(list);
+    const totalValues = sumPriceByStage(getList);
+    return { id, name, projectName, ...totalValues, nextLevel };
+    // const newFindStage = findStage.levels.map(async level => {
+    //   const levelCopy = { ...level, nextLevel: {} };
+    //   const nextLevel = await LevelsServices.find(level.id);
+    //   if (Object.keys(levelCopy).length) levelCopy.nextLevel = nextLevel;
+    //   return {
+    //     ...levelCopy,
+    //     spending: 0,
+    //     balance: 0,
+    //     price: 0,
+    //     details: {
+    //       UNRESOLVED: 0,
+    //       PROCESS: 0,
+    //       INREVIEW: 0,
+    //       DENIED: 0,
+    //       DONE: 0,
+    //       LIQUIDATION: 0,
+    //       TOTAL: 0,
+    //     },
+    //   };
+    // });
+    // const result = (await Promise.all(newFindStage)) as Level[];
+    // const transformData: Level[] = [
+    //   {
+    //     id: 0,
+    //     item: '',
+    //     rootId: 0,
+    //     spending: 0,
+    //     balance: 0,
+    //     price: 0,
+    //     level: 0,
+    //     rootLevel: 0,
+    //     stagesId: 0,
+    //     isInclude: false,
+    //     userId: null,
+    //     isArea: false,
+    //     isProject: false,
+    //     details: {
+    //       UNRESOLVED: 0,
+    //       PROCESS: 0,
+    //       INREVIEW: 0,
+    //       DENIED: 0,
+    //       DONE: 0,
+    //       LIQUIDATION: 0,
+    //       TOTAL: 0,
+    //     },
+    //     name: findStage.project?.name || 'lEVEL',
+    //     nextLevel: result,
+    //   },
+    // ];
+    // return calculateAndUpdateDataByLevel(transformData);
   }
 
   static async create({ name, projectId }: Stages) {

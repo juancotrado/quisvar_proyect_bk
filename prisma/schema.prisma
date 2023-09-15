@@ -275,7 +275,6 @@ model IndexTasks {
   workAreaId Int
   item       String     @default("")
   workArea   WorkAreas  @relation(fields: [workAreaId], references: [id], onDelete: Cascade)
-  subTasks   SubTasks[]
   tasks      Tasks[]
 }
 
@@ -285,7 +284,6 @@ model Tasks {
   unique      Boolean      @default(false)
   indexTaskId Int
   item        String       @default("")
-  subTasks    SubTasks[]
   tasks_2     Task_lvl_2[]
   indexTask   IndexTasks   @relation(fields: [indexTaskId], references: [id], onDelete: Cascade)
 }
@@ -296,7 +294,6 @@ model Task_lvl_2 {
   unique   Boolean      @default(false)
   taskId   Int
   item     String       @default("")
-  subTasks SubTasks[]
   task     Tasks        @relation(fields: [taskId], references: [id], onDelete: Cascade)
   tasks_3  Task_lvl_3[]
 }
@@ -307,7 +304,6 @@ model Task_lvl_3 {
   unique    Boolean    @default(false)
   item      String     @default("")
   task_2_Id Int
-  subTasks  SubTasks[]
   task_2    Task_lvl_2 @relation(fields: [task_2_Id], references: [id], onDelete: Cascade)
 }
 
@@ -317,25 +313,16 @@ model SubTasks {
   item        String        @default("")
   name        String
   description String?
-  percentage  Int           @default(0)
   price       Decimal       @db.Money
-  hours       Float
+  days       Float
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
-  taskId      Int?
-  indexTaskId Int?
-  task_2_Id   Int?
-  task_3_Id   Int?
   hasPDF      Boolean       @default(false)
   levels_Id   Int?
   feedBacks   Feedback[]
   files       Files[]
-  indexTask   IndexTasks?   @relation(fields: [indexTaskId], references: [id], onDelete: Cascade)
   Levels      Levels?       @relation(fields: [levels_Id], references: [id])
-  task        Tasks?        @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  task_lvl_2  Task_lvl_2?   @relation(fields: [task_2_Id], references: [id], onDelete: Cascade)
-  task_lvl_3  Task_lvl_3?   @relation(fields: [task_3_Id], references: [id], onDelete: Cascade)
-  users       TaskOnUsers[]
+   users       TaskOnUsers[]
 }
 
 enum UserRole {

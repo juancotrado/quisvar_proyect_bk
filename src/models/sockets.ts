@@ -15,13 +15,14 @@ class Sockets {
     this.socketEvents();
   }
   roomPlace(subTask: SubTasks) {
-    const room = subTask.indexTaskId
-      ? subTask.indexTaskId + 'indextask'
-      : subTask.taskId
-      ? subTask.taskId + 'task'
-      : subTask.task_2_Id
-      ? subTask.task_2_Id + 'task2'
-      : subTask.task_3_Id + 'task3';
+    // const room = subTask.indexTaskId
+    //   ? subTask.indexTaskId + 'indextask'
+    //   : subTask.taskId
+    //   ? subTask.taskId + 'task'
+    //   : subTask.task_2_Id
+    //   ? subTask.task_2_Id + 'task2'
+    //   : subTask.task_3_Id + 'task3';
+    const room = 'level';
     return room;
   }
   socketEvents() {

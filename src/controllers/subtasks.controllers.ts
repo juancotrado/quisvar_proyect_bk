@@ -111,9 +111,13 @@ export const assignUserBySubtask = async (
     const { body } = req;
     const task = await SubTasksServices.assignUserBySubtask(body, +id);
     const project = await StageServices.find(+stageId);
-    res
-      .status(200)
-      .json({ task, project: { ...project[0], stagesId: stageId } });
+    res.status(200).json({
+      task,
+      project: {
+        // ...project[0],
+        stagesId: stageId,
+      },
+    });
   } catch (error) {
     next(error);
   }

@@ -16,7 +16,8 @@ const storage = multer.diskStorage({
       const { id } = req.params;
       const _subtask_id = parseInt(id);
       const status = req.query.status as Files['type'];
-      const path = await PathServices.pathSubTask(_subtask_id, status);
+      // const path = await PathServices.pathSubTask(_subtask_id, status);
+      const path = '';
       callback(null, path);
     } catch (error) {
       callback(new AppError(`No se pudo encontrar la ruta`, 404), '');

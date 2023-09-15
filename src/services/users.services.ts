@@ -57,44 +57,7 @@ class UsersServices {
         orderBy: { subtaskId: 'desc' },
         select: {
           subtask: {
-            include: {
-              indexTask: {
-                select: { id: true, workAreaId: true },
-              },
-              task: {
-                select: {
-                  id: true,
-                  indexTask: { select: { id: true, workAreaId: true } },
-                },
-              },
-              task_lvl_2: {
-                select: {
-                  id: true,
-                  task: {
-                    select: {
-                      id: true,
-                      indexTask: { select: { id: true, workAreaId: true } },
-                    },
-                  },
-                },
-              },
-              task_lvl_3: {
-                select: {
-                  id: true,
-                  task_2: {
-                    select: {
-                      id: true,
-                      task: {
-                        select: {
-                          id: true,
-                          indexTask: { select: { id: true, workAreaId: true } },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
+            include: {},
           },
         },
       });
@@ -108,18 +71,11 @@ class UsersServices {
         users: {
           every: { userId },
         },
-        indexTask: { workArea: { projectId } },
       },
       include: {
         users: {
           select: {
             assignedAt: true,
-          },
-        },
-        indexTask: {
-          select: {
-            id: true,
-            workAreaId: true,
           },
         },
       },
@@ -129,23 +85,11 @@ class UsersServices {
         users: {
           every: { userId },
         },
-        task: { indexTask: { workArea: { projectId } } },
       },
       include: {
         users: {
           select: {
             assignedAt: true,
-          },
-        },
-        task: {
-          select: {
-            id: true,
-            indexTask: {
-              select: {
-                id: true,
-                workAreaId: true,
-              },
-            },
           },
         },
       },
@@ -155,28 +99,11 @@ class UsersServices {
         users: {
           every: { userId },
         },
-        task_lvl_2: { task: { indexTask: { workArea: { projectId } } } },
       },
       include: {
         users: {
           select: {
             assignedAt: true,
-          },
-        },
-        task_lvl_2: {
-          select: {
-            id: true,
-            task: {
-              select: {
-                id: true,
-                indexTask: {
-                  select: {
-                    id: true,
-                    workAreaId: true,
-                  },
-                },
-              },
-            },
           },
         },
       },
@@ -186,35 +113,11 @@ class UsersServices {
         users: {
           every: { userId },
         },
-        task_lvl_3: {
-          task_2: { task: { indexTask: { workArea: { projectId } } } },
-        },
       },
       include: {
         users: {
           select: {
             assignedAt: true,
-          },
-        },
-        task_lvl_3: {
-          select: {
-            id: true,
-            task_2: {
-              select: {
-                id: true,
-                task: {
-                  select: {
-                    id: true,
-                    indexTask: {
-                      select: {
-                        id: true,
-                        workAreaId: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
           },
         },
       },

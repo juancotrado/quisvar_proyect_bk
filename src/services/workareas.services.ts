@@ -36,133 +36,13 @@ class WorkAreasServices {
     const getTask = await prisma.subTasks.findMany({
       where: {
         status: 'INREVIEW',
-        OR: [
-          { indexTask: { workArea: { userId } } },
-          { task: { indexTask: { workArea: { userId } } } },
-          { task_lvl_2: { task: { indexTask: { workArea: { userId } } } } },
-          {
-            task_lvl_3: {
-              task_2: {
-                task: { indexTask: { workArea: { userId } } },
-              },
-            },
-          },
-        ],
       },
       select: {
         id: true,
         name: true,
         item: true,
         status: true,
-        indexTask: {
-          select: {
-            id: true,
-            name: true,
-            item: true,
-            workArea: {
-              select: {
-                id: true,
-                name: true,
-                item: true,
-                project: {
-                  select: { name: true },
-                },
-              },
-            },
-          },
-        },
-        task: {
-          select: {
-            id: true,
-            name: true,
-            item: true,
-            indexTask: {
-              select: {
-                id: true,
-                name: true,
-                item: true,
-                workArea: {
-                  select: {
-                    id: true,
-                    name: true,
-                    item: true,
-                    project: {
-                      select: { name: true },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        task_lvl_2: {
-          select: {
-            id: true,
-            name: true,
-            item: true,
-            task: {
-              select: {
-                id: true,
-                name: true,
-                item: true,
-                indexTask: {
-                  select: {
-                    id: true,
-                    name: true,
-                    item: true,
-                    workArea: {
-                      select: {
-                        id: true,
-                        name: true,
-                        item: true,
-                        project: {
-                          select: { name: true },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        task_lvl_3: {
-          select: {
-            id: true,
-            name: true,
-            item: true,
-            task_2: {
-              select: {
-                name: true,
-                item: true,
-                task: {
-                  select: {
-                    id: true,
-                    name: true,
-                    item: true,
-                    indexTask: {
-                      select: {
-                        id: true,
-                        name: true,
-                        item: true,
-                        workArea: {
-                          select: {
-                            id: true,
-                            name: true,
-                            item: true,
-                            project: {
-                              select: { name: true },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
+
         users: {
           select: {
             user: {
@@ -210,7 +90,6 @@ class WorkAreasServices {
             name: true,
             unique: true,
             item: true,
-            subTasks: true,
             tasks: {
               orderBy: { id: 'asc' },
               select: {
@@ -218,7 +97,6 @@ class WorkAreasServices {
                 name: true,
                 unique: true,
                 item: true,
-                subTasks: true,
                 tasks_2: {
                   orderBy: { id: 'asc' },
                   select: {
@@ -226,7 +104,6 @@ class WorkAreasServices {
                     name: true,
                     unique: true,
                     item: true,
-                    subTasks: true,
                     tasks_3: {
                       orderBy: { id: 'asc' },
                       select: {
@@ -234,8 +111,6 @@ class WorkAreasServices {
                         name: true,
                         unique: true,
                         item: true,
-                        subTasks: true,
-                        _count: { select: { subTasks: true } },
                       },
                     },
                   },

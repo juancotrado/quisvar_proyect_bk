@@ -19,12 +19,9 @@ class SubTasksServices {
     const findSubTask = await prisma.subTasks.findUnique({
       where: { id },
       include: {
-        ...Queries.includeSubtask,
-        task: {
-          select: {
-            name: true,
-          },
-        },
+        // ...Queries.includeSubtask,
+        // task: {
+        // },
       },
     });
     if (!findSubTask) throw new AppError('No se pudo encontrar la tares ', 404);
@@ -35,11 +32,6 @@ class SubTasksServices {
     const findSubTasks = await prisma.subTasks.findMany({
       include: {
         ...Queries.includeSubtask,
-        task: {
-          select: {
-            name: true,
-          },
-        },
       },
     });
     if (!findSubTasks) throw new AppError('No Hay ninguna tarea', 404);
@@ -72,13 +64,7 @@ class SubTasksServices {
     const duplicated = list.map(({ name }) => name).includes(name);
     return { duplicated, levels_Id, rootItem };
   }
-  static async create({
-    name,
-    price,
-    description,
-    hours,
-    levels_Id,
-  }: SubTasks) {
+  static async create({ name, price, description, days, levels_Id }: SubTasks) {
     if (!levels_Id)
       throw new AppError('Oops!,se necesita el ID del nivel ', 400);
     const isDuplicated = await this.findDuplicate(name, levels_Id, 'ROOT');
@@ -86,7 +72,7 @@ class SubTasksServices {
     if (duplicated) throw new AppError('Error, Nombre existente', 404);
     const quantity = await prisma.subTasks.count({ where: { levels_Id } });
     const item = rootItem + '.' + (quantity + 1);
-    const data = { name, price, hours, description, levels_Id, item };
+    const data = { name, price, days, description, levels_Id, item };
     const newSubTask = await prisma.subTasks.create({
       data,
       include: { users: { select: { user: Queries.selectProfileUser } } },
@@ -116,10 +102,10 @@ class SubTasksServices {
     if (option == 'apply') {
       const getHours = await prisma.subTasks.findUnique({
         where: { id },
-        select: { hours: true },
+        select: { days: true },
       });
       const today = new Date().getTime();
-      const hours = (getHours ? getHours.hours : 0) * 60 * 60 * 1000;
+      const hours = (getHours ? getHours.days : 0) * 60 * 60 * 1000;
       const assignedAt = new Date(
         new Date().setHours(new Date().getHours() - 5)
       );
@@ -153,7 +139,7 @@ class SubTasksServices {
 
   static async update(
     id: SubTasks['id'],
-    data: Pick<SubTasks, 'name' | 'hours' | 'price' | 'description'>
+    data: Pick<SubTasks, 'name' | 'days' | 'price' | 'description'>
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateTask = await prisma.subTasks.update({
@@ -178,7 +164,7 @@ class SubTasksServices {
 
   static async updateStatus(
     id: SubTasks['id'],
-    { status, percentage }: SubTasks,
+    { status }: SubTasks,
     user: Users
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
@@ -186,7 +172,6 @@ class SubTasksServices {
       where: { id },
       data: {
         status,
-        percentage,
       },
       include: Queries.includeSubtask,
     });
@@ -213,7 +198,7 @@ class SubTasksServices {
         await prisma.files.create({
           data: {
             name: file.name,
-            dir: modelDir,
+            // dir: modelDir,
             type: 'MATERIAL',
             userId: file.userId,
             subTasksId: file.subTasksId,
@@ -221,7 +206,11 @@ class SubTasksServices {
         });
         await prisma.files.update({
           where: { id: file.id },
-          data: { type: 'SUCCESSFUL', name: newFileName, dir: newDir },
+          data: {
+            type: 'SUCCESSFUL',
+            name: newFileName,
+            //  dir: newDir
+          },
         });
         copyFile(`${oldDir}/${file.name}`, `${modelDir}/${file.name}`).then(
           () => {
@@ -323,10 +312,10 @@ class SubTasksServices {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const getHours = await prisma.subTasks.findUnique({
       where: { id },
-      select: { hours: true },
+      select: { days: true },
     });
     const today = new Date().getTime();
-    const hours = (getHours ? getHours.hours : 0) * 60 * 60 * 1000;
+    const hours = (getHours ? getHours.days : 0) * 60 * 60 * 1000;
     const assignedAt = new Date(new Date().setHours(new Date().getHours() - 5));
     // const assignUserBySubtaskPromises = userData.map(async user => {
     return await prisma.subTasks.update({

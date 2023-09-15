@@ -1,4 +1,4 @@
-import { Levels } from '@prisma/client';
+import { Levels, SubTasks } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import PathLevelServices from './path_levels.services';
@@ -13,30 +13,29 @@ import {
   existRootLevelPath,
   filterLevelList,
   getDetailsSubtask,
+  getFilterListLevels,
   getRootItem,
   getRootPath,
   parseRootItem,
   percentageSubTasks,
   sumValues,
 } from '../utils/tools';
-import { DuplicateLevel } from 'types/types';
+import { DuplicateLevel, GetFilterLevels } from 'types/types';
 import { existsSync } from 'fs';
 
 class LevelsServices {
   static async find(id: Levels['id']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
-    const findProject = await prisma.levels.findUnique({
-      where: { id },
-      select: {
-        stages: { select: { project: { select: { percentage: true } } } },
-      },
+    const findRootLevel = await prisma.levels.findUnique({ where: { id } });
+    if (!findRootLevel) throw new AppError('No se pudó encontrar nivel', 400);
+    const { stagesId, level } = findRootLevel;
+    const getList = await prisma.levels.findMany({
+      where: { stagesId, level: { gt: level } },
+      orderBy: { item: 'asc' },
+      include: { subTasks: true },
     });
-    if (!findProject || !findProject.stages)
-      throw new AppError('Oops!, proyecto invalido', 400);
-    const { project } = findProject.stages;
-    if (!project) throw new AppError('Oops!, proyecto invalido', 400);
-    const findLevel = await this.findList(id, project.percentage);
-    return findLevel;
+    const nextLevel = this.findList(getList, id, level);
+    return { ...findRootLevel, nextLevel };
   }
 
   static async duplicate(
@@ -112,9 +111,9 @@ class LevelsServices {
     //------------------------------------------------------------------------
     const { rootPath, ...level } = await getRootPath(id);
     const { rootId, stagesId, _item } = level;
-    // const deleteLevel = await prisma.levels.delete({ where: { id } });
-    const deleteLevel = await prisma.levels.findUnique({ where: { id } });
-    if (!deleteLevel) throw new AppError('errpr', 404);
+    const deleteLevel = await prisma.levels.delete({ where: { id } });
+    // const deleteLevel = await prisma.levels.findUnique({ where: { id } });
+    // if (!deleteLevel) throw new AppError('errpr', 404);
     if (!_item) return rootPath + parsePath(deleteLevel.item, deleteLevel.name);
     //------------------------------------------------------------------------
     const getList = await prisma.levels.findMany({
@@ -187,7 +186,7 @@ class LevelsServices {
     return result;
   }
 
-  static async findList(rootId: Levels['rootId'], percentage: number) {
+  static async findList23(rootId: Levels['rootId'], percentage: number) {
     const findList = await prisma.levels.findMany({
       where: { rootId },
       include: {
@@ -208,7 +207,7 @@ class LevelsServices {
     });
     if (findList.length === 0) return [];
     const newListTask = findList.map(async ({ subTasks, ...level }) => {
-      const nextLevel: typeof findList = await this.findList(
+      const nextLevel: typeof findList = await this.findList23(
         level.id,
         percentage
       );
@@ -230,6 +229,39 @@ class LevelsServices {
     });
     const result = await Promise.all(newListTask);
     return result;
+  }
+
+  static findList(
+    array: GetFilterLevels[],
+    _rootId: number,
+    _rootLevel: number
+  ) {
+    const findList = array.filter(
+      ({ rootId, rootLevel }) => rootId === _rootId && rootLevel === _rootLevel
+    );
+    const list = array.filter(value => !findList.includes(value));
+    if (!findList.length) return [];
+    const newList = findList.map(({ subTasks, ...value }) => {
+      const { id, level } = value;
+      let data: any = {
+        spending: 0,
+        balance: 0,
+        price: 0,
+        days: 0,
+        ...value,
+      };
+      if (subTasks && subTasks.length) {
+        const price = sumValues(subTasks, 'price');
+        const days = sumValues(subTasks, 'days');
+        const spending = sumValues(subTasks, 'spending');
+        const balance = price - spending;
+        data = { price, spending, balance, days, ...value, subTasks };
+      }
+      const nextLevel: typeof findList = this.findList(list, id, level);
+      if (!nextLevel.length) return data;
+      return { ...data, nextLevel };
+    });
+    return newList;
   }
 }
 

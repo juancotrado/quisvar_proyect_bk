@@ -3,7 +3,6 @@ import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import PathServices from './paths.services';
 import { renameDir } from '../utils/fileSystem';
-import Queries from '../utils/queries';
 
 class Task_2_Services {
   static async find(id: Task_lvl_2['id']) {
@@ -13,9 +12,6 @@ class Task_2_Services {
       select: {
         id: true,
         name: true,
-        subTasks: {
-          include: Queries.includeSubtask,
-        },
       },
     });
     return findTaskLvl2;

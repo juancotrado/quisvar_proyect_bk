@@ -193,7 +193,7 @@ class DuplicatesServices {
       where: { [type]: idOld },
       select: {
         id: true,
-        hours: true,
+        days: true,
         item: true,
         name: true,
         price: true,
@@ -244,7 +244,7 @@ class DuplicatesServices {
               return file;
             })
           );
-          await prisma.files.createMany({ data: newFiles });
+          // await prisma.files.createMany({ data: newFiles });
         }
       });
     }

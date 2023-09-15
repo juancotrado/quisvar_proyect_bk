@@ -118,7 +118,7 @@ export const uploadFiles = async (
       userId: userInfo.id,
     }));
     if (!req.files) return;
-    await FilesServices.createManyFiles(data, _subtask_id);
+    // await FilesServices.createManyFiles(data, _subtask_id);
     const query = await SubTasksServices.find(_subtask_id);
     res.status(201).json(query);
   } catch (error) {

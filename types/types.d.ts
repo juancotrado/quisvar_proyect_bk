@@ -1,5 +1,6 @@
 import {
   IndexTasks,
+  Levels,
   SubTasks,
   Supervisor,
   Task_lvl_2,
@@ -89,7 +90,8 @@ export interface Level {
   rootLevel: number;
   stagesId: number;
   userId: null;
-  details: Details;
+  days: number;
+  // details: Details;
   nextLevel?: Level[];
 }
 
@@ -120,4 +122,8 @@ export interface DuplicateLevel {
   id: number;
   stagesId: number;
   type: 'ROOT' | 'ID';
+}
+
+export interface GetFilterLevels extends Levels {
+  subTasks?: SubTasks[];
 }
