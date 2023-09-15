@@ -269,12 +269,12 @@ model WorkAreas {
 }
 
 model IndexTasks {
-  id         Int        @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
-  unique     Boolean    @default(false)
+  unique     Boolean   @default(false)
   workAreaId Int
-  item       String     @default("")
-  workArea   WorkAreas  @relation(fields: [workAreaId], references: [id], onDelete: Cascade)
+  item       String    @default("")
+  workArea   WorkAreas @relation(fields: [workAreaId], references: [id], onDelete: Cascade)
   tasks      Tasks[]
 }
 
@@ -289,13 +289,13 @@ model Tasks {
 }
 
 model Task_lvl_2 {
-  id       Int          @id @default(autoincrement())
-  name     String
-  unique   Boolean      @default(false)
-  taskId   Int
-  item     String       @default("")
-  task     Tasks        @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  tasks_3  Task_lvl_3[]
+  id      Int          @id @default(autoincrement())
+  name    String
+  unique  Boolean      @default(false)
+  taskId  Int
+  item    String       @default("")
+  task    Tasks        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  tasks_3 Task_lvl_3[]
 }
 
 model Task_lvl_3 {
@@ -314,15 +314,15 @@ model SubTasks {
   name        String
   description String?
   price       Decimal       @db.Money
-  days       Float
+  days        Float
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   hasPDF      Boolean       @default(false)
-  levels_Id   Int?
+  levels_Id   Int
   feedBacks   Feedback[]
   files       Files[]
-  Levels      Levels?       @relation(fields: [levels_Id], references: [id])
-   users       TaskOnUsers[]
+  Levels      Levels        @relation(fields: [levels_Id], references: [id])
+  users       TaskOnUsers[]
 }
 
 enum UserRole {

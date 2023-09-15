@@ -33,13 +33,18 @@ class StageInfo {
     return stage;
   }
   static async getValues(id: number) {
-    if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findLevel = await prisma.levels.findUnique({ where: { id } });
     if (!findLevel) throw new AppError('Oops!,ID no encontrado', 400);
     const { rootId, item, name } = findLevel;
     if (!rootId) return item + name;
     const nextLevel: string = await this.getValues(rootId);
     return nextLevel + '/' + item + name;
+  }
+  static async findSubtask(id: number) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const findSubTask = await prisma.subTasks.findUnique({ where: { id } });
+    if (!findSubTask) throw new AppError('Oops!,No hay el directorio', 404);
+    return findSubTask;
   }
 }
 
@@ -61,10 +66,14 @@ class PathLevelServices {
     const findLevel = await prisma.levels.findUnique({ where: { id } });
     if (!findLevel) throw new AppError('Oops!,No hay el directorio', 404);
     const { stagesId } = findLevel;
-    if (!stagesId) throw new AppError('Oops!,No hay el directorio', 404);
     const projectPath = await this.pathStage(stagesId, 'UPLOADS');
     const path = await StageInfo.getValues(id);
     return projectPath + '/' + path;
+  }
+  static async pathSubTask(id: number) {
+    const { levels_Id, name, item } = await StageInfo.findSubtask(id);
+    const levelPath = await this.pathLevel(levels_Id);
+    return levelPath + '/' + item + name;
   }
 }
 export default PathLevelServices;

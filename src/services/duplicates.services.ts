@@ -196,6 +196,7 @@ class DuplicatesServices {
         days: true,
         item: true,
         name: true,
+        levels_Id: true,
         price: true,
         files: {
           where: { type: 'MATERIAL' },
