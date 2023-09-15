@@ -87,7 +87,15 @@ class LevelsServices {
     const isInclude = project || include;
     const newRootItem = rootItem ? rootItem + '.' : '';
     const item = isInclude ? newRootItem + `${quantity + 1}` : '';
-    const user = userId && project ? { connect: { id: userId } } : undefined;
+    const findUser = isInclude
+      ? await prisma.levels.findUnique({ where: { id: rootId } })
+      : null;
+    const user =
+      findUser && findUser.userId
+        ? { connect: { id: findUser.userId } }
+        : userId && project
+        ? { connect: { id: userId } }
+        : undefined;
     const _values = { rootId, item, name, rootLevel, stages, level };
     const data = { ..._values, isProject, isArea, isInclude, user };
     const newLevel = await prisma.levels.create({ data });
