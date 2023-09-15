@@ -8,29 +8,12 @@ import {
   showSubTasksByUser,
 } from './users.controllers';
 import { login, recoverPassword } from './auth.controllers';
-import {
-  createIndexTask,
-  deleteIndexTasks,
-  showIndexTask,
-  showSubtasksByIndexTask,
-  updatIndexTask,
-} from './indextasks.controllers';
+
 // updateTaskStatus,
 // assignedTask,
-import {
-  createTask,
-  deleteTasks,
-  updateTask,
-  showTask,
-} from './tasks.controllers';
+
 // showWorkareas,
-import {
-  deleteWorkarea,
-  createWorkArea,
-  updateWorkarea,
-  showWorkArea,
-  showReviewList,
-} from './workareas.controllers';
+
 import {
   deleteProject,
   showProjects,
@@ -45,7 +28,7 @@ import {
   showSubTask,
   assignedSubTask,
   updateStatusSubTask,
-  updateStatusPDF,
+  // updateStatusPDF,
   updatePercentage,
 } from './subtasks.controllers';
 import {
@@ -61,16 +44,7 @@ import {
   updateSpeciality,
 } from './speacialities.controllers';
 import { deleteFile, uploadFile, uploadFiles } from './files.controllers';
-import {
-  createTaskLvl_2,
-  deleteTaskLvl_2,
-  updateTaskLvl_2,
-} from './task_2.controllers';
-import {
-  createTaskLvl_3,
-  deleteTaskLvl_3,
-  updateTaskLvl_3,
-} from './task_3.controllers';
+
 import { generateIndex, showListReportByUser } from './reports.controllers';
 import { createFeedback, findFeedbacks } from './feedbacks.controllers';
 import {
@@ -129,15 +103,6 @@ export {
   updateSpeciality,
 };
 
-//WorkAreas Controllers
-export {
-  showWorkArea,
-  // showWorkareas,
-  deleteWorkarea,
-  createWorkArea,
-  updateWorkarea,
-  showReviewList,
-};
 //Project Controllers
 export {
   showProjects,
@@ -146,20 +111,6 @@ export {
   createProject,
   updateProject,
 };
-//IndexTask Controllers
-export {
-  showIndexTask,
-  deleteIndexTasks,
-  createIndexTask,
-  updatIndexTask,
-  showSubtasksByIndexTask,
-};
-//Task Controllers
-export { showTask, createTask, deleteTasks, updateTask };
-//Task Lvl2 Controllers
-export { createTaskLvl_2, updateTaskLvl_2, deleteTaskLvl_2 };
-//Task Lvl3 Controllers
-export { createTaskLvl_3, updateTaskLvl_3, deleteTaskLvl_3 };
 
 //Subtask Controllers
 export {
@@ -169,7 +120,7 @@ export {
   updateSubTask,
   assignedSubTask,
   updateStatusSubTask,
-  updateStatusPDF,
+  // updateStatusPDF,
   updatePercentage,
 };
 //Profile Controllers

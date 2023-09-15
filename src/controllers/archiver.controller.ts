@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
-import { PathLevelServices, PathServices } from '../services';
+import { PathServices } from '../services';
 import { archiverFolder } from '../utils/archiver';
 import fs from 'fs';
 
 const TYPE_PATH = {
   // routes: PathServices.pathArea,
-  projects: PathLevelServices.pathProject,
-  levels: PathLevelServices.pathLevel,
-  stages: PathLevelServices.pathStage,
+  projects: PathServices.project,
+  levels: PathServices.level,
+  stages: PathServices.stage,
   // indextasks: PathServices.pathIndexTask,
   // tasks: PathServices.pathTask,
   // tasks2: PathServices.pathTask2,

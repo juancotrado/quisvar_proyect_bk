@@ -2,7 +2,7 @@ import { Response, Request, NextFunction } from 'express';
 import AppError from '../utils/appError';
 import { UserType } from './auth.middleware';
 import { SubTasks, Users, prisma } from '../utils/prisma.server';
-import { SubTasksServices, TasksServices } from '../services';
+import { SubTasksServices } from '../services';
 
 const permStatus: SubTasks['status'][] = ['UNRESOLVED', 'PROCESS', 'INREVIEW'];
 const permRole: Users['role'][] = ['ADMIN', 'MOD'];

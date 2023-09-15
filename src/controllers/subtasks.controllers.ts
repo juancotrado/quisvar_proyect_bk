@@ -123,21 +123,21 @@ export const assignUserBySubtask = async (
   }
 };
 
-export const updateStatusPDF = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const pdf = req.query.pdf == 'true';
-    const _subtask_id = parseInt(id);
-    const query = await SubTasksServices.updateHasPDF(_subtask_id, pdf);
-    return query;
-  } catch (error) {
-    next(error);
-  }
-};
+// export const updateStatusPDF = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const { id } = req.params;
+//     const pdf = req.query.pdf == 'true';
+//     const _subtask_id = parseInt(id);
+//     const query = await SubTasksServices.updateHasPDF(_subtask_id, pdf);
+//     return query;
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 export const updatePercentage = async (
   req: Request,
@@ -150,21 +150,6 @@ export const updatePercentage = async (
     const _subtask_id = parseInt(id);
     const query = await SubTasksServices.updatePercentage(_subtask_id, body);
     res.status(201).json(query);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const deleteFileSubTask = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const { filename } = req.params;
-    const query = await SubTasksServices.deleteFile(filename, +id);
-    res.status(200).json(query);
   } catch (error) {
     next(error);
   }

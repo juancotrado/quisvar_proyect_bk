@@ -31,6 +31,8 @@ class SubTasksServices {
 
   static async findDuplicate(name: string, id: number, type: 'ROOT' | 'ID') {
     let levels_Id, rootItem;
+    if (name.includes('projects'))
+      throw new AppError('Error palabra reservada', 404);
     if (type === 'ID') {
       const getLevelId = await prisma.subTasks.findUnique({
         where: { id },
@@ -47,21 +49,17 @@ class SubTasksServices {
     });
     if (!findLevel) throw new AppError('No se pudo encontrar el índice', 404);
     rootItem = findLevel.item;
-    const list = await prisma.subTasks.groupBy({
-      by: ['name'],
-      where: { levels_Id },
-    });
+    const list = await prisma.subTasks.findMany({ where: { levels_Id } });
+    const quantity = list.length;
     if (!list) throw new AppError('No se pudo encontrar la lista ', 404);
     const duplicated = list.map(({ name }) => name).includes(name);
-    return { duplicated, levels_Id, rootItem };
+    return { duplicated, quantity, levels_Id, rootItem };
   }
+
   static async create({ name, price, description, days, levels_Id }: SubTasks) {
-    if (!levels_Id)
-      throw new AppError('Oops!,se necesita el ID del nivel ', 400);
     const isDuplicated = await this.findDuplicate(name, levels_Id, 'ROOT');
-    const { duplicated, rootItem } = isDuplicated;
+    const { duplicated, rootItem, quantity } = isDuplicated;
     if (duplicated) throw new AppError('Error, Nombre existente', 404);
-    const quantity = await prisma.subTasks.count({ where: { levels_Id } });
     const item = rootItem + '.' + (quantity + 1);
     const data = { name, price, days, description, levels_Id, item };
     const newSubTask = await prisma.subTasks.create({
@@ -143,15 +141,15 @@ class SubTasksServices {
     return updateTask;
   }
 
-  static async updateHasPDF(id: SubTasks['id'], hasPDF: SubTasks['hasPDF']) {
-    if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const updateStatusPDF = await prisma.subTasks.update({
-      where: { id },
-      data: { hasPDF },
-      include: Queries.includeSubtask,
-    });
-    return updateStatusPDF;
-  }
+  // static async updateHasPDF(id: SubTasks['id'], hasPDF: SubTasks['hasPDF']) {
+  //   if (!id) throw new AppError('Oops!,ID invalido', 400);
+  //   const updateStatusPDF = await prisma.subTasks.update({
+  //     where: { id },
+  //     data: { hasPDF },
+  //     include: Queries.includeSubtask,
+  //   });
+  //   return updateStatusPDF;
+  // }
 
   static async updateStatus(
     id: SubTasks['id'],
@@ -179,9 +177,9 @@ class SubTasksServices {
           feedback: { comment: { equals: null } },
         },
       });
-      const oldDir = await PathServices.pathSubTask(id, 'REVIEW');
-      const newDir = await PathServices.pathSubTask(id, 'SUCCESSFUL');
-      const modelDir = await PathServices.pathSubTask(id, 'MATERIAL');
+      const oldDir = await PathServices.subTask(id, 'REVIEW');
+      const newDir = await PathServices.subTask(id, 'UPLOADS');
+      const modelDir = await PathServices.subTask(id, 'MODEL');
       const filesPromises = files.map(async (file, index) => {
         const ext = file.name.split('.').at(-1);
         const newFileName =
@@ -190,7 +188,7 @@ class SubTasksServices {
           data: {
             name: file.name,
             // dir: modelDir,
-            type: 'MATERIAL',
+            type: 'MODEL',
             userId: file.userId,
             subTasksId: file.subTasksId,
           },
@@ -198,7 +196,7 @@ class SubTasksServices {
         await prisma.files.update({
           where: { id: file.id },
           data: {
-            type: 'SUCCESSFUL',
+            type: 'UPLOADS',
             name: newFileName,
             //  dir: newDir
           },
@@ -279,19 +277,15 @@ class SubTasksServices {
     data: { userId: Users['id']; percentage: number }[]
   ) {
     if (!subtaskId) throw new AppError('Opps!, ID invalido', 400);
-    const setPercentage = await Promise.all(
-      data.map(async value => {
-        const { percentage, userId } = value;
-        if (percentage > 100 || percentage < 0)
-          throw new AppError('Ingresar valores desde 0 a 100', 400);
-        return await prisma.taskOnUsers.update({
-          where: { subtaskId_userId: { subtaskId, userId } },
-          data: {
-            percentage,
-          },
-        });
-      })
-    );
+    const listPercentage = data.map(async ({ percentage, userId }) => {
+      if (percentage > 100 || percentage < 0)
+        throw new AppError('Ingresar valores desde 0 a 100', 400);
+      return await prisma.taskOnUsers.update({
+        where: { subtaskId_userId: { subtaskId, userId } },
+        data: { percentage },
+      });
+    });
+    const setPercentage = await Promise.all(listPercentage);
     return setPercentage;
   }
 
@@ -305,9 +299,10 @@ class SubTasksServices {
       where: { id },
       select: { days: true },
     });
-    const today = new Date().getTime();
-    const hours = (getHours ? getHours.days : 0) * 60 * 60 * 1000;
-    const assignedAt = new Date(new Date().setHours(new Date().getHours() - 5));
+    // const GMT = 60 * 60 * 1000;
+    // const today = new Date().getTime();
+    // const hours = (getHours ? getHours.days : 0) * GMT;
+    // const assignedAt = new Date(new Date().setHours(new Date().getHours() - 5));
     // const assignUserBySubtaskPromises = userData.map(async user => {
     return await prisma.subTasks.update({
       where: { id },
@@ -317,8 +312,8 @@ class SubTasksServices {
           create: newUserData,
           updateMany: {
             data: {
-              untilDate: new Date(today + hours),
-              assignedAt,
+              // untilDate: new Date(today + hours),
+              // assignedAt,
             },
             where: {
               subtaskId: id,
@@ -332,38 +327,6 @@ class SubTasksServices {
     // );
     // await Promise.all(assignUserBySubtaskPromises);
     // return assignUserBySubtaskPromises[assignUserBySubtaskPromises.length - 1];
-  }
-
-  static async deleteFile(fileName: string, id: SubTasks['id']) {
-    if (!id) throw new AppError('Oops!,ID invalido', 400);
-
-    const subTasks = await prisma.subTasks.findUnique({
-      where: {
-        id,
-      },
-    });
-    if (!subTasks) throw new AppError('Subtarea no encotrada', 400);
-    fs.unlinkSync(`./uploads/${fileName}`);
-    const uploadFile = await prisma.subTasks.update({
-      where: { id },
-      data: {
-        files: {
-          // set: subTasks?.files.filter(name => name !== fileName),
-        },
-      },
-      include: {
-        users: {
-          select: {
-            user: {
-              select: {
-                profile: true,
-              },
-            },
-          },
-        },
-      },
-    });
-    return uploadFile;
   }
 }
 export default SubTasksServices;

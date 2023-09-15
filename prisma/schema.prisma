@@ -344,8 +344,8 @@ enum TaskRole {
 }
 
 enum FileTypes {
-  MATERIAL
-  SUCCESSFUL
+  MODEL
+  UPLOADS
   REVIEW
 }
 

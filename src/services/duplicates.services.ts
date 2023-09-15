@@ -199,7 +199,7 @@ class DuplicatesServices {
         levels_Id: true,
         price: true,
         files: {
-          where: { type: 'MATERIAL' },
+          where: { type: 'MODEL' },
           // { type: 'SUCCESSFUL' }
         },
       },
@@ -229,8 +229,8 @@ class DuplicatesServices {
               const newName = itemTask
                 ? name.replace(subtask.item.slice(0, -2), itemTask)
                 : name;
-              if (file.type === 'MATERIAL') {
-                const newDir = await PathServices.pathSubTask(
+              if (file.type === 'MODEL') {
+                const newDir = await PathServices.subTask(
                   _subtask_id,
                   file.type
                 );

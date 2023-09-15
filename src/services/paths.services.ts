@@ -1,8 +1,7 @@
-import { StageParse } from 'types/types';
+import { ProjectDir } from 'types/types';
 import { _dirPath, _materialPath, _reviewPath } from '.';
 import AppError from '../utils/appError';
-import { parsePath, parseProjectName } from '../utils/fileSystem';
-import { Files, SubTasks, prisma } from '../utils/prisma.server';
+import { Files, prisma } from '../utils/prisma.server';
 
 class StageInfo {
   static async findProject(id: number) {
@@ -18,149 +17,70 @@ class StageInfo {
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
     return project;
   }
-
-  static async findArea(id: number) {
+  static async findStage(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const area = await prisma.workAreas.findUnique({
+    const stage = await prisma.stages.findUnique({
       where: { id },
       select: {
+        id: true,
         name: true,
-        item: true,
-        projectId: true,
+        project: { select: { id: true, name: true } },
       },
     });
-    if (!area)
+    if (!stage)
       throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
-    const project = await this.findProject(area.projectId);
-    const projectPath = await PathServices.pathProject(area.projectId);
-    return { ...area, project, projectPath };
+    return stage;
   }
-
-  static async findIndexTask(id: number) {
-    if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const index_task = await prisma.indexTasks.findUnique({
-      where: { id },
-      select: {
-        name: true,
-        item: true,
-        workAreaId: true,
-      },
-    });
-    if (!index_task)
-      throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
-    const area = await this.findArea(index_task.workAreaId);
-    const areaPath = await PathServices.pathArea(index_task.workAreaId);
-    return { ...index_task, area, areaPath };
+  static async getValues(id: number) {
+    const findLevel = await prisma.levels.findUnique({ where: { id } });
+    if (!findLevel) throw new AppError('Oops!,ID no encontrado', 400);
+    const { rootId, item, name } = findLevel;
+    if (!rootId) return item + name;
+    const nextLevel: string = await this.getValues(rootId);
+    return nextLevel + '/' + item + name;
   }
-
-  static async findTask(id: number) {
+  static async findSubtask(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const task = await prisma.tasks.findUnique({
+    const findSubTask = await prisma.subTasks.findUnique({
       where: { id },
-      select: {
-        name: true,
-        item: true,
-        indexTaskId: true,
-      },
+      include: { Levels: { select: { stages: true } } },
     });
-    if (!task)
-      throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
-    const indexTask = await this.findIndexTask(task.indexTaskId);
-    const indexTaskPath = await PathServices.pathIndexTask(task.indexTaskId);
-    return { ...task, indexTask, indexTaskPath };
-  }
-
-  static async findTask_2(id: number) {
-    if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const task_2 = await prisma.task_lvl_2.findUnique({
-      where: { id },
-      select: {
-        name: true,
-        item: true,
-        taskId: true,
-      },
-    });
-    if (!task_2)
-      throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
-    const task = await this.findTask(task_2.taskId);
-    const taskPath = await PathServices.pathTask(task_2.taskId);
-    return { ...task_2, task, taskPath };
-  }
-
-  static async findTask_3(id: number) {
-    if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const task_3 = await prisma.task_lvl_3.findUnique({
-      where: { id },
-      select: {
-        name: true,
-        item: true,
-        task_2_Id: true,
-      },
-    });
-    if (!task_3)
-      throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
-    const task_2 = await this.findTask_2(task_3.task_2_Id);
-    const task_2Path = await PathServices.pathTask2(task_2.taskId);
-    return { ...task_3, task_2, task_2Path };
-  }
-  static async findSubTask(id: number) {
-    if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const subTask = await prisma.subTasks.findUnique({
-      where: { id },
-    });
-    if (!subTask)
-      throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
-    const { item, name, status } = subTask;
-
-    // return { id, item, name, rootPathTask: '' };
-    throw new AppError('Oops!,No pudimos encontrar el directorio', 404);
+    if (!findSubTask) throw new AppError('Oops!,No hay el directorio', 404);
+    return findSubTask;
   }
 }
 
 class PathServices {
-  static async pathProject(id: number) {
+  static async project(id: number, type: ProjectDir) {
     const { name } = await StageInfo.findProject(id);
-    return _dirPath + '/';
+    if (type === 'MODEL') return _materialPath + '/' + name;
+    if (type === 'REVIEW') return _reviewPath + '/' + name;
+    return _dirPath + '/' + name;
   }
-
-  static async pathArea(id: number) {
-    const { item, name, projectPath } = await StageInfo.findArea(id);
-    const areaPath = parsePath(item, name);
-    return projectPath + areaPath;
+  static async stage(id: number, type: ProjectDir) {
+    const { name, project } = await StageInfo.findStage(id);
+    if (!project) throw new AppError('Oops!,ID no encontrado', 400);
+    const pathProject = await this.project(project.id, type);
+    return pathProject + '/' + name;
   }
-
-  static async pathIndexTask(id: number) {
-    const { item, name, areaPath } = await StageInfo.findIndexTask(id);
-    const indexTaskPath = parsePath(item, name);
-    return areaPath + indexTaskPath;
+  static async level(id: number) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const findLevel = await prisma.levels.findUnique({ where: { id } });
+    if (!findLevel) throw new AppError('Oops!,No hay el directorio', 404);
+    const { stagesId } = findLevel;
+    const projectPath = await this.stage(stagesId, 'UPLOADS');
+    const path = await StageInfo.getValues(id);
+    return projectPath + '/' + path;
   }
-
-  static async pathTask(id: number) {
-    const { item, name, indexTaskPath } = await StageInfo.findTask(id);
-    const taskPath = parsePath(item, name);
-    return indexTaskPath + taskPath;
-  }
-
-  static async pathTask2(id: number) {
-    const { item, name, taskPath } = await StageInfo.findTask_2(id);
-    const task_2Path = parsePath(item, name);
-    return taskPath + task_2Path;
-  }
-
-  static async pathTask3(id: number) {
-    const { item, name, task_2Path } = await StageInfo.findTask_3(id);
-    const task_3Path = parsePath(item, name);
-    return task_2Path + task_3Path;
-  }
-
-  static async pathSubTask(id: SubTasks['id'], type: Files['type']) {
-    const rootPathTask = await StageInfo.findSubTask(id);
-    const projectDir = rootPathTask;
-    // .split('/').at(3);
-    if (type === 'MATERIAL') return _materialPath + '/' + projectDir;
-    if (type === 'REVIEW') return _reviewPath + '/' + projectDir;
-    return rootPathTask;
+  static async subTask(id: number, type: Files['type']) {
+    const { levels_Id, Levels } = await StageInfo.findSubtask(id);
+    const { stages } = Levels;
+    if (type === 'UPLOADS') {
+      const levelPath = await this.level(levels_Id);
+      return levelPath;
+    }
+    const rootPath = await this.stage(stages.id, type);
+    return rootPath;
   }
 }
-
 export default PathServices;

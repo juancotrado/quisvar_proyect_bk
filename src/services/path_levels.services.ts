@@ -2,7 +2,7 @@ import { ProjectDir } from 'types/types';
 import { _dirPath, _materialPath, _reviewPath } from '.';
 import AppError from '../utils/appError';
 import { parsePath, parseProjectName } from '../utils/fileSystem';
-import { prisma } from '../utils/prisma.server';
+import { Files, prisma } from '../utils/prisma.server';
 
 class StageInfo {
   static async findProject(id: number) {
@@ -42,7 +42,10 @@ class StageInfo {
   }
   static async findSubtask(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const findSubTask = await prisma.subTasks.findUnique({ where: { id } });
+    const findSubTask = await prisma.subTasks.findUnique({
+      where: { id },
+      include: { Levels: { select: { stages: true } } },
+    });
     if (!findSubTask) throw new AppError('Oops!,No hay el directorio', 404);
     return findSubTask;
   }
@@ -70,10 +73,15 @@ class PathLevelServices {
     const path = await StageInfo.getValues(id);
     return projectPath + '/' + path;
   }
-  static async pathSubTask(id: number) {
-    const { levels_Id, name, item } = await StageInfo.findSubtask(id);
-    const levelPath = await this.pathLevel(levels_Id);
-    return levelPath + '/' + item + name;
+  static async pathSubTask(id: number, type: Files['type']) {
+    const { levels_Id, Levels } = await StageInfo.findSubtask(id);
+    const { stages } = Levels;
+    if (type === 'UPLOADS') {
+      const levelPath = await this.pathLevel(levels_Id);
+      return levelPath;
+    }
+    const rootPath = await this.pathStage(stages.id, type);
+    return rootPath;
   }
 }
 export default PathLevelServices;

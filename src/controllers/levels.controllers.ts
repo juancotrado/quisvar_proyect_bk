@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { LevelsServices, PathLevelServices } from '../services';
+import { LevelsServices, PathServices } from '../services';
 import { mkdirSync, rmSync } from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
 
@@ -26,7 +26,7 @@ export const createLevel = async (
   try {
     const { body } = req;
     const query = await LevelsServices.create(body);
-    const path = await PathLevelServices.pathLevel(query.id);
+    const path = await PathServices.level(query.id);
     const editablePath = path.replace('projects', 'editables');
     if (query) {
       mkdirSync(path);

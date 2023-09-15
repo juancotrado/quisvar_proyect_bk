@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from 'express';
 import {
-  PathLevelServices,
+  PathServices,
   StageServices,
   _dirPath,
   _editablePath,
@@ -8,7 +8,7 @@ import {
   _reviewPath,
 } from '../services';
 import { mkdirSync, rmSync } from 'fs';
-import { renameDir, setNewPath } from '../utils/fileSystem';
+import { renameDir } from '../utils/fileSystem';
 
 const dir = _dirPath;
 const model = _materialPath;

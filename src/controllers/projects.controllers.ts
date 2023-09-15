@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response, query } from 'express';
 import {
-  PathLevelServices,
   PathServices,
   ProjectsServices,
   _editablePath,
@@ -62,7 +61,7 @@ export const createProject = async (
   try {
     const { body } = req;
     const query = await ProjectsServices.create(body);
-    const path = await PathLevelServices.pathProject(query.id, 'UPLOADS');
+    const path = await PathServices.project(query.id, 'UPLOADS');
     const projectName = query.name;
     createFolders();
     mkdirSync(path);
@@ -84,7 +83,7 @@ export const updateProject = async (
     const { body } = req;
     const { id } = req.params;
     const _project_id = parseInt(id);
-    const oldDir = await PathLevelServices.pathProject(_project_id, 'UPLOADS');
+    const oldDir = await PathServices.project(_project_id, 'UPLOADS');
     if (!existsSync(oldDir))
       throw new AppError('No se pudo editar el projecto', 400);
     const oldName = oldDir.split('/').at(-1);

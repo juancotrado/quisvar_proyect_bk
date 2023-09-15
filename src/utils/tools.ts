@@ -13,7 +13,7 @@ import {
 } from 'types/types';
 import { prisma } from './prisma.server';
 import AppError from './appError';
-import { PathLevelServices } from '../services';
+import { PathServices } from '../services';
 import { existsSync } from 'fs';
 
 export const sumValues = (list: any[], label: string) => {
@@ -284,8 +284,8 @@ export const getRootPath = async (id: number) => {
 
 export const existRootLevelPath = async (rootId: number, stagesId: number) => {
   const rootPath = rootId
-    ? await PathLevelServices.pathLevel(rootId)
-    : await PathLevelServices.pathStage(stagesId, 'UPLOADS');
+    ? await PathServices.level(rootId)
+    : await PathServices.stage(stagesId, 'UPLOADS');
   if (!existsSync(rootPath)) throw new AppError('Ops!,carpeta no existe', 404);
   return rootPath;
 };

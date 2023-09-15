@@ -6,17 +6,12 @@ import { Server as WebSocketServer } from 'socket.io';
 import http from 'http';
 import {
   userRouter,
-  taskRouter,
   authRouter,
-  workareasRouter,
   projectRouter,
   subTaskRouter,
-  indexTasksRouter,
   profileRouter,
   speacilitiesRouter,
   filesRouter,
-  taskLvl_2Router,
-  taskLvl_3Router,
   reportsRouter,
   feedbacksRouter,
   duplicatesRouter,
@@ -46,11 +41,6 @@ class Server {
     profile: `/${process.env.ROUTE}/profile`,
     specialities: `/${process.env.ROUTE}/specialities`,
     projects: `/${process.env.ROUTE}/projects`,
-    workareas: `/${process.env.ROUTE}/workareas`,
-    indextasks: `/${process.env.ROUTE}/indextasks`,
-    tasks: `/${process.env.ROUTE}/tasks`,
-    tasks2: `/${process.env.ROUTE}/tasks2`,
-    tasks3: `/${process.env.ROUTE}/tasks3`,
     subtasks: `/${process.env.ROUTE}/subtasks`,
     files: `/${process.env.ROUTE}/files`,
     reports: `/${process.env.ROUTE}/reports`,
@@ -98,11 +88,6 @@ class Server {
     this.app.use(this.path.profile, profileRouter);
     this.app.use(this.path.projects, projectRouter);
     this.app.use(this.path.specialities, speacilitiesRouter);
-    this.app.use(this.path.workareas, workareasRouter);
-    this.app.use(this.path.indextasks, indexTasksRouter);
-    this.app.use(this.path.tasks, taskRouter);
-    this.app.use(this.path.tasks2, taskLvl_2Router);
-    this.app.use(this.path.tasks3, taskLvl_3Router);
     this.app.use(this.path.subtasks, subTaskRouter);
     this.app.use(this.path.files, filesRouter);
     this.app.use(this.path.reports, reportsRouter);
