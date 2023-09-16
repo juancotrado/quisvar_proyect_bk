@@ -80,7 +80,7 @@ export const getAllListByDate = async (
   next: NextFunction
 ) => {
   try {
-    const { startDate } = req.query;
+    const startDate = req.query.startDate as string;
     const query = await ListServices.getAllListByDate(startDate);
     res.status(200).json(query);
   } catch (error) {

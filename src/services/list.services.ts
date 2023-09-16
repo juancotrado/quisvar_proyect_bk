@@ -37,48 +37,77 @@ class ListServices {
     return updateStatus;
   }
   static async getListById(listId: List['id']) {
-    try {
-      const list = await prisma.list.findMany({
-        where: {
-          id: listId,
-        },
-        select: {
-          title: true,
-          users: true,
-          createdAt: true,
-        },
-      });
-      if (list.length == 0)
-        throw new AppError('No se pudo encontrar el registro de usuarios', 404);
-      return list;
-    } catch (error) {
-      throw error;
-    }
+    if (!listId) throw new AppError('Oops!,ID invalido', 400);
+    const list = await prisma.list.findMany({
+      where: {
+        id: listId,
+      },
+      select: {
+        title: true,
+        users: true,
+        createdAt: true,
+      },
+    });
+    if (!list.length)
+      throw new AppError('No se pudo encontrar el registro de usuarios', 404);
+    return list;
   }
-  static async getAllListByDate(startDate: any) {
-    try {
-      const GMT = 60 * 60 * 1000;
-      const _startDate = new Date(startDate).getTime();
-      const startOfDay = new Date(_startDate + GMT * 5);
-      const endOfDay = new Date(_startDate + GMT * 29 - 1);
-      const list = await prisma.list.findMany({
-        where: {
-          createdAt: {
-            gte: startOfDay,
-            lte: endOfDay,
+  static async getAllListByDate(startDate: string) {
+    const GMT = 60 * 60 * 1000;
+    const _startDate = new Date(startDate).getTime();
+    const startOfDay = new Date(_startDate + GMT * 5);
+    const endOfDay = new Date(_startDate + GMT * 29 - 1);
+    const list = await prisma.list.findMany({
+      where: {
+        createdAt: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+      select: {
+        createdAt: true,
+        id: true,
+        title: true,
+        users: true,
+      },
+    });
+
+    return list;
+  }
+  static async getListRange(startDate: string, endDate?: string) {
+    const GMT = 60 * 60 * 1000;
+    const _startDate = new Date(startDate).getTime();
+    const startOfDay = new Date(_startDate + GMT * 5);
+    const endOfDay = new Date(_startDate + GMT * 29 - 1);
+    const list = await prisma.users.findMany({
+      select: {
+        id: true,
+        profile: {
+          select: {
+            firstName: true,
+            lastName: true,
+            dni: true,
+            phone: true,
           },
         },
-        select: {
-          createdAt: true,
-          id: true,
-          title: true,
-          users: true,
+        list: {
+          where: {
+            assignedAt: {
+              gte: startOfDay,
+              lte: endOfDay,
+            },
+          },
+          select: {
+            status: true,
+            assignedAt: true,
+          },
         },
-      });
-      return list;
-    } catch (error) {
-      throw error;
-    }
+      },
+      orderBy: { id: 'asc' },
+    });
+    console.log(list.length);
+
+    return list;
   }
 }
 export default ListServices;
