@@ -160,7 +160,7 @@ class SubTasksServices {
           where: { id: file.id },
           data: { type: 'UPLOADS', name: _name, dir },
         });
-        renameSync(`${path}/${file.name}`, `${dir}/${_name}`);
+        renameSync(`${dir}/${file.name}`, `${path}/${_name}`);
       });
       return await Promise.all(_files).then(() => updateTaskStatus);
     }
