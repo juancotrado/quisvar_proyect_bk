@@ -31,7 +31,7 @@ class Sockets {
         console.log('room:', room);
         socket.join(room);
       });
-      socket.on('client:update-subTask', (data: DataProjectAndTask) => {
+      socket.on('client:update-projectAndTask', (data: DataProjectAndTask) => {
         const { project, task } = data;
         this.io.to(`task-${task.id}`).emit('server:update-subTask', task);
         this.io

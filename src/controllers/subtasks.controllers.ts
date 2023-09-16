@@ -71,16 +71,23 @@ export const updateStatusSubTask = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
+    const { id, stageId } = req.params;
     const { body } = req;
     const userInfo: UserType = res.locals.userInfo;
     const _subtask_id = parseInt(id);
-    const query = await SubTasksServices.updateStatus(
+    const task = await SubTasksServices.updateStatus(
       _subtask_id,
       body,
       userInfo
     );
-    res.status(200).json(query);
+    const project = await StageServices.find(+stageId);
+    res.status(200).json({
+      task,
+      project: {
+        ...project,
+        stagesId: stageId,
+      },
+    });
   } catch (error) {
     next(error);
   }
