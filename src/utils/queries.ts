@@ -18,6 +18,11 @@ class Queries {
     },
   };
   static includeSubtask = {
+    Levels: {
+      select: {
+        userId: true,
+      },
+    },
     feedBacks: {
       include: {
         files: this.includeFiles,

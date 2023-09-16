@@ -31,7 +31,7 @@ class Sockets {
         console.log('room:', room);
         socket.join(room);
       });
-      socket.on('client:update-subTask', (data: DataProjectAndTask) => {
+      socket.on('client:update-projectAndTask', (data: DataProjectAndTask) => {
         const { project, task } = data;
         this.io.to(`task-${task.id}`).emit('server:update-subTask', task);
         this.io
@@ -40,6 +40,10 @@ class Sockets {
       });
       socket.on('client:update-task', (task: SubTasks) => {
         this.io.to(`task-${task.id}`).emit('server:update-subTask', task);
+      });
+      socket.on('client:call-notification', () => {
+        this.io.emit('server:call-notification');
+        // this.io.to(`task-${task.id}`).emit('server:update-subTask', task);
       });
       // socket.on('client:create-subTask', (subTask: SubTasks) => {
       //   const room = this.roomPlace(subTask);
