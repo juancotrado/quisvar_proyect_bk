@@ -114,7 +114,7 @@ export const assignUserBySubtask = async (
     res.status(200).json({
       task,
       project: {
-        // ...project[0],
+        ...project,
         stagesId: stageId,
       },
     });

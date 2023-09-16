@@ -97,7 +97,7 @@ class FilesServices {
     const getFile = await prisma.files.findUnique({ where: { id } });
     const deleteFile = await prisma.files.delete({ where: { id } });
     if (!getFile) throw new AppError('No se pudo encontrar el archivo', 404);
-    if (getFile.type === 'MODEL')
+    if (getFile.type === 'UPLOADS')
       throw new AppError(
         'No se puede eliminar archivo, porque se marco como hecho',
         400

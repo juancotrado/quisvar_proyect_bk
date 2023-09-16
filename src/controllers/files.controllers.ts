@@ -109,9 +109,9 @@ export const uploadFiles = async (
     const userInfo: UserType = res.locals.userInfo;
     const type = req.query.status as Files['type'];
     const newFiles = req.files as Express.Multer.File[];
-    // const dir = await PathServices.subTask(subTasksId, type);
+    const dir = await PathServices.subTask(subTasksId, type);
     const data = newFiles.map(({ filename, path }) => ({
-      dir: path,
+      dir,
       type,
       subTasksId,
       name: filename,

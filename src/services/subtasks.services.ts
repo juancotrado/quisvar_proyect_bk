@@ -12,11 +12,7 @@ class SubTasksServices {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findSubTask = await prisma.subTasks.findUnique({
       where: { id },
-      // include: {
-      //   // ...Queries.includeSubtask,
-      //   // task: {
-      //   // },
-      // },
+      include: Queries.includeSubtask,
     });
     if (!findSubTask) throw new AppError('No se pudo encontrar la tares ', 404);
     return findSubTask;
