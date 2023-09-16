@@ -41,6 +41,10 @@ class Sockets {
       socket.on('client:update-task', (task: SubTasks) => {
         this.io.to(`task-${task.id}`).emit('server:update-subTask', task);
       });
+      socket.on('client:call-notification', () => {
+        this.io.emit('server:call-notification');
+        // this.io.to(`task-${task.id}`).emit('server:update-subTask', task);
+      });
       // socket.on('client:create-subTask', (subTask: SubTasks) => {
       //   const room = this.roomPlace(subTask);
       //   this.io.to(room).emit('server:create-subTask', subTask);
