@@ -74,11 +74,14 @@ class ListServices {
 
     return list;
   }
-  static async getListRange(startDate: string, endDate?: string) {
+  static async getListRange(startDate: string, endDate: string) {
     const GMT = 60 * 60 * 1000;
     const _startDate = new Date(startDate).getTime();
+    const _endDate = new Date(endDate).getTime();
     const startOfDay = new Date(_startDate + GMT * 5);
-    const endOfDay = new Date(_startDate + GMT * 29 - 1);
+    const endOfDay = new Date(_endDate + GMT * 29 - 1);
+    console.log(startOfDay, endOfDay);
+
     const list = await prisma.users.findMany({
       select: {
         id: true,
@@ -92,14 +95,24 @@ class ListServices {
         },
         list: {
           where: {
-            assignedAt: {
-              gte: startOfDay,
-              lte: endOfDay,
+            list: {
+              createdAt: {
+                gte: startOfDay,
+                lte: endOfDay,
+              },
             },
+          },
+          orderBy: {
+            assignedAt: 'asc',
           },
           select: {
             status: true,
-            assignedAt: true,
+            usersId: true,
+            list: {
+              select: {
+                createdAt: true,
+              },
+            },
           },
         },
       },

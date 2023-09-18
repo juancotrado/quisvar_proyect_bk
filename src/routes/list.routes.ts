@@ -4,6 +4,7 @@ import {
   createList,
   getAllListByDate,
   getListById,
+  getListRange,
   updateAttendance,
   updateList,
   userAttendance,
@@ -16,4 +17,5 @@ router.get('/attendance', getAllListByDate);
 router.post('/attendance/:id', userAttendance);
 router.patch('/attendance/:id', updateAttendance);
 router.get('/:id', getListById);
+router.get('/attendance/range', getListRange);
 export default router;
