@@ -26,6 +26,7 @@ model Users {
   Levels      Levels[]
   list        ListOnUsers[]
   stages      Stages[]
+  message     Mail[]
 }
 
 model GeneralFiles {
@@ -109,7 +110,7 @@ model Stages {
   company      Company?          @relation(fields: [companyId], references: [id])
   consortium   Consortium?       @relation(fields: [consortiumId], references: [id])
   specialists  PersonBussiness[]
-  moderator    Users?             @relation(fields: [userId], references: [id])
+  moderator    Users?            @relation(fields: [userId], references: [id])
   //-----------------------------------------------------
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
@@ -248,6 +249,40 @@ model SubTasks {
   users       TaskOnUsers[]
 }
 
+model Mail {
+  messageId  Int
+  userId     Int
+  message    Messages    @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user       Users       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type       MessageUser @default(RECEIVER)
+  status     Boolean     @default(true)
+  assignedAt DateTime    @default(now())
+
+  @@id([userId, messageId])
+}
+
+model Messages {
+  id              Int            @id @default(autoincrement())
+  title           String
+  description     String
+  status          Boolean        @default(false)
+  type            MessageType    @default(INFORME)
+  files           FilesMessage[]
+  users           Mail[]
+  idMessageReply  Int?
+  idMessageResend Int?
+  createdAt       DateTime       @default(now())
+}
+
+model FilesMessage {
+  id        Int       @id @default(autoincrement())
+  name      String
+  path      String
+  messageId Int?
+  message   Messages? @relation(fields: [messageId], references: [id])
+  createdAt DateTime  @default(now())
+}
+
 enum UserRole {
   SUPER_ADMIN
   ADMIN
@@ -272,12 +307,6 @@ enum FileTypes {
   REVIEW
 }
 
-enum ReportStatus {
-  DECLINE
-  PROCESS
-  DONE
-}
-
 enum ListDetails {
   PUNTUAL
   TARDE
@@ -285,4 +314,15 @@ enum ListDetails {
   GRAVE
   MUY_GRAVE
   PERMISO
+}
+
+enum MessageUser {
+  SENDER
+  RECEIVER
+}
+
+enum MessageType {
+  CARTA
+  INFORME
+  MEMORANDUM
 }

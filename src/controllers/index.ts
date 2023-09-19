@@ -88,6 +88,7 @@ import {
   getAllListByDate,
   getListRange,
 } from './list.controller';
+import { createMessage, showMessage, showMessages } from './mail.controllers';
 // User Controllers
 export {
   showUsers,
@@ -178,3 +179,6 @@ export {
   getAllListByDate,
   getListRange,
 };
+
+//Mail Controllers
+export { showMessages, createMessage, showMessage };

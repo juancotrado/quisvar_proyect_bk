@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import { ListServices } from '../services';
-import AppError from '../utils/appError';
 
 export const createList = async (
   req: Request,

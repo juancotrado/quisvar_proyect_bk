@@ -22,6 +22,7 @@ import {
   sectorRouter,
   levelsRouter,
   listRouter,
+  mailRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -55,6 +56,7 @@ class Server {
     levels: `/${process.env.ROUTE}/levels`,
     resource: `/${process.env.ROUTE}/resource`,
     list: `/${process.env.ROUTE}/list`,
+    mail: `/${process.env.ROUTE}/mail`,
   };
 
   constructor() {
@@ -106,6 +108,7 @@ class Server {
     this.app.use(this.path.sector, sectorRouter);
     this.app.use(this.path.levels, levelsRouter);
     this.app.use(this.path.list, listRouter);
+    this.app.use(this.path.mail, mailRouter);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)

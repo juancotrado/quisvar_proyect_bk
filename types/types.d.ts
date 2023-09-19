@@ -1,11 +1,14 @@
 import {
   IndexTasks,
   Levels,
+  Mail,
+  Messages,
   SubTasks,
   Supervisor,
   Task_lvl_2,
   Task_lvl_3,
   Tasks,
+  Users,
   WorkAreas,
 } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
@@ -133,4 +136,18 @@ export interface SubTaskFilter extends SubTasks {
   users: {
     percentage: number;
   }[];
+}
+
+export interface ParametersMail {
+  skip?: number;
+  limit?: number;
+  type?: Mail['type'];
+  status?: boolean;
+  assignedAt?: 'asc' | 'desc';
+}
+export interface PickMail extends Messages {
+  senderId: Users['id'];
+  receiverId: Users['id'];
+  idMessageReply?: number;
+  idMessageResend?: number;
 }
