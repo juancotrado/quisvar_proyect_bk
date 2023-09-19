@@ -80,11 +80,10 @@ class ListServices {
     const _endDate = new Date(endDate).getTime();
     const startOfDay = new Date(_startDate + GMT * 5);
     const endOfDay = new Date(_endDate + GMT * 29 - 1);
-    console.log(startOfDay, endOfDay);
-
     const list = await prisma.users.findMany({
       select: {
         id: true,
+        role: true,
         profile: {
           select: {
             firstName: true,
@@ -111,6 +110,8 @@ class ListServices {
             list: {
               select: {
                 createdAt: true,
+                title: true,
+                id: true,
               },
             },
           },
@@ -118,8 +119,6 @@ class ListServices {
       },
       orderBy: { id: 'asc' },
     });
-    console.log(list.length);
-
     return list;
   }
 }

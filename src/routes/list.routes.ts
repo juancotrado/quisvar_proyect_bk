@@ -9,8 +9,10 @@ import {
   updateList,
   userAttendance,
 } from '../controllers';
+import { _admin_role } from '../middlewares/role.middleware';
 const router = Router();
 router.use(authenticateHandler);
+router.use(_admin_role);
 router.post('/', createList);
 router.patch('/:id', updateList);
 router.get('/attendance', getAllListByDate);
