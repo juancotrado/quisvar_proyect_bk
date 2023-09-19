@@ -12,12 +12,6 @@ class SectorServices {
               include: {
                 projects: {
                   include: {
-                    areas: {
-                      select: {
-                        id: true,
-                        name: true,
-                      },
-                    },
                     specialists: Queries.selectSpecialist,
                     company: Queries.selectCompany,
                     consortium: Queries.selectConsortium,

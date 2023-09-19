@@ -13,7 +13,6 @@ import StageServices from './stages.services';
 import SectorServices from './sector.services';
 import TypeSpecialitiesServices from './typeSpecialities.services';
 import LevelsServices from './levels.services';
-import ResourceHumanServices from './resourceHuman.services';
 import ListServices from './list.services';
 export {
   UsersServices,
@@ -32,7 +31,6 @@ export {
   TypeSpecialitiesServices,
   LevelsServices,
   // PathLevelServices,
-  ResourceHumanServices,
   ListServices,
 };
 export const rootPath = './uploads';

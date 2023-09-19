@@ -21,7 +21,6 @@ import {
   typeSpecialityRouter,
   sectorRouter,
   levelsRouter,
-  humanRscRouter,
   listRouter,
 } from '../routes';
 import AppError from '../utils/appError';
@@ -106,7 +105,6 @@ class Server {
     this.app.use(this.path.typespecialities, typeSpecialityRouter);
     this.app.use(this.path.sector, sectorRouter);
     this.app.use(this.path.levels, levelsRouter);
-    this.app.use(this.path.resource, humanRscRouter);
     this.app.use(this.path.list, listRouter);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       return next(

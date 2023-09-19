@@ -244,69 +244,6 @@ class ReportsServices {
         moderator: {
           select: { profile: { select: { firstName: true, lastName: true } } },
         },
-        areas: {
-          select: {
-            id: true,
-            item: true,
-            name: true,
-            indexTasks: {
-              select: {
-                id: true,
-                item: true,
-                name: true,
-                // subTasks: {
-                //   select: {
-                //     id: true,
-                //     item: true,
-                //     name: true,
-                //   },
-                // },
-                tasks: {
-                  select: {
-                    id: true,
-                    item: true,
-                    name: true,
-                    // subTasks: {
-                    //   select: {
-                    //     id: true,
-                    //     item: true,
-                    //     name: true,
-                    //   },
-                    // },
-                    tasks_2: {
-                      select: {
-                        id: true,
-                        item: true,
-                        name: true,
-                        // subTasks: {
-                        //   select: {
-                        //     id: true,
-                        //     item: true,
-                        //     name: true,
-                        //   },
-                        // },
-                        tasks_3: {
-                          select: {
-                            id: true,
-                            item: true,
-                            name: true,
-                            // subTasks: {
-                            //   select: {
-                            //     id: true,
-                            //     item: true,
-                            //     name: true,
-                            //   },
-                            // },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
       },
     });
     return getIndex;

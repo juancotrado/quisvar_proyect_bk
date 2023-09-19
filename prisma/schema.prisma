@@ -20,14 +20,12 @@ model Users {
   cv          String?
   declaration String?
   profile     Profiles?
-  supervisor  Supervisor?
   files       Files[]
   project     Projects[]
   subTasks    TaskOnUsers[]
-  area        WorkAreas[]
   Levels      Levels[]
-  reports     Reports[]
   list        ListOnUsers[]
+  stages      Stages[]
 }
 
 model GeneralFiles {
@@ -77,13 +75,13 @@ model TypeSpecialities {
 
 model Projects {
   id               Int               @id @default(autoincrement())
+  CUI              String?
   name             String            @unique
   description      String?
-  percentage       Int               @default(30)
   department       String?
   province         String?
   district         String?
-  CUI              String?
+  percentage       Int               @default(30)
   startDate        DateTime          @default(now())
   untilDate        DateTime
   status           Boolean           @default(false)
@@ -91,32 +89,35 @@ model Projects {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   userId           Int
-  typeSpecialityId Int?
-  groupId          Int?
+  typeSpecialityId Int
+  typeSpeciality   TypeSpecialities  @relation(fields: [typeSpecialityId], references: [id])
+  moderator        Users             @relation(fields: [userId], references: [id])
+  stages           Stages[]
   company          Company?
   consortium       Consortium?
   specialists      PersonBussiness[]
-  group            GroupProjects?    @relation(fields: [groupId], references: [id])
-  typeSpeciality   TypeSpecialities? @relation(fields: [typeSpecialityId], references: [id])
-  moderator        Users             @relation(fields: [userId], references: [id])
-  areas            WorkAreas[]
-  stages           Stages[]
 }
 
 model Stages {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  levels    Levels[]
-  project   Projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId Int
-}
-
-model GroupProjects {
-  id       Int        @id @default(autoincrement())
-  name     String?
-  projects Projects[]
+  id           Int               @id @default(autoincrement())
+  name         String
+  //-----------------------------------------------------
+  startDate    DateTime          @default(now())
+  untilDate    DateTime          @default(now())
+  status       Boolean           @default(false)
+  userId       Int?
+  company      Company?          @relation(fields: [companyId], references: [id])
+  consortium   Consortium?       @relation(fields: [consortiumId], references: [id])
+  specialists  PersonBussiness[]
+  moderator    Users?             @relation(fields: [userId], references: [id])
+  //-----------------------------------------------------
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  project      Projects          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId    Int
+  levels       Levels[]
+  companyId    Int?
+  consortiumId Int?
 }
 
 model Levels {
@@ -183,6 +184,8 @@ model PersonBussiness {
   pdf        String?
   projectsId Int?
   Projects   Projects? @relation(fields: [projectsId], references: [id])
+  stages     Stages?   @relation(fields: [stagesId], references: [id])
+  stagesId   Int?
 }
 
 model Consortium {
@@ -192,6 +195,7 @@ model Consortium {
   projectId Int       @unique
   companies Company[]
   project   Projects  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  stages    Stages[]
 }
 
 model Company {
@@ -204,18 +208,7 @@ model Company {
   projectId    Int?        @unique
   Consortium   Consortium? @relation(fields: [consortiumId], references: [id])
   project      Projects?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-}
-
-model Reports {
-  id          Int                   @id @default(autoincrement())
-  name        String
-  status      ReportStatus          @default(PROCESS)
-  stage       ReportStage           @default(STEP_1)
-  createdAt   DateTime              @default(now())
-  updatedAt   DateTime              @updatedAt
-  userId      Int?
-  user        Users?                @relation(fields: [userId], references: [id])
-  supervisors SupervisorOnReports[]
+  stages       Stages[]
 }
 
 model List {
@@ -235,76 +228,6 @@ model ListOnUsers {
   assignedAt DateTime    @default(now())
 
   @@id([usersId, listId])
-}
-
-model Supervisor {
-  id      Int                   @id @default(autoincrement())
-  type    SupervisorTypes
-  userId  Int                   @unique
-  user    Users                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reports SupervisorOnReports[]
-}
-
-model SupervisorOnReports {
-  supervisorId Int
-  reportId     Int
-  comments     String?
-  supervisor   Supervisor @relation(fields: [supervisorId], references: [id], onDelete: Cascade)
-  report       Reports    @relation(fields: [reportId], references: [id], onDelete: Cascade)
-  assignedAt   DateTime   @default(now())
-
-  @@id([supervisorId, reportId])
-}
-
-model WorkAreas {
-  id         Int          @id @default(autoincrement())
-  name       String
-  userId     Int?
-  projectId  Int
-  item       String       @default("")
-  stageId    Int?
-  indexTasks IndexTasks[]
-  project    Projects     @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  user       Users?       @relation(fields: [userId], references: [id])
-}
-
-model IndexTasks {
-  id         Int       @id @default(autoincrement())
-  name       String
-  unique     Boolean   @default(false)
-  workAreaId Int
-  item       String    @default("")
-  workArea   WorkAreas @relation(fields: [workAreaId], references: [id], onDelete: Cascade)
-  tasks      Tasks[]
-}
-
-model Tasks {
-  id          Int          @id @default(autoincrement())
-  name        String
-  unique      Boolean      @default(false)
-  indexTaskId Int
-  item        String       @default("")
-  tasks_2     Task_lvl_2[]
-  indexTask   IndexTasks   @relation(fields: [indexTaskId], references: [id], onDelete: Cascade)
-}
-
-model Task_lvl_2 {
-  id      Int          @id @default(autoincrement())
-  name    String
-  unique  Boolean      @default(false)
-  taskId  Int
-  item    String       @default("")
-  task    Tasks        @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  tasks_3 Task_lvl_3[]
-}
-
-model Task_lvl_3 {
-  id        Int        @id @default(autoincrement())
-  name      String
-  unique    Boolean    @default(false)
-  item      String     @default("")
-  task_2_Id Int
-  task_2    Task_lvl_2 @relation(fields: [task_2_Id], references: [id], onDelete: Cascade)
 }
 
 model SubTasks {
@@ -353,21 +276,6 @@ enum ReportStatus {
   DECLINE
   PROCESS
   DONE
-}
-
-enum ReportStage {
-  STEP_1
-  STEP_2
-  STEP_3
-  STEP_4
-  STEP_5
-}
-
-enum SupervisorTypes {
-  ROLE_1
-  ROLE_2
-  ROLE_3
-  ROLE_4
 }
 
 enum ListDetails {
