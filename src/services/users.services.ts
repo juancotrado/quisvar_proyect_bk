@@ -40,14 +40,7 @@ class UsersServices {
 
   static async findListTask(id: Users['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const findTaskUser = await prisma.tasks.findMany({
-      where: {
-        id,
-      },
-    });
-    if (!findTaskUser)
-      throw new AppError('No se pudo encontrar la tarea ', 404);
-    return findTaskUser;
+    return;
   }
   static async findListSubTask(userId: Users['id'], projectId: number) {
     if (!userId) throw new AppError('Oops!,ID invalido', 400);

@@ -1,16 +1,8 @@
-import { GetFilterLevels, Level } from 'types/types';
 import AppError from '../utils/appError';
-import {
-  Levels,
-  Projects,
-  Stages,
-  SubTasks,
-  prisma,
-} from '../utils/prisma.server';
+import { Projects, Stages, prisma } from '../utils/prisma.server';
 import {
   calculateAndUpdateDataByLevel,
   sumPriceByStage,
-  sumSubtaksByStage,
   sumValues,
 } from '../utils/tools';
 import LevelsServices from './levels.services';
@@ -44,12 +36,28 @@ class StageServices {
     const getList = await prisma.levels.findMany({
       where: { stagesId: id },
       orderBy: { item: 'asc' },
-      include: { subTasks: true },
+      include: {
+        subTasks: {
+          orderBy: { id: 'asc' },
+          include: { users: { select: { percentage: true } } },
+        },
+      },
     });
     const list = LevelsServices.findList(getList, 0, 0);
     const nextLevel = calculateAndUpdateDataByLevel(list);
+    const total = sumValues(nextLevel, 'total');
+    const _percentage = sumValues(nextLevel, 'percentage') / nextLevel.length;
+    const percentage = Math.round(_percentage * 100) / 100;
     const totalValues = sumPriceByStage(getList);
-    return { id, name, projectName, ...totalValues, nextLevel };
+    return {
+      id,
+      name,
+      projectName,
+      percentage,
+      total,
+      ...totalValues,
+      nextLevel,
+    };
     // const newFindStage = findStage.levels.map(async level => {
     //   const levelCopy = { ...level, nextLevel: {} };
     //   const nextLevel = await LevelsServices.find(level.id);

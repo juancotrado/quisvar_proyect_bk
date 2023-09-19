@@ -82,6 +82,8 @@ export interface Level {
   rootId: number;
   spending: number;
   balance: number;
+  percentage: number;
+  total: number;
   isProject: boolean;
   isInclude: boolean;
   isArea: boolean;
@@ -125,5 +127,10 @@ export interface DuplicateLevel {
 }
 
 export interface GetFilterLevels extends Levels {
-  subTasks?: SubTasks[];
+  subTasks?: SubTaskFilter[];
+}
+export interface SubTaskFilter extends SubTasks {
+  users: {
+    percentage: number;
+  }[];
 }

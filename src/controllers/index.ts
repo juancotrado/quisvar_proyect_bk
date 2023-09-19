@@ -80,10 +80,6 @@ import {
   updateLevel,
 } from './levels.controllers';
 import {
-  createReportByUser,
-  showReportsBySupervisor,
-} from './humanResource.controllers';
-import {
   createList,
   updateList,
   userAttendance,
@@ -170,9 +166,6 @@ export {
 
 //levels Controllers
 export { createLevel, updateLevel, deleteLevel, showLevel };
-
-//human Resource Controllers
-export { createReportByUser, showReportsBySupervisor };
 
 //List Controllers
 export {

@@ -10,6 +10,7 @@ import {
   PriceTask,
   PriceTaskLvl2,
   PriceTaskLvl3,
+  SubTaskFilter,
 } from 'types/types';
 import { prisma } from './prisma.server';
 import AppError from './appError';
@@ -45,11 +46,11 @@ export const parseSubTasks = (
 };
 
 export const percentageSubTasks = (
-  listSubtask: PickSubtask[],
+  listSubtask: SubTaskFilter[],
   _percentage: number
 ) => {
-  return listSubtask.map(subtask => {
-    const percentage = sumValues(subtask.users, 'percentage');
+  return listSubtask.map(({ users, ...subtask }) => {
+    const percentage = sumValues(users, 'percentage');
     const spending =
       subtask.status === 'LIQUIDATION'
         ? subtask.price
@@ -210,6 +211,8 @@ export const calculateAndUpdateDataByLevel = (levels: Level[]) => {
     level.spending = calculateSumTotal(level, 'spending');
     level.price = calculateSumTotal(level, 'price');
     level.days = calculateSumTotal(level, 'days');
+    level.total = calculateSumTotal(level, 'total');
+    // level.percentage = calculateSumTotal(level, 'percentage');
     // level.details.UNRESOLVED = calculateSumTotal(
     //   level,
     //   'details',
@@ -226,6 +229,9 @@ export const calculateAndUpdateDataByLevel = (levels: Level[]) => {
     // level.details.DONE = calculateSumTotal(level, 'details', 'DONE');
     // level.details.TOTAL = calculateSumTotal(level, 'details', 'TOTAL');
     if (level.nextLevel && level.nextLevel.length > 0) {
+      const _percentage =
+        calculateSumTotal(level, 'percentage') / level.nextLevel.length;
+      level.percentage = Math.round(_percentage * 100) / 100;
       calculateAndUpdateDataByLevel(level.nextLevel);
     }
   });

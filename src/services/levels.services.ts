@@ -1,19 +1,13 @@
-import { Levels, SubTasks } from '@prisma/client';
+import { Levels } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import PathLevelServices from './path_levels.services';
-import {
-  parsePath,
-  parsePathLevel,
-  renameDir,
-  setNewPath,
-} from '../utils/fileSystem';
+import { parsePath, parsePathLevel, renameDir } from '../utils/fileSystem';
 import Queries from '../utils/queries';
 import {
   existRootLevelPath,
   filterLevelList,
   getDetailsSubtask,
-  getFilterListLevels,
   getRootItem,
   getRootPath,
   parseRootItem,
@@ -32,7 +26,12 @@ class LevelsServices {
     const getList = await prisma.levels.findMany({
       where: { stagesId, level: { gt: level } },
       orderBy: { item: 'asc' },
-      include: { subTasks: true },
+      include: {
+        subTasks: {
+          orderBy: { item: 'asc' },
+          include: { users: { select: { percentage: true } } },
+        },
+      },
     });
     const nextLevel = this.findList(getList, id, level);
     return { ...findRootLevel, nextLevel };
@@ -194,50 +193,50 @@ class LevelsServices {
     return result;
   }
 
-  static async findList23(rootId: Levels['rootId'], percentage: number) {
-    const findList = await prisma.levels.findMany({
-      where: { rootId },
-      include: {
-        subTasks: {
-          select: {
-            id: true,
-            name: true,
-            item: true,
-            description: true,
-            price: true,
-            status: true,
-            users: {
-              select: { percentage: true, user: Queries.selectProfileUser },
-            },
-          },
-        },
-      },
-    });
-    if (findList.length === 0) return [];
-    const newListTask = findList.map(async ({ subTasks, ...level }) => {
-      const nextLevel: typeof findList = await this.findList23(
-        level.id,
-        percentage
-      );
-      const subtasks = percentageSubTasks(subTasks, percentage);
-      const details = getDetailsSubtask(subTasks);
-      const price = sumValues(subtasks, 'price');
-      const spending = sumValues(subtasks, 'spending');
-      const balance = price - spending;
-      const newLevel = {
-        ...level,
-        spending,
-        balance,
-        price,
-        details,
-        subTasks: subtasks,
-      };
-      if (nextLevel.length !== 0) return { ...newLevel, nextLevel };
-      return { ...newLevel };
-    });
-    const result = await Promise.all(newListTask);
-    return result;
-  }
+  // static async findList23(rootId: Levels['rootId'], percentage: number) {
+  //   const findList = await prisma.levels.findMany({
+  //     where: { rootId },
+  //     include: {
+  //       subTasks: {
+  //         select: {
+  //           id: true,
+  //           name: true,
+  //           item: true,
+  //           description: true,
+  //           price: true,
+  //           status: true,
+  //           users: {
+  //             select: { percentage: true, user: Queries.selectProfileUser },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   });
+  //   if (findList.length === 0) return [];
+  //   const newListTask = findList.map(async ({ subTasks, ...level }) => {
+  //     const nextLevel: typeof findList = await this.findList23(
+  //       level.id,
+  //       percentage
+  //     );
+  //     const subtasks = percentageSubTasks(subTasks, percentage);
+  //     const details = getDetailsSubtask(subTasks);
+  //     const price = sumValues(subtasks, 'price');
+  //     const spending = sumValues(subtasks, 'spending');
+  //     const balance = price - spending;
+  //     const newLevel = {
+  //       ...level,
+  //       spending,
+  //       balance,
+  //       price,
+  //       details,
+  //       subTasks: subtasks,
+  //     };
+  //     if (nextLevel.length !== 0) return { ...newLevel, nextLevel };
+  //     return { ...newLevel };
+  //   });
+  //   const result = await Promise.all(newListTask);
+  //   return result;
+  // }
 
   static findList(
     array: GetFilterLevels[],
@@ -256,14 +255,28 @@ class LevelsServices {
         balance: 0,
         price: 0,
         days: 0,
+        percentage: 0,
+        total: 0,
         ...value,
       };
       if (subTasks && subTasks.length) {
-        const price = sumValues(subTasks, 'price');
-        const days = sumValues(subTasks, 'days');
-        const spending = sumValues(subTasks, 'spending');
+        const subtasks = percentageSubTasks(subTasks, 30);
+        const price = sumValues(subtasks, 'price');
+        const days = sumValues(subtasks, 'days');
+        const spending = sumValues(subtasks, 'spending');
+        const percentage = sumValues(subtasks, 'percentage') / subTasks.length;
+        const total = subTasks.length;
         const balance = price - spending;
-        data = { price, spending, balance, days, ...value, subTasks };
+        data = {
+          price,
+          spending,
+          balance,
+          days,
+          percentage,
+          total,
+          ...value,
+          subTasks: subtasks,
+        };
       }
       const nextLevel: typeof findList = this.findList(list, id, level);
       if (!nextLevel.length) return data;

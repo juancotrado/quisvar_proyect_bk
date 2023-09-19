@@ -24,12 +24,6 @@ class TypeSpecialitiesServices {
         projects: {
           orderBy: { name: 'asc' },
           include: {
-            areas: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
             specialists: Queries.selectSpecialist,
             company: Queries.selectCompany,
             consortium: Queries.selectConsortium,
@@ -38,22 +32,12 @@ class TypeSpecialitiesServices {
         },
       },
     });
-    const groupProjects = await prisma.groupProjects.findMany({
-      select: { id: true },
-    });
     if (!findTypeSpeciality)
       throw new AppError(
         'No se pudo encontrar el registro de especialidades',
         404
       );
-    const { projects, ...speciality } = findTypeSpeciality;
-    const groups = groupProjects
-      .map(_project => ({
-        id: _project.id,
-        projects: projects.filter(p => p.groupId == _project.id),
-      }))
-      .filter(p => p.projects.length);
-    return { ...speciality, groups };
+    return { ...findTypeSpeciality };
   }
 
   static async create({ name, specialitiesId }: TypeSpecialities) {
