@@ -86,6 +86,7 @@ import {
   updateAttendance,
   getListById,
   getAllListByDate,
+  getListRange,
 } from './list.controller';
 // User Controllers
 export {
@@ -175,4 +176,5 @@ export {
   updateAttendance,
   getListById,
   getAllListByDate,
+  getListRange,
 };

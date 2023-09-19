@@ -80,8 +80,24 @@ export const getAllListByDate = async (
   next: NextFunction
 ) => {
   try {
-    const { startDate } = req.query;
+    const startDate = req.query.startDate as string;
     const query = await ListServices.getAllListByDate(startDate);
+    res.status(200).json(query);
+  } catch (error) {
+    console.log(error);
+
+    next(error);
+  }
+};
+export const getListRange = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const startDate = req.query.startDate as string;
+    const endDate = req.query.endDate as string;
+    const query = await ListServices.getListRange(startDate, endDate);
     res.status(200).json(query);
   } catch (error) {
     console.log(error);
