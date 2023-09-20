@@ -239,7 +239,10 @@ class SubTasksServices {
           status: 'PROCESS',
           users: {
             create: newUserData,
-            updateMany: { data: { untilDate }, where: { subtaskId: id } },
+            updateMany: {
+              data: { untilDate },
+              where: { subtaskId: id, userId: user.id },
+            },
           },
         },
         include: Queries.includeSubtask,
