@@ -88,7 +88,12 @@ import {
   getAllListByDate,
   getListRange,
 } from './list.controller';
-import { createMessage, showMessage, showMessages } from './mail.controllers';
+import {
+  createMessage,
+  quantityFiles,
+  showMessage,
+  showMessages,
+} from './mail.controllers';
 // User Controllers
 export {
   showUsers,
@@ -181,4 +186,4 @@ export {
 };
 
 //Mail Controllers
-export { showMessages, createMessage, showMessage };
+export { showMessages, createMessage, showMessage, quantityFiles };

@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { MailServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
+import AppError from '../utils/appError';
+import { PickMail } from 'types/types';
+import { existsSync, mkdirSync, renameSync } from 'fs';
 
 export const showMessages = async (
   req: Request,
@@ -9,14 +12,11 @@ export const showMessages = async (
 ) => {
   try {
     const { params } = req.query;
-    // console.log(req.query, '<==');
-    const { id } = req.params;
-    const userId = parseInt(id);
-    console.log(userId);
+    const userInfo: UserType = res.locals.userInfo;
+    const userId = userInfo.id;
     const query = await MailServices.getByUser(userId, {
       // skip: 0,
-      limit: 20,
-      type: 'RECEIVER',
+      // type: 'SENDER',
       // status: true,
     });
     res.status(200).json(query);
@@ -33,7 +33,6 @@ export const showMessage = async (
   try {
     const { id } = req.params;
     const messageId = parseInt(id);
-    console.log(messageId);
     const query = await MailServices.getMessage(messageId);
     res.status(200).json(query);
   } catch (error) {
@@ -49,9 +48,34 @@ export const createMessage = async (
   try {
     const userInfo: UserType = res.locals.userInfo;
     const senderId = userInfo.id;
+    if (!req.files)
+      throw new AppError('Oops!, no se pudo subir los archivos', 400);
+    const files = req.files as Express.Multer.File[];
+    const path = `public/mail/${senderId}`;
+    if (!existsSync(path)) mkdirSync(path, { recursive: true });
+    const parseFiles = files.map(({ filename: name, ...file }) => {
+      renameSync(file.path, path + '/' + name);
+      return { name, path };
+    });
     const { body } = req;
-    const query = await MailServices.create({ ...body, senderId });
+    const data = JSON.parse(body.data) as PickMail;
+    const query = await MailServices.create({ ...data, senderId }, parseFiles);
     res.status(201).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const quantityFiles = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userInfo: UserType = res.locals.userInfo;
+    const { id } = userInfo;
+    const query = await MailServices.quantityFiles(id);
+    res.status(200).json(query);
   } catch (error) {
     next(error);
   }

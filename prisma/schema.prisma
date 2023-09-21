@@ -264,6 +264,8 @@ model Mail {
 model Messages {
   id              Int            @id @default(autoincrement())
   title           String
+  header          String         @default("")
+  isOpen          Boolean        @default(false)
   description     String
   status          Boolean        @default(false)
   type            MessageType    @default(INFORME)
