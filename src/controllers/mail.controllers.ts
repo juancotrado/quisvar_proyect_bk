@@ -2,8 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { MailServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
-import { PickMail } from 'types/types';
+import { ParametersMail, PickMail } from 'types/types';
 import { existsSync, mkdirSync, renameSync } from 'fs';
+import { Mail, Messages } from '@prisma/client';
 
 export const showMessages = async (
   req: Request,
@@ -11,14 +12,10 @@ export const showMessages = async (
   next: NextFunction
 ) => {
   try {
-    const { params } = req.query;
+    const params = req.query as ParametersMail;
     const userInfo: UserType = res.locals.userInfo;
     const userId = userInfo.id;
-    const query = await MailServices.getByUser(userId, {
-      // skip: 0,
-      // type: 'SENDER',
-      // status: true,
-    });
+    const query = await MailServices.getByUser(userId, params);
     res.status(200).json(query);
   } catch (error) {
     next(error);

@@ -9,6 +9,7 @@ import {
 } from '../services';
 import { mkdirSync, rmSync } from 'fs';
 import { renameDir } from '../utils/fileSystem';
+import { SubTasks } from '@prisma/client';
 
 const dir = _dirPath;
 const model = _materialPath;
@@ -47,7 +48,8 @@ export const showStage = async (
   try {
     const { id } = req.params;
     const _stage_id = parseInt(id);
-    const query = await StageServices.find(_stage_id);
+    const status = req.query.status as SubTasks['status'];
+    const query = await StageServices.find(_stage_id, status);
     return res.status(200).json(query);
   } catch (error) {
     next(error);

@@ -143,7 +143,9 @@ export interface ParametersMail {
   skip?: number;
   limit?: number;
   type?: Mail['type'];
-  status?: boolean;
+  // status?: boolean;
+  typeMessage?: Messages['type'];
+  status?: Messages['status'];
   assignedAt?: 'asc' | 'desc';
 }
 export interface PickMail extends Messages {

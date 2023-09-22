@@ -10,10 +10,13 @@ class MailServices {
     if (type === 'RECEIVER') return 'SENDER' as Mail['type'];
     return undefined;
   }
-  static async getByUser(userId: Users['id'], { skip, type }: ParametersMail) {
+  static async getByUser(
+    userId: Users['id'],
+    { skip, type, status, typeMessage }: ParametersMail
+  ) {
     const typeMail = this.PickType(type);
     const getListMail = await prisma.mail.findMany({
-      where: { userId, type },
+      where: { userId, type, message: { status, type: typeMessage } },
       orderBy: { assignedAt: 'desc' },
       skip,
       take: 20,
