@@ -48,20 +48,23 @@ export const createMessage = async (
   try {
     const userInfo: UserType = res.locals.userInfo;
     const senderId = userInfo.id;
+    const attempt = `${new Date().getTime}`;
     if (!req.files)
       throw new AppError('Oops!, no se pudo subir los archivos', 400);
     const files = req.files as Express.Multer.File[];
+    console.log(attempt);
     const path = `public/mail/${senderId}`;
     if (!existsSync(path)) mkdirSync(path, { recursive: true });
     const parseFiles = files.map(({ filename: name, ...file }) => {
       renameSync(file.path, path + '/' + name);
-      return { name, path };
+      return { name, path, attempt };
     });
     const { body } = req;
     const data = JSON.parse(body.data) as PickMail;
     const query = await MailServices.create({ ...data, senderId }, parseFiles);
     res.status(201).json(query);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };

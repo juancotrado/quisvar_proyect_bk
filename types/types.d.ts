@@ -1,4 +1,5 @@
 import {
+  FilesMessage,
   IndexTasks,
   Levels,
   Mail,
@@ -150,4 +151,6 @@ export interface PickMail extends Messages {
   receiverId: Users['id'];
   idMessageReply?: number;
   idMessageResend?: number;
+  secondaryReceiver: { userId: number }[];
 }
+export type FileMessagePick = Pick<FilesMessage, 'name' | 'path' | 'attempt'>;
