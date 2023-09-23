@@ -15,7 +15,7 @@ class MailServices {
     { skip, type, status, typeMessage }: ParametersMail
   ) {
     const typeMail = this.PickType(type);
-    const getListMail = await prisma.mail.findMany({
+    const mail = await prisma.mail.findMany({
       where: { userId, type, message: { status, type: typeMessage } },
       orderBy: { assignedAt: 'desc' },
       skip,
@@ -39,7 +39,10 @@ class MailServices {
         },
       },
     });
-    return getListMail;
+    const total = await prisma.mail.count({
+      where: { userId, type, message: { status, type: typeMessage } },
+    });
+    return { total, mail };
   }
   static async getMessage(id: Messages['id']) {
     if (!id) throw new AppError('Ops!, ID invalido', 400);

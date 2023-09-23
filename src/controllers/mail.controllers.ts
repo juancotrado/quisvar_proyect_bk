@@ -4,7 +4,6 @@ import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
 import { ParametersMail, PickMail } from 'types/types';
 import { existsSync, mkdirSync, renameSync } from 'fs';
-import { Mail, Messages } from '@prisma/client';
 
 export const showMessages = async (
   req: Request,
@@ -49,7 +48,6 @@ export const createMessage = async (
     if (!req.files)
       throw new AppError('Oops!, no se pudo subir los archivos', 400);
     const files = req.files as Express.Multer.File[];
-    console.log(attempt);
     const path = `public/mail/${senderId}`;
     if (!existsSync(path)) mkdirSync(path, { recursive: true });
     const parseFiles = files.map(({ filename: name, ...file }) => {
@@ -61,7 +59,6 @@ export const createMessage = async (
     const query = await MailServices.create({ ...data, senderId }, parseFiles);
     res.status(201).json(query);
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
