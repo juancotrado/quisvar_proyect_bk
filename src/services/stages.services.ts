@@ -1,5 +1,5 @@
 import AppError from '../utils/appError';
-import { Projects, Stages, prisma } from '../utils/prisma.server';
+import { Projects, Stages, SubTasks, prisma } from '../utils/prisma.server';
 import {
   calculateAndUpdateDataByLevel,
   sumPriceByStage,
@@ -23,7 +23,7 @@ class StageServices {
     if (!findStage) throw new AppError('Oops!, ID invalido', 400);
     return findStage;
   }
-  static async find(id: Stages['id']) {
+  static async find(id: Stages['id'], status?: SubTasks['status']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const findStage = await prisma.stages.findUnique({
       where: { id },
@@ -34,7 +34,7 @@ class StageServices {
     const { name, project } = findStage;
     const projectName = project.name;
     const getList = await prisma.levels.findMany({
-      where: { stagesId: id },
+      where: { stagesId: id, subTasks: { every: { status } } },
       orderBy: { item: 'asc' },
       include: {
         subTasks: {

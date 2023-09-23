@@ -9,24 +9,25 @@ datasource db {
 }
 
 model Users {
-  id          Int           @id @default(autoincrement())
-  status      Boolean       @default(false)
-  role        UserRole      @default(EMPLOYEE)
-  password    String
-  email       String        @unique
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  contract    String?
-  cv          String?
-  declaration String?
-  profile     Profiles?
-  files       Files[]
-  project     Projects[]
-  subTasks    TaskOnUsers[]
-  Levels      Levels[]
-  list        ListOnUsers[]
-  stages      Stages[]
-  message     Mail[]
+  id           Int              @id @default(autoincrement())
+  status       Boolean          @default(false)
+  role         UserRole         @default(EMPLOYEE)
+  password     String
+  email        String           @unique
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  contract     String?
+  cv           String?
+  declaration  String?
+  profile      Profiles?
+  files        Files[]
+  project      Projects[]
+  subTasks     TaskOnUsers[]
+  Levels       Levels[]
+  list         ListOnUsers[]
+  stages       Stages[]
+  message      Mail[]
+  messageReply MessageHistory[]
 }
 
 model GeneralFiles {
@@ -255,32 +256,55 @@ model Mail {
   message    Messages    @relation(fields: [messageId], references: [id], onDelete: Cascade)
   user       Users       @relation(fields: [userId], references: [id], onDelete: Cascade)
   type       MessageUser @default(RECEIVER)
-  status     Boolean     @default(true)
+  status     Boolean     @default(false)
+  role       MessageRole @default(SECONDARY)
   assignedAt DateTime    @default(now())
 
   @@id([userId, messageId])
 }
 
 model Messages {
-  id              Int            @id @default(autoincrement())
-  title           String
-  description     String
-  status          Boolean        @default(false)
-  type            MessageType    @default(INFORME)
-  files           FilesMessage[]
-  users           Mail[]
-  idMessageReply  Int?
-  idMessageResend Int?
-  createdAt       DateTime       @default(now())
+  id          Int              @id @default(autoincrement())
+  title       String
+  header      String           @default("")
+  description String
+  status      MessageStatus    @default(PROCESO)
+  type        MessageType      @default(INFORME)
+  files       FilesMessage[]
+  users       Mail[]
+  history     MessageHistory[]
+  createdAt   DateTime         @default(now())
+}
+
+model MessageHistory {
+  id          Int                   @id @default(autoincrement())
+  title       String
+  header      String                @default("")
+  description String
+  userId      Int
+  user        Users                 @relation(fields: [userId], references: [id])
+  files       FilesMessageHistory[]
+  message     Messages?             @relation(fields: [messageId], references: [id])
+  messageId   Int?
 }
 
 model FilesMessage {
   id        Int       @id @default(autoincrement())
+  attempt   String    @default("") //Date.getTime()
   name      String
   path      String
   messageId Int?
   message   Messages? @relation(fields: [messageId], references: [id])
   createdAt DateTime  @default(now())
+}
+
+model FilesMessageHistory {
+  id        Int             @id @default(autoincrement())
+  name      String
+  path      String
+  replyId   Int?
+  reply     MessageHistory? @relation(fields: [replyId], references: [id])
+  createdAt DateTime        @default(now())
 }
 
 enum UserRole {
@@ -325,4 +349,20 @@ enum MessageType {
   CARTA
   INFORME
   MEMORANDUM
+  ACUERDO
+  OFICIO
+  COORDINACION
+}
+
+enum MessageRole {
+  MAIN
+  SECONDARY
+}
+
+enum MessageStatus {
+  PROCESO
+  RECHAZADO
+  ARCHIVADO
+  FINALIZADO
+  GUARDADO
 }

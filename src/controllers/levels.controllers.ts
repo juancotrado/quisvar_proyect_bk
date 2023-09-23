@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { LevelsServices, PathServices } from '../services';
 import { mkdirSync, rmSync } from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
+import { SubTasks } from '@prisma/client';
 
 export const showLevel = async (
   req: Request,
@@ -10,8 +11,9 @@ export const showLevel = async (
 ) => {
   try {
     const { id } = req.params;
+    const status = req.query.status as SubTasks['status'];
     const _task_id = parseInt(id);
-    const query = await LevelsServices.find(_task_id);
+    const query = await LevelsServices.find(_task_id, status);
     res.status(200).json(query);
   } catch (error) {
     next(error);

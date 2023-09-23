@@ -1,78 +1,75 @@
 import { Mail, Messages, Users } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
-import { ParametersMail, PickMail } from 'types/types';
+import { FileMessagePick, ParametersMail, PickMail } from 'types/types';
 import Queries from '../utils/queries';
 import AppError from '../utils/appError';
 
 class MailServices {
+  static PickType(type?: Mail['type']) {
+    if (type === 'SENDER') return 'RECEIVER' as Mail['type'];
+    if (type === 'RECEIVER') return 'SENDER' as Mail['type'];
+    return undefined;
+  }
   static async getByUser(
     userId: Users['id'],
-    { skip, limit, type, status }: ParametersMail
+    { skip, type, status, typeMessage }: ParametersMail
   ) {
-    const take = limit ? limit : 10;
-    const getListMail = await prisma.mail.findMany({
-      where: { userId, type, status },
+    const typeMail = this.PickType(type);
+    const mail = await prisma.mail.findMany({
+      where: { userId, type, message: { status, type: typeMessage } },
       orderBy: { assignedAt: 'desc' },
       skip,
-      take,
+      take: 20,
       select: {
         messageId: true,
         status: true,
-        message: true,
-        // message: {
-        //   select: {
-        //     id: true,
-        //     description: true,
-        //     idMessageReply: true,
-        //     idMessageResend: true,
-        //     // users: {
-        //     //   select: {
-        //     //     userId: true,
-        //     //     type: true,
-        //     //     user: Queries.selectProfileUser,
-        //     //   },
-        //     // },
-        //     createdAt: true,
-        //     // files: { select: { id: true, name: true, path: true } },
-        //   },
-        // },
+        type: true,
+        message: {
+          include: {
+            users: {
+              where: { type: typeMail, role: 'MAIN' },
+              select: {
+                type: true,
+                role: true,
+                status: true,
+                user: Queries.selectProfileUser,
+              },
+            },
+          },
+        },
       },
     });
-    return getListMail;
+    const total = await prisma.mail.count({
+      where: { userId, type, message: { status, type: typeMessage } },
+    });
+    return { total, mail };
   }
   static async getMessage(id: Messages['id']) {
     if (!id) throw new AppError('Ops!, ID invalido', 400);
     const getMessage = await prisma.messages.findUnique({
       where: { id },
-      select: {
-        id: true,
-        title: true,
-        status: true,
-        description: true,
-        type: true,
-        idMessageReply: true,
-        idMessageResend: true,
+      include: {
         users: {
           select: {
             userId: true,
             type: true,
+            role: true,
+            status: true,
             user: Queries.selectProfileUser,
           },
         },
-        createdAt: true,
-        files: { select: { id: true, name: true, path: true } },
+        files: true,
+        history: {
+          include: {
+            files: { select: { id: true, name: true, path: true } },
+            user: Queries.selectProfileUser,
+          },
+        },
       },
     });
     if (!getMessage)
       throw new AppError('No se pudo encontrar datos del mensaje', 404);
-    const { idMessageReply, idMessageResend, ...message } = getMessage;
-    const previewMessage = idMessageReply
-      ? await this.getMessagePreview(idMessageReply)
-      : idMessageResend
-      ? await this.getMessagePreview(idMessageResend)
-      : null;
-    const data = { ...message, previewMessage };
-    return data;
+    return getMessage;
   }
 
   static async getMessagePreview(id: Messages['id']) {
@@ -83,6 +80,7 @@ class MailServices {
         id: true,
         title: true,
         status: true,
+        header: true,
         description: true,
         type: true,
         createdAt: true,
@@ -94,42 +92,44 @@ class MailServices {
     return getMessage;
   }
 
-  static async create({
-    title,
-    description,
-    type,
-    senderId,
-    receiverId,
-    idMessageReply,
-    idMessageResend,
-  }: PickMail) {
+  static async create(
+    {
+      title,
+      description,
+      type,
+      header,
+      senderId,
+      receiverId,
+      secondaryReceiver,
+    }: PickMail,
+    files: FileMessagePick[]
+  ) {
     const typeMail: Mail['type'] = 'SENDER';
+    const role: Mail['role'] = 'MAIN';
+    const status = true;
+    console.log([...secondaryReceiver], '<===');
     const createMessage = await prisma.messages.create({
       data: {
         title,
+        header,
         description,
         type,
-        idMessageReply,
-        idMessageResend,
         users: {
           createMany: {
             data: [
-              { userId: senderId, type: typeMail },
-              { userId: receiverId },
+              ...secondaryReceiver,
+              { userId: senderId, role, type: typeMail },
+              { userId: receiverId, role, status },
             ],
             skipDuplicates: true,
           },
         },
-        files: {
-          createMany: {
-            data: [{ name: '', path: '' }],
-          },
-        },
+        files: { createMany: { data: files } },
       },
     });
     return createMessage;
   }
-  static async updateStatus(id: Messages['id'], status: boolean) {
+  static async updateStatus(id: Messages['id'], status: Messages['status']) {
     const updateStatus = await prisma.messages.update({
       where: { id },
       data: { status },
@@ -142,6 +142,19 @@ class MailServices {
       data: { status: false },
     });
     return archivedList;
+  }
+  static async quantityFiles(userId: Users['id']) {
+    const quantity = await prisma.messages.groupBy({
+      by: ['type'],
+      _count: { type: true },
+      where: {
+        // status: true,
+        users: {
+          some: { userId },
+        },
+      },
+    });
+    return quantity;
   }
 }
 export default MailServices;

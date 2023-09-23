@@ -1,4 +1,4 @@
-import { Levels } from '@prisma/client';
+import { Levels, SubTasks } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import PathLevelServices from './path_levels.services';
@@ -18,13 +18,17 @@ import { DuplicateLevel, GetFilterLevels } from 'types/types';
 import { existsSync } from 'fs';
 
 class LevelsServices {
-  static async find(id: Levels['id']) {
+  static async find(id: Levels['id'], status?: SubTasks['status']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const findRootLevel = await prisma.levels.findUnique({ where: { id } });
     if (!findRootLevel) throw new AppError('No se pudó encontrar nivel', 400);
     const { stagesId, level } = findRootLevel;
     const getList = await prisma.levels.findMany({
-      where: { stagesId, level: { gt: level } },
+      where: {
+        stagesId,
+        level: { gt: level },
+        subTasks: { every: { status } },
+      },
       orderBy: { item: 'asc' },
       include: {
         subTasks: {
