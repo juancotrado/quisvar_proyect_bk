@@ -1,6 +1,11 @@
 import { Mail, Messages, Users } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
-import { FileMessagePick, ParametersMail, PickMail } from 'types/types';
+import {
+  FileMessagePick,
+  ParametersMail,
+  PickMail,
+  PickMessageReply,
+} from 'types/types';
 import Queries from '../utils/queries';
 import AppError from '../utils/appError';
 
@@ -64,10 +69,16 @@ class MailServices {
             user: Queries.selectProfileUser,
           },
         },
-        files: true,
+        files: {
+          orderBy: { id: 'desc' },
+          select: { id: true, name: true, path: true, attempt: true },
+        },
         history: {
           include: {
-            files: { select: { id: true, name: true, path: true } },
+            files: {
+              orderBy: { id: 'desc' },
+              select: { id: true, name: true, path: true },
+            },
             user: Queries.selectProfileUser,
           },
         },
@@ -113,7 +124,6 @@ class MailServices {
     const typeMail: Mail['type'] = 'SENDER';
     const role: Mail['role'] = 'MAIN';
     const status = true;
-    console.log([...secondaryReceiver], '<===');
     const createMessage = await prisma.messages.create({
       data: {
         title,
@@ -135,6 +145,98 @@ class MailServices {
     });
     return createMessage;
   }
+  static async createReply(
+    {
+      title,
+      receiverId,
+      senderId,
+      header,
+      description,
+      status,
+      messageId,
+    }: PickMessageReply,
+    files: Pick<FileMessagePick, 'name' | 'path'>[]
+  ) {
+    if (status === 'RECHAZADO') {
+      await prisma.messages.update({
+        where: { id: messageId },
+        data: { status },
+      });
+      const createReply = await prisma.messageHistory.create({
+        data: {
+          title,
+          header,
+          description,
+          user: { connect: { id: senderId } },
+          message: { connect: { id: messageId } },
+          files: { createMany: { data: files } },
+        },
+      });
+      return createReply;
+    }
+    if (!receiverId) throw new AppError('Ingrese Destinatario', 400);
+    console.log(title, receiverId, senderId, header, status, messageId);
+    // const updatePriorityReceiver =
+    await prisma.mail.create({
+      data: { messageId, userId: receiverId, role: 'MAIN', status: true },
+    });
+    // const updateStatusSender =
+    await prisma.mail.update({
+      where: { userId_messageId: { userId: senderId, messageId } },
+      data: { status: false },
+    });
+    const createForward = await prisma.messageHistory.create({
+      data: {
+        title,
+        header,
+        description,
+        user: { connect: { id: senderId } },
+        message: { connect: { id: messageId } },
+        files: { createMany: { data: files } },
+      },
+    });
+    return createForward;
+  }
+  static async updateMessage(
+    id: Messages['id'],
+    { header, title, description }: Messages,
+    files: FileMessagePick[]
+  ) {
+    const updateMessage = await prisma.messages.update({
+      where: { id },
+      data: {
+        header,
+        title,
+        description,
+        status: 'PROCESO',
+        files: { createMany: { data: files } },
+      },
+    });
+    return updateMessage;
+  }
+  static async archived(id: Messages['id']) {
+    const archived = await prisma.messages.update({
+      where: { id },
+      data: { status: 'ARCHIVADO' },
+    });
+    await prisma.mail.updateMany({
+      where: { messageId: id },
+      data: { status: false },
+    });
+    return archived;
+  }
+  static async done(id: Messages['id']) {
+    if (!id) throw new AppError('Ops, ID invalido', 400);
+    const done = await prisma.messages.update({
+      where: { id },
+      data: { status: 'FINALIZADO' },
+    });
+    await prisma.mail.updateMany({
+      where: { messageId: id },
+      data: { status: false },
+    });
+    return done;
+  }
   static async updateStatus(id: Messages['id'], status: Messages['status']) {
     const updateStatus = await prisma.messages.update({
       where: { id },
@@ -142,7 +244,7 @@ class MailServices {
     });
     return updateStatus;
   }
-  static async archived(messageId: Messages['id']) {
+  static async archivedItem(messageId: Messages['id']) {
     const archivedList = await prisma.mail.updateMany({
       where: { messageId, type: 'RECEIVER' },
       data: { status: false },

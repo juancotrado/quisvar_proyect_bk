@@ -89,10 +89,14 @@ import {
   getListRange,
 } from './list.controller';
 import {
+  archivedMessage,
   createMessage,
+  createReplyMessage,
+  doneMessage,
   quantityFiles,
   showMessage,
   showMessages,
+  updateMessage,
 } from './mail.controllers';
 // User Controllers
 export {
@@ -186,4 +190,13 @@ export {
 };
 
 //Mail Controllers
-export { showMessages, createMessage, showMessage, quantityFiles };
+export {
+  showMessages,
+  createMessage,
+  showMessage,
+  quantityFiles,
+  createReplyMessage,
+  updateMessage,
+  archivedMessage,
+  doneMessage,
+};

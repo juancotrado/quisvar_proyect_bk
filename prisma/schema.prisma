@@ -274,6 +274,7 @@ model Messages {
   users       Mail[]
   history     MessageHistory[]
   createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 }
 
 model MessageHistory {

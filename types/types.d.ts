@@ -3,6 +3,7 @@ import {
   IndexTasks,
   Levels,
   Mail,
+  MessageHistory,
   Messages,
   SubTasks,
   Supervisor,
@@ -154,5 +155,12 @@ export interface PickMail extends Messages {
   idMessageReply?: number;
   idMessageResend?: number;
   secondaryReceiver: { userId: number }[];
+}
+export interface PickMessageReply extends MessageHistory {
+  // type?: Mail['type'];
+  senderId: Users['id'];
+  receiverId?: Users['id'];
+  status?: Messages['status'];
+  messageId: Messages['id'];
 }
 export type FileMessagePick = Pick<FilesMessage, 'name' | 'path' | 'attempt'>;
