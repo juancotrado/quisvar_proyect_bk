@@ -34,10 +34,11 @@ class StageServices {
     const { name, project } = findStage;
     const projectName = project.name;
     const getList = await prisma.levels.findMany({
-      where: { stagesId: id, subTasks: { every: { status } } },
+      where: { stagesId: id },
       orderBy: { item: 'asc' },
       include: {
         subTasks: {
+          where: { status },
           orderBy: { id: 'asc' },
           include: { users: { select: { percentage: true } } },
         },

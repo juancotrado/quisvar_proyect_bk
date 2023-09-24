@@ -11,10 +11,13 @@ export const showMessages = async (
   next: NextFunction
 ) => {
   try {
-    const params = req.query as ParametersMail;
+    const { skip, ...params } = req.query as ParametersMail;
     const userInfo: UserType = res.locals.userInfo;
     const userId = userInfo.id;
-    const query = await MailServices.getByUser(userId, params);
+    const offset = parseInt(`${skip}`);
+    const _skip = !isNaN(offset) ? offset : undefined;
+    const newParams = { skip: _skip, ...params };
+    const query = await MailServices.getByUser(userId, newParams);
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -44,7 +47,7 @@ export const createMessage = async (
   try {
     const userInfo: UserType = res.locals.userInfo;
     const senderId = userInfo.id;
-    const attempt = `${new Date().getTime}`;
+    const attempt = `${new Date().getTime()}`;
     if (!req.files)
       throw new AppError('Oops!, no se pudo subir los archivos', 400);
     const files = req.files as Express.Multer.File[];

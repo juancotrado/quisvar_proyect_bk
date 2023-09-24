@@ -27,11 +27,11 @@ class LevelsServices {
       where: {
         stagesId,
         level: { gt: level },
-        subTasks: { every: { status } },
       },
       orderBy: { item: 'asc' },
       include: {
         subTasks: {
+          where: { status },
           orderBy: { item: 'asc' },
           include: { users: { select: { percentage: true } } },
         },

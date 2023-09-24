@@ -25,7 +25,13 @@ class MailServices {
         status: true,
         type: true,
         message: {
-          include: {
+          select: {
+            id: true,
+            header: true,
+            status: true,
+            type: true,
+            title: true,
+            createdAt: true,
             users: {
               where: { type: typeMail, role: 'MAIN' },
               select: {
