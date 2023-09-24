@@ -60,7 +60,7 @@ class PathServices {
   static async stage(id: number, type: ProjectDir) {
     const { name, project } = await StageInfo.findStage(id);
     if (!project) throw new AppError('Oops!,ID no encontrado', 400);
-    const pathProject = await this.project(project.id, type);
+    const pathProject = await PathServices.project(project.id, type);
     return pathProject + '/' + name;
   }
   static async level(id: number) {
@@ -68,7 +68,7 @@ class PathServices {
     const findLevel = await prisma.levels.findUnique({ where: { id } });
     if (!findLevel) throw new AppError('Oops!,No hay el directorio', 404);
     const { stagesId } = findLevel;
-    const projectPath = await this.stage(stagesId, 'UPLOADS');
+    const projectPath = await PathServices.stage(stagesId, 'UPLOADS');
     const path = await StageInfo.getValues(id);
     return projectPath + '/' + path;
   }
@@ -76,10 +76,10 @@ class PathServices {
     const { levels_Id, Levels } = await StageInfo.findSubtask(id);
     const { stages } = Levels;
     if (type === 'UPLOADS') {
-      const levelPath = await this.level(levels_Id);
+      const levelPath = await PathServices.level(levels_Id);
       return levelPath;
     }
-    const rootPath = await this.stage(stages.id, type);
+    const rootPath = await PathServices.stage(stages.id, type);
     return rootPath;
   }
 }
