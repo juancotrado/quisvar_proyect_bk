@@ -175,7 +175,6 @@ class MailServices {
       return createReply;
     }
     if (!receiverId) throw new AppError('Ingrese Destinatario', 400);
-    console.log(title, receiverId, senderId, header, status, messageId);
     // const updatePriorityReceiver =
     await prisma.mail.create({
       data: { messageId, userId: receiverId, role: 'MAIN', status: true },

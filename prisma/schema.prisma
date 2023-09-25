@@ -287,6 +287,7 @@ model MessageHistory {
   files       FilesMessageHistory[]
   message     Messages?             @relation(fields: [messageId], references: [id])
   messageId   Int?
+  createdAt   DateTime              @default(now())
 }
 
 model FilesMessage {
