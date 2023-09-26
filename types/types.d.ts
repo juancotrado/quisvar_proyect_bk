@@ -1,4 +1,5 @@
 import {
+  Files,
   FilesMessage,
   IndexTasks,
   Levels,
@@ -134,10 +135,17 @@ export interface DuplicateLevel {
 export interface GetFilterLevels extends Levels {
   subTasks?: SubTaskFilter[];
 }
+export interface GetDuplicateLevels extends Levels {
+  subTasks?: SubTaskFiles[];
+  nextLevel?: GetDuplicateLevels[];
+}
 export interface SubTaskFilter extends SubTasks {
   users: {
     percentage: number;
   }[];
+}
+export interface SubTaskFiles extends SubTasks {
+  files: Files[];
 }
 
 export interface ParametersMail {

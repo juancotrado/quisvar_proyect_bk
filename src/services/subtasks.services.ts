@@ -30,6 +30,7 @@ class SubTasksServices {
 
   static async findDuplicate(name: string, id: number, type: 'ROOT' | 'ID') {
     let levels_Id, rootItem;
+    levels_Id = id;
     if (name.includes('projects'))
       throw new AppError('Error palabra reservada', 404);
     if (type === 'ID') {

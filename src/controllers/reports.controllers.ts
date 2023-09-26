@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ReportsServices } from '../services';
 import AppError from '../utils/appError';
-import { UserType } from '../middlewares/auth.middleware';
-import { indexTemplate } from '../templates/index.template';
 
 export const showListReportByUser = async (
   req: Request,

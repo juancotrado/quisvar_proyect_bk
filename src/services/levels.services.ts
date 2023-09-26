@@ -3,11 +3,9 @@ import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import PathLevelServices from './path_levels.services';
 import { parsePath, parsePathLevel, renameDir } from '../utils/fileSystem';
-import Queries from '../utils/queries';
 import {
   existRootLevelPath,
   filterLevelList,
-  getDetailsSubtask,
   getRootItem,
   getRootPath,
   parseRootItem,

@@ -246,7 +246,7 @@ model SubTasks {
   levels_Id   Int
   feedBacks   Feedback[]
   files       Files[]
-  Levels      Levels        @relation(fields: [levels_Id], references: [id])
+  Levels      Levels        @relation(fields: [levels_Id], references: [id], onDelete: Cascade)
   users       TaskOnUsers[]
 }
 

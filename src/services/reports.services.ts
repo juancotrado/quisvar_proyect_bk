@@ -1,6 +1,5 @@
 import AppError from '../utils/appError';
 import { Projects, Users, prisma } from '../utils/prisma.server';
-import Queries from '../utils/queries';
 
 class ReportsServices {
   static async getReportByUser(
@@ -10,6 +9,11 @@ class ReportsServices {
     status: 'DONE' | 'LIQUIDATION'
   ) {
     if (!userId) throw new AppError('Oops!, ID invalido', 400);
+    const GMT = 60 * 60 * 1000;
+    const _startDate = new Date(initialDate).getTime();
+    const _endDate = new Date(untilDate).getTime();
+    const startOfDay = new Date(_startDate + GMT * 5);
+    const endOfDay = new Date(_endDate + GMT * 29 - 1);
     const user = await prisma.users.findUnique({
       where: { id: userId },
       select: {
@@ -20,13 +24,15 @@ class ReportsServices {
             lastName: true,
             dni: true,
             phone: true,
+            description: true,
+            degree: true,
           },
         },
       },
     });
     const reportList = await prisma.taskOnUsers.findMany({
       where: {
-        assignedAt: { gte: initialDate, lte: untilDate },
+        assignedAt: { gte: startOfDay, lte: endOfDay },
         userId,
         subtask: { status },
       },
@@ -42,113 +48,23 @@ class ReportsServices {
             description: true,
             price: true,
             name: true,
-            // indexTask: {
-            //   select: {
-            //     id: true,
-            //     workArea: {
-            //       select: {
-            //         id: true,
-            //         name: true,
-            //         project: {
-            //           select: {
-            //             id: true,
-            //             name: true,
-            //             description: true,
-            //             CUI: true,
-            //           },
-            //         },
-            //       },
-            //     },
-            //   },
-            // },
-            // task: {
-            //   select: {
-            //     id: true,
-            //     indexTask: {
-            //       select: {
-            //         id: true,
-            //         workArea: {
-            //           select: {
-            //             id: true,
-            //             name: true,
-            //             project: {
-            //               select: {
-            //                 id: true,
-            //                 name: true,
-            //                 description: true,
-            //                 CUI: true,
-            //                 district: true,
-            //               },
-            //             },
-            //           },
-            //         },
-            //       },
-            //     },
-            //   },
-            // },
-            // task_lvl_2: {
-            //   select: {
-            //     id: true,
-            //     task: {
-            //       select: {
-            //         id: true,
-            //         indexTask: {
-            //           select: {
-            //             id: true,
-            //             workArea: {
-            //               select: {
-            //                 id: true,
-            //                 name: true,
-            //                 project: {
-            //                   select: {
-            //                     id: true,
-            //                     name: true,
-            //                     description: true,
-            //                     CUI: true,
-            //                   },
-            //                 },
-            //               },
-            //             },
-            //           },
-            //         },
-            //       },
-            //     },
-            //   },
-            // },
-            // task_lvl_3: {
-            //   select: {
-            //     id: true,
-            //     task_2: {
-            //       select: {
-            //         id: true,
-            //         task: {
-            //           select: {
-            //             id: true,
-            //             indexTask: {
-            //               select: {
-            //                 id: true,
-            //                 workArea: {
-            //                   select: {
-            //                     id: true,
-            //                     name: true,
-            //                     project: {
-            //                       select: {
-            //                         id: true,
-            //                         name: true,
-            //                         description: true,
-            //                         CUI: true,
-            //                       },
-            //                     },
-            //                   },
-            //                 },
-            //               },
-            //             },
-            //           },
-            //         },
-            //       },
-            //     },
-            //   },
-            // },
+            Levels: {
+              select: {
+                stages: {
+                  select: {
+                    project: {
+                      select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                        CUI: true,
+                        percentage: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -160,46 +76,52 @@ class ReportsServices {
         CUI: true,
         description: true,
         district: true,
+        percentage: true,
       },
     });
+    //----------------------------------------------------------------------------
+    const list = await prisma.listOnUsers.groupBy({
+      by: ['status'],
+      where: {
+        usersId: userId,
+        assignedAt: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+    });
+    const attendance = list.reduce((acc: { [key: string]: number }, _list) => {
+      const status = _list.status;
+      if (!acc[status]) acc[status] = 0;
+      acc[status] += 1;
+      return acc;
+    }, {});
+    //----------------------------------------------------------------------------
+    if (!user) throw new AppError('Oops!, ID invalido', 400);
     if (!reportList) new AppError('no se pudo encontrar los registros', 404);
-    const newReport = reportList.map(({ ...data }) => {
-      let project;
-      // let workArea;
-      // if (subtask.indexTask) {
-      //   project = subtask.indexTask.workArea.project;
-      //   // workArea = subtask.indexTask.workArea;
-      // }
-      // if (subtask.task) {
-      //   project = subtask.task.indexTask.workArea.project;
-      //   // workArea = subtask.task.indexTask.workArea;
-      // }
-      // if (subtask.task_lvl_2) {
-      //   project = subtask.task_lvl_2.task.indexTask.workArea.project;
-      //   // workArea = subtask.task_lvl_2.task.indexTask.workArea;
-      // }
-      // if (subtask.task_lvl_3) {
-      //   project = subtask.task_lvl_3.task_2.task.indexTask.workArea.project;
-      //   // workArea = subtask.task_lvl_3.task_2.task.indexTask.workArea;
-      // }
-      return { ...data, subtask: [], project };
+    const newReport = reportList.map(({ subtask, ...data }) => {
+      const project = subtask.Levels.stages.project;
+      const { Levels, ..._subTask } = subtask;
+      return { ...data, ..._subTask, project };
     });
-    const newReportByList = projectList.map(project => {
-      // const subtasks = newReport.filter(
-      //   subtask => subtask.project?.id === project.id
-      // );
-      // const newSubTask = subtasks.map(({ project, ...a }) => ({
-      //   ...a,
-      //   // liquidation: a.status === 'LIQUIDATION' ? 30 : 100,
-      // }));
+    const newReportByList = projectList.map(_project => {
+      const subtasks = newReport.filter(
+        ({ project }) => project.id === _project.id
+      );
+      const newSubTask = subtasks.map(({ project, ...a }) => ({
+        ...a,
+        // liquidation:
+        //   a.status === 'LIQUIDATION'
+        //     ? 100 - project.percentage
+        //     : project.percentage,
+      }));
 
-      return { ...project, subtasks: [] };
+      return { ..._project, subtasks: newSubTask };
     });
-    const filterProjects = newReportByList.filter(
+    const projects = newReportByList.filter(
       project => project.subtasks.length !== 0
     );
-    // return filterProjects;
-    return { user, subtask: filterProjects };
+    return { user, attendance, projects };
   }
   static async getSubTasksByProyect(projectId: Projects['id']) {
     const findSubtasks = await prisma.subTasks.findMany({

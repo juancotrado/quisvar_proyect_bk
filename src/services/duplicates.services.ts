@@ -1,10 +1,19 @@
 import { copyFileSync, mkdirSync } from 'fs';
 import AppError from '../utils/appError';
-import { Levels, Projects, Stages, prisma } from '../utils/prisma.server';
+import {
+  Levels,
+  Projects,
+  Stages,
+  SubTasks,
+  prisma,
+} from '../utils/prisma.server';
 import PathServices from './paths.services';
 import PathLevelServices from './path_levels.services';
-import { ProjectDir } from 'types/types';
+import { GetDuplicateLevels, ProjectDir } from 'types/types';
 import Queries from '../utils/queries';
+import { getRootItem } from '../utils/tools';
+import LevelsServices from './levels.services';
+import SubTasksServices from './subtasks.services';
 
 class DuplicatesServices {
   static async project(id: Projects['id']) {
@@ -104,8 +113,7 @@ class DuplicatesServices {
     return result;
   }
 
-  static async level(id: Levels['id'], stageId?: number) {
-    console.log(stageId, '<===');
+  static async level(id: Levels['id'], stageId?: number, name?: string) {
     if (!id) throw new AppError('Oops!,ID invalido?', 400);
     const findLevel = await prisma.levels.findUnique({ where: { id } });
     if (!findLevel)
@@ -118,12 +126,12 @@ class DuplicatesServices {
     const stageItem = findLevel.item;
     const levelItem = (_rootItem ? _rootItem + '.' : '') + (quantityLevel + 1);
     const newItem = stageId ? stageItem : levelItem;
-    const newName = findLevel.name + (stageId ? '' : '-copia');
+    // const newName = findLevel.name + (stageId ? '' : '-copia');
     const newLevel = await prisma.levels.create({
       data: {
         rootId,
         item: newItem,
-        name: newName,
+        name: '',
         rootLevel: findLevel.rootLevel,
         level: findLevel.level,
         // unique: findLevel.unique,
@@ -183,73 +191,141 @@ class DuplicatesServices {
     const result = await Promise.all(newListTask);
     return result;
   }
-  static async duplicateSubTask(
-    idOld: number,
-    idNew: number,
-    type: 'indexTaskId' | 'taskId' | 'task_2_Id' | 'task_3_Id',
-    itemTask?: string
-  ) {
-    const listSubtasks = await prisma.subTasks.findMany({
-      where: { [type]: idOld },
+  static async subTask(id: SubTasks['id'], newName: string) {
+    const { quantity } = await SubTasksServices.findDuplicate(
+      newName,
+      id,
+      'ID'
+    );
+    const getSubTask = await prisma.subTasks.findUnique({
+      where: { id },
       select: {
-        id: true,
         days: true,
+        description: true,
         item: true,
-        name: true,
         levels_Id: true,
         price: true,
-        files: {
-          where: { type: 'MODEL' },
-          // { type: 'SUCCESSFUL' }
-        },
+        status: true,
+        files: { where: { type: 'MODEL' } },
       },
     });
-    const newListSubTasks = listSubtasks.map(data => {
-      const { files, id, item, ..._data } = data;
-      const newItem = itemTask ? itemTask + item.slice(-2) : item;
-      return { [type]: idNew, item: newItem, ..._data };
+    if (!getSubTask) throw new AppError('Ops!, no se pudo encontrar', 404);
+    const { lastItem } = getRootItem(getSubTask.item);
+    const newItem = !getSubTask.item.length
+      ? lastItem
+      : getSubTask.item + '.' + lastItem;
+    // const newSubTask = await prisma.subTasks.create();
+  }
+  static async _duplicateLevel(lvlId: Levels['id'], _name: string) {
+    if (!lvlId) throw new AppError('Oops!, ID invalido', 400);
+    const rootLevel = await prisma.levels.findUnique({ where: { id: lvlId } });
+    if (!rootLevel) throw new AppError('No se pudó encontrar nivel', 400);
+    const duplicated = await LevelsServices.duplicate(lvlId, 0, _name, 'ID');
+    const { quantity } = duplicated;
+    const { stagesId, level } = rootLevel;
+    const { id, item, ...otherProps } = rootLevel;
+    const { rootItem } = getRootItem(item);
+    const newItem = !item.length
+      ? ''
+      : (rootItem ? rootItem + '.' : '') + `${quantity + 1}`;
+    //---------------------------------------------------------------------
+    const data = { ...otherProps, name: _name, item: newItem };
+    const newLevel = await prisma.levels.create({ data });
+    //---------------------------------------------------------------------
+    const getList = await prisma.levels.findMany({
+      where: { stagesId, level: { gt: level } },
+      orderBy: { item: 'asc' },
+      include: {
+        subTasks: { include: { files: { where: { type: 'MODEL' } } } },
+      },
     });
-    const newSubTaks = await prisma.subTasks.createMany({
-      data: newListSubTasks,
-    });
-    const getIdSubTaks = await prisma.subTasks.findMany({
-      where: { [type]: idNew },
-      select: { id: true, item: true },
-    });
-    if (listSubtasks.length !== 0) {
-      listSubtasks.forEach(async subtask => {
-        const findSubTask = getIdSubTaks.filter(
-          s => s.item.slice(-1) == subtask.item.slice(-1)
-        );
-        const _subtask_id = findSubTask[0].id;
-        if (subtask.files.length !== 0) {
-          const newFiles = await Promise.all(
-            subtask.files.map(async file => {
-              const { dir, id, subTasksId, name, ...data } = file;
-              const newName = itemTask
-                ? name.replace(subtask.item.slice(0, -2), itemTask)
-                : name;
-              if (file.type === 'MODEL') {
-                const newDir = await PathServices.subTask(
-                  _subtask_id,
-                  file.type
-                );
-                copyFileSync(`${dir}/${name}`, `${newDir}/${newName}`);
-                return {
-                  dir: newDir,
-                  subTasksId: _subtask_id,
-                  name: newName,
-                  ...data,
-                };
-              }
-              return file;
-            })
-          );
-          // await prisma.files.createMany({ data: newFiles });
-        }
+    //---------------------------------------------------------------------
+    const nextLevel = this.findList(getList, lvlId, level, newItem);
+    const createDuplicate = await this.createLevel(nextLevel, newLevel.id);
+    return createDuplicate;
+  }
+  static async createLevel(array: GetDuplicateLevels[], mainId: number) {
+    array.forEach(async ({ id, rootId, subTasks, nextLevel, ...level }) => {
+      const newLevel = await prisma.levels.create({
+        data: { ...level, rootId: mainId },
       });
-    }
-    return newSubTaks;
+      if (subTasks)
+        subTasks.forEach(
+          async ({
+            id,
+            levels_Id,
+            files,
+            createdAt,
+            updatedAt,
+            ..._subtask
+          }) => {
+            const newSubTaks = await prisma.subTasks.create({
+              data: {
+                ..._subtask,
+                status: 'UNRESOLVED',
+                levels_Id: newLevel.id,
+              },
+            });
+            if (files) {
+              const newFiles = files.map(
+                ({ id, assignedAt, feedbackId, subTasksId, ...data }) => ({
+                  ...data,
+                  name: `${newSubTaks.id}${data.name}`,
+                  subTasksId: newSubTaks.id,
+                })
+              );
+              await prisma.files.createMany({ data: newFiles });
+            }
+          }
+        );
+      if (nextLevel) await this.createLevel(nextLevel, newLevel.id);
+    });
+  }
+  static findList(
+    array: GetDuplicateLevels[],
+    _rootId: number,
+    _rootLevel: number,
+    newRootItem: string
+    // newRootId: number
+  ) {
+    const findList = array.filter(
+      ({ rootId, rootLevel }) => rootId === _rootId && rootLevel === _rootLevel
+    );
+    const list = array.filter(value => !findList.includes(value));
+    if (!findList.length) return [];
+    const newList = findList.map(({ item, subTasks, ...value }) => {
+      const { level, id, rootId, ...data } = value;
+      const { lastItem } = getRootItem(item);
+      const newItem = !newRootItem.length
+        ? lastItem
+        : newRootItem + '.' + lastItem;
+      //---------------------------------------------------------------------------
+      // const newLevel = await prisma.levels.create({
+      //   data: {
+      //     item: newItem,
+      //     rootId: 2,
+      //     ...data,
+      //   },
+      // });
+      //---------------------------------------------------------------------------
+      const _subtasks = subTasks?.map(({ ...s }) => {
+        const { lastItem } = getRootItem(item);
+        const _item = !newItem ? lastItem : newItem + '.' + lastItem;
+        return { ...s, item: _item };
+      });
+      //---------------------------------------------------------------------------
+      const nextLevel: typeof findList = this.findList(
+        list,
+        id,
+        level,
+        newItem
+        // newLevel.id
+      );
+      if (!nextLevel.length)
+        return { ...value, item: newItem, subTasks: _subtasks };
+      return { ...value, item: newItem, subTasks: _subtasks, nextLevel };
+    });
+    return newList;
   }
 }
 

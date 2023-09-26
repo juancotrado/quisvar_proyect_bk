@@ -10,9 +10,8 @@ class UsersServices {
         orderBy: { id: 'asc' },
         include: { profile: true },
       });
-      if (users.length == 0) {
+      if (users.length == 0)
         throw new AppError('No se pudo encontrar el registro de usuarios', 404);
-      }
       return users;
     } catch (error) {
       throw error;
@@ -22,9 +21,7 @@ class UsersServices {
   static async find(id: Users['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findUser = await prisma.users.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
       select: {
         id: true,
         email: true,
