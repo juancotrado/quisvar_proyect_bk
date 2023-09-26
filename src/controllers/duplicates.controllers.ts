@@ -53,11 +53,9 @@ export const duplicateLevels = async (
   try {
     const { id } = req.params;
     const _level_id = parseInt(id);
+    const { name } = req.body;
     // const oldDir = await PathLevelServices.pathLevel(_level_id);
-    const duplicate = await DuplicatesServices._duplicateLevel(
-      _level_id,
-      'nuevo nombre'
-    );
+    const duplicate = await DuplicatesServices._duplicateLevel(_level_id, name);
     // if (duplicate) mkdirSync(newPath);
     res.status(201).json(duplicate);
   } catch (error) {
