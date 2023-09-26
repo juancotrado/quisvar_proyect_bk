@@ -45,21 +45,15 @@ class Sockets {
       socket.on('client:update-task', (task: SubTasks) => {
         this.io.to(`task-${task.id}`).emit('server:update-subTask', task);
       });
+      socket.on('client:update-project', (project: Level) => {
+        this.io
+          .to(`project-${project.stagesId}`)
+          .emit('server:update-project', project);
+      });
       socket.on('client:call-notification', () => {
         this.io.emit('server:call-notification');
-        // this.io.to(`task-${task.id}`).emit('server:update-subTask', task);
       });
-      // socket.on('client:create-subTask', (subTask: SubTasks) => {
-      //   const room = this.roomPlace(subTask);
-      //   this.io.to(room).emit('server:create-subTask', subTask);
-      // });
-      // socket.on('client:delete-subTask', (subTasks: SubTasks[]) => {
-      //   const room = this.roomPlace(subTasks[0]);
-      //   if (!subTasks[0].id) {
-      //     return this.io.to(room).emit('server:delete-subTask', []);
-      //   }
-      //   this.io.to(room).emit('server:delete-subTask', subTasks);
-      // });
+
       socket.on('disconnect', () => {
         console.log('User disconected ==>', socket.id);
       });
