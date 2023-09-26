@@ -23,9 +23,10 @@ export const createSubTask = async (
   next: NextFunction
 ) => {
   try {
-    const { body } = req;
-    const query = await SubTasksServices.create(body);
-    res.status(201).json(query);
+    const { stageId, ...body } = req.body;
+    await SubTasksServices.create(body);
+    const query = await StageServices.find(+stageId);
+    res.status(201).json({ ...query, stagesId: stageId });
   } catch (error) {
     next(error);
   }
