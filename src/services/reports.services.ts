@@ -77,6 +77,16 @@ class ReportsServices {
         description: true,
         district: true,
         percentage: true,
+        moderator: {
+          select: {
+            profile: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
       },
     });
     //----------------------------------------------------------------------------
