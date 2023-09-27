@@ -23,7 +23,6 @@ class MailServices {
     userId: Users['id'],
     { skip, type, status, typeMessage }: ParametersMail
   ) {
-    type StatusList = { status: Messages['status'] }[];
     const typeMail = this.PickType(type);
     const mail = await prisma.mail.findMany({
       where: {
