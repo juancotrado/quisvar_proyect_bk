@@ -8,6 +8,8 @@ class Queries {
           lastName: true,
           dni: true,
           phone: true,
+          degree: true,
+          description: true,
         },
       },
     },
