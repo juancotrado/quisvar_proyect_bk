@@ -167,7 +167,7 @@ export interface PickMail extends Messages {
 export interface PickMessageReply extends MessageHistory {
   // type?: Mail['type'];
   senderId: Users['id'];
-  receiverId?: Users['id'];
+  receiverId: Users['id'];
   status?: Messages['status'];
   messageId: Messages['id'];
 }

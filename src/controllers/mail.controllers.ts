@@ -95,7 +95,7 @@ export const updateMessage = async (
     const data = JSON.parse(body.data) as PickMail;
     const query = await MailServices.updateMessage(
       _messageId,
-      { ...data },
+      { ...data, senderId },
       parseFiles
     );
     res.status(201).json(query);
@@ -136,9 +136,11 @@ export const archivedMessage = async (
   next: NextFunction
 ) => {
   try {
+    const userInfo: UserType = res.locals.userInfo;
+    const senderId = userInfo.id;
     const { id } = req.params;
     const _messageId = parseInt(id);
-    const query = await MailServices.archived(_messageId);
+    const query = await MailServices.archived(_messageId, senderId);
     res.status(201).json(query);
   } catch (error) {
     next(error);
@@ -151,9 +153,11 @@ export const doneMessage = async (
   next: NextFunction
 ) => {
   try {
+    const userInfo: UserType = res.locals.userInfo;
+    const senderId = userInfo.id;
     const { id } = req.params;
     const _messageId = parseInt(id);
-    const query = await MailServices.done(_messageId);
+    const query = await MailServices.done(_messageId, senderId);
     res.status(201).json(query);
   } catch (error) {
     next(error);
