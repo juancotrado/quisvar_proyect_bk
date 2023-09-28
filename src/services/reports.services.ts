@@ -94,16 +94,14 @@ class ReportsServices {
       by: ['status'],
       where: {
         usersId: userId,
-        assignedAt: {
-          gte: startOfDay,
-          lte: endOfDay,
-        },
+        assignedAt: { gte: startOfDay, lte: endOfDay },
       },
+      _count: { status: true },
     });
     const attendance = list.reduce((acc: { [key: string]: number }, _list) => {
       const status = _list.status;
       if (!acc[status]) acc[status] = 0;
-      acc[status] += 1;
+      acc[status] = _list._count.status;
       return acc;
     }, {});
     //----------------------------------------------------------------------------

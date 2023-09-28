@@ -45,6 +45,7 @@ class MailServices {
             type: true,
             title: true,
             createdAt: true,
+            updatedAt: true,
             users: {
               where: { type: typeMail, role: 'MAIN' },
               select: {

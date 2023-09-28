@@ -14,6 +14,7 @@ import {
 } from '../utils/tools';
 import { DuplicateLevel, GetFilterLevels } from 'types/types';
 import { existsSync } from 'fs';
+import Queries from '../utils/queries';
 
 class LevelsServices {
   static async find(id: Levels['id'], status?: SubTasks['status']) {
@@ -31,7 +32,11 @@ class LevelsServices {
         subTasks: {
           where: { status },
           orderBy: { item: 'asc' },
-          include: { users: { select: { percentage: true } } },
+          include: {
+            users: {
+              select: { percentage: true, user: Queries.selectProfileUser },
+            },
+          },
         },
       },
     });
