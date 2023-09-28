@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { DuplicatesServices, _materialPath, _reviewPath } from '../services';
 import { cpSync, mkdirSync } from 'fs';
+import PathLevelServices from '../services/path_levels.services';
 
 export const duplicateProject = async (
   req: Request,
@@ -56,6 +57,25 @@ export const duplicateLevels = async (
     const { name } = req.body;
     // const oldDir = await PathLevelServices.pathLevel(_level_id);
     const duplicate = await DuplicatesServices._duplicateLevel(_level_id, name);
+    // if (duplicate) mkdirSync(newPath);
+    res.status(201).json(duplicate);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const duplicateSubtask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const _level_id = parseInt(id);
+    const { name } = req.body;
+    // const oldDir = await PathLevelServices.pathLevel(_level_id);
+    // const oldDir = await PathLevelServices.pathSubTask(_level_id, 'UPLOADS');
+    const duplicate = await DuplicatesServices.subTask(_level_id, name);
     // if (duplicate) mkdirSync(newPath);
     res.status(201).json(duplicate);
   } catch (error) {

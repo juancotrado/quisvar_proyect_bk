@@ -8,6 +8,7 @@ import { getRootItem } from '../utils/tools';
 class SubTasksServices {
   static GMT = 60 * 60 * 1000;
   static today = new Date().getTime();
+
   static async find(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findSubTask = await prisma.subTasks.findUnique({
@@ -39,20 +40,19 @@ class SubTasksServices {
         select: { levels_Id: true, item: true },
       });
       if (!getLevelId)
-        throw new AppError('No se pudo encontrar el índice', 404);
+        throw new AppError('No se pudo encontrar el índice de nivel', 404);
       levels_Id = getLevelId.levels_Id;
       rootItem = getLevelId.item;
     }
     const findLevel = await prisma.levels.findUnique({
-      where: { id },
-      select: { item: true },
+      where: { id: levels_Id },
+      select: { item: true, subTasks: { select: { name: true } } },
     });
     if (!findLevel) throw new AppError('No se pudo encontrar el índice', 404);
+    const { subTasks } = findLevel;
     rootItem = findLevel.item;
-    const list = await prisma.subTasks.findMany({ where: { levels_Id } });
-    const quantity = list.length;
-    if (!list) throw new AppError('No se pudo encontrar la lista ', 404);
-    const duplicated = list.map(({ name }) => name).includes(name);
+    const quantity = subTasks.length;
+    const duplicated = subTasks.map(({ name }) => name).includes(name);
     return { duplicated, quantity, levels_Id, rootItem };
   }
 
@@ -60,6 +60,7 @@ class SubTasksServices {
     const isDuplicated = await this.findDuplicate(name, levels_Id, 'ROOT');
     const { duplicated, rootItem, quantity } = isDuplicated;
     if (duplicated) throw new AppError('Error, Nombre existente', 404);
+    //--------------------------------------------------------------------------
     const item = rootItem + '.' + (quantity + 1);
     const data = { name, price, days, description, levels_Id, item };
     const newSubTask = await prisma.subTasks.create({
@@ -156,12 +157,12 @@ class SubTasksServices {
       const dir = reviewPath.split('/').slice(0, 5).join('/');
       const _files = files.map(async (file, index) => {
         const ext = file.name.split('.').at(-1);
-        const _name = lastItem + name + (index + 1) + '.' + ext;
+        const _name = item + name + (index + 1) + '.' + ext;
         await prisma.files.update({
           where: { id: file.id },
           data: { type: 'UPLOADS', name: _name, dir },
         });
-        renameSync(`${dir}/${file.name}`, `${path}/${_name}`);
+        renameSync(`${path}/${file.name}`, `${dir}/${_name}`);
       });
       return await Promise.all(_files).then(() => updateTaskStatus);
     }

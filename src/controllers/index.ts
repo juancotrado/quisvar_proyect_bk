@@ -52,6 +52,7 @@ import {
   duplicateLevels,
   duplicateProject,
   duplicateStages,
+  duplicateSubtask,
 } from './duplicates.controllers';
 import {
   createStage,
@@ -151,8 +152,7 @@ export { showListReportByUser, generateIndex };
 export { createFeedback, findFeedbacks };
 
 //Duplicates Controllers
-export { duplicateProject, duplicateLevels };
-
+export { duplicateProject, duplicateLevels, duplicateSubtask };
 //Stages Controllers
 export {
   showListStages,

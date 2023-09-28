@@ -191,30 +191,31 @@ class DuplicatesServices {
     const result = await Promise.all(newListTask);
     return result;
   }
-  static async subTask(id: SubTasks['id'], newName: string) {
-    const { quantity } = await SubTasksServices.findDuplicate(
-      newName,
-      id,
-      'ID'
-    );
+  static async subTask(_id: SubTasks['id'], _name: string) {
+    const _subtask = await SubTasksServices.findDuplicate(_name, _id, 'ID');
+    const { quantity, duplicated } = _subtask;
+    if (duplicated) throw new AppError('Nombre registrado anteriormente', 404);
     const getSubTask = await prisma.subTasks.findUnique({
-      where: { id },
-      select: {
-        days: true,
-        description: true,
-        item: true,
-        levels_Id: true,
-        price: true,
-        status: true,
-        files: { where: { type: 'MODEL' } },
-      },
+      where: { id: _id },
+      include: { files: { where: { type: 'MODEL' } } },
     });
     if (!getSubTask) throw new AppError('Ops!, no se pudo encontrar', 404);
-    const { lastItem } = getRootItem(getSubTask.item);
-    const newItem = !getSubTask.item.length
-      ? lastItem
-      : getSubTask.item + '.' + lastItem;
-    // const newSubTask = await prisma.subTasks.create();
+    const { files, item, createdAt, updatedAt, name, id, status, ...data } =
+      getSubTask;
+    const { rootItem } = getRootItem(item);
+    const _item = `${item.length ? rootItem + '.' : ''}${quantity + 1}`;
+    const duplicateSubTask = await prisma.subTasks.create({
+      data: { ...data, name: _name, item: _item },
+    });
+    const filesList = files.map(({ userId, name, dir, type }) => ({
+      userId,
+      type,
+      dir,
+      name: duplicateSubTask.id + name,
+      subTasksId: duplicateSubTask.id,
+    }));
+    const newFiles = await prisma.files.createMany({ data: filesList });
+    return newFiles;
   }
   static async _duplicateLevel(lvlId: Levels['id'], _name: string) {
     if (!lvlId) throw new AppError('Oops!, ID invalido', 400);

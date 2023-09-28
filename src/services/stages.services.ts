@@ -8,6 +8,7 @@ import {
 import LevelsServices from './levels.services';
 import { existsSync } from 'fs';
 import PathLevelServices from './path_levels.services';
+import Queries from '../utils/queries';
 
 class StageServices {
   static async findMany(projectId: Projects['id']) {
@@ -40,7 +41,11 @@ class StageServices {
         subTasks: {
           where: { status },
           orderBy: { id: 'asc' },
-          include: { users: { select: { percentage: true } } },
+          include: {
+            users: {
+              select: { percentage: true, user: Queries.selectProfileUser },
+            },
+          },
         },
       },
     });

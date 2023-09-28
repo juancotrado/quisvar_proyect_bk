@@ -9,6 +9,7 @@ import {
   duplicateLevels,
   duplicateProject,
   duplicateStages,
+  duplicateSubtask,
 } from '../controllers';
 
 const router = Router();
@@ -20,6 +21,7 @@ router.use(_mod_role);
 router.post('/project/:id', duplicateProject);
 router.post('/stage/:id', duplicateStages);
 router.post('/level/:id', duplicateLevels);
+router.post('/subtask/:id', duplicateSubtask);
 //ADMIN ROLE
 router.use(_admin_role);
 

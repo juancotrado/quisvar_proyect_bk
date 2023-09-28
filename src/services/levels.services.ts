@@ -76,29 +76,35 @@ class LevelsServices {
   }
 
   static async create({ name, stagesId, rootId, isProject, userId }: Levels) {
+    //---------------------------exist_file----------------------------------------
     await existRootLevelPath(rootId, stagesId);
+    //-------------------------duplicate_level-------------------------------------
     const getDuplicate = await this.duplicate(rootId, stagesId, name, 'ROOT');
     const { duplicated, quantity } = getDuplicate;
     if (duplicated) throw new AppError('Error al crear, Nombre existente', 404);
+    //-----------------------------------------------------------------------------
     const root = await this.findRoot(rootId);
     const { rootItem, rootLevel, project, include } = root;
     const stages = { connect: { id: stagesId } };
     const isArea = project;
     const level = rootLevel + 1;
     const isInclude = project || include;
+    //-----------------------------------------------------------------------------
     const newRootItem = rootItem ? rootItem + '.' : '';
     const item = isInclude ? newRootItem + `${quantity + 1}` : '';
-    const findUser = isInclude
-      ? await prisma.levels.findUnique({ where: { id: rootId } })
-      : null;
-    const user =
-      findUser && findUser.userId
-        ? { connect: { id: findUser.userId } }
-        : userId && project
-        ? { connect: { id: userId } }
-        : undefined;
+    //--------------------------find_user------------------------------------------
+    // const findUser = isInclude
+    //   ? await prisma.levels.findUnique({ where: { id: rootId } })
+    //   : null;
+    const _user = () => {
+      // if (findUser && findUser.userId)
+      //   return { connect: { id: findUser.userId } };
+      if (userId && project) return { connect: { id: userId } };
+      return undefined;
+    };
+    //-----------------------------------------------------------------------------
     const _values = { rootId, item, name, rootLevel, stages, level };
-    const data = { ..._values, isProject, isArea, isInclude, user };
+    const data = { ..._values, isProject, isArea, isInclude, user: _user() };
     const newLevel = await prisma.levels.create({ data });
     return newLevel;
   }

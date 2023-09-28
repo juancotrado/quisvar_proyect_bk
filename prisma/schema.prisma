@@ -128,6 +128,7 @@ model Levels {
   name      String
   level     Int        @default(0)
   rootLevel Int
+  typeItem  TypeItem   @default(NUM)
   isProject Boolean    @default(false)
   isArea    Boolean    @default(false)
   isInclude Boolean    @default(false)
@@ -367,4 +368,10 @@ enum MessageStatus {
   ARCHIVADO
   FINALIZADO
   GUARDADO
+}
+
+enum TypeItem {
+  ABC
+  ROM
+  NUM
 }
