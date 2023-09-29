@@ -236,7 +236,8 @@ model ListOnUsers {
 model SubTasks {
   id          Int           @id @default(autoincrement())
   status      TaskRole      @default(UNRESOLVED)
-  item        String        @default("")
+  item        String //@default("")
+  typeItem    TypeItem      @default(NUM)
   name        String
   description String?
   price       Decimal       @db.Money

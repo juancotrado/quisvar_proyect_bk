@@ -390,4 +390,66 @@ export const sumPriceByStage = (
   return { days, price, spending, balance, details };
 };
 
+export const convertToRoman = (number: number) => {
+  let numberRoman = '';
+  const dataRoman = [
+    { value: 1000, roman: 'M' },
+    { value: 900, roman: 'CM' },
+    { value: 500, roman: 'D' },
+    { value: 400, roman: 'CD' },
+    { value: 100, roman: 'C' },
+    { value: 90, roman: 'XC' },
+    { value: 50, roman: 'L' },
+    { value: 40, roman: 'XL' },
+    { value: 10, roman: 'X' },
+    { value: 9, roman: 'IX' },
+    { value: 5, roman: 'V' },
+    { value: 4, roman: 'IV' },
+    { value: 1, roman: 'I' },
+  ];
+  for (const { roman, value } of dataRoman) {
+    while (number >= value) {
+      numberRoman += roman;
+      number -= value;
+    }
+  }
+  return numberRoman;
+};
+
+export const convertToLetter = (number: number) => {
+  const _number = number + 64;
+  if (_number < 65 || _number > 90) return false;
+  return String.fromCharCode(_number);
+};
+const romanValues = {
+  I: 1,
+  V: 5,
+  X: 10,
+  L: 50,
+  C: 100,
+  D: 500,
+  M: 1000,
+};
+export const numberToConvert = (value: number, type: Levels['typeItem']) => {
+  if (type === 'ABC') return convertToLetter(value);
+  if (type === 'ROM') return convertToRoman(value);
+  return value.toString();
+};
+export const convertToNumber = (value: string, type: Levels['typeItem']) => {
+  if (type === 'ABC') return value.charCodeAt(0);
+  if (type === 'ROM') {
+    const listRoman = value.split('');
+    const getNumber = listRoman.reduce(
+      (acc, letter, i, arr) =>
+        romanValues[letter as keyof typeof romanValues] <
+        romanValues[arr[i + 1] as keyof typeof romanValues]
+          ? acc - romanValues[letter as keyof typeof romanValues]
+          : acc + romanValues[letter as keyof typeof romanValues],
+      0
+    );
+    return getNumber;
+  }
+  return parseInt(value);
+};
+
 // export const

@@ -60,6 +60,7 @@ export const duplicateLevels = async (
     // if (duplicate) mkdirSync(newPath);
     res.status(201).json(duplicate);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };

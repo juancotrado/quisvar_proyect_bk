@@ -137,7 +137,7 @@ export interface GetFilterLevels extends Levels {
 }
 export interface GetDuplicateLevels extends Levels {
   subTasks?: SubTaskFiles[];
-  nextLevel?: GetDuplicateLevels[];
+  next?: GetDuplicateLevels[];
 }
 export interface SubTaskFilter extends SubTasks {
   users: {

@@ -4,10 +4,13 @@ import AppError from '../utils/appError';
 import PathLevelServices from './path_levels.services';
 import { parsePath, parsePathLevel, renameDir } from '../utils/fileSystem';
 import {
+  convertToLetter,
+  convertToRoman,
   existRootLevelPath,
   filterLevelList,
   getRootItem,
   getRootPath,
+  numberToConvert,
   parseRootItem,
   percentageSubTasks,
   sumValues,
@@ -77,26 +80,36 @@ class LevelsServices {
       project: root ? root.isProject : false,
       area: root ? root.isArea : false,
       include: root ? root.isInclude : false,
+      typeIndex: root ? root.typeItem : null,
     };
   }
 
-  static async create({ name, stagesId, rootId, isProject, userId }: Levels) {
+  static async create({
+    name,
+    stagesId,
+    rootId,
+    isProject,
+    userId,
+    typeItem,
+  }: Levels) {
     //---------------------------exist_file----------------------------------------
     await existRootLevelPath(rootId, stagesId);
-    //-------------------------duplicate_level-------------------------------------
+    //--------------------duplicate_name_level-------------------------------------
     const getDuplicate = await this.duplicate(rootId, stagesId, name, 'ROOT');
     const { duplicated, quantity } = getDuplicate;
     if (duplicated) throw new AppError('Error al crear, Nombre existente', 404);
-    //-----------------------------------------------------------------------------
+    //--------------------------get_new_item---------------------------------------
     const root = await this.findRoot(rootId);
-    const { rootItem, rootLevel, project, include } = root;
+    const { rootItem, rootLevel, project, include, typeIndex } = root;
     const stages = { connect: { id: stagesId } };
     const isArea = project;
     const level = rootLevel + 1;
     const isInclude = project || include;
-    //-----------------------------------------------------------------------------
+    //--------------------------set_new_item---------------------------------------
     const newRootItem = rootItem ? rootItem + '.' : '';
-    const item = isInclude ? newRootItem + `${quantity + 1}` : '';
+    const _type = numberToConvert(quantity + 1, typeItem);
+    if (!_type) throw new AppError('excediste Limite de conversion', 400);
+    const item = typeItem === typeIndex ? `${newRootItem}${_type}` : `${_type}`;
     //--------------------------find_user------------------------------------------
     // const findUser = isInclude
     //   ? await prisma.levels.findUnique({ where: { id: rootId } })
@@ -108,7 +121,15 @@ class LevelsServices {
       return undefined;
     };
     //-----------------------------------------------------------------------------
-    const _values = { rootId, item, name, rootLevel, stages, level };
+    const _values = {
+      rootId,
+      item,
+      name,
+      rootLevel,
+      stages,
+      level,
+      typeItem,
+    };
     const data = { ..._values, isProject, isArea, isInclude, user: _user() };
     const newLevel = await prisma.levels.create({ data });
     return newLevel;

@@ -40,7 +40,7 @@ class StageServices {
       include: {
         subTasks: {
           where: { status },
-          orderBy: { id: 'asc' },
+          orderBy: { item: 'asc' },
           include: {
             users: {
               select: { percentage: true, user: Queries.selectProfileUser },
