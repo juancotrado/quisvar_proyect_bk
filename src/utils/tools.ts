@@ -452,4 +452,13 @@ export const convertToNumber = (value: string, type: Levels['typeItem']) => {
   return parseInt(value);
 };
 
+export const toEditablesFiles = (value: string) => {
+  // const getValue = value.split('/');
+  // const index = getValue.findIndex(v => v === 'projects');
+  // const rootPath = getValue.slice(0, index).join('/');
+  // const lastPath = getValue.slice(index + 1).join('/');
+  // const result = rootPath + '/editables/' + lastPath;
+  const result = value.replace('projects', 'editables');
+  return result;
+};
 // export const
