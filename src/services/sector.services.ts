@@ -16,6 +16,11 @@ class SectorServices {
                     company: Queries.selectCompany,
                     consortium: Queries.selectConsortium,
                     moderator: Queries.selectProfileUser,
+                    stages: {
+                      select: {
+                        id: true,
+                      },
+                    },
                   },
                 },
                 _count: {
