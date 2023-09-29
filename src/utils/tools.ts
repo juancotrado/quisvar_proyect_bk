@@ -62,6 +62,7 @@ export const percentageSubTasks = (
       percentage,
       spending,
       balance,
+      users,
       ...subtask,
     };
   });
@@ -388,3 +389,5 @@ export const sumPriceByStage = (
   const details = sumSubtaksByStage(list);
   return { days, price, spending, balance, details };
 };
+
+// export const
