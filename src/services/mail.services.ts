@@ -45,6 +45,7 @@ class MailServices {
             type: true,
             title: true,
             createdAt: true,
+            updatedAt: true,
             users: {
               where: { type: typeMail, role: 'MAIN' },
               select: {
@@ -173,14 +174,16 @@ class MailServices {
         data: { status },
       });
       //------------------------------------------------------------------
-      await prisma.mail.update({
+      const uno = await prisma.mail.update({
         where: { userId_messageId: { messageId, userId: senderId } },
-        data: { type: 'SENDER' },
+        data: { type: 'SENDER', status: false },
       });
-      await prisma.mail.update({
+      const dos = await prisma.mail.update({
         where: { userId_messageId: { messageId, userId: receiverId } },
-        data: { type: 'RECEIVER' },
+        data: { type: 'RECEIVER', status: true },
       });
+      console.log(uno, dos);
+
       //------------------------------------------------------------------
       const createReply = await prisma.messageHistory.create({
         data: {
@@ -254,11 +257,11 @@ class MailServices {
     //------------------------------------------------------------------
     await prisma.mail.update({
       where: { userId_messageId: { messageId: id, userId: senderId } },
-      data: { type: 'SENDER' },
+      data: { type: 'SENDER', status: false },
     });
     await prisma.mail.update({
       where: { userId_messageId: { messageId: id, userId: receiverId } },
-      data: { type: 'RECEIVER' },
+      data: { type: 'RECEIVER', status: true },
     });
     //------------------------------------------------------------------
 
