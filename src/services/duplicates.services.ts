@@ -12,7 +12,12 @@ import PathServices from './paths.services';
 import PathLevelServices from './path_levels.services';
 import { GetDuplicateLevels, ProjectDir, SubTaskFiles } from 'types/types';
 import Queries from '../utils/queries';
-import { getRootItem, numberToConvert, toEditablesFiles } from '../utils/tools';
+import {
+  getPathStage,
+  getRootItem,
+  numberToConvert,
+  toEditablesFiles,
+} from '../utils/tools';
 import LevelsServices from './levels.services';
 import SubTasksServices from './subtasks.services';
 
@@ -60,7 +65,7 @@ class DuplicatesServices {
       mkdirSync(path);
     }
     const newStages = stages.map(async stage => {
-      return await this.stage(stage.id, createNewProject.id);
+      // return await this.stage(stage.id, createNewProject.id);
     });
     if (company) {
       const newCompany = { projectId: createNewProject.id, ...company };
@@ -79,40 +84,43 @@ class DuplicatesServices {
     return { ...createNewProject, listStage };
   }
 
-  static async stage(id: Stages['id'], project_id?: number) {
+  static async stage(id: Stages['id'], name: string) {
     if (!id) throw new AppError('Oops!,ID invalido?', 400);
-    const findStage = await prisma.stages.findUnique({
+    const getStage = await prisma.stages.findUnique({
       where: { id },
       select: {
         projectId: true,
         name: true,
-        levels: { where: { rootId: 0 }, select: { id: true } },
+        levels: {
+          orderBy: { item: 'asc' },
+          include: {
+            subTasks: { include: { files: { where: { type: 'MODEL' } } } },
+          },
+        },
       },
     });
-    if (!findStage)
+    if (!getStage)
       throw new AppError('Oops!,no se pudo encontrar el nivel', 400);
-    const name = project_id ? findStage.name : findStage.name + '-copia';
+    //----------------------------create_stage--------------------------------------
     const createStage = await prisma.stages.create({
-      data: { name, projectId: project_id ? project_id : findStage.projectId },
+      data: { name, projectId: getStage.projectId },
     });
-    const getPath = async (id: number, type: ProjectDir) => {
-      return await PathLevelServices.pathStage(id, type);
-    };
-    const modelpath = await getPath(createStage.id, 'MODEL');
-    const reviewpath = await getPath(createStage.id, 'REVIEW');
-    const path = await getPath(createStage.id, 'UPLOADS');
-    if (createStage && path) {
-      mkdirSync(modelpath);
-      mkdirSync(reviewpath);
-      mkdirSync(path);
-    }
-    // const newListTask = findStage.levels.map(async level => {
-    //   return await this.level(level.id, createStage.id);
-    // });
-    // const listLevel = await Promise.all(newListTask);
-    const result = { ...createStage };
-    return result;
+    const { id: stageId } = createStage;
+    //----------------------------create_files--------------------------------------
+    const path = await getPathStage(createStage.id, 'UPLOADS');
+    const editablePath = toEditablesFiles(path);
+    const modelPath = toEditablesFiles(path, 'MODEL');
+    const reviewPath = toEditablesFiles(path, 'REVIEW');
+    mkdirSync(modelPath, { recursive: true });
+    mkdirSync(reviewPath, { recursive: true });
+    mkdirSync(editablePath, { recursive: true });
+    mkdirSync(path, { recursive: true });
+    //------------------------------------------------------------------------------
+    const nextLevel = this.getList(getStage.levels, 0, 0, '', 'ABC', stageId);
+    const levels = await this.createLevel(nextLevel, 0, path, modelPath);
+    return { ...createStage, levels };
   }
+
   static async level(lvlId: Levels['id'], _name: string) {
     if (!lvlId) throw new AppError('Oops!, ID invalido', 400);
     const rootLevel = await prisma.levels.findUnique({
@@ -165,7 +173,6 @@ class DuplicatesServices {
       subTasks: _subtasks,
       createDuplicate,
     };
-    // return nextLevel;
   }
 
   static async subTask(_id: SubTasks['id'], name: string) {
@@ -211,7 +218,8 @@ class DuplicatesServices {
 
   static async listSubtask(
     list: SubTaskFiles[],
-    { item: rootItem, typeItem, id: rootId }: Levels
+    { item: rootItem, typeItem, id: rootId }: Levels,
+    stagePath?: string
   ) {
     const newSubTaks = list.map(async ({ id, files, ...subtask }) => {
       const { levels_Id, createdAt, updatedAt, item, ...data } = subtask;
@@ -228,12 +236,14 @@ class DuplicatesServices {
       //--------------------------set_new_files----------------------------
       const hash = new Date().getTime();
       const newFiles = files.map(
-        ({ id, assignedAt, feedbackId, subTasksId, ...data }) => {
+        ({ id, assignedAt, feedbackId, subTasksId, dir, ...data }) => {
           const getName = data.name.split('$')[1];
           const name = `${hash}$${getName}`;
-          copyFileSync(`${data.dir}/${data.name}`, `${data.dir}/${name}`);
+          const _dir = stagePath ? stagePath : dir;
+          copyFileSync(`${dir}/${data.name}`, `${_dir}/${name}`);
           return {
             ...data,
+            dir: _dir,
             name,
             subTasksId: _newSubTaks.id,
           };
@@ -255,7 +265,8 @@ class DuplicatesServices {
   static async createLevel(
     array: GetDuplicateLevels[],
     mainId: number,
-    rootPath: string
+    rootPath: string,
+    stagePath?: string
   ) {
     const list = array.map(async ({ id, next, subTasks, ...level }) => {
       const data = { ...level, rootId: mainId };
@@ -267,12 +278,18 @@ class DuplicatesServices {
       mkdirSync(editablePath, { recursive: true });
       //-------------------------duplicate_subtasks---------------------------------
       const _subtasks =
-        newLevel && subTasks ? await this.listSubtask(subTasks, newLevel) : [];
+        newLevel && subTasks
+          ? await this.listSubtask(subTasks, newLevel, stagePath)
+          : [];
       //----------------------------------------------------------------------------
-
       if (!next) return { ...level, id, subTasks: _subtasks };
       type Next = GetDuplicateLevels[];
-      const _next: Next = await this.createLevel(next, newLevel.id, path);
+      const _next: Next = await this.createLevel(
+        next,
+        newLevel.id,
+        path,
+        stagePath
+      );
       return { ...level, id, subTasks, next: _next };
     });
     return Promise.all(list);
@@ -291,7 +308,7 @@ class DuplicatesServices {
     );
     const list = array.filter(value => !findList.includes(value));
     if (!findList.length) return [];
-    const newList = findList.map(({ item, subTasks, ...value }) => {
+    const newList = findList.map(({ item, subTasks, stagesId, ...value }) => {
       //--------------------------set_new_item--------------------------------------
       const { lastItem } = getRootItem(item);
       const parseRootItem = newRootItem ? newRootItem + '.' : '';
@@ -306,9 +323,22 @@ class DuplicatesServices {
       });
       //---------------------------------------------------------------------------
       const { level, id } = value;
+      const stgID = _stageId ? _stageId : stagesId;
       type Next = typeof findList;
-      const next: Next = this.getList(list, id, level, _item, value.typeItem);
-      const data = { item: _item, ...value, subTasks: _subtasks };
+      const next: Next = this.getList(
+        list,
+        id,
+        level,
+        _item,
+        value.typeItem,
+        stgID
+      );
+      const data = {
+        item: _item,
+        stagesId: stgID,
+        ...value,
+        subTasks: _subtasks,
+      };
       if (!next.length) return data;
       return { ...data, next };
     });

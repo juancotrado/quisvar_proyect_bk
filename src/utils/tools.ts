@@ -10,12 +10,14 @@ import {
   PriceTask,
   PriceTaskLvl2,
   PriceTaskLvl3,
+  ProjectDir,
   SubTaskFilter,
 } from 'types/types';
 import { prisma } from './prisma.server';
 import AppError from './appError';
 import { PathServices } from '../services';
 import { existsSync } from 'fs';
+import PathLevelServices from '../services/path_levels.services';
 
 export const sumValues = (list: any[], label: string) => {
   const sum = list.reduce((a: number, c) => a + +c[label], 0);
@@ -452,13 +454,17 @@ export const convertToNumber = (value: string, type: Levels['typeItem']) => {
   return parseInt(value);
 };
 
-export const toEditablesFiles = (value: string) => {
+export const toEditablesFiles = (value: string, type?: 'MODEL' | 'REVIEW') => {
   // const getValue = value.split('/');
   // const index = getValue.findIndex(v => v === 'projects');
   // const rootPath = getValue.slice(0, index).join('/');
   // const lastPath = getValue.slice(index + 1).join('/');
   // const result = rootPath + '/editables/' + lastPath;
+  if (type === 'MODEL') return value.replace('projects', 'models');
+  if (type === 'REVIEW') return value.replace('projects', 'reviews');
   const result = value.replace('projects', 'editables');
   return result;
 };
-// export const
+export const getPathStage = async (id: number, type: ProjectDir) => {
+  return await PathLevelServices.pathStage(id, type);
+};

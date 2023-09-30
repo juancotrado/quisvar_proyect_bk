@@ -117,6 +117,7 @@ class StageServices {
   }
 
   static async create({ name, projectId }: Stages) {
+    if (name.includes('projects')) throw new AppError('Nombre reservado', 404);
     const path = await PathLevelServices.pathProject(projectId, 'UPLOADS');
     if (!existsSync(path)) throw new AppError('Ops!,carpeta no existe', 404);
     const createStage = await prisma.stages.create({
