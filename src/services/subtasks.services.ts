@@ -137,11 +137,8 @@ class SubTasksServices {
     user: Users
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const updateTaskStatus = await prisma.subTasks.update({
-      where: { id },
-      data: { status },
-      include: Queries.includeSubtask,
-    });
+    const updateTaskStatus = await SubTasksServices.find(id);
+
     const { item, name } = updateTaskStatus;
     const { lastItem } = getRootItem(item);
     if (status === 'DONE') {
@@ -167,6 +164,12 @@ class SubTasksServices {
       return await Promise.all(_files).then(() => updateTaskStatus);
     }
     if (status === 'PROCESS') {
+      if (updateTaskStatus.status === 'INREVIEW')
+        return await prisma.subTasks.update({
+          where: { id },
+          data: { status },
+          include: Queries.includeSubtask,
+        });
       return await prisma.subTasks.update({
         where: { id },
         data: { users: { create: { userId: user.id } } },
