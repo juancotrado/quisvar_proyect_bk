@@ -88,6 +88,7 @@ import {
   getListById,
   getAllListByDate,
   getListRange,
+  deleteManyList,
 } from './list.controller';
 import {
   archivedMessage,
@@ -187,6 +188,7 @@ export {
   getListById,
   getAllListByDate,
   getListRange,
+  deleteManyList,
 };
 
 //Mail Controllers

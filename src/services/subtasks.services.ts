@@ -105,15 +105,24 @@ class SubTasksServices {
     }
     throw new AppError('Oops!, Necesitamos un status para esta consulta', 400);
   }
-
   static async update(
     id: SubTasks['id'],
-    data: Pick<SubTasks, 'name' | 'days' | 'price' | 'description'>
+    {
+      days,
+      description,
+      name,
+      price,
+    }: Pick<SubTasks, 'name' | 'days' | 'price' | 'description'>
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateTask = await prisma.subTasks.update({
       where: { id },
-      data,
+      data: {
+        days,
+        description,
+        name,
+        price,
+      },
       include: {
         users: { select: { user: Queries.selectProfileUser } },
       },

@@ -121,5 +121,37 @@ class ListServices {
     });
     return list;
   }
+  static async deleteManyList() {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1); // Ayer
+    const GMT = 60 * 60 * 1000;
+    const _yesterday = yesterday.getTime();
+    const startOfDay = new Date(_yesterday + GMT * 5);
+    const endOfDay = new Date(_yesterday + GMT * 29 - 1);
+    const lists = await prisma.list.findMany({
+      where: {
+        createdAt: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+      select: {
+        id: true,
+        title: true,
+        users: true,
+        _count: true,
+      },
+    });
+    const listsToDelete = lists.filter(list => list.users.length === 0);
+    const deleteResult = await prisma.list.deleteMany({
+      where: {
+        id: {
+          in: listsToDelete.map(list => list.id),
+        },
+      },
+    });
+    return deleteResult;
+  }
 }
 export default ListServices;

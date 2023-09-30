@@ -104,3 +104,17 @@ export const getListRange = async (
     next(error);
   }
 };
+export const deleteManyList = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await ListServices.deleteManyList();
+    res.status(200).json({ message: 'Eliminados' });
+  } catch (error) {
+    console.log(error);
+
+    next(error);
+  }
+};
