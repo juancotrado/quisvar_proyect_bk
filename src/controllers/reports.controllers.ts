@@ -30,26 +30,3 @@ export const showListReportByUser = async (
     next(error);
   }
 };
-export const generateIndex = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const _project_id = parseInt(id);
-    const query = await ReportsServices.index(_project_id);
-    const stream = res.writeHead(200, {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `inline;filename=index/${_project_id}.pdf`,
-    });
-    // indexTemplate(
-    //   (chunk: any) => stream.write(chunk),
-    //   () => stream.end(),
-    //   query
-    // );
-    // res.status(200).json(query);
-  } catch (error) {
-    next(error);
-  }
-};

@@ -12,9 +12,6 @@ class SectorServices {
               include: {
                 projects: {
                   include: {
-                    specialists: Queries.selectSpecialist,
-                    company: Queries.selectCompany,
-                    consortium: Queries.selectConsortium,
                     moderator: Queries.selectProfileUser,
                     stages: {
                       select: {

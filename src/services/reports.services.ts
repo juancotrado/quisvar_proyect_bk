@@ -118,10 +118,6 @@ class ReportsServices {
       );
       const newSubTask = subtasks.map(({ project, ...a }) => ({
         ...a,
-        // liquidation:
-        //   a.status === 'LIQUIDATION'
-        //     ? 100 - project.percentage
-        //     : project.percentage,
       }));
 
       return { ..._project, subtasks: newSubTask };
@@ -131,6 +127,7 @@ class ReportsServices {
     );
     return { user, attendance, projects };
   }
+
   static async getSubTasksByProyect(projectId: Projects['id']) {
     const findSubtasks = await prisma.subTasks.findMany({
       where: {
@@ -160,23 +157,6 @@ class ReportsServices {
       },
     });
     return findSubtasks;
-  }
-  static async index(id: Projects['id']) {
-    if (!id) throw new AppError('No se pudo encontrar el proyecto', 404);
-    const getIndex = await prisma.projects.findUnique({
-      where: { id },
-      select: {
-        CUI: true,
-        name: true,
-        description: true,
-        startDate: true,
-        untilDate: true,
-        moderator: {
-          select: { profile: { select: { firstName: true, lastName: true } } },
-        },
-      },
-    });
-    return getIndex;
   }
 }
 export default ReportsServices;

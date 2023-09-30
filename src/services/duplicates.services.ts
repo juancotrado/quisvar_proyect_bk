@@ -31,25 +31,24 @@ class DuplicatesServices {
         name: true,
         userId: true,
         description: true,
-        startDate: true,
-        untilDate: true,
+        // startDate: true,
+        // untilDate: true,
         department: true,
         province: true,
         district: true,
         typeSpecialityId: true,
         stages: { select: { id: true } },
-        specialists: Queries.selectSpecialist,
-        company: Queries.selectCompany,
-        consortium: Queries.selectConsortium,
+        // specialists: Queries.selectSpecialist,
+        // company: Queries.selectCompany,
+        // consortium: Queries.selectConsortium,
       },
     });
     if (!getProyect)
       throw new AppError('No se pudo encontrar el proyecto', 404);
-    const { specialists, company, consortium, stages, name, ..._data } =
-      getProyect;
+    const { stages, name, ..._data } = getProyect;
     const data = {
       name: name + '-copia',
-      specialists: { createMany: { data: specialists } },
+      // specialists: { createMany: { data: specialists } },
       ..._data,
     };
     const createNewProject = await prisma.projects.create({ data });
@@ -67,19 +66,19 @@ class DuplicatesServices {
     const newStages = stages.map(async stage => {
       // return await this.stage(stage.id, createNewProject.id);
     });
-    if (company) {
-      const newCompany = { projectId: createNewProject.id, ...company };
-      await prisma.company.createMany({ data: newCompany });
-    }
-    if (consortium) {
-      const { companies, ..._consortium } = consortium;
-      const newConsortium = {
-        projectId: createNewProject.id,
-        companies: { createMany: { data: companies } },
-        ..._consortium,
-      };
-      await prisma.consortium.create({ data: newConsortium });
-    }
+    // if (company) {
+    //   const newCompany = { projectId: createNewProject.id, ...company };
+    //   await prisma.company.createMany({ data: newCompany });
+    // }
+    // if (consortium) {
+    //   const { companies, ..._consortium } = consortium;
+    //   const newConsortium = {
+    //     projectId: createNewProject.id,
+    //     companies: { createMany: { data: companies } },
+    //     ..._consortium,
+    //   };
+    //   await prisma.consortium.create({ data: newConsortium });
+    // }
     const listStage = await Promise.all(newStages);
     return { ...createNewProject, listStage };
   }

@@ -24,9 +24,6 @@ class TypeSpecialitiesServices {
         projects: {
           orderBy: { name: 'asc' },
           include: {
-            specialists: Queries.selectSpecialist,
-            company: Queries.selectCompany,
-            consortium: Queries.selectConsortium,
             moderator: Queries.selectProfileUser,
           },
         },

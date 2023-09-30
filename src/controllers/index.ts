@@ -45,7 +45,7 @@ import {
 } from './speacialities.controllers';
 import { deleteFile, uploadFile, uploadFiles } from './files.controllers';
 
-import { generateIndex, showListReportByUser } from './reports.controllers';
+import { showListReportByUser } from './reports.controllers';
 import { createFeedback, findFeedbacks } from './feedbacks.controllers';
 import {
   addNewStage,
@@ -147,7 +147,7 @@ export { showProfile, downloadProfile, updateProfile };
 export { uploadFile, deleteFile, uploadFiles };
 
 //Reports Controllers
-export { showListReportByUser, generateIndex };
+export { showListReportByUser };
 
 //FeedBack Controllers
 export { createFeedback, findFeedbacks };
