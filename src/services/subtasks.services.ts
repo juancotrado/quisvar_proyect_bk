@@ -61,8 +61,9 @@ class SubTasksServices {
     const { duplicated, rootItem, quantity } = isDuplicated;
     if (duplicated) throw new AppError('Error, Nombre existente', 404);
     //--------------------------------------------------------------------------
-    const item = rootItem + '.' + (quantity + 1);
-    const data = { name, price, days, description, levels_Id, item };
+    const index = quantity + 1;
+    const item = rootItem + '.' + index;
+    const data = { name, price, days, description, levels_Id, item, index };
     const newSubTask = await prisma.subTasks.create({
       data,
       include: { users: { select: { user: Queries.selectProfileUser } } },
@@ -176,7 +177,7 @@ class SubTasksServices {
         const _name = item + name + (index + 1) + '.' + ext;
         await prisma.files.update({
           where: { id: file.id },
-          data: { type: 'UPLOADS', name: _name, dir },
+          data: { type: 'UPLOADS', name: _name, dir: path },
         });
         renameSync(`${dir}/${file.name}`, `${path}/${_name}`);
       });
