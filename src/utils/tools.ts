@@ -468,3 +468,6 @@ export const toEditablesFiles = (value: string, type?: 'MODEL' | 'REVIEW') => {
 export const getPathStage = async (id: number, type: ProjectDir) => {
   return await PathLevelServices.pathStage(id, type);
 };
+export const getPathProject = async (id: number, type: ProjectDir) => {
+  return await PathLevelServices.pathProject(id, type);
+};

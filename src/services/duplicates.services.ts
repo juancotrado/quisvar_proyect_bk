@@ -9,10 +9,9 @@ import {
   prisma,
 } from '../utils/prisma.server';
 import PathServices from './paths.services';
-import PathLevelServices from './path_levels.services';
-import { GetDuplicateLevels, ProjectDir, SubTaskFiles } from 'types/types';
-import Queries from '../utils/queries';
+import { GetDuplicateLevels, SubTaskFiles } from 'types/types';
 import {
+  getPathProject,
   getPathStage,
   getRootItem,
   numberToConvert,
@@ -22,68 +21,46 @@ import LevelsServices from './levels.services';
 import SubTasksServices from './subtasks.services';
 
 class DuplicatesServices {
-  static async project(id: Projects['id']) {
+  static async project(id: Projects['id'], name: string) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const getProyect = await prisma.projects.findUnique({
       where: { id },
       select: {
         CUI: true,
-        name: true,
         userId: true,
         description: true,
-        // startDate: true,
-        // untilDate: true,
         department: true,
         province: true,
         district: true,
         typeSpecialityId: true,
-        stages: { select: { id: true } },
-        // specialists: Queries.selectSpecialist,
-        // company: Queries.selectCompany,
-        // consortium: Queries.selectConsortium,
+        stages: { select: { id: true, name: true }, take: 1 },
       },
     });
     if (!getProyect)
       throw new AppError('No se pudo encontrar el proyecto', 404);
-    const { stages, name, ..._data } = getProyect;
-    const data = {
-      name: name + '-copia',
-      // specialists: { createMany: { data: specialists } },
-      ..._data,
-    };
+    //----------------------------create_project--------------------------------------
+    const { stages, ..._data } = getProyect;
+    const data = { name, ..._data };
     const createNewProject = await prisma.projects.create({ data });
-    const getPath = async (id: number, type: ProjectDir) => {
-      return await PathLevelServices.pathProject(id, type);
-    };
-    const modelpath = await getPath(createNewProject.id, 'MODEL');
-    const reviewpath = await getPath(createNewProject.id, 'REVIEW');
-    const path = await getPath(createNewProject.id, 'UPLOADS');
-    if (createNewProject && path) {
-      mkdirSync(modelpath);
-      mkdirSync(reviewpath);
-      mkdirSync(path);
-    }
-    const newStages = stages.map(async stage => {
-      // return await this.stage(stage.id, createNewProject.id);
+    const { id: projectId } = createNewProject;
+    //----------------------------create_files--------------------------------------
+    const path = await getPathProject(projectId, 'UPLOADS');
+    const editablePath = toEditablesFiles(path);
+    const modelPath = toEditablesFiles(path, 'MODEL');
+    const reviewPath = toEditablesFiles(path, 'REVIEW');
+    mkdirSync(modelPath, { recursive: true });
+    mkdirSync(reviewPath, { recursive: true });
+    mkdirSync(editablePath, { recursive: true });
+    mkdirSync(path, { recursive: true });
+    //------------------------------------------------------------------------------
+    const newStages = stages.map(async ({ id, name }) => {
+      return await this.stage(id, name, projectId);
     });
-    // if (company) {
-    //   const newCompany = { projectId: createNewProject.id, ...company };
-    //   await prisma.company.createMany({ data: newCompany });
-    // }
-    // if (consortium) {
-    //   const { companies, ..._consortium } = consortium;
-    //   const newConsortium = {
-    //     projectId: createNewProject.id,
-    //     companies: { createMany: { data: companies } },
-    //     ..._consortium,
-    //   };
-    //   await prisma.consortium.create({ data: newConsortium });
-    // }
-    const listStage = await Promise.all(newStages);
-    return { ...createNewProject, listStage };
+    const _stages = await Promise.all(newStages);
+    return { ...createNewProject, stage: _stages };
   }
 
-  static async stage(id: Stages['id'], name: string) {
+  static async stage(id: Stages['id'], name: string, projectId?: number) {
     if (!id) throw new AppError('Oops!,ID invalido?', 400);
     const getStage = await prisma.stages.findUnique({
       where: { id },
@@ -102,7 +79,7 @@ class DuplicatesServices {
       throw new AppError('Oops!,no se pudo encontrar el nivel', 400);
     //----------------------------create_stage--------------------------------------
     const createStage = await prisma.stages.create({
-      data: { name, projectId: getStage.projectId },
+      data: { name, projectId: projectId ? projectId : getStage.projectId },
     });
     const { id: stageId } = createStage;
     //----------------------------create_files--------------------------------------

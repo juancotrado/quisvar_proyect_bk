@@ -77,7 +77,7 @@ model TypeSpecialities {
 
 model Projects {
   id               Int              @id @default(autoincrement())
-  CUI              String           @unique
+  CUI              String
   name             String           @unique
   description      String
   department       String
