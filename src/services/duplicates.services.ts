@@ -109,15 +109,16 @@ class DuplicatesServices {
     const duplicated = await LevelsServices.duplicate(lvlId, 0, _name, 'ID');
     const { quantity } = duplicated;
     const { stagesId, level } = rootLevel;
-    const { id, item, typeItem, subTasks, ...otherProps } = rootLevel;
+    const { id, item, typeItem, subTasks, index: i, ...otherProps } = rootLevel;
     const { rootItem } = getRootItem(item);
     //--------------------------get_new_item---------------------------------------
     const newRootItem = rootItem ? rootItem + '.' : '';
-    const _type = numberToConvert(quantity + 1, typeItem);
+    const index = quantity + 1;
+    const _type = numberToConvert(index + 1, typeItem);
     if (!_type) throw new AppError('excediste Limite de conversion', 400);
     const _item = newRootItem + _type;
     //--------------------------create_level---------------------------------------
-    const data = { ...otherProps, typeItem, name: _name, item: _item };
+    const data = { ...otherProps, typeItem, name: _name, item: _item, index };
     const newLevel = await prisma.levels.create({ data });
     // //---------------------------create_file---------------------------------------
     const path = await PathServices.level(newLevel.id);
@@ -170,12 +171,13 @@ class DuplicatesServices {
     //--------------------------set_new_item-----------------------------
     const { item: rootItem, id: levels_Id } = Levels;
     const parseItem = rootItem ? rootItem + '.' : '';
-    const _type = numberToConvert(quantity + 1, _data.typeItem);
+    const index = quantity + 1;
+    const _type = numberToConvert(index, _data.typeItem);
     if (!_type) throw new AppError('excediste Limite de conversion', 400);
     const item = parseItem + _type;
     //--------------------------set_new_subtasks-------------------------
     const status: SubTasks['status'] = 'UNRESOLVED';
-    const data = { ..._data, status, name, item, levels_Id };
+    const data = { ..._data, status, name, item, levels_Id, index };
     const _newSubTaks = await prisma.subTasks.create({ data });
     //--------------------------set_new_files----------------------------
     const hash = new Date().getTime();

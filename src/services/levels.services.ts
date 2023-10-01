@@ -4,8 +4,6 @@ import AppError from '../utils/appError';
 import PathLevelServices from './path_levels.services';
 import { parsePath, parsePathLevel, renameDir } from '../utils/fileSystem';
 import {
-  convertToLetter,
-  convertToRoman,
   existRootLevelPath,
   filterLevelList,
   getRootItem,
@@ -106,8 +104,9 @@ class LevelsServices {
     const level = rootLevel + 1;
     const isInclude = project || include;
     //--------------------------set_new_item---------------------------------------
+    const index = quantity + 1;
     const newRootItem = rootItem ? rootItem + '.' : '';
-    const _type = numberToConvert(quantity + 1, typeItem);
+    const _type = numberToConvert(index, typeItem);
     if (!_type) throw new AppError('excediste Limite de conversion', 400);
     const item = typeItem === typeIndex ? `${newRootItem}${_type}` : `${_type}`;
     //--------------------------find_user------------------------------------------
@@ -125,6 +124,7 @@ class LevelsServices {
       rootId,
       item,
       name,
+      index,
       rootLevel,
       stages,
       level,
