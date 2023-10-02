@@ -7,10 +7,13 @@ class SectorServices {
     const getSectors = await prisma.sector.findMany({
       include: {
         specialities: {
+          orderBy: { id: 'asc' },
           include: {
             typeSpecialities: {
+              orderBy: { id: 'asc' },
               include: {
                 projects: {
+                  orderBy: { id: 'asc' },
                   include: {
                     moderator: Queries.selectProfileUser,
                     stages: {

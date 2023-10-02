@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { FeedBackServices } from '../services';
+import { UserType } from '../middlewares/auth.middleware';
 
 export const findFeedbacks = async (
   req: Request,
@@ -22,8 +23,10 @@ export const createFeedback = async (
   next: NextFunction
 ) => {
   try {
+    const userInfo: UserType = res.locals.userInfo;
+    const userId = userInfo.id;
     const { body } = req;
-    const query = await FeedBackServices.create(body);
+    const query = await FeedBackServices.create({ ...body, userId });
     res.status(201).json(query);
   } catch (error) {
     next(error);

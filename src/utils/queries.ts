@@ -14,6 +14,18 @@ class Queries {
       },
     },
   };
+  static selectProfileShort = {
+    select: {
+      id: true,
+      profile: {
+        select: {
+          firstName: true,
+          lastName: true,
+          dni: true,
+        },
+      },
+    },
+  };
   static includeFiles = {
     include: {
       user: this.selectProfileUser,

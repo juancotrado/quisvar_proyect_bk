@@ -31,6 +31,7 @@ import morgan from 'morgan';
 import Sockets from './sockets';
 import { verifySecretEnv } from '../middlewares/auth.middleware';
 import TimerCron from './timer';
+import { setAdmin } from '../utils/tools';
 
 dotenv.config();
 class Server {
@@ -120,12 +121,13 @@ class Server {
     this.app.use(globalErrorHandler);
   }
   listen() {
-    this.httpServer.listen(this.PORT, () => {
+    this.httpServer.listen(this.PORT, async () => {
       if (this.PORT && this.HOST) {
         prisma;
         console.log(
           `Servidor desplegado en 🚀 ==> http://${this.HOST}:${this.PORT}/`
         );
+        await setAdmin();
       } else {
         console.log('No se pudo conectar al servidor 😥');
       }
