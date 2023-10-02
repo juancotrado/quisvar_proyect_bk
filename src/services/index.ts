@@ -15,6 +15,7 @@ import TypeSpecialitiesServices from './typeSpecialities.services';
 import LevelsServices from './levels.services';
 import ListServices from './list.services';
 import MailServices from './mail.services';
+import LicenseServices from './licenses.service';
 export {
   UsersServices,
   authServices,
@@ -34,6 +35,7 @@ export {
   // PathLevelServices,
   ListServices,
   MailServices,
+  LicenseServices,
 };
 export const rootPath = './uploads';
 export const _dirPath = `${rootPath}/projects`;

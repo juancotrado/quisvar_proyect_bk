@@ -100,6 +100,12 @@ import {
   showMessages,
   updateMessage,
 } from './mail.controllers';
+import {
+  createLicense,
+  getLicenseById,
+  updateLicense,
+} from './licenses.controllers';
+
 // User Controllers
 export {
   showUsers,
@@ -202,3 +208,5 @@ export {
   archivedMessage,
   doneMessage,
 };
+//Licenses Controllers
+export { createLicense, updateLicense, getLicenseById };

@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import authenticateHandler from '../middlewares/auth.middleware';
+import { createLicense, updateLicense, getLicenseById } from '../controllers';
+import { _admin_role } from '../middlewares/role.middleware';
+const router = Router();
+router.use(authenticateHandler);
+router.use(_admin_role);
+router.post('/', createLicense);
+router.patch('/:id', updateLicense);
+router.get('/:id', getLicenseById);
+export default router;

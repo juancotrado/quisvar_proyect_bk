@@ -234,6 +234,14 @@ model ListOnUsers {
   @@id([usersId, listId])
 }
 
+model Licenses {
+  id          Int         @id @default(autoincrement())
+  userId      Int  
+  reason      String?
+  startDate   DateTime          
+  untilDate   DateTime
+}
+
 model SubTasks {
   id          Int           @id @default(autoincrement())
   status      TaskRole      @default(UNRESOLVED)

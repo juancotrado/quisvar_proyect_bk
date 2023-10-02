@@ -22,6 +22,7 @@ import {
   sectorRouter,
   levelsRouter,
   listRouter,
+  licenseRouter,
   mailRouter,
 } from '../routes';
 import AppError from '../utils/appError';
@@ -56,6 +57,7 @@ class Server {
     levels: `/${process.env.ROUTE}/levels`,
     resource: `/${process.env.ROUTE}/resource`,
     list: `/${process.env.ROUTE}/list`,
+    license: `/${process.env.ROUTE}/license`,
     mail: `/${process.env.ROUTE}/mail`,
   };
 
@@ -108,6 +110,7 @@ class Server {
     this.app.use(this.path.sector, sectorRouter);
     this.app.use(this.path.levels, levelsRouter);
     this.app.use(this.path.list, listRouter);
+    this.app.use(this.path.license, licenseRouter);
     this.app.use(this.path.mail, mailRouter);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       return next(

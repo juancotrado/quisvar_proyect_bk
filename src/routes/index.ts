@@ -15,6 +15,7 @@ import typeSpecialityRouter from './typeSpecialities.routes';
 import levelsRouter from './levels.routes';
 import listRouter from './list.routes';
 import mailRouter from './mail.routes';
+import licenseRouter from './licenses.routes';
 export {
   userRouter,
   authRouter,
@@ -32,5 +33,6 @@ export {
   typeSpecialityRouter,
   levelsRouter,
   listRouter,
+  licenseRouter,
   mailRouter,
 };
