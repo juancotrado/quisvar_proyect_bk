@@ -28,6 +28,7 @@ model Users {
   stages       Stages[]
   message      Mail[]
   messageReply MessageHistory[]
+  feedbacks     Feedback[]
 }
 
 model GeneralFiles {
@@ -144,13 +145,35 @@ model Levels {
 model TaskOnUsers {
   subtaskId  Int
   userId     Int
-  assignedAt DateTime @default(now())
+  status     Boolean  @default(false)
   percentage Int      @default(0)
   untilDate  DateTime @default(now())
   subtask    SubTasks @relation(fields: [subtaskId], references: [id], onDelete: Cascade)
   user       Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignedAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@id([subtaskId, userId])
+}
+
+model SubTasks {
+  id          Int           @id @default(autoincrement())
+  status      TaskRole      @default(UNRESOLVED)
+  item        String //@default("")
+  index       Int
+  typeItem    TypeItem      @default(NUM)
+  name        String
+  description String?
+  price       Decimal       @db.Money
+  days        Float
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  hasPDF      Boolean       @default(false)
+  levels_Id   Int
+  feedBacks   Feedback[]
+  files       Files[]
+  Levels      Levels        @relation(fields: [levels_Id], references: [id], onDelete: Cascade)
+  users       TaskOnUsers[]
 }
 
 model Feedback {
@@ -160,6 +183,8 @@ model Feedback {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   subTasksId Int
+  userId     Int
+  user       Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
   subTasks   SubTasks @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
   files      Files[]
 }
@@ -232,26 +257,6 @@ model ListOnUsers {
   assignedAt DateTime    @default(now())
 
   @@id([usersId, listId])
-}
-
-model SubTasks {
-  id          Int           @id @default(autoincrement())
-  status      TaskRole      @default(UNRESOLVED)
-  item        String //@default("")
-  index       Int
-  typeItem    TypeItem      @default(NUM)
-  name        String
-  description String?
-  price       Decimal       @db.Money
-  days        Float
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  hasPDF      Boolean       @default(false)
-  levels_Id   Int
-  feedBacks   Feedback[]
-  files       Files[]
-  Levels      Levels        @relation(fields: [levels_Id], references: [id], onDelete: Cascade)
-  users       TaskOnUsers[]
 }
 
 model Mail {
@@ -335,6 +340,7 @@ enum FileTypes {
   MODEL
   UPLOADS
   REVIEW
+  EDITABLES
 }
 
 enum ListDetails {

@@ -4,7 +4,7 @@ import fs, { copyFileSync, renameSync } from 'fs';
 import PathServices from './paths.services';
 import Queries from '../utils/queries';
 import { copyFile } from 'fs/promises';
-import { getRootItem } from '../utils/tools';
+import { getRootItem, numberToConvert } from '../utils/tools';
 class SubTasksServices {
   static GMT = 60 * 60 * 1000;
   static today = new Date().getTime();
@@ -46,26 +46,34 @@ class SubTasksServices {
     }
     const findLevel = await prisma.levels.findUnique({
       where: { id: levels_Id },
-      select: { item: true, subTasks: { select: { name: true } } },
+      select: {
+        item: true,
+        typeItem: true,
+        subTasks: { select: { name: true } },
+      },
     });
     if (!findLevel) throw new AppError('No se pudo encontrar el índice', 404);
-    const { subTasks } = findLevel;
+    const { subTasks, typeItem } = findLevel;
     rootItem = findLevel.item;
     const quantity = subTasks.length;
+    typeItem;
     const duplicated = subTasks.map(({ name }) => name).includes(name);
-    return { duplicated, quantity, levels_Id, rootItem };
+    return { duplicated, quantity, levels_Id, rootItem, typeItem };
   }
 
   static async create({ name, price, description, days, levels_Id }: SubTasks) {
     const isDuplicated = await this.findDuplicate(name, levels_Id, 'ROOT');
-    const { duplicated, rootItem, quantity } = isDuplicated;
+    const { duplicated, rootItem, quantity, typeItem } = isDuplicated;
     if (duplicated) throw new AppError('Error, Nombre existente', 404);
-    //--------------------------------------------------------------------------
+    //--------------------------set_new_item---------------------------------------
     const index = quantity + 1;
-    const item = rootItem + '.' + index;
+    const _type = numberToConvert(index, typeItem);
+    if (!_type) throw new AppError('excediste Limite de conversion', 400);
+    const item = rootItem + _type + '.';
+    //--------------------------------------------------------------------------
     const data = { name, price, days, description, levels_Id, item, index };
     const newSubTask = await prisma.subTasks.create({
-      data,
+      data: { ...data, typeItem },
       include: { users: { select: { user: Queries.selectProfileUser } } },
     });
     return newSubTask;
@@ -106,6 +114,7 @@ class SubTasksServices {
     }
     throw new AppError('Oops!, Necesitamos un status para esta consulta', 400);
   }
+
   static async update(
     id: SubTasks['id'],
     {
@@ -150,7 +159,6 @@ class SubTasksServices {
     const updateTaskStatus = await SubTasksServices.find(id);
 
     const { item, name } = updateTaskStatus;
-    const { lastItem } = getRootItem(item);
     if (status === 'DONE') {
       const path = await PathServices.subTask(id, 'UPLOADS');
       const files = await prisma.files.findMany({
@@ -194,27 +202,36 @@ class SubTasksServices {
         include: Queries.includeSubtask,
       });
     }
-    if (status === 'LIQUIDATION') {
-      return await prisma.subTasks.findUnique({
-        where: { id },
-        include: Queries.includeSubtask,
-      });
-    }
+    // if (status === 'LIQUIDATION') {
+    //   return await prisma.subTasks.findUnique({
+    //     where: { id },
+    //     include: Queries.includeSubtask,
+    //   });
+    // }
     return updateTaskStatus;
   }
 
   static async delete(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const subTask = await prisma.subTasks.findUnique({ where: { id } });
+    const subTask = await prisma.subTasks.delete({ where: { id } });
     if (!subTask) throw new AppError(`No se pudo encontrar la subtarea`, 404);
     const list = await prisma.subTasks.findMany({
-      where: { levels_Id: subTask.levels_Id, item: { gte: subTask.item } },
-      orderBy: { item: 'asc' },
-      include: { Levels: { select: { item: true } } },
+      where: { levels_Id: subTask.levels_Id, index: { gte: subTask.index } },
+      orderBy: { index: 'asc' },
+      include: {
+        Levels: { select: { item: true } },
+        files: { where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] } },
+      },
     });
-    const updateList = list.map(async ({ id, Levels }, i) => {
-      const item = Levels.item + '.' + (i + 1);
-      return await prisma.subTasks.update({ where: { id }, data: { item } });
+    const updateList = list.map(async ({ id, Levels, typeItem }, i) => {
+      const index = subTask.index + i;
+      const _type = numberToConvert(index, typeItem);
+      if (!_type) throw new AppError('excediste Limite de conversion', 400);
+      const item = Levels.item + _type + '.';
+      return await prisma.subTasks.update({
+        where: { id },
+        data: { item, index },
+      });
     });
     const result = await Promise.all(updateList);
     return result;

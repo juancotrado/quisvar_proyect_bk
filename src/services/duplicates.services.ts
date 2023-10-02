@@ -114,13 +114,13 @@ class DuplicatesServices {
     //--------------------------get_new_item---------------------------------------
     const newRootItem = rootItem ? rootItem + '.' : '';
     const index = quantity + 1;
-    const _type = numberToConvert(index + 1, typeItem);
+    const _type = numberToConvert(index, typeItem);
     if (!_type) throw new AppError('excediste Limite de conversion', 400);
-    const _item = newRootItem + _type;
+    const _item = newRootItem + _type + '.';
     //--------------------------create_level---------------------------------------
     const data = { ...otherProps, typeItem, name: _name, item: _item, index };
     const newLevel = await prisma.levels.create({ data });
-    // //---------------------------create_file---------------------------------------
+    //---------------------------create_file---------------------------------------
     const path = await PathServices.level(newLevel.id);
     const editablePath = toEditablesFiles(path);
     mkdirSync(path, { recursive: true });
@@ -170,7 +170,7 @@ class DuplicatesServices {
     const { files, Levels, ..._data } = getSubTask;
     //--------------------------set_new_item-----------------------------
     const { item: rootItem, id: levels_Id } = Levels;
-    const parseItem = rootItem ? rootItem + '.' : '';
+    const parseItem = rootItem ? rootItem : '';
     const index = quantity + 1;
     const _type = numberToConvert(index, _data.typeItem);
     if (!_type) throw new AppError('excediste Limite de conversion', 400);
@@ -204,9 +204,9 @@ class DuplicatesServices {
       const status = 'UNRESOLVED';
       //--------------------------set_new_item-----------------------------
       const { lastItem } = getRootItem(subtask.item);
-      const parseItem = rootItem ? rootItem + '.' : '';
-      const newItem =
-        subtask.typeItem === typeItem ? parseItem + lastItem : lastItem;
+      const parseItem = rootItem ? rootItem : '';
+      const newItem = parseItem + lastItem;
+      // subtask.typeItem === typeItem ? parseItem + lastItem : lastItem;
       //--------------------------set_new_subtasks-------------------------
       const _newSubTaks = await prisma.subTasks.create({
         data: { ...data, status, item: newItem, levels_Id: rootId },
@@ -252,8 +252,10 @@ class DuplicatesServices {
       //---------------------------create_file---------------------------------------
       const path = rootPath + '/' + newLevel.item + newLevel.name;
       const editablePath = toEditablesFiles(path);
-      mkdirSync(path, { recursive: true });
-      mkdirSync(editablePath, { recursive: true });
+      if (newLevel) {
+        mkdirSync(path, { recursive: true });
+        mkdirSync(editablePath, { recursive: true });
+      }
       //-------------------------duplicate_subtasks---------------------------------
       const _subtasks =
         newLevel && subTasks
@@ -289,14 +291,15 @@ class DuplicatesServices {
     const newList = findList.map(({ item, subTasks, stagesId, ...value }) => {
       //--------------------------set_new_item--------------------------------------
       const { lastItem } = getRootItem(item);
-      const parseRootItem = newRootItem ? newRootItem + '.' : '';
-      const _item =
-        value.typeItem === _typeItem ? parseRootItem + lastItem : lastItem;
+      const parseRootItem = newRootItem ? newRootItem : '';
+      const _item = parseRootItem + lastItem + '.';
+      // value.typeItem === _typeItem ? parseRootItem + lastItem : lastItem;
       //--------------------------set_new_subtasks-----------------------------------
       const _subtasks = subTasks?.map(({ item, ...s }) => {
         const { rootItem, lastItem } = getRootItem(item);
-        const _root = rootItem ? rootItem + '.' : '';
-        const _item = s.typeItem === _typeItem ? _root + lastItem : lastItem;
+        const _root = rootItem ? rootItem : '';
+        const _item = _root + lastItem + '.';
+        // const _item = s.typeItem === _typeItem ? _root + lastItem : lastItem;
         return { item: _item, ...s };
       });
       //---------------------------------------------------------------------------

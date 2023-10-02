@@ -10,8 +10,6 @@ import {
   UserRole,
   Users,
 } from '@prisma/client';
-import { type } from 'os';
-import { ellipseAnnotation } from 'pdfkit';
 
 export type userProfilePick = Pick<
   Users & Profiles,
@@ -32,9 +30,9 @@ export type projectPick = Pick<
   Projects,
   | 'name'
   | 'description'
-  | 'startDate'
-  | 'untilDate'
-  | 'unique'
+  // | 'startDate'
+  // | 'untilDate'
+  // | 'unique'
   | 'CUI'
   | 'department'
   | 'province'
@@ -43,9 +41,9 @@ export type projectPick = Pick<
 > & {
   userId: Users['id'];
   typeSpecialityId: TypeSpecialities['id'];
-  specialistsInfo: PersonBussinessType[];
-  companyInfo: CompanyType;
-  consortiumInfo: ConsortiumType;
+  // specialistsInfo: PersonBussinessType[];
+  // companyInfo: CompanyType;
+  // consortiumInfo: ConsortiumType;
   stageName?: string;
 };
 
@@ -53,7 +51,7 @@ export type UpdateProjectPick = Omit<
   projectPick,
   'typeSpecialityId' | 'unique' | 'stageName'
 > & {
-  status: Projects['status'];
+  // status: Projects['status'];
 };
 
 export type PersonBussinessType = Omit<PersonBussiness, 'id' | 'projectsId'>;

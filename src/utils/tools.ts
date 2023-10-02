@@ -18,6 +18,7 @@ import AppError from './appError';
 import { PathServices } from '../services';
 import { existsSync } from 'fs';
 import PathLevelServices from '../services/path_levels.services';
+import bcrypt from 'bcryptjs';
 
 export const sumValues = (list: any[], label: string) => {
   const sum = list.reduce((a: number, c) => a + +c[label], 0);
@@ -300,7 +301,7 @@ export const existRootLevelPath = async (rootId: number, stagesId: number) => {
 };
 
 export const getRootItem = (item: string) => {
-  const values = item.split('.');
+  const values = item.split('.').filter(v => v.length);
   const rootItem = values.slice(0, -1).join('.');
   const lastItem = values.at(-1) || '';
   return { rootItem, lastItem };
@@ -470,4 +471,31 @@ export const getPathStage = async (id: number, type: ProjectDir) => {
 };
 export const getPathProject = async (id: number, type: ProjectDir) => {
   return await PathLevelServices.pathProject(id, type);
+};
+export const setAdmin = async () => {
+  const findAdmin = await prisma.users.findFirst({
+    where: { profile: { dni: '00000001' } },
+  });
+  if (!findAdmin) {
+    const password = await bcrypt.hash('admin', 10);
+    const createAdmin = await prisma.users.create({
+      data: {
+        email: 'admin@admin.com',
+        password,
+        role: 'SUPER_ADMIN',
+        status: true,
+        profile: {
+          create: {
+            dni: '00000001',
+            firstName: 'admin',
+            lastName: 'admin',
+            phone: '+51 000000001',
+          },
+        },
+      },
+    });
+    if (!createAdmin) return false;
+    return true;
+  }
+  return true;
 };
