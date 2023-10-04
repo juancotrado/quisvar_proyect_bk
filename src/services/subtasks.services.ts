@@ -5,6 +5,7 @@ import PathServices from './paths.services';
 import Queries from '../utils/queries';
 import { copyFile } from 'fs/promises';
 import { getRootItem, numberToConvert } from '../utils/tools';
+import { UpdateLevelBlock } from 'types/types';
 class SubTasksServices {
   static GMT = 60 * 60 * 1000;
   static today = new Date().getTime();
@@ -215,30 +216,81 @@ class SubTasksServices {
     return updateTaskStatus;
   }
 
+  static async updateBlock(
+    subtasks: UpdateLevelBlock['subTasks'],
+    rootItem: string,
+    newPath: string,
+    newEditable: string,
+    previusIndex?: number
+  ) {
+    const subTasks = await Promise.all(
+      subtasks.map(async ({ item: _item, files: _files, ...subtask }, i) => {
+        const { lastItem } = getRootItem(_item);
+        let index = subtask.index;
+        let item = rootItem + lastItem + '.';
+        if (previusIndex) {
+          index = previusIndex + i;
+          const _type = numberToConvert(index, subtask.typeItem) || '';
+          item = rootItem + _type + '.';
+        }
+        // const item = rootItem + lastItem + '.';
+        const updateSubtask = await prisma.subTasks.update({
+          where: { id: subtask.id },
+          data: { item, index },
+        });
+        //-------------------------------------------------------------------------------
+        const parseFiles = await Promise.all(
+          _files.map(async ({ dir: d, id: _id, name: n, ...file }, i) => {
+            const { item: _i, name: _n } = updateSubtask;
+            const dir = file.type === 'UPLOADS' ? newPath : newEditable;
+            const ext = `.${n.split('.').at(-1)}`;
+            const name = _i + _n + `_${i + 1}${ext}`;
+            await prisma.files
+              .update({
+                where: { id: _id },
+                data: { dir, name },
+              })
+              .then(() => renameSync(`${dir}/${n}`, `${dir}/${name}`));
+            return { dir, name, ...file };
+          })
+        );
+        //-------------------------------------------------------------------------------
+        const files = parseFiles.map(f => ({ id: 0, ...f }));
+        return { item, files, ...subtask };
+      })
+    );
+    return subTasks;
+  }
   static async delete(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const subTask = await prisma.subTasks.delete({ where: { id } });
-    if (!subTask) throw new AppError(`No se pudo encontrar la subtarea`, 404);
+    const subTaskDelete = await prisma.subTasks.delete({
+      where: { id },
+      include: { Levels: { select: { item: true, id: true } } },
+    });
+    const { levels_Id, index, Levels } = subTaskDelete;
+    const newPath = await PathServices.level(Levels.id);
+    const newEditables = newPath.replace('projects', 'editables');
     const list = await prisma.subTasks.findMany({
-      where: { levels_Id: subTask.levels_Id, index: { gte: subTask.index } },
+      where: {
+        levels_Id,
+        index: { gte: index },
+      },
       orderBy: { index: 'asc' },
       include: {
-        Levels: { select: { item: true } },
-        files: { where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] } },
+        files: {
+          where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] },
+          select: { id: true, dir: true, name: true, type: true },
+        },
       },
     });
-    const updateList = list.map(async ({ id, Levels, typeItem }, i) => {
-      const index = subTask.index + i;
-      const _type = numberToConvert(index, typeItem);
-      if (!_type) throw new AppError('excediste Limite de conversion', 400);
-      const item = Levels.item + _type + '.';
-      return await prisma.subTasks.update({
-        where: { id },
-        data: { item, index },
-      });
-    });
-    const result = await Promise.all(updateList);
-    return result;
+    const updateBlock = await this.updateBlock(
+      list,
+      Levels.item,
+      newPath,
+      newEditables,
+      index
+    );
+    return { ...subTaskDelete, tasks: updateBlock };
   }
 
   static async updatePercentage(

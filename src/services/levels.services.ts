@@ -98,7 +98,7 @@ class LevelsServices {
     if (duplicated) throw new AppError('Error al crear, Nombre existente', 404);
     //--------------------------get_new_item---------------------------------------
     const root = await this.findRoot(rootId);
-    const { rootItem, rootLevel, project, include, typeIndex } = root;
+    const { rootItem, rootLevel, project, include } = root;
     const stages = { connect: { id: stagesId } };
     const isArea = project;
     const level = rootLevel + 1;
@@ -109,14 +109,8 @@ class LevelsServices {
     const _type = numberToConvert(index, typeItem);
     if (!_type) throw new AppError('excediste Limite de conversion', 400);
     const item = `${newRootItem}${_type}.`;
-    // typeItem === typeIndex ? `${newRootItem}${_type}.` : `${_type}.`;
     //--------------------------find_user------------------------------------------
-    // const findUser = isInclude
-    //   ? await prisma.levels.findUnique({ where: { id: rootId } })
-    //   : null;
     const _user = () => {
-      // if (findUser && findUser.userId)
-      //   return { connect: { id: findUser.userId } };
       if (userId && project) return { connect: { id: userId } };
       return undefined;
     };
@@ -170,6 +164,7 @@ class LevelsServices {
             index: true,
             id: true,
             item: true,
+            typeItem: true,
             files: {
               where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] },
               select: { id: true, dir: true, name: true, type: true },
