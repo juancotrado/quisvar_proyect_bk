@@ -58,7 +58,6 @@ export const duplicateLevels = async (
     const duplicate = await DuplicatesServices.level(_level_id, name);
     res.status(201).json(duplicate);
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
