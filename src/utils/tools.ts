@@ -300,7 +300,6 @@ export const existRootLevelPath = async (rootId: number, stagesId: number) => {
   const rootPath = rootId
     ? await PathServices.level(rootId)
     : await PathServices.stage(stagesId, 'UPLOADS');
-  console.log(rootPath);
   if (!existsSync(rootPath)) throw new AppError('Ops!,carpeta no existe', 404);
   return rootPath;
 };
@@ -472,10 +471,10 @@ export const toEditablesFiles = (value: string, type?: 'MODEL' | 'REVIEW') => {
   return result;
 };
 export const getPathStage = async (id: number, type: ProjectDir) => {
-  return await PathLevelServices.pathStage(id, type);
+  return await PathServices.stage(id, type);
 };
 export const getPathProject = async (id: number, type: ProjectDir) => {
-  return await PathLevelServices.pathProject(id, type);
+  return await PathServices.project(id, type);
 };
 export const setAdmin = async () => {
   const findAdmin = await prisma.users.findFirst({

@@ -176,7 +176,13 @@ export type UpdateLevelBlock = Levels & {
   subTasks: {
     id: number;
     item: string;
+    typeItem: SubTasks['typeItem'];
     index: number;
-    files: { id: number; dir: string; name: string; type: Files['type'] }[];
+    files: {
+      id: number;
+      dir: string | null;
+      name: string;
+      type: Files['type'];
+    }[];
   }[];
 };

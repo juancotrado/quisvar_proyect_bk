@@ -7,8 +7,8 @@ import {
 } from '../utils/tools';
 import LevelsServices from './levels.services';
 import { existsSync } from 'fs';
-import PathLevelServices from './path_levels.services';
 import Queries from '../utils/queries';
+import PathServices from './paths.services';
 
 class StageServices {
   static async findMany(projectId: Projects['id']) {
@@ -122,24 +122,24 @@ class StageServices {
     if (type === 'ID') {
       const project = await prisma.stages.findUnique({ where: { id } });
       if (!project) throw new AppError('Etapa no Encontrada', 404);
-      projectId = project.id;
+      projectId = project.projectId;
     }
     const getStages = await prisma.stages.groupBy({
       by: ['name'],
       where: { projectId },
     });
     const list = getStages.map(({ name }) => name);
-    if (list.includes(name)) return true;
-    return false;
+    return list.includes(name);
   }
   static async create({ name, projectId }: Stages) {
     const duplicated = await this.duplicate(projectId, name, 'ROOT');
     if (duplicated) throw new AppError('Ops!,Nombre repetido', 400);
-    const path = await PathLevelServices.pathProject(projectId, 'UPLOADS');
+    const path = await PathServices.project(projectId, 'UPLOADS');
+    console.log(path);
     if (!existsSync(path)) throw new AppError('Ops!,carpeta no existe', 404);
     const createStage = await prisma.stages.create({
       data: { name, projectId },
-      include: { project: { select: { name: true } } },
+      include: { project: { select: { name: true, id: true } } },
     });
     return createStage;
   }
@@ -148,7 +148,7 @@ class StageServices {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const duplicated = await this.duplicate(id, name, 'ID');
     if (duplicated) throw new AppError('Ops!,Nombre repetido', 400);
-    const path = await PathLevelServices.pathStage(id, 'UPLOADS');
+    const path = await PathServices.stage(id, 'UPLOADS');
     if (!existsSync(path)) throw new AppError('Ops!,carpeta no existe', 404);
     const updateStage = await prisma.stages.update({
       where: { id },
@@ -160,7 +160,7 @@ class StageServices {
 
   static async delete(id: Stages['id']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
-    const path = await PathLevelServices.pathStage(id, 'UPLOADS');
+    const path = await PathServices.stage(id, 'UPLOADS');
     if (!existsSync(path)) throw new AppError('Ops!,carpeta no existe', 404);
     const deleteStage = await prisma.stages.delete({
       where: { id },
