@@ -19,6 +19,7 @@ import {
 } from '../utils/tools';
 import LevelsServices from './levels.services';
 import SubTasksServices from './subtasks.services';
+import StageServices from './stages.services';
 
 class DuplicatesServices {
   static async project(id: Projects['id'], name: string) {
@@ -62,6 +63,12 @@ class DuplicatesServices {
 
   static async stage(id: Stages['id'], name: string, projectId?: number) {
     if (!id) throw new AppError('Oops!,ID invalido?', 400);
+    const duplicate = await StageServices.duplicate(id, name, 'ID');
+    if (duplicate)
+      throw new AppError(
+        'Oops!,Ya se registro esta etapa en este proyecto',
+        400
+      );
     const getStage = await prisma.stages.findUnique({
       where: { id },
       select: {
@@ -106,12 +113,13 @@ class DuplicatesServices {
       },
     });
     if (!rootLevel) throw new AppError('No se pudó encontrar nivel', 400);
-    const duplicated = await LevelsServices.duplicate(lvlId, 0, _name, 'ID');
-    const { quantity } = duplicated;
+    const duplicate = await LevelsServices.duplicate(lvlId, 0, _name, 'ID');
+    const { quantity, duplicated } = duplicate;
+    if (duplicated) throw new AppError('Ya se registro el nombre', 400);
     const { stagesId, level } = rootLevel;
     const { id, item, typeItem, subTasks, index: i, ...otherProps } = rootLevel;
-    const { rootItem } = getRootItem(item);
     //--------------------------get_new_item---------------------------------------
+    const { rootItem } = getRootItem(item);
     const newRootItem = rootItem ? rootItem + '.' : '';
     const index = quantity + 1;
     const _type = numberToConvert(index, typeItem);
@@ -174,7 +182,7 @@ class DuplicatesServices {
     const index = quantity + 1;
     const _type = numberToConvert(index, _data.typeItem);
     if (!_type) throw new AppError('excediste Limite de conversion', 400);
-    const item = parseItem + _type;
+    const item = parseItem + _type + '.';
     //--------------------------set_new_subtasks-------------------------
     const status: SubTasks['status'] = 'UNRESOLVED';
     const data = { ..._data, status, name, item, levels_Id, index };
@@ -205,7 +213,7 @@ class DuplicatesServices {
       //--------------------------set_new_item-----------------------------
       const { lastItem } = getRootItem(subtask.item);
       const parseItem = rootItem ? rootItem : '';
-      const newItem = parseItem + lastItem;
+      const newItem = parseItem + lastItem + '.';
       // subtask.typeItem === typeItem ? parseItem + lastItem : lastItem;
       //--------------------------set_new_subtasks-------------------------
       const _newSubTaks = await prisma.subTasks.create({
@@ -297,7 +305,7 @@ class DuplicatesServices {
       //--------------------------set_new_subtasks-----------------------------------
       const _subtasks = subTasks?.map(({ item, ...s }) => {
         const { rootItem, lastItem } = getRootItem(item);
-        const _root = rootItem ? rootItem : '';
+        const _root = rootItem ? rootItem + '.' : '';
         const _item = _root + lastItem + '.';
         // const _item = s.typeItem === _typeItem ? _root + lastItem : lastItem;
         return { item: _item, ...s };

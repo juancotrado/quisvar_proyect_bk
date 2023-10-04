@@ -1,4 +1,4 @@
-import { Levels, SubTasks, TaskRole } from '@prisma/client';
+import { Levels, SubTasks, TaskRole, TypeItem } from '@prisma/client';
 import {
   Details,
   DuplicateLevel,
@@ -12,6 +12,7 @@ import {
   PriceTaskLvl3,
   ProjectDir,
   SubTaskFilter,
+  UpdateLevelBlock,
 } from 'types/types';
 import { prisma } from './prisma.server';
 import AppError from './appError';
@@ -287,9 +288,12 @@ export const getRootPath = async (id: number) => {
   if (!id) throw new AppError('Oops!, ID invalido', 400);
   const findLevel = await prisma.levels.findUnique({ where: { id } });
   if (!findLevel) throw new AppError('No se pudieron encontrar el nivel', 404);
-  const { rootId, stagesId, item, ...level } = findLevel;
-  const rootPath = await existRootLevelPath(rootId, stagesId);
-  return { rootId, stagesId, rootPath, _item: item, ...level };
+  const { item, ...level } = findLevel;
+  const rootPath = await existRootLevelPath(
+    findLevel.rootId,
+    findLevel.stagesId
+  );
+  return { rootPath, _item: item, ...level };
 };
 
 export const existRootLevelPath = async (rootId: number, stagesId: number) => {
@@ -307,15 +311,15 @@ export const getRootItem = (item: string) => {
   return { rootItem, lastItem };
 };
 
-export const parseRootItem = (item: string, index: number) => {
+export const parseRootItem = (item: string, i: number) => {
   const { rootItem, lastItem } = getRootItem(item);
-  const quantity = +lastItem + index;
+  const index = +lastItem + i;
   const newRootItem = rootItem ? rootItem + '.' : '';
-  const newItem = newRootItem + quantity;
+  const newItem = newRootItem + index + '.';
   return newItem;
 };
 export const filterLevelList = (
-  rootList: Levels[],
+  rootList: UpdateLevelBlock[],
   _rootId: number,
   _rootLevel: number
 ) => {
@@ -467,10 +471,10 @@ export const toEditablesFiles = (value: string, type?: 'MODEL' | 'REVIEW') => {
   return result;
 };
 export const getPathStage = async (id: number, type: ProjectDir) => {
-  return await PathLevelServices.pathStage(id, type);
+  return await PathServices.stage(id, type);
 };
 export const getPathProject = async (id: number, type: ProjectDir) => {
-  return await PathLevelServices.pathProject(id, type);
+  return await PathServices.project(id, type);
 };
 export const setAdmin = async () => {
   const findAdmin = await prisma.users.findFirst({

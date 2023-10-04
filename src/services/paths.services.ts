@@ -52,16 +52,16 @@ class StageInfo {
 
 class PathServices {
   static async project(id: number, type: ProjectDir) {
-    const { name } = await StageInfo.findProject(id);
-    if (type === 'MODEL') return _materialPath + '/' + name;
-    if (type === 'REVIEW') return _reviewPath + '/' + name;
-    return _dirPath + '/' + name;
+    const { id: _id } = await StageInfo.findProject(id);
+    if (type === 'MODEL') return _materialPath + '/' + _id;
+    if (type === 'REVIEW') return _reviewPath + '/' + _id;
+    return _dirPath + '/' + _id;
   }
   static async stage(id: number, type: ProjectDir) {
-    const { name, project } = await StageInfo.findStage(id);
+    const { name, id: _id, project } = await StageInfo.findStage(id);
     if (!project) throw new AppError('Oops!,ID no encontrado', 400);
     const pathProject = await PathServices.project(project.id, type);
-    return pathProject + '/' + name;
+    return pathProject + '/' + _id;
   }
   static async level(id: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
