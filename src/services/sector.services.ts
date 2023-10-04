@@ -46,7 +46,7 @@ class SectorServices {
   }
   static async update(id: Sector['id'], { name }: Sector) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const updateSector = await prisma.specialities.update({
+    const updateSector = await prisma.sector.update({
       where: { id },
       data: { name },
     });
@@ -54,7 +54,7 @@ class SectorServices {
   }
   static async delete(id: Specialities['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const deleteSector = await prisma.specialities.delete({
+    const deleteSector = await prisma.sector.delete({
       where: { id },
     });
     return deleteSector;
