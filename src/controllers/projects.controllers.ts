@@ -60,9 +60,9 @@ export const createProject = async (
 ) => {
   try {
     const { body } = req;
-    const query = await ProjectsServices.create(body);
+    const query = await ProjectsServices.create({ ...body, userId: 1 });
     const path = await PathServices.project(query.id, 'UPLOADS');
-    const projectName = query.name;
+    const projectName = query.id;
     createFolders();
     mkdirSync(path);
     mkdirSync(`${model}/${projectName}`);
@@ -86,16 +86,16 @@ export const updateProject = async (
     const oldDir = await PathServices.project(_project_id, 'UPLOADS');
     if (!existsSync(oldDir))
       throw new AppError('No se pudo editar el projecto', 400);
-    const oldName = oldDir.split('/').at(-1);
+    // const oldName = oldDir.split('/').at(-1);
     const query = await ProjectsServices.update(_project_id, body);
-    const { name } = query;
-    const newDir = setNewPath(oldDir, name);
-    if (query) {
-      renameDir(oldDir, newDir);
-      renameDir(`${model}/${oldName}`, `${model}/${name}`);
-      renameDir(`${review}/${oldName}`, `${review}/${name}`);
-      renameDir(`${editables}/${oldName}`, `${editables}/${name}`);
-    }
+    // const { name } = query;
+    // const newDir = setNewPath(oldDir, name);
+    // if (query) {
+    //   renameDir(oldDir, newDir);
+    //   renameDir(`${model}/${oldName}`, `${model}/${name}`);
+    //   renameDir(`${review}/${oldName}`, `${review}/${name}`);
+    //   renameDir(`${editables}/${oldName}`, `${editables}/${name}`);
+    // }
     res.status(200).json(query);
   } catch (error) {
     next(error);
