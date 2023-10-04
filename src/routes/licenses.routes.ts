@@ -7,5 +7,5 @@ router.use(authenticateHandler);
 router.use(_admin_role);
 router.post('/', createLicense);
 router.patch('/:id', updateLicense);
-router.get('/:id', getLicenseById);
+router.get('/', getLicenseById);
 export default router;

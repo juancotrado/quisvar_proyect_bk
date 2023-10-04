@@ -28,7 +28,7 @@ model Users {
   stages       Stages[]
   message      Mail[]
   messageReply MessageHistory[]
-  feedbacks     Feedback[]
+  feedbacks    Feedback[]
 }
 
 model GeneralFiles {
@@ -247,13 +247,18 @@ model List {
   updatedAt DateTime      @updatedAt
   users     ListOnUsers[]
 }
+
 model Licenses {
-  id          Int         @id @default(autoincrement())
-  userId      Int  
-  reason      String?
-  startDate   DateTime          
-  untilDate   DateTime
+  id        Int            @id @default(autoincrement())
+  userId    Int
+  reason    String?
+  feedback  String?
+  status    LicensesStatus @default(PROCESS)
+  startDate DateTime       @updatedAt
+  untilDate DateTime       @updatedAt
+  createdAt DateTime       @default(now())
 }
+
 model ListOnUsers {
   usersId    Int
   listId     Int
@@ -356,6 +361,13 @@ enum ListDetails {
   GRAVE
   MUY_GRAVE
   PERMISO
+}
+
+enum LicensesStatus {
+  ACTIVE
+  INACTIVE
+  PROCESS
+  DENIED
 }
 
 enum MessageUser {

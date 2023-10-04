@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { LicenseServices } from '../services';
+import { LicensesStatus } from '@prisma/client';
 
 export const createLicense = async (
   req: Request,
@@ -34,8 +35,9 @@ export const getLicenseById = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const query = await LicenseServices.getLicenceById(Number(id));
+    // const id = req.params.id;
+    // const status = req.query.status as LicensesStatus;
+    const query = await LicenseServices.getLicenceById();
     res.status(200).json(query);
   } catch (error) {
     next(error);

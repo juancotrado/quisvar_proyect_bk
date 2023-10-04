@@ -1,21 +1,21 @@
 import AppError from '../utils/appError';
-import { Licenses, prisma } from '../utils/prisma.server';
+import { Licenses, LicensesStatus, prisma } from '../utils/prisma.server';
 
 class LicenseServices {
   static async create(data: Licenses) {
-    console.log(data);
-
     if (!data) throw new AppError(`Datos incorrectos`, 400);
-    const startDate = new Date(data.startDate);
-    const untilDate = new Date(data.untilDate);
-    console.log(startDate);
-
+    const GMT = 60 * 60 * 1000;
+    const _startDate = new Date(data.startDate).getTime();
+    const _untilDate = new Date(data.untilDate).getTime();
+    const startOfDay = new Date(_startDate - GMT * 5);
+    const endOfDay = new Date(_untilDate - GMT * 5);
+    console.log(startOfDay, endOfDay);
     const newLicence = await prisma.licenses.create({
       data: {
         userId: data.userId,
         reason: data.reason,
-        startDate: startDate,
-        untilDate: untilDate,
+        startDate: startOfDay,
+        untilDate: endOfDay,
       },
     });
     return newLicence;
@@ -31,14 +31,30 @@ class LicenseServices {
     });
     return updateList;
   }
-  static async getLicenceById(licenceId: Licenses['id']) {
-    if (!licenceId) throw new AppError('Oops!,ID invalido', 400);
-    const licenses = await prisma.licenses.findMany({
+  static async getLicenceById() // userId: Licenses['id'],
+  // status: Licenses['status'],
+  {
+    // if (!userId) throw new AppError('Oops!,ID invalido', 400);
+    // if (!status) throw new AppError('Oops!,Estado incorrecto', 400);
+    const GMT = 60 * 60 * 1000;
+    const today = new Date().toISOString().split('T')[0];
+    // const todays = new Date().toLocaleDateString().split('T')
+    const _startDate = new Date(today).getTime();
+    const startOfDay = new Date(_startDate + GMT * 5);
+    const endOfDay = new Date(_startDate + GMT * 29 - 1);
+    console.log(startOfDay, endOfDay);
+
+    const licenses = await prisma.licenses.groupBy({
+      by: ['id', 'status'],
       where: {
-        id: licenceId,
+        startDate: {
+          gte: startOfDay,
+        },
+        untilDate: {
+          lte: endOfDay,
+        },
       },
     });
-    if (!licenses.length) throw new AppError('Aun no hay licencias', 404);
     return licenses;
   }
 }
