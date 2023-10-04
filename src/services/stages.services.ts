@@ -116,29 +116,44 @@ class StageServices {
     // return calculateAndUpdateDataByLevel(transformData);
   }
 
-  static async create({ name, projectId }: Stages) {
+  static async duplicate(id: number, name: string, type: 'ID' | 'ROOT') {
+    let projectId: number = id;
     if (name.includes('projects')) throw new AppError('Nombre reservado', 404);
+    if (type === 'ID') {
+      const project = await prisma.stages.findUnique({ where: { id } });
+      if (!project) throw new AppError('Etapa no Encontrada', 404);
+      projectId = project.id;
+    }
+    const getStages = await prisma.stages.groupBy({
+      by: ['name'],
+      where: { projectId },
+    });
+    const list = getStages.map(({ name }) => name);
+    if (list.includes(name)) return true;
+    return false;
+  }
+  static async create({ name, projectId }: Stages) {
+    const duplicated = await this.duplicate(projectId, name, 'ROOT');
+    if (duplicated) throw new AppError('Ops!,Nombre repetido', 400);
     const path = await PathLevelServices.pathProject(projectId, 'UPLOADS');
     if (!existsSync(path)) throw new AppError('Ops!,carpeta no existe', 404);
     const createStage = await prisma.stages.create({
       data: { name, projectId },
-      include: {
-        project: { select: { name: true } },
-      },
+      include: { project: { select: { name: true } } },
     });
     return createStage;
   }
 
   static async update(id: Stages['id'], { name }: Stages) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
+    const duplicated = await this.duplicate(id, name, 'ID');
+    if (duplicated) throw new AppError('Ops!,Nombre repetido', 400);
     const path = await PathLevelServices.pathStage(id, 'UPLOADS');
     if (!existsSync(path)) throw new AppError('Ops!,carpeta no existe', 404);
     const updateStage = await prisma.stages.update({
       where: { id },
       data: { name },
-      include: {
-        project: { select: { name: true } },
-      },
+      include: { project: { select: { name: true } } },
     });
     return updateStage;
   }

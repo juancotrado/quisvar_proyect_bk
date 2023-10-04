@@ -172,3 +172,11 @@ export interface PickMessageReply extends MessageHistory {
   messageId: Messages['id'];
 }
 export type FileMessagePick = Pick<FilesMessage, 'name' | 'path' | 'attempt'>;
+export type UpdateLevelBlock = Levels & {
+  subTasks: {
+    id: number;
+    item: string;
+    index: number;
+    files: { id: number; dir: string; name: string; type: Files['type'] }[];
+  }[];
+};

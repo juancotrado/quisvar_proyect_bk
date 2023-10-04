@@ -110,8 +110,8 @@ class DuplicatesServices {
     const { quantity } = duplicated;
     const { stagesId, level } = rootLevel;
     const { id, item, typeItem, subTasks, index: i, ...otherProps } = rootLevel;
-    const { rootItem } = getRootItem(item);
     //--------------------------get_new_item---------------------------------------
+    const { rootItem } = getRootItem(item);
     const newRootItem = rootItem ? rootItem + '.' : '';
     const index = quantity + 1;
     const _type = numberToConvert(index, typeItem);
@@ -174,7 +174,7 @@ class DuplicatesServices {
     const index = quantity + 1;
     const _type = numberToConvert(index, _data.typeItem);
     if (!_type) throw new AppError('excediste Limite de conversion', 400);
-    const item = parseItem + _type;
+    const item = parseItem + _type + '.';
     //--------------------------set_new_subtasks-------------------------
     const status: SubTasks['status'] = 'UNRESOLVED';
     const data = { ..._data, status, name, item, levels_Id, index };

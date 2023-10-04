@@ -3,6 +3,7 @@ import { LevelsServices, PathServices } from '../services';
 import { mkdirSync, rmSync } from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
 import { SubTasks } from '@prisma/client';
+// import mv from 'mv';
 
 export const showLevel = async (
   req: Request,
@@ -54,6 +55,7 @@ export const updateLevel = async (
     const oldEditable = oldPath.replace('projects', 'editables');
     const newEditable = newPath.replace('projects', 'editables');
     if (query) {
+      // mv(oldPath, newPath, err => console.log(err));
       renameDir(oldPath, newPath);
       renameDir(oldEditable, newEditable);
     }
@@ -72,9 +74,14 @@ export const deleteLevel = async (
     const { id } = req.params;
     const _task_id = parseInt(id);
     const query = await LevelsServices.delete(_task_id);
-    // if (query) rmSync(query, { recursive: true });
+    const editables = query.replace('projects', 'editables');
+    if (query) {
+      rmSync(query, { recursive: true });
+      rmSync(editables, { recursive: true });
+    }
     res.status(200).json(query);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };

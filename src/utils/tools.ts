@@ -1,4 +1,4 @@
-import { Levels, SubTasks, TaskRole } from '@prisma/client';
+import { Levels, SubTasks, TaskRole, TypeItem } from '@prisma/client';
 import {
   Details,
   DuplicateLevel,
@@ -12,6 +12,7 @@ import {
   PriceTaskLvl3,
   ProjectDir,
   SubTaskFilter,
+  UpdateLevelBlock,
 } from 'types/types';
 import { prisma } from './prisma.server';
 import AppError from './appError';
@@ -287,15 +288,19 @@ export const getRootPath = async (id: number) => {
   if (!id) throw new AppError('Oops!, ID invalido', 400);
   const findLevel = await prisma.levels.findUnique({ where: { id } });
   if (!findLevel) throw new AppError('No se pudieron encontrar el nivel', 404);
-  const { rootId, stagesId, item, ...level } = findLevel;
-  const rootPath = await existRootLevelPath(rootId, stagesId);
-  return { rootId, stagesId, rootPath, _item: item, ...level };
+  const { item, ...level } = findLevel;
+  const rootPath = await existRootLevelPath(
+    findLevel.rootId,
+    findLevel.stagesId
+  );
+  return { rootPath, _item: item, ...level };
 };
 
 export const existRootLevelPath = async (rootId: number, stagesId: number) => {
   const rootPath = rootId
     ? await PathServices.level(rootId)
     : await PathServices.stage(stagesId, 'UPLOADS');
+  console.log(rootPath);
   if (!existsSync(rootPath)) throw new AppError('Ops!,carpeta no existe', 404);
   return rootPath;
 };
@@ -307,15 +312,15 @@ export const getRootItem = (item: string) => {
   return { rootItem, lastItem };
 };
 
-export const parseRootItem = (item: string, index: number) => {
+export const parseRootItem = (item: string, i: number) => {
   const { rootItem, lastItem } = getRootItem(item);
-  const quantity = +lastItem + index;
+  const index = +lastItem + i;
   const newRootItem = rootItem ? rootItem + '.' : '';
-  const newItem = newRootItem + quantity;
+  const newItem = newRootItem + index + '.';
   return newItem;
 };
 export const filterLevelList = (
-  rootList: Levels[],
+  rootList: UpdateLevelBlock[],
   _rootId: number,
   _rootLevel: number
 ) => {
