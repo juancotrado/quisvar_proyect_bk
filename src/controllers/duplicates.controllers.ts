@@ -37,8 +37,7 @@ export const duplicateStages = async (
   try {
     const { id } = req.params;
     const _stage_id = parseInt(id);
-    // const { name } = req.body;
-    const name = 'ETAPA COPIA';
+    const { name } = req.body;
     const duplicate = await DuplicatesServices.stage(_stage_id, name);
     res.status(201).json(duplicate);
   } catch (error) {
