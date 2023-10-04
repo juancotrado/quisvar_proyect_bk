@@ -38,11 +38,12 @@ export const updateSubTask = async (
   next: NextFunction
 ) => {
   try {
-    const { body } = req;
+    const { stageId, ...body } = req.body;
     const { id } = req.params;
     const _subtask_id = parseInt(id);
-    const query = await SubTasksServices.update(_subtask_id, body);
-    res.status(200).json(query);
+    await SubTasksServices.update(_subtask_id, body);
+    const query = await StageServices.find(+stageId);
+    res.status(201).json({ ...query, stagesId: stageId });
   } catch (error) {
     next(error);
   }
@@ -100,10 +101,11 @@ export const deleteSubTasks = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
+    const { id, stageId } = req.params;
     const _subtask_id = parseInt(id);
-    const query = await SubTasksServices.delete(_subtask_id);
-    res.status(200).json(query);
+    await SubTasksServices.delete(_subtask_id);
+    const query = await StageServices.find(+stageId);
+    res.status(201).json({ ...query, stagesId: stageId });
   } catch (error) {
     next(error);
   }

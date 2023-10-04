@@ -39,6 +39,6 @@ router.use(_mod_role);
 router.post('/', createSubTask);
 router.patch('/:id', updateSubTask);
 router.patch('/assignUser/:id/:stageId', assignUserBySubtask);
-router.delete('/:id', validSubtaskByIdAndStatus, deleteSubTasks);
+router.delete('/:id/:stageId', validSubtaskByIdAndStatus, deleteSubTasks);
 
 export default router;
