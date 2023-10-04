@@ -103,6 +103,8 @@ import {
 import {
   createLicense,
   getLicenseById,
+  getLicensesByStatus,
+  getLicensesEmployee,
   updateLicense,
 } from './licenses.controllers';
 
@@ -209,4 +211,10 @@ export {
   doneMessage,
 };
 //Licenses Controllers
-export { createLicense, updateLicense, getLicenseById };
+export {
+  createLicense,
+  updateLicense,
+  getLicenseById,
+  getLicensesByStatus,
+  getLicensesEmployee,
+};

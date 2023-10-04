@@ -31,9 +31,7 @@ class LicenseServices {
     });
     return updateList;
   }
-  static async getLicenceById() // userId: Licenses['id'],
-  // status: Licenses['status'],
-  {
+  static async getLicenceById() { // status: Licenses['status'], // userId: Licenses['id'],
     // if (!userId) throw new AppError('Oops!,ID invalido', 400);
     // if (!status) throw new AppError('Oops!,Estado incorrecto', 400);
     const GMT = 60 * 60 * 1000;
@@ -42,7 +40,7 @@ class LicenseServices {
     const _startDate = new Date(today).getTime();
     const startOfDay = new Date(_startDate + GMT * 5);
     const endOfDay = new Date(_startDate + GMT * 29 - 1);
-    console.log(startOfDay, endOfDay);
+    // console.log(startOfDay, endOfDay);
 
     const licenses = await prisma.licenses.groupBy({
       by: ['id', 'status'],
@@ -53,6 +51,30 @@ class LicenseServices {
         untilDate: {
           lte: endOfDay,
         },
+      },
+    });
+    return licenses;
+  }
+  static async getLicensesByStatus(status: Licenses['status']) {
+    const licenses = await prisma.licenses.findMany({
+      where: status ? { status } : {},
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return licenses;
+  }
+  static async getLicensesEmployee(
+    userId: Licenses['userId'],
+    status?: Licenses['status']
+  ) {
+    const licenses = await prisma.licenses.findMany({
+      where: {
+        userId,
+        ...(status ? { status } : {}),
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
     return licenses;

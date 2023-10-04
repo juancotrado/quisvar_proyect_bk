@@ -43,3 +43,32 @@ export const getLicenseById = async (
     next(error);
   }
 };
+export const getLicensesByStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // const id = req.params.id;
+    const status = req.query.status as LicensesStatus;
+    const query = await LicenseServices.getLicensesByStatus(status);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const getLicensesEmployee = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const id = req.params.id;
+    // console.log(id);
+    const status = req.query.status as LicensesStatus;
+    const query = await LicenseServices.getLicensesEmployee(Number(id), status);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
