@@ -198,8 +198,19 @@ class MailServices {
       return createReply;
     }
     //------------------------------------------------------------------
-    const newSender = await prisma.mail.create({
-      data: {
+    const newSender = await prisma.mail.upsert({
+      where: {
+        userId_messageId: {
+          messageId,
+          userId: receiverId,
+        },
+      },
+      update: {
+        type: 'RECEIVER',
+        role: 'MAIN',
+        status: true,
+      },
+      create: {
         messageId,
         userId: receiverId,
         type: 'RECEIVER',
@@ -207,9 +218,9 @@ class MailServices {
         status: true,
       },
     });
-    const newReceiver = await prisma.mail.update({
+    await prisma.mail.update({
       where: { userId_messageId: { messageId, userId: senderId } },
-      data: { type: 'SENDER', status: false, role: 'SECONDARY' },
+      data: { type: 'SENDER', status: false, role: 'MAIN' },
     });
     // const newReceiver = await prisma.mail.delete({
     //   where: { userId_messageId: { messageId, userId: senderId } },
