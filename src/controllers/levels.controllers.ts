@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { LevelsServices, PathServices } from '../services';
 import { mkdirSync, rmSync } from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
-import { SubTasks } from '@prisma/client';
+import { Levels, SubTasks } from '@prisma/client';
 // import mv from 'mv';
 
 export const showLevel = async (
@@ -65,6 +65,23 @@ export const updateLevel = async (
   }
 };
 
+export const updateTypeItem = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const item = req.query.item as Levels['typeItem'];
+    const type = req.query.type as 'STAGE' | 'LEVEL';
+    const _task_id = parseInt(id);
+    const query = await LevelsServices.updateTypeItem(_task_id, item, type);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteLevel = async (
   req: Request,
   res: Response,
@@ -81,7 +98,6 @@ export const deleteLevel = async (
     }
     res.status(200).json(query);
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
