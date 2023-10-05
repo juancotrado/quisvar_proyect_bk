@@ -9,7 +9,6 @@ import {
   getRootItem,
   getRootPath,
   numberToConvert,
-  parseRootItem,
   percentageSubTasks,
   sumValues,
 } from '../utils/tools';
@@ -81,7 +80,6 @@ class LevelsServices {
       typeIndex: root ? root.typeItem : null,
     };
   }
-
   static async create({
     name,
     stagesId,
@@ -143,6 +141,25 @@ class LevelsServices {
     return { ...updateLevel, oldPath };
   }
 
+  static async updateTypeItem(
+    id: Levels['id'],
+    rootTypeItem: Levels['rootTypeItem'],
+    type: 'LEVEL' | 'STAGE' = 'LEVEL'
+  ) {
+    if (type === 'STAGE') {
+      const stageType = await prisma.stages.update({
+        where: { id },
+        data: { rootTypeItem },
+      });
+      return stageType;
+    }
+    const levelType = await prisma.levels.update({
+      where: { id },
+      data: { rootTypeItem },
+    });
+    return levelType;
+  }
+
   static async delete(id: Levels['id']) {
     //----------------------------verify_exist------------------------------------
     const getInfoLevel = await getRootPath(id);
@@ -191,6 +208,7 @@ class LevelsServices {
     });
     return result;
   }
+
   static async deleteBlock(stagesId: number, item: string, level: number) {
     const deleteList = await prisma.levels.groupBy({
       by: ['id'],
@@ -199,15 +217,14 @@ class LevelsServices {
         item: { startsWith: item },
         level: { gt: level },
       },
-      // orderBy: { item: 'asc' },
-      // select: { id: true },
     });
     const levelListDelete = deleteList.map(({ id }) => id);
-    // return await prisma.levels.deleteMany({
-    //   where: { id: { in: levelListDelete } },
-    // });
+    await prisma.levels.deleteMany({
+      where: { id: { in: levelListDelete } },
+    });
     return levelListDelete;
   }
+
   static updateBlock(
     _list: UpdateLevelBlock[],
     _rootLevel: number,
@@ -286,51 +303,6 @@ class LevelsServices {
     const result = Promise.all(newList);
     return result;
   }
-
-  // static async findList23(rootId: Levels['rootId'], percentage: number) {
-  //   const findList = await prisma.levels.findMany({
-  //     where: { rootId },
-  //     include: {
-  //       subTasks: {
-  //         select: {
-  //           id: true,
-  //           name: true,
-  //           item: true,
-  //           description: true,
-  //           price: true,
-  //           status: true,
-  //           users: {
-  //             select: { percentage: true, user: Queries.selectProfileUser },
-  //           },
-  //         },
-  //       },
-  //     },
-  //   });
-  //   if (findList.length === 0) return [];
-  //   const newListTask = findList.map(async ({ subTasks, ...level }) => {
-  //     const nextLevel: typeof findList = await this.findList23(
-  //       level.id,
-  //       percentage
-  //     );
-  //     const subtasks = percentageSubTasks(subTasks, percentage);
-  //     const details = getDetailsSubtask(subTasks);
-  //     const price = sumValues(subtasks, 'price');
-  //     const spending = sumValues(subtasks, 'spending');
-  //     const balance = price - spending;
-  //     const newLevel = {
-  //       ...level,
-  //       spending,
-  //       balance,
-  //       price,
-  //       details,
-  //       subTasks: subtasks,
-  //     };
-  //     if (nextLevel.length !== 0) return { ...newLevel, nextLevel };
-  //     return { ...newLevel };
-  //   });
-  //   const result = await Promise.all(newListTask);
-  //   return result;
-  // }
 
   static findList(
     array: GetFilterLevels[],

@@ -79,6 +79,7 @@ import {
   deleteLevel,
   showLevel,
   updateLevel,
+  updateTypeItem,
 } from './levels.controllers';
 import {
   createList,
@@ -185,7 +186,7 @@ export {
 };
 
 //levels Controllers
-export { createLevel, updateLevel, deleteLevel, showLevel };
+export { createLevel, updateLevel, deleteLevel, showLevel, updateTypeItem };
 
 //List Controllers
 export {

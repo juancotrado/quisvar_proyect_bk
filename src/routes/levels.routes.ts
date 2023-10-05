@@ -4,6 +4,7 @@ import {
   updateLevel,
   deleteLevel,
   showLevel,
+  updateTypeItem,
 } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 
@@ -24,6 +25,7 @@ router.get('/:id', showLevel);
 //MOD ROLE
 router.use(_mod_role);
 router.put('/:id', updateLevel);
+router.patch('/:id', updateTypeItem);
 router.post('/', createLevel);
 router.delete('/:id', deleteLevel);
 export default router;
