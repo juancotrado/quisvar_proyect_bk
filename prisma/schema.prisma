@@ -251,12 +251,12 @@ model List {
 
 model Licenses {
   id        Int            @id @default(autoincrement())
-  userId    Int
+  usersId    Int
   reason    String?
   feedback  String?
   status    LicensesStatus @default(PROCESS)
-  startDate DateTime       @updatedAt
-  untilDate DateTime       @updatedAt
+  startDate DateTime       
+  untilDate DateTime       
   createdAt DateTime       @default(now())
 }
 

@@ -64,6 +64,9 @@ class ListServices {
           lte: endOfDay,
         },
       },
+      orderBy: {
+        createdAt: 'asc',
+      },
       select: {
         createdAt: true,
         id: true,

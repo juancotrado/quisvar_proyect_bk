@@ -8,7 +8,7 @@ export const createLicense = async (
   next: NextFunction
 ) => {
   try {
-    const body = req.body;
+    const { body } = req;
     const query = await LicenseServices.create(body);
     res.status(200).json(query);
   } catch (error) {
@@ -38,6 +38,7 @@ export const getLicenseById = async (
     // const id = req.params.id;
     // const status = req.query.status as LicensesStatus;
     const query = await LicenseServices.getLicenceById();
+    // const query = await LicenseServices.deleteExpiredLicenses();
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -68,6 +69,18 @@ export const getLicensesEmployee = async (
     const status = req.query.status as LicensesStatus;
     const query = await LicenseServices.getLicensesEmployee(Number(id), status);
     res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const expiredLicenses = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const query = await LicenseServices.deleteExpiredLicenses();
+    res.status(201).json(query);
   } catch (error) {
     next(error);
   }

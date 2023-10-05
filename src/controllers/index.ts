@@ -102,6 +102,7 @@ import {
 } from './mail.controllers';
 import {
   createLicense,
+  expiredLicenses,
   getLicenseById,
   getLicensesByStatus,
   getLicensesEmployee,
@@ -217,4 +218,5 @@ export {
   getLicenseById,
   getLicensesByStatus,
   getLicensesEmployee,
+  expiredLicenses,
 };

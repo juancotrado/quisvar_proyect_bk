@@ -6,6 +6,7 @@ import {
   getLicenseById,
   getLicensesByStatus,
   getLicensesEmployee,
+  expiredLicenses,
 } from '../controllers';
 import { _admin_role, _employee_role } from '../middlewares/role.middleware';
 const router = Router();
@@ -19,4 +20,5 @@ router.patch('/:id', updateLicense);
 router.use(_admin_role);
 router.get('/', getLicenseById);
 router.get('/status', getLicensesByStatus);
+router.post('/expired', expiredLicenses);
 export default router;
