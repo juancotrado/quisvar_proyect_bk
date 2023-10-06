@@ -1,7 +1,6 @@
 import { Files, Levels, SubTasks, TypeItem } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-import PathLevelServices from './path_levels.services';
 import { parsePath, parsePathLevel, renameDir } from '../utils/fileSystem';
 import {
   existRootLevelPath,
@@ -15,6 +14,7 @@ import {
 import { DuplicateLevel, GetFilterLevels, UpdateLevelBlock } from 'types/types';
 import { existsSync, renameSync } from 'fs';
 import Queries from '../utils/queries';
+import PathServices from './paths.services';
 
 class LevelsServices {
   static async find(id: Levels['id'], status?: SubTasks['status']) {
@@ -125,12 +125,15 @@ class LevelsServices {
     };
     const data = { ..._values, isProject, isArea, isInclude, user: _user() };
     const newLevel = await prisma.levels.create({ data });
+    console.log(newLevel.name);
+
     return newLevel;
   }
 
   static async update(id: Levels['id'], { name }: Levels) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const oldPath = await PathLevelServices.pathLevel(id);
+    const oldPath = await PathServices.level(id);
+    console.log(oldPath);
     if (!existsSync(oldPath)) throw new AppError('Ops!,carpeta no existe', 404);
     const { duplicated } = await this.duplicate(id, 0, name, 'ID');
     if (duplicated) throw new AppError('Error al crear, Nombre existente', 404);
@@ -167,8 +170,8 @@ class LevelsServices {
     //----------------------------delete_level------------------------------------
     const deleteLevel = await prisma.levels.delete({ where: { id } });
     const deleteDir = rootPath + parsePath(_item, deleteLevel.name);
-    const deleteList = async () =>
-      await this.deleteBlock(stagesId, deleteLevel.item, deleteLevel.level);
+    await this.deleteBlock(stagesId, deleteLevel.item, deleteLevel.level);
+    // const deleteList = async () =>
     const getList = await prisma.levels.findMany({
       where: {
         stagesId,
@@ -198,12 +201,12 @@ class LevelsServices {
       rootLevel,
       rootId,
       rootPath,
-      rootItem,
+      rootItem + '.',
       getInfoLevel.index
     );
     //-------------------------return_delete_dir---------------------------------
     const result = await Promise.all(updateList).then(() => {
-      deleteList();
+      // deleteList();
       return deleteDir;
     });
     return result;
@@ -241,6 +244,8 @@ class LevelsServices {
         //-----------------------------get_new_item--------------------------------------
         const { lastItem } = getRootItem(item);
         let index = value.index;
+        console.log(rootItem);
+
         let _item = rootItem + lastItem + '.';
         if (previusIndex) {
           index = previusIndex + i;
@@ -248,10 +253,12 @@ class LevelsServices {
           _item = rootItem + _type + '.';
         }
         //----------------------------update_level---------------------------------------
+
         const updateLevel = await prisma.levels.update({
           where: { id },
           data: { item: _item, index },
         });
+        console.log(_item);
         //------------------------------get_paths---------------------------------------
         const oldPath = rootPath + parsePath(item, name);
         const newPath = rootPath + parsePath(updateLevel.item, name);
