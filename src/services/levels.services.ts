@@ -130,17 +130,23 @@ class LevelsServices {
     return newLevel;
   }
 
-  static async update(id: Levels['id'], { name }: Levels) {
+  static async update(id: Levels['id'], { name, userId = null }: Levels) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const oldPath = await PathServices.level(id);
     console.log(oldPath);
     if (!existsSync(oldPath)) throw new AppError('Ops!,carpeta no existe', 404);
     const { duplicated } = await this.duplicate(id, 0, name, 'ID');
     if (duplicated) throw new AppError('Error al crear, Nombre existente', 404);
-    const updateLevel = await prisma.levels.update({
+    let updateLevel = await prisma.levels.update({
       where: { id },
       data: { name },
     });
+    if (userId) {
+      updateLevel = await prisma.levels.update({
+        where: { id },
+        data: { userId },
+      });
+    }
     return { ...updateLevel, oldPath };
   }
 

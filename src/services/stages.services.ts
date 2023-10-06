@@ -38,6 +38,7 @@ class StageServices {
       where: { stagesId: id },
       orderBy: { index: 'asc' },
       include: {
+        user: Queries.selectProfileShort,
         subTasks: {
           where: { status },
           orderBy: { index: 'asc' },
