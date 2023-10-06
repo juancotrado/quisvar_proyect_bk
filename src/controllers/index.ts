@@ -95,6 +95,8 @@ import {
   archivedMessage,
   createMessage,
   createReplyMessage,
+  createVoucher,
+  declineVoucher,
   doneMessage,
   quantityFiles,
   showMessage,
@@ -211,6 +213,8 @@ export {
   updateMessage,
   archivedMessage,
   doneMessage,
+  createVoucher,
+  declineVoucher,
 };
 //Licenses Controllers
 export {

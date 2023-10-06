@@ -3,7 +3,7 @@ import { MailServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
 import { ParametersMail, PickMail, PickMessageReply } from 'types/types';
-import { existsSync, mkdirSync, renameSync } from 'fs';
+import { existsSync, mkdirSync, renameSync, unlinkSync } from 'fs';
 import { Messages } from '@prisma/client';
 
 export const showMessages = async (
@@ -173,6 +173,57 @@ export const quantityFiles = async (
     const userInfo: UserType = res.locals.userInfo;
     const { id } = userInfo;
     const query = await MailServices.quantityFiles(id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createVoucher = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const { body } = req;
+    const userInfo: UserType = res.locals.userInfo;
+    const { id: senderId } = userInfo;
+    const _messageId = parseInt(id);
+    //-----------------------------------------------------------------------------
+    if (!req.file)
+      throw new AppError('Oops!, no se pudo subir los archivos', 400);
+    const { filename, path: FilePath } = req.file as Express.Multer.File;
+    const path = `public/voucher/${id}`;
+    const voucher = path + '/' + filename;
+    if (!existsSync(path)) mkdirSync(path, { recursive: true });
+    renameSync(FilePath, path + '/' + filename);
+    //-----------------------------------------------------------------------------
+    const query = await MailServices.createVoucher(_messageId, {
+      senderId,
+      voucher,
+    });
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const declineVoucher = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userInfo: UserType = res.locals.userInfo;
+    const { id: senderId } = userInfo;
+    const { id } = req.params;
+    const status = req.query.status as Messages['status'];
+    const _messageId = parseInt(id);
+    const query = await MailServices.updateVoucher(_messageId, {
+      senderId,
+      status,
+    });
     res.status(200).json(query);
   } catch (error) {
     next(error);
