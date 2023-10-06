@@ -394,7 +394,7 @@ class MailServices {
     id: Messages['id'],
     { status, senderId }: Pick<Messages, 'status'> & { senderId: number }
   ) {
-    if (!['RECHAZADO', 'PAGADO'].includes(status))
+    if (!['FINALIZADO', 'PAGADO'].includes(status))
       throw new AppError('Ingrese un estado valido para este proceso', 400);
     const denied = await prisma.messages.update({
       where: { id },
@@ -416,7 +416,7 @@ class MailServices {
       data: { type: 'RECEIVER' },
     });
     //------------------------------------------------------------------
-    if (status == 'RECHAZADO' && denied.voucher) {
+    if (status == 'FINALIZADO' && denied.voucher) {
       unlinkSync(denied.voucher);
       await prisma.messages.update({ where: { id }, data: { voucher: null } });
     }
