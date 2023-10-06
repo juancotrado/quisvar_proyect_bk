@@ -1,4 +1,10 @@
-import { Mail, Messages, Users } from '@prisma/client';
+import {
+  Mail,
+  MessageStatus,
+  MessageType,
+  Messages,
+  Users,
+} from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import {
   FileMessagePick,
@@ -8,6 +14,7 @@ import {
 } from 'types/types';
 import Queries from '../utils/queries';
 import AppError from '../utils/appError';
+import { unlinkSync } from 'fs';
 
 class MailServices {
   static PickType(type?: Mail['type']) {
@@ -308,17 +315,23 @@ class MailServices {
     });
     //------------------------------------------------------------------
     await prisma.mail.updateMany({
-      where: { messageId: id, role: 'MAIN' },
-      data: { type: 'RECEIVER' },
-    });
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: senderId } },
-      data: { type: 'SENDER' },
+      where: { messageId: id },
+      data: { type: 'RECEIVER', role: 'SECONDARY', status: false },
     });
     //------------------------------------------------------------------
-    await prisma.mail.updateMany({
+    const getFirst = await prisma.mail.findFirst({
       where: { messageId: id },
-      data: { status: false },
+      orderBy: { assignedAt: 'asc' },
+    });
+    if (!getFirst) throw new AppError('error', 400);
+    //------------------------------------------------------------------
+    await prisma.mail.update({
+      where: { userId_messageId: { messageId: id, userId: senderId } },
+      data: { type: 'SENDER', role: 'MAIN' },
+    });
+    await prisma.mail.update({
+      where: { userId_messageId: { messageId: id, userId: getFirst.userId } },
+      data: { type: 'RECEIVER', role: 'MAIN' },
     });
     return done;
   }
@@ -348,6 +361,66 @@ class MailServices {
       },
     });
     return quantity;
+  }
+  static async createVoucher(
+    id: Messages['id'],
+    { voucher, senderId }: Pick<Messages, 'voucher'> & { senderId: number }
+  ) {
+    //------------------------------------------------------------------
+    const getReceiver = await prisma.mail.findFirst({
+      where: { messageId: id, type: 'SENDER', role: 'MAIN' },
+    });
+    if (!getReceiver) throw new AppError('error', 400);
+    const { userId: receiverId } = getReceiver;
+    //------------------------------------------------------------------
+    const newVoucher = await prisma.messages.update({
+      where: { id },
+      data: { voucher, status: 'POR_PAGAR' },
+    });
+    //------------------------------------------------------------------
+    await prisma.mail.update({
+      where: { userId_messageId: { messageId: id, userId: senderId } },
+      data: { type: 'SENDER' },
+    });
+    await prisma.mail.update({
+      where: { userId_messageId: { messageId: id, userId: receiverId } },
+      data: { type: 'RECEIVER' },
+    });
+    //------------------------------------------------------------------
+
+    return newVoucher;
+  }
+  static async updateVoucher(
+    id: Messages['id'],
+    { status, senderId }: Pick<Messages, 'status'> & { senderId: number }
+  ) {
+    if (!['RECHAZADO', 'PAGADO'].includes(status))
+      throw new AppError('Ingrese un estado valido para este proceso', 400);
+    const denied = await prisma.messages.update({
+      where: { id },
+      data: { status },
+    });
+    //------------------------------------------------------------------
+    const getReceiver = await prisma.mail.findFirst({
+      where: { messageId: id, type: 'SENDER', role: 'MAIN' },
+    });
+    if (!getReceiver) throw new AppError('error', 400);
+    const { userId: receiverId } = getReceiver;
+    //------------------------------------------------------------------
+    await prisma.mail.update({
+      where: { userId_messageId: { messageId: id, userId: senderId } },
+      data: { type: 'SENDER' },
+    });
+    await prisma.mail.update({
+      where: { userId_messageId: { messageId: id, userId: receiverId } },
+      data: { type: 'RECEIVER' },
+    });
+    //------------------------------------------------------------------
+    if (status == 'RECHAZADO' && denied.voucher) {
+      unlinkSync(denied.voucher);
+      await prisma.messages.update({ where: { id }, data: { voucher: null } });
+    }
+    return denied;
   }
 }
 export default MailServices;

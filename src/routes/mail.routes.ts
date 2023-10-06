@@ -8,6 +8,8 @@ import {
   archivedMessage,
   doneMessage,
   createReplyMessage,
+  declineVoucher,
+  createVoucher,
 } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 
@@ -16,7 +18,10 @@ import {
   _admin_role,
   _mod_role,
 } from '../middlewares/role.middleware';
-import { uploadFileMail } from '../middlewares/upload.middleware';
+import {
+  uploadFileMail,
+  uploadFileVoucher,
+} from '../middlewares/upload.middleware';
 
 const router = Router();
 router.use(authenticateHandler);
@@ -36,5 +41,11 @@ router.use(_mod_role);
 router.post('/reply', uploadFileMail.array('fileMail'), createReplyMessage);
 router.patch('/archived/:id', archivedMessage);
 router.patch('/done/:id', doneMessage);
+router.patch(
+  '/voucher/:id',
+  uploadFileVoucher.single('voucher'),
+  createVoucher
+);
+router.delete('/voucher/:id', declineVoucher);
 
 export default router;

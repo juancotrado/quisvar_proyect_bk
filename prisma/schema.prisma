@@ -112,7 +112,7 @@ model Stages {
   company      Company?          @relation(fields: [companyId], references: [id])
   consortium   Consortium?       @relation(fields: [consortiumId], references: [id])
   specialists  PersonBussiness[]
-  rootTypeItem  TypeItem          @default(ROM)
+  rootTypeItem TypeItem          @default(ROM)
   moderator    Users?            @relation(fields: [moderatorId], references: [id])
   //-----------------------------------------------------
   createdAt    DateTime          @default(now())
@@ -125,23 +125,23 @@ model Stages {
 }
 
 model Levels {
-  id          Int        @id @default(autoincrement())
-  item        String
-  index       Int
-  name        String
-  level       Int        @default(0)
-  rootLevel   Int
-  typeItem    TypeItem   @default(NUM)
+  id           Int        @id @default(autoincrement())
+  item         String
+  index        Int
+  name         String
+  level        Int        @default(0)
+  rootLevel    Int
+  typeItem     TypeItem   @default(NUM)
   rootTypeItem TypeItem   @default(NUM)
-  isProject   Boolean    @default(false)
-  isArea      Boolean    @default(false)
-  isInclude   Boolean    @default(false)
-  stagesId    Int
-  userId      Int?
-  rootId      Int
-  subTasks    SubTasks[]
-  user        Users?     @relation(fields: [userId], references: [id])
-  stages      Stages     @relation(fields: [stagesId], references: [id], onDelete: Cascade)
+  isProject    Boolean    @default(false)
+  isArea       Boolean    @default(false)
+  isInclude    Boolean    @default(false)
+  stagesId     Int
+  userId       Int?
+  rootId       Int
+  subTasks     SubTasks[]
+  user         Users?     @relation(fields: [userId], references: [id])
+  stages       Stages     @relation(fields: [stagesId], references: [id], onDelete: Cascade)
 }
 
 model TaskOnUsers {
@@ -252,12 +252,12 @@ model List {
 
 model Licenses {
   id        Int            @id @default(autoincrement())
-  usersId    Int
+  usersId   Int
   reason    String?
   feedback  String?
   status    LicensesStatus @default(PROCESS)
-  startDate DateTime       
-  untilDate DateTime       
+  startDate DateTime
+  untilDate DateTime
   createdAt DateTime       @default(now())
 }
 
@@ -286,17 +286,18 @@ model Mail {
 }
 
 model Messages {
-  id          Int              @id @default(autoincrement())
-  title       String
-  header      String           @default("")
-  description String
-  status      MessageStatus    @default(PROCESO)
-  type        MessageType      @default(INFORME)
-  files       FilesMessage[]
-  users       Mail[]
-  history     MessageHistory[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id            Int              @id @default(autoincrement())
+  title         String
+  header        String           @default("")
+  description   String
+  voucher       String?
+  status        MessageStatus    @default(PROCESO)
+  type          MessageType      @default(INFORME)
+  files         FilesMessage[]
+  users         Mail[]
+  history       MessageHistory[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 }
 
 model MessageHistory {
@@ -396,8 +397,11 @@ enum MessageStatus {
   RECHAZADO
   ARCHIVADO
   FINALIZADO
+  POR_PAGAR
+  PAGADO
   GUARDADO
 }
+
 
 enum TypeItem {
   ABC
