@@ -298,7 +298,8 @@ class LevelsServices {
             const parseFiles = await Promise.all(
               _files.map(async ({ dir: d, id: _id, name: n, ...file }, i) => {
                 const { item: _i, name: _n } = updateSubtask;
-                const dir = file.type === 'UPLOADS' ? newPath : newEditable;
+                // const dir = file.type === 'UPLOADS' ? newPath : newEditable;
+                const dir = newPath;
                 const ext = `.${n.split('.').at(-1)}`;
                 const name = _i + _n + `_${i + 1}${ext}`;
                 await prisma.files
@@ -306,7 +307,15 @@ class LevelsServices {
                     where: { id: _id },
                     data: { dir, name },
                   })
-                  .then(() => renameSync(`${dir}/${n}`, `${dir}/${name}`));
+                  .then(() => {
+                    if (['.pdf', '.PDF'].includes(ext) && newEditable) {
+                      renameSync(
+                        `${newEditable}/${n}`,
+                        `${newEditable}/${name}`
+                      );
+                    }
+                    renameSync(`${newPath}/${n}`, `${newPath}/${name}`);
+                  });
                 return { dir, name, ...file };
               })
             );
