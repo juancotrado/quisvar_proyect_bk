@@ -24,6 +24,7 @@ import {
   listRouter,
   licenseRouter,
   mailRouter,
+  companiesRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -60,6 +61,7 @@ class Server {
     list: `/${process.env.ROUTE}/list`,
     license: `/${process.env.ROUTE}/license`,
     mail: `/${process.env.ROUTE}/mail`,
+    companies: `/${process.env.ROUTE}/companies`,
   };
 
   constructor() {
@@ -113,6 +115,7 @@ class Server {
     this.app.use(this.path.list, listRouter);
     this.app.use(this.path.license, licenseRouter);
     this.app.use(this.path.mail, mailRouter);
+    this.app.use(this.path.companies, companiesRouter);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)

@@ -242,6 +242,42 @@ model Company {
   stages       Stages[]
 }
 
+model Companies {
+  id          Int       @id @default(autoincrement())
+  name        String
+  ruc         String    @unique @db.VarChar(11)
+  manager     String
+  address     String
+  departure   String
+  inscription DateTime?
+  activities  DateTime?
+  SEE         DateTime?
+  CCI         String    @unique
+  description String?
+}
+
+model AreaSpecialty {
+  id             Int         @id @default(autoincrement())
+  areaSpecialty  String?
+  areaExperience String?
+  specialistId   Int         @unique
+  specialist     Specialists @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+}
+
+model Specialists {
+  id        Int     @id @default(autoincrement())
+  dni       String  @db.VarChar(8)
+  firstName String
+  lastName  String
+  phone     String
+  career    String
+  degree    String
+  agreement String?
+  cv        String?
+  area      AreaSpecialty[]
+  price     String
+}
+
 model List {
   id        Int           @id @default(autoincrement())
   title     String?
@@ -286,18 +322,18 @@ model Mail {
 }
 
 model Messages {
-  id            Int              @id @default(autoincrement())
-  title         String
-  header        String           @default("")
-  description   String
-  voucher       String?
-  status        MessageStatus    @default(PROCESO)
-  type          MessageType      @default(INFORME)
-  files         FilesMessage[]
-  users         Mail[]
-  history       MessageHistory[]
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+  id          Int              @id @default(autoincrement())
+  title       String
+  header      String           @default("")
+  description String
+  voucher     String?
+  status      MessageStatus    @default(PROCESO)
+  type        MessageType      @default(INFORME)
+  files       FilesMessage[]
+  users       Mail[]
+  history     MessageHistory[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 }
 
 model MessageHistory {
@@ -401,7 +437,6 @@ enum MessageStatus {
   PAGADO
   GUARDADO
 }
-
 
 enum TypeItem {
   ABC

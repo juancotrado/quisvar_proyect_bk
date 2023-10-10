@@ -16,6 +16,7 @@ import levelsRouter from './levels.routes';
 import listRouter from './list.routes';
 import mailRouter from './mail.routes';
 import licenseRouter from './licenses.routes';
+import companiesRouter from './companies.routes';
 export {
   userRouter,
   authRouter,
@@ -35,4 +36,5 @@ export {
   listRouter,
   licenseRouter,
   mailRouter,
+  companiesRouter,
 };

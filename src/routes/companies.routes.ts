@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import authenticateHandler from '../middlewares/auth.middleware';
+import { createCompany, getCompany } from '../controllers';
+import { _admin_role } from '../middlewares/role.middleware';
+const router = Router();
+router.use(authenticateHandler);
+router.use(_admin_role);
+router.get('/', getCompany);
+router.post('/', createCompany);
+export default router;

@@ -111,6 +111,7 @@ import {
   getLicensesEmployee,
   updateLicense,
 } from './licenses.controllers';
+import { createCompany, getCompany } from './companies.controller';
 
 // User Controllers
 export {
@@ -225,3 +226,5 @@ export {
   getLicensesEmployee,
   expiredLicenses,
 };
+//Companies Controllers
+export { createCompany, getCompany };
