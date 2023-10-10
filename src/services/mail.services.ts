@@ -205,6 +205,12 @@ class MailServices {
       return createReply;
     }
     //------------------------------------------------------------------
+    if (status === 'PROCESO') {
+      await prisma.messages.update({
+        where: { id: messageId },
+        data: { status },
+      });
+    }
     const newSender = await prisma.mail.upsert({
       where: {
         userId_messageId: {
@@ -229,14 +235,6 @@ class MailServices {
       where: { userId_messageId: { messageId, userId: senderId } },
       data: { type: 'SENDER', status: false, role: 'MAIN' },
     });
-    // const newReceiver = await prisma.mail.delete({
-    //   where: { userId_messageId: { messageId, userId: senderId } },
-    // });
-    //------------------------------------------------------------------
-    // await prisma.mail.update({
-    //   where: { userId_messageId: { userId: senderId, messageId } },
-    //   data: { status: false },
-    // });
     const createForward = await prisma.messageHistory.create({
       data: {
         title,
