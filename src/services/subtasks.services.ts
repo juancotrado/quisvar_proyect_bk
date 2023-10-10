@@ -94,14 +94,14 @@ class SubTasksServices {
     }
     if (option == 'apply') {
       const status = 'PROCESS';
-      const { days } = await this.find(subtaskId);
-      const hours = days * this.GMT;
-      const untilDate = new Date(this.today + hours);
+      // const { days } = await this.find(subtaskId);
+      // const hours = days * this.GMT;
+      // const untilDate = new Date(this.today + hours);
       return await prisma.subTasks.update({
         where: { id: subtaskId },
         data: {
           status,
-          users: { create: { userId, untilDate } },
+          users: { create: { userId } },
         },
         include: Queries.includeSubtask,
       });
@@ -141,16 +141,6 @@ class SubTasksServices {
     return updateTask;
   }
 
-  // static async updateHasPDF(id: SubTasks['id'], hasPDF: SubTasks['hasPDF']) {
-  //   if (!id) throw new AppError('Oops!,ID invalido', 400);
-  //   const updateStatusPDF = await prisma.subTasks.update({
-  //     where: { id },
-  //     data: { hasPDF },
-  //     include: Queries.includeSubtask,
-  //   });
-  //   return updateStatusPDF;
-  // }
-
   static async updateStatus(
     id: SubTasks['id'],
     { status }: SubTasks,
@@ -158,20 +148,64 @@ class SubTasksServices {
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findTask = await SubTasksServices.find(id);
-    if (findTask.status === 'INREVIEW' && status === 'PROCESS')
-      return await prisma.subTasks.update({
-        where: { id },
-        data: { status },
-        include: Queries.includeSubtask,
-      });
     const updateTaskStatus = await prisma.subTasks.update({
       where: { id },
       data: { status },
       include: Queries.includeSubtask,
     });
     const { item, name } = updateTaskStatus;
+    const subtaskId_userId = { subtaskId: id, userId: user.id };
+    //-------------------------------------------------------------------
+    if (findTask.status === 'INREVIEW' && status === 'PROCESS') {
+      const lastUser = await prisma.taskOnUsers.findFirst({
+        where: { subtaskId: id },
+        select: { userId: true },
+        orderBy: { assignedAt: 'desc' },
+      });
+      if (!lastUser) throw new AppError('No se pudo encontrar al usuario', 404);
+      const subtaskId_userId = { subtaskId: id, userId: lastUser.userId };
+      console.log(subtaskId_userId);
+      const patito = await prisma.subTasks.update({
+        where: { id },
+        data: {
+          status,
+          users: {
+            update: {
+              where: { subtaskId_userId },
+              data: {
+                status: true,
+                untilDate: new Date(),
+              },
+            },
+          },
+        },
+        include: Queries.includeSubtask,
+      });
+      // console.log(patito);
+      return patito;
+    }
+    //-------------------------------------------------------------------
+    if (status === 'PROCESS')
+      return await prisma.subTasks.update({
+        where: { id },
+        data: { users: { create: { userId: user.id } } },
+        include: Queries.includeSubtask,
+      });
+    //-------------------------------------------------------------------
+    if (status === 'UNRESOLVED')
+      return await prisma.subTasks.update({
+        where: { id },
+        data: { users: { delete: { subtaskId_userId } } },
+        include: Queries.includeSubtask,
+      });
+    //-------------------------------------------------------------------
     if (status === 'DONE') {
+      //--------------------------------paths----------------------------
       const path = await PathServices.subTask(id, 'UPLOADS');
+      const reviewPath = path.replace('projects', 'reviews');
+      const editablesPath = path.replace('projects', 'editables');
+      const dir = reviewPath.split('/').slice(0, 5).join('/');
+      //------------------------------------------------------------------
       const files = await prisma.files.findMany({
         where: {
           subTasksId: id,
@@ -179,40 +213,28 @@ class SubTasksServices {
           feedback: { comment: { equals: null } },
         },
       });
-      const reviewPath = path.replace('projects', 'reviews');
-      const dir = reviewPath.split('/').slice(0, 5).join('/');
+      //-------------------------------------------------------------------
       const _files = files.map(async (file, index) => {
         const ext = file.name.split('.').at(-1);
-        const _name = item + name + (index + 1) + '.' + ext;
+        const _name = item + name + `_${index + 1}` + '.' + ext;
+        if (['pdf', 'PDF'].includes(ext!)) {
+          //--------------------------------------------------------------
+          // await prisma.files.update({
+          //   where: { id: file.id },
+          //   data: { type: 'EDITABLES', name: _name, dir: editablesPath },
+          // });
+          copyFileSync(`${dir}/${file.name}`, `${editablesPath}/${_name}`);
+          //--------------------------------------------------------------
+        }
         await prisma.files.update({
           where: { id: file.id },
           data: { type: 'UPLOADS', name: _name, dir: path },
         });
+        //----------------------------------------------------------------
         renameSync(`${dir}/${file.name}`, `${path}/${_name}`);
       });
       return await Promise.all(_files).then(() => updateTaskStatus);
     }
-    if (status === 'PROCESS') {
-      return await prisma.subTasks.update({
-        where: { id },
-        data: { users: { create: { userId: user.id } } },
-        include: Queries.includeSubtask,
-      });
-    }
-    if (status === 'UNRESOLVED') {
-      const subtaskId_userId = { subtaskId: id, userId: user.id };
-      return await prisma.subTasks.update({
-        where: { id },
-        data: { users: { delete: { subtaskId_userId } } },
-        include: Queries.includeSubtask,
-      });
-    }
-    // if (status === 'LIQUIDATION') {
-    //   return await prisma.subTasks.findUnique({
-    //     where: { id },
-    //     include: Queries.includeSubtask,
-    //   });
-    // }
     return updateTaskStatus;
   }
 
@@ -242,7 +264,8 @@ class SubTasksServices {
         const parseFiles = await Promise.all(
           _files.map(async ({ dir: d, id: _id, name: n, ...file }, i) => {
             const { item: _i, name: _n } = updateSubtask;
-            const dir = file.type === 'UPLOADS' ? newPath : newEditable;
+            // const dir = file.type === 'UPLOADS' ? newPath : newEditable;
+            const dir = newPath;
             const ext = `.${n.split('.').at(-1)}`;
             const name = _i + _n + `_${i + 1}${ext}`;
             await prisma.files
@@ -250,10 +273,16 @@ class SubTasksServices {
                 where: { id: _id },
                 data: { dir, name },
               })
-              .then(() => renameSync(`${dir}/${n}`, `${dir}/${name}`));
+              .then(() => {
+                if (['.pdf', '.PDF'].includes(ext) && newEditable) {
+                  renameSync(`${newEditable}/${n}`, `${newEditable}/${name}`);
+                }
+                renameSync(`${newPath}/${n}`, `${newPath}/${name}`);
+              });
             return { dir, name, ...file };
           })
         );
+        console.log(parseFiles);
         //-------------------------------------------------------------------------------
         const files = parseFiles.map(f => ({ id: 0, ...f }));
         return { item, files, ...subtask };

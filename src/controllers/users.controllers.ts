@@ -4,6 +4,7 @@ import { userProfilePick } from '../utils/format.server';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
 import mv from 'mv';
+import { copyFileSync } from 'fs';
 
 export const showUsers = async (
   req: Request,
@@ -79,11 +80,9 @@ export const createUser = async (
       cv: cv.filename,
       declaration: declaration.filename,
     });
-    mv(
+    copyFileSync(
       `public/cv/${declaration.filename}`,
-      `public/declaration/${declaration.filename}`,
-      { mkdirp: true },
-      next
+      `public/declaration/${declaration.filename}`
     );
     res.status(201).json(query);
   } catch (error) {

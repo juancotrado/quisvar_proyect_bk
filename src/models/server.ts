@@ -79,7 +79,7 @@ class Server {
   }
 
   middlewares() {
-    this.app.use('/static', express.static('uploads/projects'));
+    this.app.use('/projects', express.static('uploads/projects'));
     this.app.use('/models', express.static('uploads/models'));
     this.app.use('/reviews', express.static('uploads/reviews'));
     this.app.use('/file-user', express.static('public'));

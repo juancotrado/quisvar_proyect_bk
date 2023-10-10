@@ -31,48 +31,16 @@ class ProjectsServices {
     return findProject;
   }
 
-  static async create(
-    // {
-    // specialistsInfo,
-    // companyInfo,
-    // stageName,
-    // consortiumInfo,
-    //   ...otherValues
-    // }
-    {
-      CUI,
-      department,
-      description,
-      district,
-      name,
-      percentage,
-      province,
-      typeSpecialityId,
-      userId,
-    }: projectPick
-  ) {
-    // let stages, specialists, company, consortium;
-    // if (specialistsInfo)
-    //   specialists = { createMany: { data: specialistsInfo } };
-    // if (companyInfo) company = { create: companyInfo };
-    // if (consortiumInfo) {
-    //   const { manager, name, companies } = consortiumInfo;
-    //   consortium = {
-    //     create: {
-    //       manager,
-    //       name,
-    //       companies: { createMany: { data: companies } },
-    //     },
-    //   };
-    // }
-    // if (stageName) stages = { create: { name: stageName } };
-    // const data = {
-    //   ...otherValues,
-    // specialists,
-    // company,
-    // consortium,
-    // stages,
-    // };
+  static async create({
+    CUI,
+    department,
+    description,
+    district,
+    name,
+    percentage,
+    province,
+    typeSpecialityId,
+  }: projectPick) {
     const newProject = await prisma.projects.create({
       data: {
         CUI,
@@ -83,41 +51,13 @@ class ProjectsServices {
         percentage,
         province,
         typeSpecialityId,
-        userId,
       },
     });
     return newProject;
   }
 
-  static async update(
-    id: Projects['id'],
-    // {
-    //   // specialistsInfo,
-    //   // companyInfo,
-    //   // consortiumInfo,
-    //   ...otherValues
-    // }
-    data: UpdateProjectPick
-  ) {
+  static async update(id: Projects['id'], data: UpdateProjectPick) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    // let specialists, company, consortium;
-    // if (specialistsInfo)
-    //   specialists = {
-    //     deleteMany: { projectsId: id },
-    //     createMany: { data: specialistsInfo },
-    //   };
-    // if (companyInfo) company = { delete: true, create: companyInfo };
-    // if (consortiumInfo) {
-    // const { manager, name, companies } = consortiumInfo;
-    // consortium = {
-    //   delete: true,
-    //   create: {
-    //     manager,
-    //     name,
-    //     companies: { createMany: { data: companies } },
-    //   },
-    // };
-    // }
     const updateProject = await prisma.projects.update({
       where: { id },
       data,
