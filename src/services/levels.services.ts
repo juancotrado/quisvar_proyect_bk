@@ -202,12 +202,13 @@ class LevelsServices {
     });
     //-----------------------update_some_levels----------------------------------
     const { rootItem } = getRootItem(_item);
+    const _rootItem = rootItem ? rootItem + '.' : rootItem;
     const updateList = await this.updateBlock(
       getList,
       rootLevel,
       rootId,
       rootPath,
-      rootItem + '.',
+      _rootItem,
       getInfoLevel.index
     );
     //-------------------------return_delete_dir---------------------------------

@@ -56,20 +56,6 @@ class UsersServices {
       const list = subTaskGeneral.map(s => s.subtask);
       return list;
     }
-    const subtaskByIndexTask = await prisma.subTasks.findMany({
-      where: {
-        users: {
-          every: { userId },
-        },
-      },
-      include: {
-        users: {
-          select: {
-            assignedAt: true,
-          },
-        },
-      },
-    });
     const subtaskByTask = await prisma.subTasks.findMany({
       where: {
         users: {
@@ -84,43 +70,10 @@ class UsersServices {
         },
       },
     });
-    const subtaskByTask2 = await prisma.subTasks.findMany({
-      where: {
-        users: {
-          every: { userId },
-        },
-      },
-      include: {
-        users: {
-          select: {
-            assignedAt: true,
-          },
-        },
-      },
-    });
-    const subtaskByTask3 = await prisma.subTasks.findMany({
-      where: {
-        users: {
-          every: { userId },
-        },
-      },
-      include: {
-        users: {
-          select: {
-            assignedAt: true,
-          },
-        },
-      },
-    });
-    const subTasksList = [
-      ...subtaskByIndexTask,
-      ...subtaskByTask,
-      ...subtaskByTask2,
-      ...subtaskByTask3,
-    ];
-    if (!subTasksList)
+
+    if (!subtaskByTask)
       throw new AppError('No se pudo encontrar las tareas', 404);
-    return subTasksList;
+    return subtaskByTask;
   }
 
   static async create({
