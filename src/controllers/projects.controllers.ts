@@ -60,7 +60,7 @@ export const createProject = async (
 ) => {
   try {
     const { body } = req;
-    const query = await ProjectsServices.create({ ...body, userId: 1 });
+    const query = await ProjectsServices.create(body);
     const path = await PathServices.project(query.id, 'UPLOADS');
     const projectName = query.id;
     createFolders();
