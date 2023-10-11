@@ -53,6 +53,8 @@ class StageServices {
     const list = LevelsServices.findList(getList, 0, 0);
     const nextLevel = calculateAndUpdateDataByLevel(list);
     const total = sumValues(nextLevel, 'total');
+    const balance = sumValues(nextLevel, 'balance');
+    const spending = sumValues(nextLevel, 'spending');
     const _percentage = sumValues(nextLevel, 'percentage') / nextLevel.length;
     const percentage = Math.round(_percentage * 100) / 100;
     const totalValues = sumPriceByStage(getList);
@@ -64,6 +66,8 @@ class StageServices {
       total,
       rootTypeItem,
       ...totalValues,
+      balance,
+      spending,
       nextLevel,
     };
     // const newFindStage = findStage.levels.map(async level => {
@@ -137,7 +141,6 @@ class StageServices {
     const duplicated = await this.duplicate(projectId, name, 'ROOT');
     if (duplicated) throw new AppError('Ops!,Nombre repetido', 400);
     const path = await PathServices.project(projectId, 'UPLOADS');
-    console.log(path);
     if (!existsSync(path)) throw new AppError('Ops!,carpeta no existe', 404);
     const createStage = await prisma.stages.create({
       data: { name, projectId },
