@@ -109,7 +109,7 @@ class LevelsServices {
     const item = `${newRootItem}${_type}.`;
     //--------------------------find_user------------------------------------------
     const _user = () => {
-      if (userId && project) return { connect: { id: userId } };
+      if (userId && (project || isProject)) return { connect: { id: userId } };
       return undefined;
     };
     //-----------------------------------------------------------------------------
