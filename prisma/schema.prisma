@@ -265,8 +265,8 @@ model AreaSpecialty {
 }
 
 model Specialists {
-  id        Int     @id @default(autoincrement())
-  dni       String  @db.VarChar(8)
+  id        Int             @id @default(autoincrement())
+  dni       String          @unique @db.VarChar(8)
   firstName String
   lastName  String
   phone     String

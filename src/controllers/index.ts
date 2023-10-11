@@ -112,6 +112,11 @@ import {
   updateLicense,
 } from './licenses.controllers';
 import { createCompany, getCompany } from './companies.controller';
+import {
+  createSpecialist,
+  getSpecialist,
+  getSpecialistByDNI,
+} from './specialist.controller';
 
 // User Controllers
 export {
@@ -228,3 +233,5 @@ export {
 };
 //Companies Controllers
 export { createCompany, getCompany };
+//Specialists Controllers
+export { createSpecialist, getSpecialist, getSpecialistByDNI };

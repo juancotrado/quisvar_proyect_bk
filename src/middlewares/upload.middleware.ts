@@ -54,6 +54,22 @@ const storageFileUser = multer.diskStorage({
     cb(null, Date.now() + '$$' + originalname);
   },
 });
+const storageFileSpecialist = multer.diskStorage({
+  destination: function (req, file, cb) {
+    let uploadPath = 'public/cv';
+    if (file.fieldname === 'fileAgreement') {
+      uploadPath = `public/agreement`;
+    }
+    if (!existsSync(uploadPath)) {
+      mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: function (req, files, cb) {
+    const { originalname } = files;
+    cb(null, Date.now() + '$$' + originalname);
+  },
+});
 
 const storageGeneralFiles = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -163,7 +179,9 @@ export const uploadFileMail = multer({
 export const uploadFileVoucher = multer({
   storage: storageFileVoucher,
 });
-
+export const uploadFileSpecialist = multer({
+  storage: storageFileSpecialist,
+});
 export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
   try {
     res.status(200).json({ message: 'Archivo subido exitosamente' });
