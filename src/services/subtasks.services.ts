@@ -234,7 +234,8 @@ class SubTasksServices {
         //----------------------------------------------------------------
         renameSync(`${dir}/${file.name}`, `${path}/${_name}`);
       });
-      return await Promise.all(_files).then(() => updateTaskStatus);
+      await Promise.all(_files);
+      return SubTasksServices.find(id);
     }
     return updateTaskStatus;
   }

@@ -48,6 +48,7 @@ class Queries {
         percentage: true,
         assignedAt: true,
         untilDate: true,
+        status: true,
         user: this.selectProfileUser,
       },
     },
