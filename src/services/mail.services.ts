@@ -78,6 +78,7 @@ class MailServices {
       include: {
         users: {
           select: {
+            userInit: true,
             userId: true,
             type: true,
             role: true,
@@ -100,9 +101,11 @@ class MailServices {
         },
       },
     });
+
     if (!getMessage)
       throw new AppError('No se pudo encontrar datos del mensaje', 404);
-    return getMessage;
+    const userInit = getMessage.users.find(user => user.userInit);
+    return { ...getMessage, userInit };
   }
 
   static async getMessagePreview(id: Messages['id']) {
@@ -150,7 +153,7 @@ class MailServices {
           createMany: {
             data: [
               ...secondaryReceiver,
-              { userId: senderId, role, type: typeMail },
+              { userId: senderId, role, type: typeMail, userInit: true },
               { userId: receiverId, role, status },
             ],
             skipDuplicates: true,

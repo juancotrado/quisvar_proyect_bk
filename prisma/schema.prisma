@@ -317,7 +317,7 @@ model Mail {
   status     Boolean     @default(false)
   role       MessageRole @default(SECONDARY)
   assignedAt DateTime    @default(now())
-
+  userInit   Boolean     @default(false)
   @@id([userId, messageId])
 }
 
