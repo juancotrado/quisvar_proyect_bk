@@ -8,22 +8,34 @@ class SpecialistServices {
     return newSpecialist;
   }
   static async getSpecialist() {
-    const companies = await prisma.specialists.findMany({
+    const specialist = await prisma.specialists.findMany({
       orderBy: {
         lastName: 'asc',
       },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        dni: true,
+      },
     });
-    return companies;
+    return specialist;
   }
   static async getSpecialistByDNI(dni: Specialists['dni']) {
-    const companies = await prisma.specialists.findMany({
+    const specialist = await prisma.specialists.findMany({
       where: {
         dni: {
           startsWith: dni,
         },
       },
     });
-    return companies;
+    return specialist;
+  }
+  static async getSpecialistById(id: Specialists['id']) {
+    const specialist = await prisma.specialists.findFirst({
+      where: { id },
+    });
+    return specialist;
   }
 }
 export default SpecialistServices;

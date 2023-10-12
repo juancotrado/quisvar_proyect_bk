@@ -116,6 +116,7 @@ import {
   createSpecialist,
   getSpecialist,
   getSpecialistByDNI,
+  getSpecialistById,
 } from './specialist.controller';
 
 // User Controllers
@@ -234,4 +235,9 @@ export {
 //Companies Controllers
 export { createCompany, getCompany };
 //Specialists Controllers
-export { createSpecialist, getSpecialist, getSpecialistByDNI };
+export {
+  createSpecialist,
+  getSpecialist,
+  getSpecialistByDNI,
+  getSpecialistById,
+};

@@ -276,6 +276,8 @@ model Specialists {
   cv        String?
   area      AreaSpecialty[]
   price     String
+  CIP       String
+  email     String
 }
 
 model List {
