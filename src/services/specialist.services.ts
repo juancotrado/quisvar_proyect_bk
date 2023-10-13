@@ -34,6 +34,27 @@ class SpecialistServices {
   static async getSpecialistById(id: Specialists['id']) {
     const specialist = await prisma.specialists.findFirst({
       where: { id },
+      select: {
+        firstName: true,
+        lastName: true,
+        career: true,
+        CIP: true,
+        dni: true,
+        email: true,
+        agreement: true,
+        cv: true,
+        projects: {
+          include: {
+            project: {
+              select: {
+                CUI: true,
+                name: true,
+                stages: true,
+              },
+            },
+          },
+        },
+      },
     });
     return specialist;
   }

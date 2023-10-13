@@ -99,6 +99,7 @@ model Projects {
   // company          Company?
   // consortium       Consortium?
   // specialists      PersonBussiness[]
+  specialists  ProjectSpecialist[] //
 }
 
 model Stages {
@@ -278,8 +279,17 @@ model Specialists {
   price     String
   CIP       String
   email     String
+  projects  ProjectSpecialist[]
 }
+model ProjectSpecialist {
+  id           Int    @id @default(autoincrement())
+  specialistId Int
+  projectId    Int
+  specialist   Specialists @relation(fields: [specialistId], references: [id])
+  project      Projects @relation(fields: [projectId], references: [id])
 
+  @@unique([specialistId, projectId])
+}
 model List {
   id        Int           @id @default(autoincrement())
   title     String?
