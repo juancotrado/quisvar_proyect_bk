@@ -104,24 +104,15 @@ class LicenseServices {
     const licenses = await prisma.licenses.findMany({
       where: {
         status: 'ACTIVE',
-        untilDate: {
-          lt: gmtMinus5Time,
-        },
+        untilDate: { lt: gmtMinus5Time },
       },
-      select: {
-        id: true,
-      },
+      select: { id: true },
     });
-    for (const license of licenses) {
-      await prisma.licenses.update({
-        where: {
-          id: license.id,
-        },
-        data: {
-          status: 'INACTIVE',
-        },
-      });
-    }
+    const listIds = licenses.map(({ id }) => id);
+    await prisma.licenses.updateMany({
+      where: { id: { in: listIds } },
+      data: { status: 'INACTIVE' },
+    });
     return licenses;
   }
 }

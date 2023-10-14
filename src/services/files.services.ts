@@ -43,8 +43,7 @@ class FilesServices {
   static async create(
     subTasksId: Files['subTasksId'],
     filename: string,
-    type: Files['type'],
-    userId: Users['id']
+    type: Files['type']
   ) {
     const subTask = await prisma.subTasks.findUnique({
       where: { id: subTasksId },
@@ -57,7 +56,6 @@ class FilesServices {
         type,
         subTasksId,
         name: filename,
-        userId,
       },
     });
     return newFile;

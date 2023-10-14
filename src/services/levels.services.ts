@@ -7,11 +7,17 @@ import {
   filterLevelList,
   getRootItem,
   getRootPath,
+  initialProfile,
   numberToConvert,
   percentageSubTasks,
   sumValues,
 } from '../utils/tools';
-import { DuplicateLevel, GetFilterLevels, UpdateLevelBlock } from 'types/types';
+import {
+  DuplicateLevel,
+  GetFilterLevels,
+  UpdateLevelBlock,
+  usersCount,
+} from 'types/types';
 import { existsSync, renameSync } from 'fs';
 import Queries from '../utils/queries';
 import PathServices from './paths.services';
@@ -34,7 +40,11 @@ class LevelsServices {
           orderBy: { index: 'asc' },
           include: {
             users: {
-              select: { percentage: true, user: Queries.selectProfileUser },
+              select: {
+                percentage: true,
+                userId: true,
+                user: Queries.selectProfileUser,
+              },
             },
           },
         },
@@ -342,7 +352,8 @@ class LevelsServices {
   static findList(
     array: GetFilterLevels[],
     _rootId: number,
-    _rootLevel: number
+    _rootLevel: number,
+    percentageProject?: number
   ) {
     const findList = array.filter(
       ({ rootId, rootLevel }) => rootId === _rootId && rootLevel === _rootLevel
@@ -356,16 +367,30 @@ class LevelsServices {
         balance: 0,
         price: 0,
         days: 0,
+        listUsers: [],
         percentage: 0,
         total: 0,
         ...value,
       };
       if (subTasks && subTasks.length) {
-        const subtasks = percentageSubTasks(subTasks, 30);
+        const subtasks = percentageSubTasks(subTasks, percentageProject || 30);
         const price = sumValues(subtasks, 'price');
         const days = sumValues(subtasks, 'days');
         const spending = sumValues(subtasks, 'spending');
         const percentage = sumValues(subtasks, 'percentage') / subTasks.length;
+        //---------------------------------------------------------------------
+        const list = subtasks.map(({ listUsers }) => listUsers).flat(2);
+        const listUsers = list.reduce(
+          (acc: typeof list, { count, userId, ...data }) => {
+            const exist = acc.findIndex(u => u.userId === userId);
+            exist > 0
+              ? (acc[exist].count += count)
+              : acc.push({ userId, count, ...data });
+            return acc;
+          },
+          []
+        );
+        //---------------------------------------------------------------------
         const total = subTasks.length;
         const balance = price - spending;
         data = {
@@ -374,6 +399,7 @@ class LevelsServices {
           balance,
           days,
           percentage,
+          listUsers,
           total,
           ...value,
           subTasks: subtasks,

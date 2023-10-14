@@ -2,6 +2,7 @@ import AppError from '../utils/appError';
 import { Projects, Stages, SubTasks, prisma } from '../utils/prisma.server';
 import {
   calculateAndUpdateDataByLevel,
+  initialProfile,
   sumPriceByStage,
   sumValues,
 } from '../utils/tools';
@@ -9,6 +10,7 @@ import LevelsServices from './levels.services';
 import { existsSync } from 'fs';
 import Queries from '../utils/queries';
 import PathServices from './paths.services';
+import { usersCount } from 'types/types';
 
 class StageServices {
   static async findMany(projectId: Projects['id']) {
@@ -18,17 +20,19 @@ class StageServices {
     });
     return findStages;
   }
+
   static async findShort(id: Stages['id']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const findStage = await prisma.stages.findUnique({ where: { id } });
     if (!findStage) throw new AppError('Oops!, ID invalido', 400);
     return findStage;
   }
+
   static async find(id: Stages['id'], status?: SubTasks['status']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const findStage = await prisma.stages.findUnique({
       where: { id },
-      include: { project: { select: { name: true } } },
+      include: { project: { select: { name: true, percentage: true } } },
     });
     if (!findStage)
       throw new AppError('Oops!,No se pudo encontrar la etapa', 400);
@@ -44,18 +48,51 @@ class StageServices {
           orderBy: { index: 'asc' },
           include: {
             users: {
-              select: { percentage: true, user: Queries.selectProfileUser },
+              select: {
+                percentage: true,
+                userId: true,
+                user: Queries.selectProfileUser,
+              },
             },
           },
         },
       },
     });
-    const list = LevelsServices.findList(getList, 0, 0);
+    const list = LevelsServices.findList(
+      getList,
+      0,
+      0,
+      findStage.project.percentage
+    );
     const nextLevel = calculateAndUpdateDataByLevel(list);
     const total = sumValues(nextLevel, 'total');
     const balance = sumValues(nextLevel, 'balance');
     const spending = sumValues(nextLevel, 'spending');
     const _percentage = sumValues(nextLevel, 'percentage') / nextLevel.length;
+    const lists = nextLevel.map(l => l.listUsers).flat(2);
+    const listUsers: usersCount[] = lists.reduce(
+      (acc: typeof list, { count, userId, ...data }) => {
+        const exist = acc.findIndex(u => u.userId === userId);
+        exist > 0
+          ? (acc[exist].count += count)
+          : acc.push({ userId, count, ...data });
+        return acc;
+      },
+      []
+    );
+    // const listIdUsers = listUsers.map(({ userId }) => userId);
+    // const pato = await prisma.profiles.findMany({
+    //   where: { userId: { in: listIdUsers } },
+    //   select: { userId: true, firstName: true, lastName: true },
+    // });
+    // const combinedData = pato.map(user => {
+    //   const matchingCount = listUsers.find(
+    //     count => count.userId === user.userId
+    //   );
+    //   const count = matchingCount ? matchingCount.count : 0;
+    //   return { ...user, count };
+    // });
+    // console.log(combinedData);
     const percentage = Math.round(_percentage * 100) / 100;
     const totalValues = sumPriceByStage(getList);
     return {
@@ -67,6 +104,7 @@ class StageServices {
       rootTypeItem,
       ...totalValues,
       balance,
+      listUsers,
       spending,
       nextLevel,
     };
@@ -137,6 +175,7 @@ class StageServices {
     const list = getStages.map(({ name }) => name);
     return list.includes(name);
   }
+
   static async create({ name, projectId }: Stages) {
     const duplicated = await this.duplicate(projectId, name, 'ROOT');
     if (duplicated) throw new AppError('Ops!,Nombre repetido', 400);
