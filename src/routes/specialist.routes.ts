@@ -12,7 +12,7 @@ const router = Router();
 router.use(authenticateHandler);
 router.use(_admin_role);
 router.get('/', getSpecialist);
-router.get('/:dni', getSpecialistByDNI);
+router.get('/dni/:dni', getSpecialistByDNI);
 router.get('/information/:id', getSpecialistById);
 router.post(
   '/',

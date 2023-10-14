@@ -26,3 +26,16 @@ export const getCompany = async (
     next(error);
   }
 };
+export const getCompaniesById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const query = await CompaniesServices.getCompaniesById(+id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};

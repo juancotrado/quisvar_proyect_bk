@@ -111,7 +111,11 @@ import {
   getLicensesEmployee,
   updateLicense,
 } from './licenses.controllers';
-import { createCompany, getCompany } from './companies.controller';
+import {
+  createCompany,
+  getCompaniesById,
+  getCompany,
+} from './companies.controller';
 import {
   createSpecialist,
   getSpecialist,
@@ -233,7 +237,7 @@ export {
   expiredLicenses,
 };
 //Companies Controllers
-export { createCompany, getCompany };
+export { createCompany, getCompany, getCompaniesById };
 //Specialists Controllers
 export {
   createSpecialist,
