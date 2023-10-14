@@ -17,12 +17,12 @@ export const uploadFile = async (
 ) => {
   try {
     const { id } = req.params;
-    const userInfo: UserType = res.locals.userInfo;
+    // const userInfo: UserType = res.locals.userInfo;
     const status = req.query.status as Files['type'];
     const _subtask_id = parseInt(id);
     if (!req.file) return;
     const { filename } = req.file;
-    await FilesServices.create(_subtask_id, filename, status, userInfo.id);
+    await FilesServices.create(_subtask_id, filename, status);
     const query = await SubTasksServices.find(_subtask_id);
     res.status(201).json(query);
   } catch (error) {
