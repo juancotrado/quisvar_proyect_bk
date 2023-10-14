@@ -111,6 +111,7 @@ export const createMessage = async (
   try {
     const userInfo: UserType = res.locals.userInfo;
     const senderId = userInfo.id;
+    //--------------------------------------------------------------------------
     const attempt = `${new Date().getTime()}`;
     if (!req.files)
       throw new AppError('Oops!, no se pudo subir los archivos', 400);
@@ -121,6 +122,7 @@ export const createMessage = async (
       renameSync(file.path, path + '/' + name);
       return { name, path, attempt };
     });
+    //--------------------------------------------------------------------------
     const { body } = req;
     const data = JSON.parse(body.data) as PickMail;
     const query = await MailServices.create({ ...data, senderId }, parseFiles);
@@ -186,23 +188,25 @@ export const createVoucher = async (
 ) => {
   try {
     const { id } = req.params;
-    const { body } = req;
     const userInfo: UserType = res.locals.userInfo;
     const { id: senderId } = userInfo;
     const _messageId = parseInt(id);
-    //-----------------------------------------------------------------------------
-    if (!req.file)
+    //--------------------------------------------------------------------------
+    if (!req.files)
       throw new AppError('Oops!, no se pudo subir los archivos', 400);
-    const { filename, path: FilePath } = req.file as Express.Multer.File;
-    const path = `public/voucher/${id}`;
-    const voucher = path + '/' + filename;
+    const files = req.files as Express.Multer.File[];
+    const path = `public/voucher/${senderId}`;
     if (!existsSync(path)) mkdirSync(path, { recursive: true });
-    renameSync(FilePath, path + '/' + filename);
-    //-----------------------------------------------------------------------------
-    const query = await MailServices.createVoucher(_messageId, {
-      senderId,
-      voucher,
+    const parseFiles = files.map(({ filename: name, ...file }) => {
+      renameSync(file.path, path + '/' + name);
+      return { name, path };
     });
+    //--------------------------------------------------------------------------
+    const query = await MailServices.createVoucher(
+      _messageId,
+      { senderId },
+      parseFiles
+    );
     res.status(200).json(query);
   } catch (error) {
     next(error);

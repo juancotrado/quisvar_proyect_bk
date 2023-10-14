@@ -1,4 +1,5 @@
 import {
+  FilesPayment,
   Mail,
   MessageStatus,
   MessageType,
@@ -214,7 +215,7 @@ class MailServices {
         data: { status },
       });
     }
-    const newSender = await prisma.mail.upsert({
+    await prisma.mail.upsert({
       where: {
         userId_messageId: {
           messageId,
@@ -365,18 +366,24 @@ class MailServices {
   }
   static async createVoucher(
     id: Messages['id'],
-    { voucher, senderId }: Pick<Messages, 'voucher'> & { senderId: number }
+    { senderId }: { senderId: number },
+    files: Pick<FilesPayment, 'name' | 'path'>[]
   ) {
     //------------------------------------------------------------------
     const getReceiver = await prisma.mail.findFirst({
-      where: { messageId: id, type: 'SENDER', role: 'MAIN' },
+      where: { messageId: id, userInit: true },
     });
     if (!getReceiver) throw new AppError('error', 400);
     const { userId: receiverId } = getReceiver;
     //------------------------------------------------------------------
     const newVoucher = await prisma.messages.update({
       where: { id },
-      data: { voucher, status: 'POR_PAGAR' },
+      data: {
+        status: 'POR_PAGAR',
+        filesPay: {
+          create: { files: { createMany: { data: files } } },
+        },
+      },
     });
     //------------------------------------------------------------------
     await prisma.mail.update({
@@ -388,7 +395,6 @@ class MailServices {
       data: { type: 'RECEIVER' },
     });
     //------------------------------------------------------------------
-
     return newVoucher;
   }
   static async updateVoucher(
@@ -417,10 +423,10 @@ class MailServices {
       data: { type: 'RECEIVER' },
     });
     //------------------------------------------------------------------
-    if (status == 'FINALIZADO' && denied.voucher) {
-      unlinkSync(denied.voucher);
-      await prisma.messages.update({ where: { id }, data: { voucher: null } });
-    }
+    // if (status == 'FINALIZADO' && denied.voucher) {
+    //   unlinkSync(denied.voucher);
+    //   await prisma.messages.update({ where: { id }, data: { voucher: null } });
+    // }
     return denied;
   }
 }
