@@ -9,18 +9,17 @@ datasource db {
 }
 
 model Users {
-  id           Int              @id @default(autoincrement())
-  status       Boolean          @default(false)
-  role         UserRole         @default(EMPLOYEE)
+  id           Int                @id @default(autoincrement())
+  status       Boolean            @default(false)
+  role         UserRole           @default(EMPLOYEE)
   password     String
-  email        String           @unique
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  email        String             @unique
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
   contract     String?
   cv           String?
   declaration  String?
   profile      Profiles?
-  files        Files[]
   project      Projects[]
   subTasks     TaskOnUsers[]
   Levels       Levels[]
@@ -28,7 +27,7 @@ model Users {
   stages       Stages[]
   message      Mail[]
   messageReply MessageHistory[]
-  feedbacks    Feedback[]
+  feedbacks    UsersOnFeedbacks[]
 }
 
 model GeneralFiles {
@@ -77,29 +76,29 @@ model TypeSpecialities {
 }
 
 model Projects {
-  id               Int              @id @default(autoincrement())
+  id               Int                 @id @default(autoincrement())
   CUI              String
-  name             String           @unique
+  name             String              @unique
   description      String
   department       String
   province         String
   district         String
-  percentage       Int              @default(30)
+  percentage       Int                 @default(30)
   // startDate        DateTime          @default(now())
   // untilDate        DateTime
   // status           Boolean           @default(false)
   // unique           Boolean           @default(false)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
   userId           Int?
   typeSpecialityId Int
-  typeSpeciality   TypeSpecialities @relation(fields: [typeSpecialityId], references: [id])
-  moderator        Users?           @relation(fields: [userId], references: [id])
+  typeSpeciality   TypeSpecialities    @relation(fields: [typeSpecialityId], references: [id])
+  moderator        Users?              @relation(fields: [userId], references: [id])
   stages           Stages[]
   // company          Company?
   // consortium       Consortium?
   // specialists      PersonBussiness[]
-  specialists  ProjectSpecialist[] //
+  specialists      ProjectSpecialist[] //
 }
 
 model Stages {
@@ -180,22 +179,32 @@ model SubTasks {
 }
 
 model Feedback {
-  id         Int      @id @default(autoincrement())
+  id         Int                @id @default(autoincrement())
   comment    String?
-  status     Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  status     Boolean            @default(false)
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  percentage Int                @default(0)
   subTasksId Int
-  userId     Int
-  user       Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subTasks   SubTasks @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
+  subTasks   SubTasks           @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
   files      Files[]
+  users      UsersOnFeedbacks[]
+}
+
+model UsersOnFeedbacks {
+  userId     Int
+  feedbackId Int
+  feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  user       Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userMain   Boolean  @default(false)
+  assignedAt DateTime @default(now())
+
+  @@id([userId, feedbackId])
 }
 
 model Files {
   id         Int       @id @default(autoincrement())
   name       String
-  userId     Int
   dir        String?
   type       FileTypes
   subTasksId Int
@@ -203,7 +212,6 @@ model Files {
   assignedAt DateTime  @default(now())
   feedback   Feedback? @relation(fields: [feedbackId], references: [id])
   subTasks   SubTasks  @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
-  user       Users     @relation(fields: [userId], references: [id])
 }
 
 model PersonBussiness {
@@ -266,8 +274,8 @@ model AreaSpecialty {
 }
 
 model Specialists {
-  id        Int             @id @default(autoincrement())
-  dni       String          @unique @db.VarChar(8)
+  id        Int                 @id @default(autoincrement())
+  dni       String              @unique @db.VarChar(8)
   firstName String
   lastName  String
   phone     String
@@ -281,15 +289,17 @@ model Specialists {
   email     String
   projects  ProjectSpecialist[]
 }
+
 model ProjectSpecialist {
-  id           Int    @id @default(autoincrement())
+  id           Int         @id @default(autoincrement())
   specialistId Int
   projectId    Int
   specialist   Specialists @relation(fields: [specialistId], references: [id])
-  project      Projects @relation(fields: [projectId], references: [id])
+  project      Projects    @relation(fields: [projectId], references: [id])
 
   @@unique([specialistId, projectId])
 }
+
 model List {
   id        Int           @id @default(autoincrement())
   title     String?
@@ -330,6 +340,7 @@ model Mail {
   role       MessageRole @default(SECONDARY)
   assignedAt DateTime    @default(now())
   userInit   Boolean     @default(false)
+
   @@id([userId, messageId])
 }
 
@@ -338,7 +349,7 @@ model Messages {
   title       String
   header      String           @default("")
   description String
-  voucher     String?
+  filesPay    Payment[]
   status      MessageStatus    @default(PROCESO)
   type        MessageType      @default(INFORME)
   files       FilesMessage[]
@@ -369,6 +380,23 @@ model FilesMessage {
   messageId Int?
   message   Messages? @relation(fields: [messageId], references: [id])
   createdAt DateTime  @default(now())
+}
+
+model Payment {
+  id        Int            @id @default(autoincrement())
+  createdAt DateTime       @default(now())
+  messageId Int?
+  message   Messages?      @relation(fields: [messageId], references: [id])
+  files     FilesPayment[]
+}
+
+model FilesPayment {
+  id        Int      @id @default(autoincrement())
+  name      String
+  path      String
+  createdAt DateTime @default(now())
+  paymentId Int?
+  payment   Payment? @relation(fields: [paymentId], references: [id])
 }
 
 model FilesMessageHistory {

@@ -38,8 +38,10 @@ export const editFeedback = async (
   next: NextFunction
 ) => {
   try {
+    const userInfo: UserType = res.locals.userInfo;
+    const userId = userInfo.id;
     const { body } = req;
-    const query = await FeedBackServices.update(body);
+    const query = await FeedBackServices.update({ ...body, userId });
     res.status(201).json(query);
   } catch (error) {
     next(error);
