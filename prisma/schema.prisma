@@ -77,29 +77,29 @@ model TypeSpecialities {
 }
 
 model Projects {
-  id               Int              @id @default(autoincrement())
+  id               Int                 @id @default(autoincrement())
   CUI              String
-  name             String           @unique
+  name             String              @unique
   description      String
   department       String
   province         String
   district         String
-  percentage       Int              @default(30)
+  percentage       Int                 @default(30)
   // startDate        DateTime          @default(now())
   // untilDate        DateTime
   // status           Boolean           @default(false)
   // unique           Boolean           @default(false)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
   userId           Int?
   typeSpecialityId Int
-  typeSpeciality   TypeSpecialities @relation(fields: [typeSpecialityId], references: [id])
-  moderator        Users?           @relation(fields: [userId], references: [id])
+  typeSpeciality   TypeSpecialities    @relation(fields: [typeSpecialityId], references: [id])
+  moderator        Users?              @relation(fields: [userId], references: [id])
   stages           Stages[]
   // company          Company?
   // consortium       Consortium?
   // specialists      PersonBussiness[]
-  specialists  ProjectSpecialist[] //
+  specialists      ProjectSpecialist[] //
 }
 
 model Stages {
@@ -258,16 +258,19 @@ model Companies {
 }
 
 model AreaSpecialty {
-  id             Int         @id @default(autoincrement())
-  areaSpecialty  String?
-  areaExperience String?
-  specialistId   Int         @unique
-  specialist     Specialists @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+  id            Int         @id @default(autoincrement())
+  specialtyName String
+  institution   String
+  startDate     String?
+  untilDate     String?
+  file          String?
+  specialistId  Int         @unique
+  specialist    Specialists @relation(fields: [specialistId], references: [id], onDelete: Cascade)
 }
 
 model Specialists {
-  id        Int             @id @default(autoincrement())
-  dni       String          @unique @db.VarChar(8)
+  id        Int                 @id @default(autoincrement())
+  dni       String              @unique @db.VarChar(8)
   firstName String
   lastName  String
   phone     String
@@ -281,15 +284,17 @@ model Specialists {
   email     String
   projects  ProjectSpecialist[]
 }
+
 model ProjectSpecialist {
-  id           Int    @id @default(autoincrement())
+  id           Int         @id @default(autoincrement())
   specialistId Int
   projectId    Int
   specialist   Specialists @relation(fields: [specialistId], references: [id])
-  project      Projects @relation(fields: [projectId], references: [id])
+  project      Projects    @relation(fields: [projectId], references: [id])
 
   @@unique([specialistId, projectId])
 }
+
 model List {
   id        Int           @id @default(autoincrement())
   title     String?
@@ -330,6 +335,7 @@ model Mail {
   role       MessageRole @default(SECONDARY)
   assignedAt DateTime    @default(now())
   userInit   Boolean     @default(false)
+
   @@id([userId, messageId])
 }
 
