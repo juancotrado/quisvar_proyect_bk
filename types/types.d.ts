@@ -95,6 +95,7 @@ export interface Level {
   isArea: boolean;
   price: number;
   level: number;
+  listUsers: usersCount[];
   rootLevel: number;
   stagesId: number;
   userId: null;
@@ -142,6 +143,18 @@ export interface GetDuplicateLevels extends Levels {
 export interface SubTaskFilter extends SubTasks {
   users: {
     percentage: number;
+    userId: number;
+    user: {
+      id: number;
+      profile: {
+        firstName: string;
+        lastName: string;
+        dni: string;
+        phone: string | null;
+        degree: string | null;
+        description: string | null;
+      } | null;
+    };
   }[];
 }
 export interface SubTaskFiles extends SubTasks {
@@ -186,3 +199,10 @@ export type UpdateLevelBlock = Levels & {
     }[];
   }[];
 };
+
+export interface usersCount {
+  userId: number;
+  firstName?: string;
+  lastName?: string;
+  count: number;
+}

@@ -38,7 +38,7 @@ router.put('/:id', uploadFileMail.array('fileMail'), updateMessage);
 // router.get('/:id/subtasks', showSubtasksByIndexTask);
 router.patch(
   '/voucher/:id',
-  uploadFileVoucher.single('voucher'),
+  uploadFileVoucher.array('fileMail'),
   createVoucher
 );
 //MOD ROLE

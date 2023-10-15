@@ -48,10 +48,23 @@ class ReportsServices {
             description: true,
             price: true,
             name: true,
+            // feedBacks:{},
             Levels: {
               select: {
                 stages: {
                   select: {
+                    moderator: {
+                      select: {
+                        profile: {
+                          select: {
+                            userId: true,
+                            firstName: true,
+                            lastName: true,
+                            description: true,
+                          },
+                        },
+                      },
+                    },
                     project: {
                       select: {
                         id: true,

@@ -1,5 +1,5 @@
 import AppError from '../utils/appError';
-import { Feedback, SubTasks, prisma } from '../utils/prisma.server';
+import { Feedback, SubTasks, Users, prisma } from '../utils/prisma.server';
 import Queries from '../utils/queries';
 
 class FeedBackServices {
@@ -13,14 +13,13 @@ class FeedBackServices {
         comment: true,
         status: true,
         createdAt: true,
-        user: Queries.selectProfileShort,
+        // users: Queries.selectProfileShort,
         files: {
           select: {
             id: true,
             name: true,
             dir: true,
             type: true,
-            user: Queries.selectProfileShort,
           },
         },
       },
@@ -30,7 +29,8 @@ class FeedBackServices {
   static async create({
     userId,
     subTasksId,
-  }: Pick<Feedback, 'subTasksId' | 'userId'>) {
+    percentage,
+  }: Feedback & { userId: Users['id'] }) {
     const getFileList = await prisma.files.findMany({
       where: { subTasksId, type: 'REVIEW', feedback: { is: null } },
       select: { id: true },
@@ -40,17 +40,22 @@ class FeedBackServices {
     const newFeedBack = await prisma.feedback.create({
       data: {
         subTasksId,
-        userId,
+        percentage,
+        users: { create: { userId, userMain: true } },
         files: { connect: getFileList },
       },
     });
     return newFeedBack;
   }
-  static async update({ comment, id }: Feedback) {
+  static async update({
+    comment,
+    id,
+    userId,
+  }: Feedback & { userId: Users['id'] }) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateFeedback = await prisma.feedback.update({
       where: { id },
-      data: { comment },
+      data: { comment, users: { create: { userId } } },
     });
     return updateFeedback;
   }

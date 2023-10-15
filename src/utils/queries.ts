@@ -39,10 +39,11 @@ class Queries {
     },
     feedBacks: {
       include: {
-        files: this.includeFiles,
+        users: { include: { user: this.selectProfileUser } },
+        files: true,
       },
     },
-    files: this.includeFiles,
+    // files: this.includeFiles,
     users: {
       select: {
         percentage: true,

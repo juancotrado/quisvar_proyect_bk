@@ -13,12 +13,12 @@ import {
   ProjectDir,
   SubTaskFilter,
   UpdateLevelBlock,
+  usersCount,
 } from 'types/types';
 import { prisma } from './prisma.server';
 import AppError from './appError';
 import { PathServices } from '../services';
 import { existsSync } from 'fs';
-import PathLevelServices from '../services/path_levels.services';
 import bcrypt from 'bcryptjs';
 
 export const sumValues = (list: any[], label: string) => {
@@ -55,6 +55,22 @@ export const percentageSubTasks = (
 ) => {
   return listSubtask.map(({ users, ...subtask }) => {
     const percentage = sumValues(users, 'percentage');
+    const list = users.map(({ userId }) => userId);
+    const listUsers: usersCount[] = list.reduce(
+      (acc: typeof listUsers, userId) => {
+        const existingItem = acc.find(item => item.userId === userId);
+        if (existingItem) {
+          existingItem.count++;
+        } else {
+          const findUser = users.find(u => u.userId === userId);
+          const firstName = findUser?.user.profile?.firstName;
+          const lastName = findUser?.user.profile?.lastName;
+          acc.push({ userId, count: 1, firstName, lastName });
+        }
+        return acc;
+      },
+      []
+    );
     const spending =
       subtask.status === 'LIQUIDATION'
         ? subtask.price
@@ -66,6 +82,7 @@ export const percentageSubTasks = (
       percentage,
       spending,
       balance,
+      listUsers,
       users,
       ...subtask,
     };
@@ -217,6 +234,16 @@ export const calculateAndUpdateDataByLevel = (levels: Level[]) => {
     level.price = calculateSumTotal(level, 'price');
     level.days = calculateSumTotal(level, 'days');
     level.total = calculateSumTotal(level, 'total');
+    level.listUsers = calculateQuantityUser(level, 'listUsers');
+    //---------------------------------------------------------------------
+    // const listUsers = list.reduce((acc: typeof list, { count, userId }) => {
+    //   const exist = acc.findIndex(u => u.userId === userId);
+    //   exist > 0
+    //     ? (acc[exist].count += count)
+    //     : acc.push({ userId: userId, count: count });
+    //   return acc;
+    // }, []);
+    //---------------------------------------------------------------------
     // level.percentage = calculateSumTotal(level, 'percentage');
     // level.details.UNRESOLVED = calculateSumTotal(
     //   level,
@@ -256,6 +283,31 @@ const calculateSumTotal = (
     }
   }
   return sumaBalance;
+};
+const calculateQuantityUser = (level: Level, type: keyof Level) => {
+  let sumListUsers = level[type] as usersCount[];
+  if (level.nextLevel && level.nextLevel.length > 0) {
+    const list: typeof level.listUsers = level.nextLevel
+      .map(l => calculateQuantityUser(l, type))
+      .flat(2);
+    const listUsers = list.reduce(
+      (acc: typeof list, { count, userId, ...data }) => {
+        const exist = acc.findIndex(u => u.userId === userId);
+        exist > 0
+          ? (acc[exist].count += count)
+          : acc.push({ userId, count, ...data });
+        return acc;
+      },
+      []
+    );
+    return listUsers;
+  }
+  return sumListUsers;
+};
+
+export const initialProfile = {
+  firstName: '',
+  lastName: '',
 };
 
 // export const LEVEL_DATA: Level = {
