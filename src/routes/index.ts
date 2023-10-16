@@ -18,6 +18,7 @@ import mailRouter from './mail.routes';
 import licenseRouter from './licenses.routes';
 import companiesRouter from './companies.routes';
 import specialistRouter from './specialist.routes';
+import areaSpecialtyRouter from './areaSpecialty.routes';
 export {
   userRouter,
   authRouter,
@@ -39,4 +40,5 @@ export {
   mailRouter,
   companiesRouter,
   specialistRouter,
+  areaSpecialtyRouter,
 };

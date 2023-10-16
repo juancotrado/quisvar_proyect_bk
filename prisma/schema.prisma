@@ -267,11 +267,14 @@ model Companies {
 }
 
 model AreaSpecialty {
-  id             Int         @id @default(autoincrement())
-  areaSpecialty  String?
-  areaExperience String?
-  specialistId   Int         @unique
-  specialist     Specialists @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+  id            Int         @id @default(autoincrement())
+  specialtyName String
+  institution   String
+  startDate     DateTime?
+  untilDate     DateTime?
+  file          String?
+  specialistId  Int         
+  specialist    Specialists @relation(fields: [specialistId], references: [id], onDelete: Cascade)
 }
 
 model Specialists {
