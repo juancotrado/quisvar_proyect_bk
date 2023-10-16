@@ -205,4 +205,5 @@ export interface usersCount {
   firstName?: string;
   lastName?: string;
   count: number;
+  dni?: string;
 }
