@@ -122,7 +122,10 @@ import {
   getSpecialistByDNI,
   getSpecialistById,
 } from './specialist.controller';
-
+import {
+  createAreaSpecialty,
+  getAreaSpecialty,
+} from './areaSpecialty.controller';
 // User Controllers
 export {
   showUsers,
@@ -245,3 +248,5 @@ export {
   getSpecialistByDNI,
   getSpecialistById,
 };
+//Area Specialty Controllers
+export { createAreaSpecialty, getAreaSpecialty };

@@ -4,12 +4,13 @@ import { Companies, prisma } from '../utils/prisma.server';
 class CompaniesServices {
   static async createCompany(data: Companies) {
     if (!data) throw new AppError(`No hay datos`, 400);
+
     const newCompany = await prisma.companies.create({
       data: {
         ...data,
-        inscription: new Date(data.inscription ?? ''),
-        activities: new Date(data.activities ?? ''),
-        SEE: new Date(data.activities ?? ''),
+        inscription: data.inscription ? new Date(data.inscription) : null,
+        activities: data.activities ? new Date(data.activities) : null,
+        SEE: data.SEE ? new Date(data.SEE) : null,
       },
     });
     return newCompany;

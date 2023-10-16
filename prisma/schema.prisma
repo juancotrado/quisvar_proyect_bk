@@ -269,10 +269,10 @@ model AreaSpecialty {
   id            Int         @id @default(autoincrement())
   specialtyName String
   institution   String
-  startDate     String?
-  untilDate     String?
+  startDate     DateTime?
+  untilDate     DateTime?
   file          String?
-  specialistId  Int         @unique
+  specialistId  Int         
   specialist    Specialists @relation(fields: [specialistId], references: [id], onDelete: Cascade)
 }
 
