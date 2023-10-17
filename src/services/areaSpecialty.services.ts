@@ -1,10 +1,9 @@
+import { log } from 'console';
 import AppError from '../utils/appError';
 import { AreaSpecialty, prisma } from '../utils/prisma.server';
 
 class AreaSpecialtyServices {
   static async createAreaSpecialty(data: AreaSpecialty) {
-    console.log(data);
-
     if (!data) throw new AppError(`Datos incorrectos`, 400);
     const newArea = await prisma.areaSpecialty.create({
       data: {
@@ -21,7 +20,20 @@ class AreaSpecialtyServices {
       where: { specialistId },
     });
 
-    return areas;
+    const newData = Array.from(
+      areas
+        .reduce((map, elem) => {
+          const { specialtyName, ...items } = elem;
+          const oldData = map.get(specialtyName) || {
+            specialtyName,
+            datos: [],
+          };
+          oldData.datos.push(items);
+          return map.set(specialtyName, oldData);
+        }, new Map())
+        .values()
+    );
+    return newData;
   }
 }
 export default AreaSpecialtyServices;
