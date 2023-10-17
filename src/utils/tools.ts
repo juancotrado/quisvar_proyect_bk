@@ -65,7 +65,8 @@ export const percentageSubTasks = (
           const findUser = users.find(u => u.userId === userId);
           const firstName = findUser?.user.profile?.firstName;
           const lastName = findUser?.user.profile?.lastName;
-          acc.push({ userId, count: 1, firstName, lastName });
+          const dni = findUser?.user.profile?.dni;
+          acc.push({ userId, count: 1, firstName, lastName, dni });
         }
         return acc;
       },
