@@ -273,13 +273,13 @@ model AreaSpecialty {
   startDate     DateTime?
   untilDate     DateTime?
   file          String?
-  specialistId  Int         
+  specialistId  Int
   specialist    Specialists @relation(fields: [specialistId], references: [id], onDelete: Cascade)
 }
 
 model Specialists {
-  id        Int                 @id @default(autoincrement())
-  dni       String              @unique @db.VarChar(8)
+  id        Int                  @id @default(autoincrement())
+  dni       String               @unique @db.VarChar(8)
   firstName String
   lastName  String
   phone     String
@@ -288,6 +288,7 @@ model Specialists {
   agreement String?
   cv        String?
   area      AreaSpecialty[]
+  training  TrainingSpecialist[]
   price     String
   CIP       String
   email     String
@@ -302,6 +303,19 @@ model ProjectSpecialist {
   project      Projects    @relation(fields: [projectId], references: [id])
 
   @@unique([specialistId, projectId])
+}
+
+model TrainingSpecialist {
+  id           Int         @id @default(autoincrement())
+  trainingName String
+  institution  String
+  hours        String
+  issue        DateTime?
+  startDate    DateTime?
+  untilDate    DateTime?
+  trainingFile String?
+  specialistId Int
+  specialist   Specialists @relation(fields: [specialistId], references: [id], onDelete: Cascade)
 }
 
 model List {

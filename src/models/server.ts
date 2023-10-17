@@ -27,6 +27,7 @@ import {
   companiesRouter,
   specialistRouter,
   areaSpecialtyRouter,
+  trainingSpecialtyRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -66,6 +67,7 @@ class Server {
     companies: `/${process.env.ROUTE}/companies`,
     specialists: `/${process.env.ROUTE}/specialists`,
     areaSpecialty: `/${process.env.ROUTE}/areaSpecialty`,
+    trainingSpecialty: `/${process.env.ROUTE}/trainingSpecialty`,
   };
 
   constructor() {
@@ -122,6 +124,7 @@ class Server {
     this.app.use(this.path.companies, companiesRouter);
     this.app.use(this.path.specialists, specialistRouter);
     this.app.use(this.path.areaSpecialty, areaSpecialtyRouter);
+    this.app.use(this.path.trainingSpecialty, trainingSpecialtyRouter);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)

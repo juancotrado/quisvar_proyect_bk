@@ -1,4 +1,3 @@
-import { log } from 'console';
 import AppError from '../utils/appError';
 import { AreaSpecialty, prisma } from '../utils/prisma.server';
 

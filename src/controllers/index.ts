@@ -126,6 +126,10 @@ import {
   createAreaSpecialty,
   getAreaSpecialty,
 } from './areaSpecialty.controller';
+import {
+  createTrainingSpecialty,
+  getTrainingSpecialty,
+} from './trainingSpecialty.controller';
 // User Controllers
 export {
   showUsers,
@@ -250,3 +254,5 @@ export {
 };
 //Area Specialty Controllers
 export { createAreaSpecialty, getAreaSpecialty };
+//Training Specialty Controllers
+export { createTrainingSpecialty, getTrainingSpecialty };

@@ -83,6 +83,19 @@ const storageAreaSpecialty = multer.diskStorage({
     cb(null, Date.now() + '$$' + originalname);
   },
 });
+const storageTrainingSpecialty = multer.diskStorage({
+  destination: function (req, file, cb) {
+    let uploadPath = 'public/training';
+    if (!existsSync(uploadPath)) {
+      mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: function (req, files, cb) {
+    const { originalname } = files;
+    cb(null, Date.now() + '$$' + originalname);
+  },
+});
 
 const storageGeneralFiles = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -197,6 +210,9 @@ export const uploadFileSpecialist = multer({
 });
 export const uploadFileAreaSpecialty = multer({
   storage: storageAreaSpecialty,
+});
+export const uploadFileTrainingSpecialty = multer({
+  storage: storageTrainingSpecialty,
 });
 export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
   try {
