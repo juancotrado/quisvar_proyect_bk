@@ -1,7 +1,6 @@
 import { ProjectDir } from 'types/types';
 import { _dirPath, _materialPath, _reviewPath } from '.';
 import AppError from '../utils/appError';
-import { parsePath, parseProjectName } from '../utils/fileSystem';
 import { Files, prisma } from '../utils/prisma.server';
 
 class StageInfo {

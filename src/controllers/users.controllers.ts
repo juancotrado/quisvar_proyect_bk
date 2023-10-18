@@ -3,7 +3,6 @@ import { UsersServices } from '../services';
 import { userProfilePick } from '../utils/format.server';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
-import mv from 'mv';
 import { copyFileSync } from 'fs';
 
 export const showUsers = async (

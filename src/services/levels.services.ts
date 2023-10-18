@@ -1,23 +1,19 @@
-import { Files, Levels, SubTasks, TypeItem } from '@prisma/client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Levels, SubTasks } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-import { parsePath, parsePathLevel, renameDir } from '../utils/fileSystem';
+import { parsePath, renameDir } from '../utils/fileSystem';
 import {
   existRootLevelPath,
   filterLevelList,
   getRootItem,
   getRootPath,
-  initialProfile,
   numberToConvert,
   percentageSubTasks,
   sumValues,
 } from '../utils/tools';
-import {
-  DuplicateLevel,
-  GetFilterLevels,
-  UpdateLevelBlock,
-  usersCount,
-} from 'types/types';
+import { DuplicateLevel, GetFilterLevels, UpdateLevelBlock } from 'types/types';
 import { existsSync, renameSync } from 'fs';
 import Queries from '../utils/queries';
 import PathServices from './paths.services';

@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, query } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import {
   PathServices,
   ProjectsServices,
@@ -6,8 +6,7 @@ import {
   _materialPath,
   _reviewPath,
 } from '../services';
-import { rmSync, mkdirSync, existsSync, renameSync } from 'fs';
-import { renameDir, setNewPath } from '../utils/fileSystem';
+import { rmSync, mkdirSync, existsSync } from 'fs';
 import AppError from '../utils/appError';
 
 const model = _materialPath;

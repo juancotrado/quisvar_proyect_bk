@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { NextFunction, Request, Response } from 'express';
 
 const catchAsync = (fn: Function) => {

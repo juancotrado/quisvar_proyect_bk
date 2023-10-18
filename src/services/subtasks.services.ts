@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { SubTasks, Users, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import { copyFileSync, renameSync } from 'fs';

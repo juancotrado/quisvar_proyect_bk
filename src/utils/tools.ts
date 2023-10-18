@@ -1,7 +1,6 @@
-import { Levels, SubTasks, TaskRole, TypeItem } from '@prisma/client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Levels, SubTasks, TaskRole } from '@prisma/client';
 import {
-  Details,
-  DuplicateLevel,
   GetFilterLevels,
   Level,
   PickSubtask,

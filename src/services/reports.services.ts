@@ -123,12 +123,14 @@ class ReportsServices {
     const newReport = reportList.map(({ subtask, ...data }) => {
       const project = subtask.Levels.stages.project;
       const { Levels, ..._subTask } = subtask;
+      console.log(Levels);
       return { ...data, ..._subTask, project };
     });
     const newReportByList = projectList.map(_project => {
       const subtasks = newReport.filter(
         ({ project }) => project.id === _project.id
       );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const newSubTask = subtasks.map(({ project, ...a }) => ({
         ...a,
       }));
@@ -142,6 +144,7 @@ class ReportsServices {
   }
 
   static async getSubTasksByProyect(projectId: Projects['id']) {
+    console.log(projectId);
     const findSubtasks = await prisma.subTasks.findMany({
       where: {
         // OR: [

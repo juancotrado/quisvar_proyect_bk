@@ -4,8 +4,6 @@ import {
   PersonBussiness,
   Profiles,
   Projects,
-  Specialities,
-  Stages,
   TypeSpecialities,
   UserRole,
   Users,

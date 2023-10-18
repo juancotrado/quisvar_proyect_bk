@@ -1,6 +1,5 @@
 import AppError from '../utils/appError';
 import { Feedback, SubTasks, Users, prisma } from '../utils/prisma.server';
-import Queries from '../utils/queries';
 
 class FeedBackServices {
   static async find(subTasksId: SubTasks['id']) {

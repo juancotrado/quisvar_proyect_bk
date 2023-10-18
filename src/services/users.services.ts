@@ -5,17 +5,13 @@ import bcrypt from 'bcryptjs';
 
 class UsersServices {
   static async getAll() {
-    try {
-      const users = await prisma.users.findMany({
-        orderBy: { id: 'asc' },
-        include: { profile: true },
-      });
-      if (users.length == 0)
-        throw new AppError('No se pudo encontrar el registro de usuarios', 404);
-      return users;
-    } catch (error) {
-      throw error;
-    }
+    const users = await prisma.users.findMany({
+      orderBy: { id: 'asc' },
+      include: { profile: true },
+    });
+    if (users.length == 0)
+      throw new AppError('No se pudo encontrar el registro de usuarios', 404);
+    return users;
   }
 
   static async find(id: Users['id']) {

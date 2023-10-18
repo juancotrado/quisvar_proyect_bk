@@ -10,7 +10,7 @@ import authenticateHandler from '../middlewares/auth.middleware';
 
 import {
   _employee_role,
-  _admin_role,
+  // _admin_role,
   _mod_role,
 } from '../middlewares/role.middleware';
 

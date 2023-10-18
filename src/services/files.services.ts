@@ -107,6 +107,7 @@ class FilesServices {
     id: number,
     type: 'PROYECT' | 'AREA' | 'INDEXTASK' | 'TASK'
   ) {
+    return { id, type };
     // if (type === 'PROYECT') {
     //   await prisma.projects.update({
     //     where: { id },
