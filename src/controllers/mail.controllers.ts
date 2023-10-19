@@ -3,7 +3,7 @@ import { MailServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
 import { ParametersMail, PickMail, PickMessageReply } from 'types/types';
-import { existsSync, mkdirSync, renameSync, unlinkSync } from 'fs';
+import { existsSync, mkdirSync, renameSync } from 'fs';
 import { Messages } from '@prisma/client';
 
 export const showMessages = async (

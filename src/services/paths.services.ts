@@ -58,7 +58,7 @@ class PathServices {
     return _dirPath + '/' + _id;
   }
   static async stage(id: number, type: ProjectDir) {
-    const { name, id: _id, project } = await StageInfo.findStage(id);
+    const { id: _id, project } = await StageInfo.findStage(id);
     if (!project) throw new AppError('Oops!,ID no encontrado', 400);
     const pathProject = await PathServices.project(project.id, type);
     return pathProject + '/' + _id;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextFunction, Request, Response } from 'express';
 import AppError from '../utils/appError';
 import { Prisma } from '@prisma/client';

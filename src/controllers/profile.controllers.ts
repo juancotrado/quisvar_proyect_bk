@@ -23,11 +23,11 @@ export const downloadProfile = async (
   next: NextFunction
 ) => {
   try {
-    const dirSplit = __dirname.split('\\');
-    console.log(__dirname);
-    const dirPath = dirSplit.slice(0, dirSplit.length - 2).join('/');
-    const folder = '/files';
-    const newDirPath = dirPath + folder + '/Vector.rar';
+    // const dirSplit = __dirname.split('\\');
+    // console.log(__dirname);
+    // const dirPath = dirSplit.slice(0, dirSplit.length - 2).join('/');
+    // const folder = '/files';
+    // // const newDirPath = dirPath + folder + '/Vector.rar';
     res.download('./files/Vector.rar', err => {
       console.log(err);
       res.status(404).json(err);
@@ -44,6 +44,7 @@ export const uploadProfile = async (
   next: NextFunction
 ) => {
   try {
+    console.log('patito');
   } catch (error) {
     next(error);
   }

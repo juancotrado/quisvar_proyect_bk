@@ -1,4 +1,5 @@
-import { copyFileSync, cp, mkdirSync } from 'fs';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { copyFileSync, mkdirSync } from 'fs';
 import AppError from '../utils/appError';
 import {
   Files,

@@ -1,13 +1,5 @@
-import {
-  Profiles,
-  Projects,
-  SubTasks,
-  Tasks,
-  Users,
-  WorkAreas,
-} from '@prisma/client';
+import { Profiles, Users } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
-const { Prisma } = require('@prisma/client');
 
 const newUser: Pick<Users, 'role' | 'password' | 'email'>[] = [
   {
@@ -62,129 +54,110 @@ const newProfile: Pick<
   },
 ];
 
-const newWorkAreas: Pick<WorkAreas, 'name' | 'description'>[] = [
-  {
-    name: 'Salud',
-    description: null,
-  },
-  {
-    name: 'Educacion',
-    description: null,
-  },
-  {
-    name: 'Saneamiento',
-    description: null,
-  },
-  {
-    name: 'Carreteras',
-    description: null,
-  },
-];
+// const newProjects: Pick<
+//   Projects,
+//   | 'name'
+//   | 'description'
+//   | 'startDate'
+//   | 'untilDate'
+//   | 'price'
+//   | 'workAreaId'
+//   | 'userId'
+// >[] = [
+//   {
+//     name: 'project1',
+//     description: null,
+//     startDate: new Date(),
+//     untilDate: new Date(),
+//     price: 400.99,
+//     workAreaId: 1,
+//     userId: 1,
+//   },
+//   {
+//     name: 'project2',
+//     description: null,
+//     startDate: new Date(),
+//     untilDate: new Date(),
+//     price: 400.99,
+//     workAreaId: 2,
+//     userId: 2,
+//   },
+//   {
+//     name: 'project3',
+//     description: null,
+//     startDate: new Date(),
+//     untilDate: new Date(),
+//     price: 400.99,
+//     workAreaId: 3,
+//     userId: 3,
+//   },
+//   {
+//     name: 'project4',
+//     description: null,
+//     startDate: new Date(),
+//     untilDate: new Date(),
+//     price: 400.99,
+//     workAreaId: 4,
+//     userId: 4,
+//   },
+// ];
 
-const newProjects: Pick<
-  Projects,
-  | 'name'
-  | 'description'
-  | 'startDate'
-  | 'untilDate'
-  | 'price'
-  | 'workAreaId'
-  | 'userId'
->[] = [
-  {
-    name: 'project1',
-    description: null,
-    startDate: new Date(),
-    untilDate: new Date(),
-    price: 400.99,
-    workAreaId: 1,
-    userId: 1,
-  },
-  {
-    name: 'project2',
-    description: null,
-    startDate: new Date(),
-    untilDate: new Date(),
-    price: 400.99,
-    workAreaId: 2,
-    userId: 2,
-  },
-  {
-    name: 'project3',
-    description: null,
-    startDate: new Date(),
-    untilDate: new Date(),
-    price: 400.99,
-    workAreaId: 3,
-    userId: 3,
-  },
-  {
-    name: 'project4',
-    description: null,
-    startDate: new Date(),
-    untilDate: new Date(),
-    price: 400.99,
-    workAreaId: 4,
-    userId: 4,
-  },
-];
+// const newTask: Pick<Tasks, 'name' | 'projectId' | 'status'>[] = [
+//   {
+//     name: 'task1',
+//     status: 'UNRESOLVED',
+//     projectId: 1,
+//   },
+//   {
+//     name: 'task2',
+//     status: 'DONE',
+//     projectId: 1,
+//   },
+//   {
+//     name: 'task3',
+//     status: 'PROCESS',
+//     projectId: 2,
+//   },
+//   {
+//     name: 'task4',
+//     projectId: 3,
+//     status: 'UNRESOLVED',
+//   },
+// ];
 
-const newTask: Pick<Tasks, 'name' | 'projectId' | 'status'>[] = [
-  {
-    name: 'task1',
-    status: 'UNRESOLVED',
-    projectId: 1,
-  },
-  {
-    name: 'task2',
-    status: 'DONE',
-    projectId: 1,
-  },
-  {
-    name: 'task3',
-    status: 'PROCESS',
-    projectId: 2,
-  },
-  {
-    name: 'task4',
-    projectId: 3,
-    status: 'UNRESOLVED',
-  },
-];
-
-const newSubtask: Pick<
-  SubTasks,
-  'name' | 'description' | 'hours' | 'price' | 'taskId'
->[] = [
-  {
-    name: 'project1',
-    description: null,
-    price: 100.76,
-    hours: 20,
-    taskId: 1,
-  },
-  {
-    name: 'project2',
-    description: null,
-    price: 100.76,
-    hours: 20,
-    taskId: 1,
-  },
-  {
-    name: 'project3',
-    description: null,
-    price: 100.76,
-    hours: 20,
-    taskId: 2,
-  },
-  {
-    name: 'project4',
-    description: null,
-    price: 100.76,
-    hours: 20,
-    taskId: 3,
-  },
-];
+// const newSubtask: Pick<
+//   SubTasks,
+//   'name' | 'description' | 'hours' | 'price' | 'taskId'
+// >[] = [
+//   {
+//     name: 'project1',
+//     description: null,
+//     price: 100.76,
+//     hours: 20,
+//     taskId: 1,
+//   },
+//   {
+//     name: 'project2',
+//     description: null,
+//     price: 100.76,
+//     hours: 20,
+//     taskId: 1,
+//   },
+//   {
+//     name: 'project3',
+//     description: null,
+//     price: 100.76,
+//     hours: 20,
+//     taskId: 2,
+//   },
+//   {
+//     name: 'project4',
+//     description: null,
+//     price: 100.76,
+//     hours: 20,
+//     taskId: 3,
+//   },
+// ];
 
 const createUsers = async () => {
   await prisma.users.createMany({
@@ -198,33 +171,33 @@ const createProfile = async () => {
   });
 };
 
-const createWorkAreas = async () => {
-  await prisma.workAreas.createMany({
-    data: newWorkAreas,
-  });
-};
+// const createWorkAreas = async () => {
+//   await prisma.workAreas.createMany({
+//     data: newWorkAreas,
+//   });
+// };
 
-const createProjects = async () => {
-  await prisma.projects.createMany({
-    data: newProjects,
-  });
-};
+// const createProjects = async () => {
+//   await prisma.projects.createMany({
+//     data: newProjects,
+//   });
+// };
 
-const createTask = async () => {
-  await prisma.tasks.createMany({
-    data: newTask,
-  });
-};
+// const createTask = async () => {
+//   await prisma.tasks.createMany({
+//     data: newTask,
+//   });
+// };
 
-const createSubTask = async () => {
-  await prisma.subTasks.createMany({
-    data: newSubtask,
-  });
-};
+// const createSubTask = async () => {
+//   await prisma.subTasks.createMany({
+//     data: newSubtask,
+//   });
+// };
 
 createUsers();
 createProfile();
-createWorkAreas();
-createProjects();
-createTask();
-createSubTask();
+// createWorkAreas();
+// createProjects();
+// createTask();
+// createSubTask();

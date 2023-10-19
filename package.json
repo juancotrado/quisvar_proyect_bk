@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx prisma generate && npx prisma db push && ts-node ./src/app.ts",
+    "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
     "generate": "npx prisma generate",
     "reset": "npx prisma migrate reset",
     "dbpush": "npx prisma db push",
@@ -56,6 +57,9 @@
     "@types/node": "^18.11.18",
     "@types/node-cron": "^3.0.8",
     "@types/pdfkit": "^0.12.8",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "@typescript-eslint/parser": "^6.8.0",
+    "eslint": "^8.51.0",
     "husky": "^8.0.3",
     "nodemon": "^3.0.1",
     "prettier": "^2.8.8",

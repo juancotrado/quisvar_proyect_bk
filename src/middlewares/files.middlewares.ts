@@ -12,7 +12,7 @@ export const verifyFiles = async (
     if (!req.file) return res.json('patito');
     const { filename } = req.file;
     console.log(filename, '<==');
-    const extFileUpload = filename.split;
+    // const extFileUpload = filename.split;
     const files = await FilesServices.findBySubTask(_subtask_id, 'REVIEW');
     const filesList = files.map(f => ({
       id: f.id,

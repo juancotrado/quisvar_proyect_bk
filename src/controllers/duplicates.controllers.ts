@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import { DuplicatesServices, _materialPath, _reviewPath } from '../services';
+import { DuplicatesServices } from '../services';
 
 export const duplicateProject = async (
   req: Request,

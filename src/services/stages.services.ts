@@ -2,7 +2,6 @@ import AppError from '../utils/appError';
 import { Projects, Stages, SubTasks, prisma } from '../utils/prisma.server';
 import {
   calculateAndUpdateDataByLevel,
-  initialProfile,
   sumPriceByStage,
   sumValues,
 } from '../utils/tools';

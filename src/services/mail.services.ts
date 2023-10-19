@@ -1,11 +1,4 @@
-import {
-  FilesPayment,
-  Mail,
-  MessageStatus,
-  MessageType,
-  Messages,
-  Users,
-} from '@prisma/client';
+import { FilesPayment, Mail, Messages, Users } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import {
   FileMessagePick,
@@ -15,7 +8,6 @@ import {
 } from 'types/types';
 import Queries from '../utils/queries';
 import AppError from '../utils/appError';
-import { unlinkSync } from 'fs';
 
 class MailServices {
   static PickType(type?: Mail['type']) {

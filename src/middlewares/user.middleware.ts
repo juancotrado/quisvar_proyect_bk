@@ -2,7 +2,6 @@ import { Response, Request, NextFunction } from 'express';
 import AppError from '../utils/appError';
 import { UserType } from './auth.middleware';
 import { prisma } from '../utils/prisma.server';
-import { error } from 'console';
 
 const taskVerify = async (req: Request, res: Response, next: NextFunction) => {
   try {

@@ -1,27 +1,22 @@
 import { Specialities, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-import Queries from '../utils/queries';
 
 class SpecialitiesServices {
   static async getAll() {
-    try {
-      const getSpecialities: string[] = [];
-      // const getSpecialities = await prisma.specialities.findMany({
-      //   orderBy: { name: 'asc' },
-      //   include: {
-      //     _count: {
-      //       select: {
-      //         projects: true,
-      //       },
-      //     },
-      //   },
-      // });
-      if (getSpecialities.length == 0)
-        throw new AppError('No se pudo encontrar las areas de trabajo', 404);
-      return getSpecialities;
-    } catch (error) {
-      throw error;
-    }
+    const getSpecialities: string[] = [];
+    // const getSpecialities = await prisma.specialities.findMany({
+    //   orderBy: { name: 'asc' },
+    //   include: {
+    //     _count: {
+    //       select: {
+    //         projects: true,
+    //       },
+    //     },
+    //   },
+    // });
+    if (getSpecialities.length == 0)
+      throw new AppError('No se pudo encontrar las areas de trabajo', 404);
+    return getSpecialities;
   }
 
   static async find(id: Specialities['id']) {

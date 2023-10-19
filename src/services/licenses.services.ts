@@ -1,5 +1,5 @@
 import AppError from '../utils/appError';
-import { Licenses, LicensesStatus, prisma } from '../utils/prisma.server';
+import { Licenses, prisma } from '../utils/prisma.server';
 
 class LicenseServices {
   static async create(data: Licenses) {
@@ -45,12 +45,12 @@ class LicenseServices {
     // status: Licenses['status'], // usersId: Licenses['id'],
     // if (!usersId) throw new AppError('Oops!,ID invalido', 400);
     // if (!status) throw new AppError('Oops!,Estado incorrecto', 400);
-    const GMT = 60 * 60 * 1000;
-    const today = new Date().toISOString().split('T')[0];
+    // const GMT = 60 * 60 * 1000;
+    // const today = new Date().toISOString().split('T')[0];
     // const todays = new Date().toLocaleDateString().split('T')
-    const _startDate = new Date(today).getTime();
-    const startOfDay = new Date(_startDate - GMT * 5);
-    const endOfDay = new Date(_startDate - GMT * 29 - 1);
+    // const _startDate = new Date(today).getTime();
+    // const startOfDay = new Date(_startDate - GMT * 5);
+    // const endOfDay = new Date(_startDate - GMT * 29 - 1);
     // console.log(startOfDay, endOfDay);
 
     const licenses = await prisma.licenses.groupBy({

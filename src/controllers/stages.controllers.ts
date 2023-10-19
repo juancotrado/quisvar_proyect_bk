@@ -1,6 +1,5 @@
 import { Response, Request, NextFunction } from 'express';
 import {
-  PathServices,
   StageServices,
   _dirPath,
   _editablePath,
@@ -8,7 +7,6 @@ import {
   _reviewPath,
 } from '../services';
 import { mkdirSync, rmSync } from 'fs';
-import { renameDir } from '../utils/fileSystem';
 import { SubTasks } from '@prisma/client';
 
 const dir = _dirPath;
@@ -20,9 +18,9 @@ const createfiles = (list: string[], rootPath: string) => {
   list.forEach(path => mkdirSync(`${path}/${rootPath}`));
 };
 
-const uploadFiles = (list: string[], oldPath: string, newPath: string) => {
-  list.forEach(path => renameDir(`${path}/${oldPath}`, `${path}/${newPath}`));
-};
+// const uploadFiles = (list: string[], oldPath: string, newPath: string) => {
+//   list.forEach(path => renameDir(`${path}/${oldPath}`, `${path}/${newPath}`));
+// };
 
 const deleteFiles = (list: string[], rootPath: string) => {
   list.forEach(path => rmSync(`${path}/${rootPath}`, { recursive: true }));
@@ -82,7 +80,7 @@ export const updateStage = async (
     const { body } = req;
     const _stage_id = parseInt(id);
     // const oldStage = await StageServices.findShort(_stage_id);
-    const { project, ...query } = await StageServices.update(_stage_id, body);
+    const query = await StageServices.update(_stage_id, body);
     // const oldStagePath = project.name + '/' + oldStage.name;
     // const newStagePath = project.name + '/' + query.name;
     // uploadFiles([model, dir, review, editables], oldStagePath, newStagePath);

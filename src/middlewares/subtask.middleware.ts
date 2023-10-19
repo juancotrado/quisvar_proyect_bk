@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from 'express';
 import AppError from '../utils/appError';
 import { UserType } from './auth.middleware';
-import { SubTasks, Users, prisma } from '../utils/prisma.server';
+import { SubTasks, Users } from '../utils/prisma.server';
 import { SubTasksServices } from '../services';
 
 const permStatus: SubTasks['status'][] = ['UNRESOLVED', 'PROCESS', 'INREVIEW'];

@@ -1,5 +1,5 @@
-import PDFDocument, { x } from 'pdfkit';
-import { Projects } from '@prisma/client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 type SubTasks = {
   id: number;
   item: string;

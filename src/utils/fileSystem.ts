@@ -1,7 +1,5 @@
 import fs from 'fs';
-import mv from 'mv';
 import { StageParse } from 'types/types';
-import AppError from './appError';
 export const renameDir = (oldDir: string, newDir: string) => {
   if (oldDir !== newDir) {
     const subDir = fs

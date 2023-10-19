@@ -1,20 +1,16 @@
 import { Projects, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import { UpdateProjectPick, projectPick } from '../utils/format.server';
-import { PathServices, _dirPath } from '.';
+import { PathServices } from '.';
 import Queries from '../utils/queries';
 import { existsSync } from 'fs';
 
 class ProjectsServices {
   static async getAll() {
-    try {
-      const getListProjects = await prisma.projects.findMany({
-        orderBy: { id: 'asc' },
-      });
-      return getListProjects;
-    } catch (error) {
-      throw error;
-    }
+    const getListProjects = await prisma.projects.findMany({
+      orderBy: { id: 'asc' },
+    });
+    return getListProjects;
   }
 
   static async find(id: Projects['id']) {

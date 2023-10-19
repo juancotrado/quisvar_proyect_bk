@@ -1,14 +1,13 @@
 import { Files } from '@prisma/client';
 import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
-import path from 'path';
-import { FilesServices, PathServices } from '../services';
+import { PathServices } from '../services';
 import AppError from '../utils/appError';
 import { existsSync, mkdirSync } from 'fs';
-import { PickMail, TypeFileUser } from 'types/types';
+import { TypeFileUser } from 'types/types';
 
 const MAX_SIZE = 1024 * 1000 * 1000 * 1000;
-const FILE_TYPES = ['.rar', '.zip'];
+// const FILE_TYPES = ['.rar', '.zip'];
 
 const storage = multer.diskStorage({
   destination: async (req, file, callback) => {
