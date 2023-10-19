@@ -26,11 +26,7 @@ class Queries {
       },
     },
   };
-  static includeFiles = {
-    include: {
-      user: this.selectProfileUser,
-    },
-  };
+
   static includeSubtask = {
     Levels: {
       select: {
@@ -43,7 +39,7 @@ class Queries {
         files: true,
       },
     },
-    // files: this.includeFiles,
+    files: true,
     users: {
       select: {
         percentage: true,

@@ -164,7 +164,6 @@ class SubTasksServices {
       });
       if (!lastUser) throw new AppError('No se pudo encontrar al usuario', 404);
       const subtaskId_userId = { subtaskId: id, userId: lastUser.userId };
-      console.log(subtaskId_userId);
       const patito = await prisma.subTasks.update({
         where: { id },
         data: {
