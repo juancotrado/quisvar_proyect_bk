@@ -51,11 +51,12 @@ class FeedBackServices {
     comment,
     id,
     userId,
+    status,
   }: Feedback & { userId: Users['id'] }) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateFeedback = await prisma.feedback.update({
       where: { id },
-      data: { comment, users: { create: { userId } } },
+      data: { comment, status, users: { create: { userId } } },
     });
     return updateFeedback;
   }
