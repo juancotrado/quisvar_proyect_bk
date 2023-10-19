@@ -19,7 +19,9 @@ import licenseRouter from './licenses.routes';
 import companiesRouter from './companies.routes';
 import specialistRouter from './specialist.routes';
 import areaSpecialtyRouter from './areaSpecialty.routes';
+import areaSpecialtyListRouter from './areaSpecialtyList.routes';
 import trainingSpecialtyRouter from './trainingSpecialty.routes';
+import trainingSpecialtyListRouter from './trainingSpecialtyList.routes';
 export {
   userRouter,
   authRouter,
@@ -42,5 +44,7 @@ export {
   companiesRouter,
   specialistRouter,
   areaSpecialtyRouter,
+  areaSpecialtyListRouter,
   trainingSpecialtyRouter,
+  trainingSpecialtyListRouter,
 };

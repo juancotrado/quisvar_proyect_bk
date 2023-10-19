@@ -28,6 +28,12 @@ class SpecialistServices {
           startsWith: dni,
         },
       },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        dni: true,
+      },
     });
     return specialist;
   }

@@ -124,12 +124,26 @@ import {
 } from './specialist.controller';
 import {
   createAreaSpecialty,
+  deleteAreaSpecialty,
   getAreaSpecialty,
+  uploadAreaSpecialty,
 } from './areaSpecialty.controller';
 import {
   createTrainingSpecialty,
+  deleteTrainingSpecialty,
   getTrainingSpecialty,
+  updateTrainingSpecialty,
 } from './trainingSpecialty.controller';
+import {
+  createAreaSpecialtyList,
+  deleteAreaSpecialtyList,
+  getAreaSpecialtyList,
+  updateAreaSpecialtyList,
+} from './areaSpecialtyList.controller';
+import {
+  createTrainingSpecialtyList,
+  getTrainingSpecialtyList,
+} from './trainingSpecialtyList.controllers';
 // User Controllers
 export {
   showUsers,
@@ -253,6 +267,25 @@ export {
   getSpecialistById,
 };
 //Area Specialty Controllers
-export { createAreaSpecialty, getAreaSpecialty };
+export {
+  createAreaSpecialty,
+  getAreaSpecialty,
+  uploadAreaSpecialty,
+  deleteAreaSpecialty,
+};
+//Area Specialty List Controllers
+export {
+  createAreaSpecialtyList,
+  getAreaSpecialtyList,
+  updateAreaSpecialtyList,
+  deleteAreaSpecialtyList,
+};
 //Training Specialty Controllers
-export { createTrainingSpecialty, getTrainingSpecialty };
+export {
+  createTrainingSpecialty,
+  getTrainingSpecialty,
+  updateTrainingSpecialty,
+  deleteTrainingSpecialty,
+};
+//Training Specialty List Controllers
+export { createTrainingSpecialtyList, getTrainingSpecialtyList };

@@ -7,7 +7,7 @@ class TrainingSpecialtyServices {
     const newTraining = await prisma.trainingSpecialist.create({
       data: {
         ...data,
-        specialistId: +data.specialistId,
+        TrainingSpecialistNameId: +data.TrainingSpecialistNameId,
         issue: data.issue ? new Date(data.issue) : null,
         startDate: data.startDate ? new Date(data.startDate) : null,
         untilDate: data.untilDate ? new Date(data.untilDate) : null,
@@ -16,25 +16,46 @@ class TrainingSpecialtyServices {
     return newTraining;
   }
   static async getTrainingSpecialty(
-    specialistId: TrainingSpecialist['specialistId']
+    TrainingSpecialistNameId: TrainingSpecialist['TrainingSpecialistNameId']
   ) {
     const training = await prisma.trainingSpecialist.findMany({
-      where: { specialistId },
+      where: { TrainingSpecialistNameId },
     });
-    const newData = Array.from(
-      training
-        .reduce((map, elem) => {
-          const { trainingName, ...items } = elem;
-          const oldData = map.get(trainingName) || {
-            trainingName,
-            datos: [],
-          };
-          oldData.datos.push(items);
-          return map.set(trainingName, oldData);
-        }, new Map())
-        .values()
-    );
-    return newData;
+
+    return training;
+  }
+  static async updateTrainingSpecialty(
+    id: TrainingSpecialist['id'],
+    {
+      hours,
+      institution,
+      issue,
+      startDate,
+      trainingFile,
+      untilDate,
+    }: TrainingSpecialist
+  ) {
+    const training = await prisma.trainingSpecialist.update({
+      where: { id },
+      data: {
+        id,
+        institution,
+        hours,
+        issue: issue ? new Date(issue) : null,
+        startDate: startDate ? new Date(startDate) : null,
+        untilDate: untilDate ? new Date(untilDate) : null,
+        trainingFile,
+      },
+    });
+
+    return training;
+  }
+  static async deleteTrainingSpecialty(id: TrainingSpecialist['id']) {
+    const training = await prisma.trainingSpecialist.delete({
+      where: { id },
+    });
+
+    return training;
   }
 }
 export default TrainingSpecialtyServices;

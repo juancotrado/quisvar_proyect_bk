@@ -267,19 +267,26 @@ model Companies {
 }
 
 model AreaSpecialty {
-  id            Int         @id @default(autoincrement())
-  specialtyName String
-  institution   String
-  startDate     DateTime?
-  untilDate     DateTime?
-  file          String?
-  specialistId  Int
-  specialist    Specialists @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+  id                  Int                   @id @default(autoincrement())
+  institution         String
+  startDate           DateTime?
+  untilDate           DateTime?
+  file                String?
+  areaSpecialtyNameId Int
+  areaSpecialtyName   AreaSpecialtyNameList @relation(fields: [areaSpecialtyNameId], references: [id], onDelete: Cascade)
+}
+
+model AreaSpecialtyNameList {
+  id                Int             @id @default(autoincrement())
+  specialtyName     String
+  areaSpecialtyName AreaSpecialty[]
+  specialistId      Int
+  specialist        Specialists     @relation(fields: [specialistId], references: [id], onDelete: Cascade)
 }
 
 model Specialists {
-  id        Int                  @id @default(autoincrement())
-  dni       String               @unique @db.VarChar(8)
+  id        Int                          @id @default(autoincrement())
+  dni       String                       @unique @db.VarChar(8)
   firstName String
   lastName  String
   phone     String
@@ -287,8 +294,8 @@ model Specialists {
   degree    String
   agreement String?
   cv        String?
-  area      AreaSpecialty[]
-  training  TrainingSpecialist[]
+  area      AreaSpecialtyNameList[]
+  training  TrainingSpecialistNameList[]
   price     String
   CIP       String
   email     String
@@ -305,17 +312,24 @@ model ProjectSpecialist {
   @@unique([specialistId, projectId])
 }
 
+model TrainingSpecialistNameList {
+  id                     Int                  @id @default(autoincrement())
+  trainingName           String
+  trainingSpecialistName TrainingSpecialist[]
+  specialistId           Int
+  specialist             Specialists          @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+}
+
 model TrainingSpecialist {
-  id           Int         @id @default(autoincrement())
-  trainingName String
-  institution  String
-  hours        String
-  issue        DateTime?
-  startDate    DateTime?
-  untilDate    DateTime?
-  trainingFile String?
-  specialistId Int
-  specialist   Specialists @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+  id                       Int                        @id @default(autoincrement())
+  institution              String
+  hours                    String
+  issue                    DateTime?
+  startDate                DateTime?
+  untilDate                DateTime?
+  trainingFile             String?
+  TrainingSpecialistNameId Int
+  specialist               TrainingSpecialistNameList @relation(fields: [TrainingSpecialistNameId], references: [id], onDelete: Cascade)
 }
 
 model List {

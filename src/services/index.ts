@@ -20,6 +20,8 @@ import CompaniesServices from './companies.services';
 import SpecialistServices from './specialist.services';
 import AreaSpecialtyServices from './areaSpecialty.services';
 import TrainingSpecialtyServices from './trainingSpecialty.services';
+import AreaSpecialtyListServices from './areaSpecialtyList.services';
+import TrainingSpecialtyListServices from './trainingSpecialtyList.services';
 export {
   UsersServices,
   authServices,
@@ -43,7 +45,9 @@ export {
   CompaniesServices,
   SpecialistServices,
   AreaSpecialtyServices,
+  AreaSpecialtyListServices,
   TrainingSpecialtyServices,
+  TrainingSpecialtyListServices,
 };
 export const rootPath = './uploads';
 export const _dirPath = `${rootPath}/projects`;

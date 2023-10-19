@@ -36,3 +36,32 @@ export const getTrainingSpecialty = async (
     next(error);
   }
 };
+export const updateTrainingSpecialty = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const body = req.body;
+    const query = await TrainingSpecialtyServices.updateTrainingSpecialty(+id, {
+      ...body,
+    });
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteTrainingSpecialty = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const query = await TrainingSpecialtyServices.deleteTrainingSpecialty(+id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};

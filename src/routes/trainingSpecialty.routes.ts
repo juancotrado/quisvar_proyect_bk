@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import authenticateHandler from '../middlewares/auth.middleware';
-import { createTrainingSpecialty, getTrainingSpecialty } from '../controllers';
+import {
+  createTrainingSpecialty,
+  deleteTrainingSpecialty,
+  getTrainingSpecialty,
+  updateTrainingSpecialty,
+} from '../controllers';
 import { _admin_role } from '../middlewares/role.middleware';
 import { uploadFileTrainingSpecialty } from '../middlewares/upload.middleware';
 const router = Router();
@@ -12,4 +17,6 @@ router.post(
   uploadFileTrainingSpecialty.fields([{ name: 'trainingFile' }]),
   createTrainingSpecialty
 );
+router.patch('/:id', updateTrainingSpecialty);
+router.delete('/:id', deleteTrainingSpecialty);
 export default router;

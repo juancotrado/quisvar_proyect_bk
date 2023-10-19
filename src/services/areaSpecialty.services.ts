@@ -7,32 +7,41 @@ class AreaSpecialtyServices {
     const newArea = await prisma.areaSpecialty.create({
       data: {
         ...data,
-        specialistId: +data.specialistId,
+        areaSpecialtyNameId: +data.areaSpecialtyNameId,
         startDate: data.startDate ? new Date(data.startDate) : null,
         untilDate: data.untilDate ? new Date(data.untilDate) : null,
       },
     });
     return newArea;
   }
-  static async getAreaSpecialty(specialistId: AreaSpecialty['specialistId']) {
+  static async getAreaSpecialty(
+    areaSpecialtyNameId: AreaSpecialty['areaSpecialtyNameId']
+  ) {
     const areas = await prisma.areaSpecialty.findMany({
-      where: { specialistId },
+      where: { areaSpecialtyNameId },
     });
-
-    const newData = Array.from(
-      areas
-        .reduce((map, elem) => {
-          const { specialtyName, ...items } = elem;
-          const oldData = map.get(specialtyName) || {
-            specialtyName,
-            datos: [],
-          };
-          oldData.datos.push(items);
-          return map.set(specialtyName, oldData);
-        }, new Map())
-        .values()
-    );
-    return newData;
+    return areas;
+  }
+  static async uploadAreaSpecialty(
+    id: AreaSpecialty['id'],
+    { institution, startDate, untilDate, file }: AreaSpecialty
+  ) {
+    const areas = await prisma.areaSpecialty.update({
+      where: { id },
+      data: {
+        institution,
+        startDate: startDate ? new Date(startDate) : null,
+        untilDate: untilDate ? new Date(untilDate) : null,
+        file,
+      },
+    });
+    return areas;
+  }
+  static async deleteAreaSpecialty(id: AreaSpecialty['id']) {
+    const areas = await prisma.areaSpecialty.delete({
+      where: { id },
+    });
+    return areas;
   }
 }
 export default AreaSpecialtyServices;
