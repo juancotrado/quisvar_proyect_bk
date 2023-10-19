@@ -47,10 +47,22 @@ class UsersServices {
         orderBy: { subtaskId: 'desc' },
         select: {
           subtask: {
-            include: {},
+            include: {
+              Levels: {
+                select: {
+                  stages: {
+                    select: {
+                      id: true,
+                      projectId: true,
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       });
+      console.log(JSON.stringify({ subTaskGeneral }, null, 2));
       if (!subTaskGeneral)
         throw new AppError('No se pudo encontrar las tareas', 404);
       const list = subTaskGeneral.map(s => s.subtask);
