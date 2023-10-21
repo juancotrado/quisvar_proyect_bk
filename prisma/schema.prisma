@@ -28,6 +28,24 @@ model Users {
   message      Mail[]
   messageReply MessageHistory[]
   feedbacks    UsersOnFeedbacks[]
+  equipment    Equipment?
+}
+
+model WorkStation {
+  id        Int         @id @default(autoincrement())
+  name      String
+  total     Int
+  equipment Equipment[]
+}
+
+model Equipment {
+  id            Int          @id @default(autoincrement())
+  name          String
+  description   String?
+  userId        Int?         @unique
+  user          Users?       @relation(fields: [userId], references: [id])
+  workStationId Int?
+  workStation   WorkStation? @relation(fields: [workStationId], references: [id])
 }
 
 model GeneralFiles {

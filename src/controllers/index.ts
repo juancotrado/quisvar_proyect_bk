@@ -144,6 +144,18 @@ import {
   createTrainingSpecialtyList,
   getTrainingSpecialtyList,
 } from './trainingSpecialtyList.controllers';
+import {
+  createWorkStation,
+  getWorkStation,
+  updateWorkStation,
+  deleteWorkStation,
+} from './workStation.controllers';
+import {
+  createEquipment,
+  getEquipment,
+  updateEquipment,
+  deleteEquipment,
+} from './workStation.controller';
 // User Controllers
 export {
   showUsers,
@@ -289,3 +301,12 @@ export {
 };
 //Training Specialty List Controllers
 export { createTrainingSpecialtyList, getTrainingSpecialtyList };
+//WorkStation Controller
+export {
+  createWorkStation,
+  getWorkStation,
+  updateWorkStation,
+  deleteWorkStation,
+};
+//Equipment Controller
+export { createEquipment, getEquipment, updateEquipment, deleteEquipment };

@@ -22,6 +22,8 @@ import AreaSpecialtyServices from './areaSpecialty.services';
 import TrainingSpecialtyServices from './trainingSpecialty.services';
 import AreaSpecialtyListServices from './areaSpecialtyList.services';
 import TrainingSpecialtyListServices from './trainingSpecialtyList.services';
+import WorkStationServices from './workStation.services';
+import EquipmentServices from './equipment.services';
 export {
   UsersServices,
   authServices,
@@ -48,6 +50,8 @@ export {
   AreaSpecialtyListServices,
   TrainingSpecialtyServices,
   TrainingSpecialtyListServices,
+  WorkStationServices,
+  EquipmentServices,
 };
 export const rootPath = './uploads';
 export const _dirPath = `${rootPath}/projects`;
