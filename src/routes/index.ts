@@ -22,6 +22,8 @@ import areaSpecialtyRouter from './areaSpecialty.routes';
 import areaSpecialtyListRouter from './areaSpecialtyList.routes';
 import trainingSpecialtyRouter from './trainingSpecialty.routes';
 import trainingSpecialtyListRouter from './trainingSpecialtyList.routes';
+import workStationRouter from './workStation.routes';
+import equipmentRouter from './equipment.routes';
 export {
   userRouter,
   authRouter,
@@ -47,4 +49,6 @@ export {
   areaSpecialtyListRouter,
   trainingSpecialtyRouter,
   trainingSpecialtyListRouter,
+  workStationRouter,
+  equipmentRouter,
 };

@@ -30,6 +30,8 @@ import {
   trainingSpecialtyRouter,
   areaSpecialtyListRouter,
   trainingSpecialtyListRouter,
+  workStationRouter,
+  equipmentRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -72,6 +74,8 @@ class Server {
     trainingSpecialty: `/${process.env.ROUTE}/trainingSpecialty`,
     areaSpecialtyList: `/${process.env.ROUTE}/areaSpecialtyList`,
     trainingSpecialtyList: `/${process.env.ROUTE}/trainingSpecialtyList`,
+    workStation: `/${process.env.ROUTE}/workStation`,
+    equipment: `/${process.env.ROUTE}/equipment`,
   };
 
   constructor() {
@@ -131,6 +135,8 @@ class Server {
     this.app.use(this.path.trainingSpecialty, trainingSpecialtyRouter);
     this.app.use(this.path.areaSpecialtyList, areaSpecialtyListRouter);
     this.app.use(this.path.trainingSpecialtyList, trainingSpecialtyListRouter);
+    this.app.use(this.path.workStation, workStationRouter);
+    this.app.use(this.path.equipment, equipmentRouter);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)
