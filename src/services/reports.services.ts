@@ -48,7 +48,8 @@ class ReportsServices {
             description: true,
             price: true,
             name: true,
-            // feedBacks:{},
+            feedBacks: true,
+            users: true,
             Levels: {
               select: {
                 stages: {
