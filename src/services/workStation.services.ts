@@ -4,6 +4,8 @@ import { WorkStation, prisma } from '../utils/prisma.server';
 class WorkStationServices {
   static async createWorkStation(data: WorkStation) {
     if (!data) throw new AppError(`Datos incorrectos`, 400);
+    console.log(data);
+
     const stations = await prisma.workStation.create({
       data,
     });

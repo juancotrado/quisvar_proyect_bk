@@ -155,7 +155,7 @@ import {
   getEquipment,
   updateEquipment,
   deleteEquipment,
-} from './workStation.controller';
+} from './equipment.controller';
 // User Controllers
 export {
   showUsers,

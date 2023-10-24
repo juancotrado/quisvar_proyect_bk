@@ -1,13 +1,23 @@
 import { NextFunction, Request, Response } from 'express';
-import { WorkStationServices } from '../services';
+import { EquipmentServices, WorkStationServices } from '../services';
+import AppError from '../utils/appError';
+import { WorkStation } from '@prisma/client';
+type FilesProps = { [fieldname: string]: Express.Multer.File[] };
 export const createWorkStation = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { body } = req;
-    const query = await WorkStationServices.createWorkStation(body);
+    if (!req.files)
+      throw new AppError('Oops!, no se pudo subir los archivos', 400);
+    const { file } = req.files as FilesProps;
+    const body = req.body as WorkStation;
+    const query = await WorkStationServices.createWorkStation({
+      ...body,
+      total: +body.total,
+      doc: file[0].filename,
+    });
     res.status(201).json(query);
   } catch (error) {
     console.log(error);

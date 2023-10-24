@@ -19,6 +19,8 @@ model Users {
   contract     String?
   cv           String?
   declaration  String?
+  ruc          String?
+  address      String?
   profile      Profiles?
   project      Projects[]
   subTasks     TaskOnUsers[]
@@ -32,15 +34,19 @@ model Users {
 }
 
 model WorkStation {
-  id        Int         @id @default(autoincrement())
-  name      String
-  total     Int
-  equipment Equipment[]
+  id          Int         @id @default(autoincrement())
+  name        String
+  total       Int
+  doc         String?
+  description String?
+  price       String
+  equipment   Equipment[]
 }
 
 model Equipment {
   id            Int          @id @default(autoincrement())
   name          String
+  doc           String?
   description   String?
   userId        Int?         @unique
   user          Users?       @relation(fields: [userId], references: [id])
