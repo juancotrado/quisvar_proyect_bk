@@ -1,5 +1,6 @@
 import AppError from '../utils/appError';
 import { WorkStation, prisma } from '../utils/prisma.server';
+import Queries from '../utils/queries';
 
 class WorkStationServices {
   static async createWorkStation(data: WorkStation) {
@@ -14,12 +15,16 @@ class WorkStationServices {
   static async getWorkStation() {
     const stations = await prisma.workStation.findMany({
       select: {
+        id: true,
         name: true,
         total: true,
-        equipment: true,
+        equipment: {
+          include: {
+            user: Queries.selectProfileShort,
+          },
+        },
       },
     });
-
     return stations;
   }
   static async updateWorkStation(id: WorkStation['id'], data: WorkStation) {

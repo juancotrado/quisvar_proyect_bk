@@ -1,5 +1,6 @@
 import AppError from '../utils/appError';
 import { Equipment, prisma } from '../utils/prisma.server';
+import Queries from '../utils/queries';
 
 class EquipmentServices {
   static async createEquipment(data: Equipment) {

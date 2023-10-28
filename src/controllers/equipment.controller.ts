@@ -14,7 +14,9 @@ export const createEquipment = async (
     const { body } = req;
     const query = await EquipmentServices.createEquipment({
       ...body,
-      file: file[0].filename,
+      userId: +body.userId,
+      workStationId: +body.workStationId,
+      doc: file[0].filename,
     });
     res.status(201).json(query);
   } catch (error) {
