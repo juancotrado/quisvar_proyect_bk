@@ -16,13 +16,14 @@ export const archiverPath = async (
 ) => {
   try {
     const { id } = req.params;
-    const { nameZip } = req.query;
+    const { nameZip, typeZip } = req.query;
     const type = req.query.type as keyof typeof TYPE_PATH;
     const TypePathServices = TYPE_PATH[type];
 
     const path = await TypePathServices(+id, 'UPLOADS');
-    const normalicePath = path.split('/').slice(0, -1).join('/');
-    const folderPath = path.slice(2);
+    const pathReplace = path.replace('projects', typeZip as string);
+    const normalicePath = pathReplace.split('/').slice(0, -1).join('/');
+    const folderPath = pathReplace.slice(2);
     const zipFilePath = `${normalicePath}/${nameZip ?? 'defaultName'}.zip`;
     const resArchiver = await archiverFolder(folderPath, zipFilePath);
     res.status(201).json({
