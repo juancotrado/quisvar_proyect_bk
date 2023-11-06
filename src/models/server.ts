@@ -40,6 +40,7 @@ import Sockets from './sockets';
 import { verifySecretEnv } from '../middlewares/auth.middleware';
 import TimerCron from './timer';
 import { setAdmin } from '../utils/tools';
+import path from 'path';
 
 dotenv.config();
 class Server {
@@ -48,6 +49,7 @@ class Server {
   private httpServer: http.Server;
   private PORT: string = process.env.PORT || '8080';
   private HOST: string = process.env.HOST || 'localhost';
+  private rootDir = path.resolve(__dirname, '../..');
   private path = {
     auth: `/${process.env.ROUTE}/auth/login`,
     users: `/${process.env.ROUTE}/users`,
@@ -138,6 +140,7 @@ class Server {
     this.app.use(this.path.workStation, workStationRouter);
     this.app.use(this.path.equipment, equipmentRouter);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
+      res.locals.pageNotFound = this.rootDir + '/404_page/index.html';
       return next(
         new AppError(`can't find ${req.originalUrl} on this server`, 404)
       );

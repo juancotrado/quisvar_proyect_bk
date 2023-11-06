@@ -15,6 +15,13 @@ const globalErrorHandler = (
     err.message.length > 500
       ? 'Variables incorrectas, ingrese los campos necesarios'
       : err.message;
+  //---------------------------error_such_files----------------------------
+  if (req.url.includes('uploads')) {
+    const pageNotFound = res.locals.pageNotFound as string;
+    return res.sendFile(pageNotFound);
+  }
+  //-----------------------------------------------------------------------
+
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === 'P2002')
       return res.status(err.statusCode).json({
