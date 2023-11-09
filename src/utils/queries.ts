@@ -2,6 +2,8 @@ class Queries {
   static selectProfileUser = {
     select: {
       id: true,
+      ruc: true,
+      address: true,
       profile: {
         select: {
           firstName: true,

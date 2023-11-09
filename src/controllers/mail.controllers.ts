@@ -156,10 +156,11 @@ export const doneMessage = async (
 ) => {
   try {
     const userInfo: UserType = res.locals.userInfo;
+    const { paymentPdfData } = req.body;
     const senderId = userInfo.id;
     const { id } = req.params;
     const _messageId = parseInt(id);
-    const query = await MailServices.done(_messageId, senderId);
+    const query = await MailServices.done(_messageId, senderId, paymentPdfData);
     res.status(201).json(query);
   } catch (error) {
     next(error);

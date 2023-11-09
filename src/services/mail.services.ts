@@ -300,12 +300,16 @@ class MailServices {
     //------------------------------------------------------------------
     return archived;
   }
-  static async done(id: Messages['id'], senderId: number) {
+  static async done(
+    id: Messages['id'],
+    senderId: number,
+    paymentPdfData: string
+  ) {
     if (!id) throw new AppError('Ops, ID invalido', 400);
     if (!senderId) throw new AppError('Ingrese Destinatario', 400);
     const done = await prisma.messages.update({
       where: { id },
-      data: { status: 'FINALIZADO' },
+      data: { status: 'FINALIZADO', paymentPdfData },
     });
     //------------------------------------------------------------------
     await prisma.mail.updateMany({
