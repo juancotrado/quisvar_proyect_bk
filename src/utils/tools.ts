@@ -536,7 +536,7 @@ export const setAdmin = async () => {
     const password = await bcrypt.hash('admin', 10);
     const createAdmin = await prisma.users.create({
       data: {
-        email: 'admin@admin.com',
+        email: `admin${new Date().getTime()}@admin.com`,
         password,
         role: 'SUPER_ADMIN',
         status: true,
