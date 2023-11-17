@@ -71,6 +71,9 @@ model Profiles {
   degree      String?
   job         String?
   description String?
+  department  String?
+  province    String?
+  district    String?
   userId      Int      @unique
   user        Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
