@@ -22,6 +22,11 @@ export type userProfilePick = Pick<
   | 'description'
   | 'cv'
   | 'declaration'
+  | 'department'
+  | 'province'
+  | 'district'
+  | 'ruc'
+  | 'address'
 >;
 
 export type projectPick = Pick<
