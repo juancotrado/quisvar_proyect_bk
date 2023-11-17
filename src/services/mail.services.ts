@@ -79,6 +79,11 @@ class MailServices {
             user: Queries.selectProfileUser,
           },
         },
+        filesPay: {
+          select: {
+            files: true,
+          },
+        },
         files: {
           orderBy: { id: 'desc' },
           select: { id: true, name: true, path: true, attempt: true },
@@ -366,15 +371,11 @@ class MailServices {
     files: Pick<FilesPayment, 'name' | 'path'>[]
   ) {
     //------------------------------------------------------------------
-    console.log('firstLog', id, senderId, files);
     const getReceiver = await prisma.mail.findFirst({
       where: { messageId: id, type: 'SENDER', role: 'MAIN' },
     });
-
-    console.log('second', getReceiver);
     if (!getReceiver) throw new AppError('error', 400);
     const { userId: receiverId } = getReceiver;
-    console.log('third', receiverId);
     //------------------------------------------------------------------
     const newVoucher = await prisma.messages.update({
       where: { id },
@@ -385,27 +386,15 @@ class MailServices {
         },
       },
     });
-    console.log('four', newVoucher);
-    const query = prisma.messages.findMany({
-      where: {
-        id,
-      },
-      select: {
-        users: true,
-      },
-    });
-    console.log('five', query);
     //------------------------------------------------------------------
-    const uno = await prisma.mail.update({
+    await prisma.mail.update({
       where: { userId_messageId: { messageId: id, userId: senderId } },
       data: { type: 'SENDER' },
     });
-    console.log('uno', uno);
-    const dos = await prisma.mail.update({
+    await prisma.mail.update({
       where: { userId_messageId: { messageId: id, userId: receiverId } },
       data: { type: 'RECEIVER' },
     });
-    console.log('dos', dos);
     //------------------------------------------------------------------
     return newVoucher;
   }
