@@ -41,9 +41,11 @@ export const editFeedback = async (
     const userInfo: UserType = res.locals.userInfo;
     const userId = userInfo.id;
     const { body } = req;
+    console.log(body);
     const query = await FeedBackServices.update({ ...body, userId });
     res.status(201).json(query);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
