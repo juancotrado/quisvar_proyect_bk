@@ -51,10 +51,10 @@ export const updateLevel = async (
     const { id } = req.params;
     const _task_id = parseInt(id);
     const { oldPath, ...query } = await LevelsServices.update(_task_id, body);
-    const newPath = setNewPath(oldPath, query.item + query.name);
-    const oldEditable = oldPath.replace('projects', 'editables');
-    const newEditable = newPath.replace('projects', 'editables');
-    if (query) {
+    if (query && query.item && query.name) {
+      const newPath = setNewPath(oldPath, query.item + query.name);
+      const oldEditable = oldPath.replace('projects', 'editables');
+      const newEditable = newPath.replace('projects', 'editables');
       // mv(oldPath, newPath, err => console.log(err));
       renameDir(oldPath, newPath);
       renameDir(oldEditable, newEditable);
