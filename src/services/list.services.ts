@@ -87,6 +87,12 @@ class ListServices {
       select: {
         id: true,
         role: true,
+        equipment: {
+          select: {
+            name: true,
+            workStation: true,
+          },
+        },
         profile: {
           select: {
             firstName: true,
