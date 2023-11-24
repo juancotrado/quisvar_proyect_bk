@@ -106,7 +106,23 @@ class UsersServices {
     const findUserByDNI = await prisma.profiles.findUnique({
       where: { dni },
     });
-    if (findUserByDNI) throw new AppError('Oops!, DNI ha sido registrado', 404);
+    if (findUserByDNI)
+      throw new AppError('Oops!, Este DNI ya ha sido registrado', 404);
+    if (phone) {
+      const findUserByCell = await prisma.profiles.findUnique({
+        where: { phone },
+      });
+      if (findUserByCell)
+        throw new AppError(
+          'Oops!, Este Numero de Celular ya ha sido registrado',
+          404
+        );
+    }
+    const findUserByEmail = await prisma.users.findUnique({
+      where: { email },
+    });
+    if (findUserByEmail)
+      throw new AppError('Oops!, Este Correo ya ha sido registrado', 404);
     const newUser = await prisma.users.create({
       data: {
         email,

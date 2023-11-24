@@ -71,7 +71,7 @@ export const uploadFilesGeneral = async (
     const body = {
       id: 0,
       dir: `general/${req.file.filename}`,
-      name: req.file.originalname,
+      name: req.file.originalname.toUpperCase(),
       createdAt: new Date(),
     };
     const query = await FilesServices.createGeneralFile(body);
