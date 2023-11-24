@@ -7,7 +7,14 @@ class UsersServices {
   static async getAll() {
     const users = await prisma.users.findMany({
       orderBy: { id: 'asc' },
-      include: { profile: true },
+      include: {
+        profile: true,
+        equipment: {
+          include: {
+            workStation: true,
+          },
+        },
+      },
     });
     if (users.length == 0)
       throw new AppError('No se pudo encontrar el registro de usuarios', 404);
