@@ -1,10 +1,23 @@
 import AppError from '../utils/appError';
 import { Equipment, prisma } from '../utils/prisma.server';
-import Queries from '../utils/queries';
+// import Queries from '../utils/queries';
 
 class EquipmentServices {
   static async createEquipment(data: Equipment) {
     if (!data) throw new AppError(`Datos incorrectos`, 400);
+    const hasLimit = await prisma.workStation.findFirst({
+      where: { id: data.workStationId },
+      select: {
+        total: true,
+        equipment: true,
+      },
+    });
+    if (hasLimit?.equipment.length === hasLimit?.total)
+      throw new AppError(`Capacidad llena`, 400);
+    const alreadyExist = await prisma.equipment.findFirst({
+      where: { userId: data.userId },
+    });
+    if (alreadyExist) throw new AppError(`Usuario ya tiene un equipo`, 400);
     const equipment = await prisma.equipment.create({
       data,
     });

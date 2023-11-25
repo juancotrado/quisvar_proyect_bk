@@ -50,7 +50,7 @@ model Equipment {
   description   String?
   userId        Int?         @unique
   user          Users?       @relation(fields: [userId], references: [id])
-  workStationId Int?
+  workStationId Int
   workStation   WorkStation? @relation(fields: [workStationId], references: [id])
 }
 
