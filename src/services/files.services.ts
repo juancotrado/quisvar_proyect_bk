@@ -61,10 +61,22 @@ class FilesServices {
   }
 
   static async getAllGeneralFile() {
-    const generalsFiles = await prisma.generalFiles.findMany();
+    const generalsFiles = await prisma.generalFiles.findMany({
+      orderBy: {
+        name: 'asc',
+      },
+    });
     return generalsFiles;
   }
   static async createGeneralFile({ dir, name }: GeneralFiles) {
+    const duplicatedNameInFile = await prisma.generalFiles.findFirst({
+      where: {
+        name,
+      },
+    });
+    if (duplicatedNameInFile)
+      throw new AppError(`Nombre Duplicado del archivo.`, 404);
+
     const newGeneralFile = await prisma.generalFiles.create({
       data: {
         dir,
