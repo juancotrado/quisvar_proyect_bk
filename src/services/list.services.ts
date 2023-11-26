@@ -2,16 +2,23 @@ import AppError from '../utils/appError';
 import { List, ListOnUsers, Users, prisma } from '../utils/prisma.server';
 
 class ListServices {
-  static async create({ title }: List) {
-    if (!title) throw new AppError(`No hay titulo`, 400);
-    const newList = await prisma.list.create({ data: { title } });
+  static async create({ title, timer }: List) {
+    if (!title || !timer) throw new AppError(`Oops!, algo salio mal`, 400);
+    console.log(title, timer);
+    const newList = await prisma.list.create({
+      data: {
+        title,
+        timer,
+      },
+    });
+    console.log(newList);
     return newList;
   }
-  static async update(id: List['id'], { title }: List) {
+  static async update(id: List['id'], { title, timer }: List) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateList = await prisma.list.update({
       where: { id },
-      data: { title },
+      data: { title, timer },
     });
     return updateList;
   }
@@ -44,6 +51,7 @@ class ListServices {
       },
       select: {
         title: true,
+        timer: true,
         users: true,
         createdAt: true,
       },
@@ -71,6 +79,7 @@ class ListServices {
         createdAt: true,
         id: true,
         title: true,
+        timer: true,
         users: true,
       },
     });
@@ -120,6 +129,7 @@ class ListServices {
               select: {
                 createdAt: true,
                 title: true,
+                timer: true,
                 id: true,
               },
             },

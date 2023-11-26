@@ -364,6 +364,7 @@ model TrainingSpecialist {
 model List {
   id        Int           @id @default(autoincrement())
   title     String?
+  timer     String?
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   users     ListOnUsers[]
