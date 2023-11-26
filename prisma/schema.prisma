@@ -74,6 +74,8 @@ model Profiles {
   department  String?
   province    String?
   district    String?
+  room        String?
+  usuario     String?
   userId      Int      @unique
   user        Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -362,6 +364,7 @@ model TrainingSpecialist {
 model List {
   id        Int           @id @default(autoincrement())
   title     String?
+  timer     String?
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   users     ListOnUsers[]
