@@ -10,6 +10,7 @@ import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
 import { unlinkSync } from 'fs';
 import { TypeFileUser } from 'types/types';
+import { convertToUtf8 } from '../utils/tools';
 export const uploadFile = async (
   req: Request,
   res: Response,
@@ -71,7 +72,7 @@ export const uploadFilesGeneral = async (
     const body = {
       id: 0,
       dir: `general/${req.file.filename}`,
-      name: req.file.originalname.toUpperCase(),
+      name: convertToUtf8(req.file.originalname.toUpperCase()),
       createdAt: new Date(),
     };
     const query = await FilesServices.createGeneralFile(body);
@@ -114,7 +115,7 @@ export const uploadFiles = async (
       dir,
       type,
       subTasksId,
-      name: filename,
+      name: convertToUtf8(filename),
       userId: userInfo.id,
     }));
     if (!req.files) return;

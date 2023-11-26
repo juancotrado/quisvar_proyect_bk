@@ -511,6 +511,8 @@ export const convertToNumber = (value: string, type: Levels['typeItem']) => {
   return parseInt(value);
 };
 
+export const convertToUtf8 = (name: string) =>
+  Buffer.from(name, 'latin1').toString('utf8');
 export const toEditablesFiles = (value: string, type?: 'MODEL' | 'REVIEW') => {
   // const getValue = value.split('/');
   // const index = getValue.findIndex(v => v === 'projects');
