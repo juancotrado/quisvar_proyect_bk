@@ -62,22 +62,26 @@ model GeneralFiles {
 }
 
 model Profiles {
-  id          Int      @id @default(autoincrement())
-  firstName   String
-  lastName    String
-  dni         String   @unique @db.VarChar(8)
-  phone       String?  @unique
-  updatedAt   DateTime @updatedAt
-  degree      String?
-  job         String?
-  description String?
-  department  String?
-  province    String?
-  district    String?
-  room        String?
-  usuario     String?
-  userId      Int      @unique
-  user        Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           Int      @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  firstNameRef String   @default("")
+  lastNameRef  String   @default("")
+  addressRef   String?  @default("")
+  dni          String   @unique @db.VarChar(8)
+  phone        String?  @unique
+  phoneRef     String?   @default("")
+  updatedAt    DateTime @updatedAt
+  degree       String?
+  job          String?
+  description  String?
+  department   String?
+  province     String?
+  district     String?
+  room         String?
+  usuario      String?
+  userId       Int      @unique
+  user         Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Sector {

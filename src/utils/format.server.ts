@@ -27,6 +27,10 @@ export type userProfilePick = Pick<
   | 'district'
   | 'ruc'
   | 'address'
+  | 'addressRef'
+  | 'firstNameRef'
+  | 'lastNameRef'
+  | 'phoneRef'
 >;
 
 export type projectPick = Pick<

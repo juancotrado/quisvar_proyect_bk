@@ -108,6 +108,10 @@ class UsersServices {
     province,
     ruc,
     address,
+    addressRef,
+    firstNameRef,
+    lastNameRef,
+    phoneRef,
   }: userProfilePick) {
     const passwordHash = await bcrypt.hash(password, 10);
     const findUserByDNI = await prisma.profiles.findUnique({
@@ -150,6 +154,10 @@ class UsersServices {
             department,
             province,
             district,
+            addressRef,
+            phoneRef,
+            firstNameRef,
+            lastNameRef,
           },
         },
       },
