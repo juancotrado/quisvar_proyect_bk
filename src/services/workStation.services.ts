@@ -5,8 +5,6 @@ import Queries from '../utils/queries';
 class WorkStationServices {
   static async createWorkStation(data: WorkStation) {
     if (!data) throw new AppError(`Datos incorrectos`, 400);
-    console.log(data);
-
     const stations = await prisma.workStation.create({
       data,
     });
@@ -18,6 +16,7 @@ class WorkStationServices {
         id: true,
         name: true,
         total: true,
+        description: true,
         equipment: {
           include: {
             user: Queries.selectProfileShort,

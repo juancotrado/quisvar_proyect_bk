@@ -17,7 +17,8 @@ class EquipmentServices {
     const alreadyExist = await prisma.equipment.findFirst({
       where: { userId: data.userId },
     });
-    if (alreadyExist) throw new AppError(`Usuario ya tiene un equipo`, 400);
+    if (alreadyExist)
+      throw new AppError(`Usuario ya tiene un equipo (remoto)`, 400);
     const equipment = await prisma.equipment.create({
       data,
     });
@@ -31,6 +32,8 @@ class EquipmentServices {
     return equipment;
   }
   static async updateEquipment(id: Equipment['id'], data: Equipment) {
+    console.log(data, id);
+
     const equipment = await prisma.equipment.update({
       where: { id },
       data,
@@ -42,7 +45,6 @@ class EquipmentServices {
     const equipment = await prisma.equipment.delete({
       where: { id },
     });
-
     return equipment;
   }
 }
