@@ -141,6 +141,7 @@ model Stages {
   startDate    DateTime          @default(now())
   untilDate    DateTime          @default(now())
   status       Boolean           @default(false)
+  isProject    Boolean           @default(false)
   moderatorId  Int?
   company      Company?          @relation(fields: [companyId], references: [id])
   consortium   Consortium?       @relation(fields: [consortiumId], references: [id])

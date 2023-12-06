@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Levels, SubTasks } from '@prisma/client';
+import { Levels, Stages, SubTasks } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import { parsePath, renameDir } from '../utils/fileSystem';
@@ -92,6 +92,7 @@ class LevelsServices {
     rootId,
     isProject,
     userId,
+    isArea,
     typeItem,
   }: Levels) {
     //---------------------------exist_file----------------------------------------
@@ -102,11 +103,11 @@ class LevelsServices {
     if (duplicated) throw new AppError('Error al crear, Nombre existente', 404);
     //--------------------------get_new_item---------------------------------------
     const root = await this.findRoot(rootId);
-    const { rootItem, rootLevel, project, include } = root;
+    const { rootItem, rootLevel, project, include, area } = root;
     const stages = { connect: { id: stagesId } };
-    const isArea = project;
+    // const isArea = area;
     const level = rootLevel + 1;
-    const isInclude = project || include;
+    const isInclude = area || include;
     //--------------------------set_new_item---------------------------------------
     const index = quantity + 1;
     const newRootItem = rootItem ? rootItem + '.' : '';
@@ -115,7 +116,8 @@ class LevelsServices {
     const item = `${newRootItem}${_type}.`;
     //--------------------------find_user------------------------------------------
     const _user = () => {
-      if (userId && (project || isProject)) return { connect: { id: userId } };
+      if (userId && (project || isProject || isArea))
+        return { connect: { id: userId } };
       return undefined;
     };
     //-----------------------------------------------------------------------------
@@ -159,18 +161,19 @@ class LevelsServices {
   static async updateTypeItem(
     id: Levels['id'],
     rootTypeItem: Levels['rootTypeItem'],
+    isArea: Stages['isProject'],
     type: 'LEVEL' | 'STAGE' = 'LEVEL'
   ) {
     if (type === 'STAGE') {
       const stageType = await prisma.stages.update({
         where: { id },
-        data: { rootTypeItem },
+        data: { rootTypeItem, isProject: isArea },
       });
       return stageType;
     }
     const levelType = await prisma.levels.update({
       where: { id },
-      data: { rootTypeItem },
+      data: { rootTypeItem, isProject: isArea },
     });
     return levelType;
   }

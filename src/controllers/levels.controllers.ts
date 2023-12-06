@@ -74,8 +74,14 @@ export const updateTypeItem = async (
     const { id } = req.params;
     const item = req.query.item as Levels['typeItem'];
     const type = req.query.type as 'STAGE' | 'LEVEL';
+    const isArea = req.query.isArea === 'true';
     const _task_id = parseInt(id);
-    const query = await LevelsServices.updateTypeItem(_task_id, item, type);
+    const query = await LevelsServices.updateTypeItem(
+      _task_id,
+      item,
+      isArea,
+      type
+    );
     res.status(200).json(query);
   } catch (error) {
     next(error);
