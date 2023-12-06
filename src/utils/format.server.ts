@@ -31,6 +31,7 @@ export type userProfilePick = Pick<
   | 'firstNameRef'
   | 'lastNameRef'
   | 'phoneRef'
+  | 'role'
 >;
 
 export type projectPick = Pick<
