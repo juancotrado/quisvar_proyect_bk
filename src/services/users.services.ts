@@ -101,6 +101,7 @@ class UsersServices {
     degree,
     job,
     cv,
+    role,
     declaration,
     department,
     district,
@@ -141,6 +142,7 @@ class UsersServices {
         ruc,
         address,
         declaration,
+        role,
         profile: {
           create: {
             firstName,

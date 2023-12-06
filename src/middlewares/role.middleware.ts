@@ -13,7 +13,12 @@ const roleHandler =
     next();
   };
 
-export const _admin_role = roleHandler(['SUPER_ADMIN', 'ADMIN', 'ASSISTANT']);
+export const _admin_role = roleHandler([
+  'SUPER_ADMIN',
+  'ADMIN',
+  'ASSISTANT',
+  'ASSISTANT_ADMINISTRATIVE',
+]);
 export const _mod_role = roleHandler([
   'SUPER_ADMIN',
   'ADMIN',
@@ -28,4 +33,5 @@ export const _employee_role = roleHandler([
   'SUPER_MOD',
   'MOD',
   'EMPLOYEE',
+  'ASSISTANT_ADMINISTRATIVE',
 ]);
