@@ -1,5 +1,6 @@
 import AppError from '../utils/appError';
 import { userProfilePick } from '../utils/format.server';
+import { enviarCorreoAgradecimiento } from '../utils/mailer';
 import { Users, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
 
@@ -162,6 +163,10 @@ class UsersServices {
         },
       },
     });
+    enviarCorreoAgradecimiento(
+      email,
+      `Tus datos de acceso son: \n DNI: ${dni} \n Contraseña: ${password}`
+    );
     return newUser;
   }
 
