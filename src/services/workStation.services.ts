@@ -17,11 +17,15 @@ class WorkStationServices {
         name: true,
         total: true,
         description: true,
+        price: true,
         equipment: {
           include: {
             user: Queries.selectProfileShort,
           },
         },
+      },
+      orderBy: {
+        name: 'asc',
       },
     });
     return stations;
