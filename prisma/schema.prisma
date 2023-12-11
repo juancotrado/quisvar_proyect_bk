@@ -70,7 +70,7 @@ model Profiles {
   addressRef   String?  @default("")
   dni          String   @unique @db.VarChar(8)
   phone        String?  @unique
-  phoneRef     String?   @default("")
+  phoneRef     String?  @default("")
   updatedAt    DateTime @updatedAt
   degree       String?
   job          String?
@@ -79,6 +79,7 @@ model Profiles {
   province     String?
   district     String?
   room         String?
+  userPc       String?
   usuario      String?
   userId       Int      @unique
   user         Users    @relation(fields: [userId], references: [id], onDelete: Cascade)

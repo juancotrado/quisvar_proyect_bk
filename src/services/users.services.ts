@@ -112,6 +112,7 @@ class UsersServices {
     addressRef,
     firstNameRef,
     room,
+    userPc,
     lastNameRef,
     phoneRef,
   }: userProfilePick) {
@@ -160,6 +161,7 @@ class UsersServices {
             phoneRef,
             firstNameRef,
             room,
+            userPc,
             lastNameRef,
           },
         },
