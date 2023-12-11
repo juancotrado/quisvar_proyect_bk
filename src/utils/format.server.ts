@@ -32,6 +32,7 @@ export type userProfilePick = Pick<
   | 'lastNameRef'
   | 'phoneRef'
   | 'room'
+  | 'userPc'
   | 'role'
 >;
 
