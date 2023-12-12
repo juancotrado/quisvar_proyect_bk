@@ -5,13 +5,23 @@ class ListServices {
   static async create({ title, timer }: List) {
     if (!title || !timer) throw new AppError(`Oops!, algo salio mal`, 400);
     console.log(title, timer);
+    const lastList = await prisma.list.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        users: true,
+      },
+      take: 1,
+    });
+    if (lastList[0].users.length === 0)
+      throw new AppError(`Oops!, Al parecer hay una lista en curso`, 400);
     const newList = await prisma.list.create({
       data: {
         title,
         timer,
       },
     });
-    console.log(newList);
     return newList;
   }
   static async update(id: List['id'], { title, timer }: List) {
