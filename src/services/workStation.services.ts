@@ -20,7 +20,19 @@ class WorkStationServices {
         price: true,
         equipment: {
           include: {
-            user: Queries.selectProfileShort,
+            user: {
+              select: {
+                id: true,
+                profile: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    dni: true,
+                    userPc: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
