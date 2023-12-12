@@ -1,8 +1,23 @@
 import { Router } from 'express';
-import { login, recoverPassword } from '../controllers';
+import { AuthController } from '../controllers';
+import authenticateHandler from '../middlewares/auth.middleware';
 
-const router = Router();
+class AuthRouter {
+  public readonly router: Router;
 
-router.post('/', login);
-router.patch('/recovery', recoverPassword);
+  constructor() {
+    this.router = Router();
+    this.setUp();
+  }
+
+  public setUp() {
+    const { login, recoverPassword } = AuthController;
+    this.router.post('/login', login);
+    this.router.use(authenticateHandler);
+    this.router.post('/recovery', recoverPassword);
+  }
+}
+
+const { router } = new AuthRouter();
+
 export default router;

@@ -51,7 +51,7 @@ class Server {
   private HOST: string = process.env.HOST || 'localhost';
   private rootDir = path.resolve(__dirname, '../..');
   private path = {
-    auth: `/${process.env.ROUTE}/auth/login`,
+    auth: `/${process.env.ROUTE}/auth`,
     users: `/${process.env.ROUTE}/users`,
     profile: `/${process.env.ROUTE}/profile`,
     specialities: `/${process.env.ROUTE}/specialities`,

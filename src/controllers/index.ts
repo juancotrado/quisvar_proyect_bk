@@ -7,7 +7,7 @@ import {
   showTaskByUser,
   showSubTasksByUser,
 } from './users.controllers';
-import { login, recoverPassword } from './auth.controllers';
+import AuthController from './auth.controllers';
 
 // updateTaskStatus,
 // assignedTask,
@@ -167,7 +167,6 @@ export {
   showSubTasksByUser,
 };
 //Auth Controllers
-export { login, recoverPassword };
 export {
   showSpecialities,
   createSpeciality,
@@ -310,3 +309,5 @@ export {
 };
 //Equipment Controller
 export { createEquipment, getEquipment, updateEquipment, deleteEquipment };
+
+export { AuthController };
