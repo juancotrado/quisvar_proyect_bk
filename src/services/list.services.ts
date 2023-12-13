@@ -118,6 +118,8 @@ class ListServices {
             lastName: true,
             dni: true,
             phone: true,
+            room: true,
+            userPc: true,
           },
         },
         list: {
