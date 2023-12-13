@@ -6,8 +6,11 @@ import bcrypt from 'bcryptjs';
 
 class UsersServices {
   static async getAll() {
-    const users = await prisma.users.findMany({
-      orderBy: { id: 'asc' },
+    const usersAdmin = await prisma.users.findMany({
+      where: {
+        role: { in: ['SUPER_ADMIN', 'ADMIN'] },
+      },
+      orderBy: { createdAt: 'asc' },
       include: {
         profile: true,
         equipment: {
@@ -17,9 +20,31 @@ class UsersServices {
         },
       },
     });
-    if (users.length == 0)
+    const usersEmployes = await prisma.users.findMany({
+      where: {
+        role: {
+          in: [
+            'ASSISTANT',
+            'ASSISTANT_ADMINISTRATIVE',
+            'SUPER_MOD',
+            'MOD',
+            'EMPLOYEE',
+          ],
+        },
+      },
+      orderBy: { profile: { lastName: 'asc' } },
+      include: {
+        profile: true,
+        equipment: {
+          include: {
+            workStation: true,
+          },
+        },
+      },
+    });
+    if (usersAdmin.length == 0 && usersEmployes.length == 0)
       throw new AppError('No se pudo encontrar el registro de usuarios', 404);
-    return users;
+    return [...usersAdmin, ...usersEmployes];
   }
 
   static async find(id: Users['id']) {
