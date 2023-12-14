@@ -102,7 +102,11 @@ class ListServices {
     const _endDate = new Date(endDate).getTime();
     const startOfDay = new Date(_startDate + GMT * 5);
     const endOfDay = new Date(_endDate + GMT * 29 - 1);
-    const list = await prisma.users.findMany({
+    const listAdmin = await prisma.users.findMany({
+      where: {
+        role: { in: ['SUPER_ADMIN', 'ADMIN'] },
+      },
+      orderBy: { createdAt: 'asc' },
       select: {
         id: true,
         role: true,
@@ -148,9 +152,67 @@ class ListServices {
           },
         },
       },
-      orderBy: { id: 'asc' },
     });
-    return list;
+    const listEmploye = await prisma.users.findMany({
+      where: {
+        role: {
+          in: [
+            'ASSISTANT',
+            'ASSISTANT_ADMINISTRATIVE',
+            'SUPER_MOD',
+            'MOD',
+            'EMPLOYEE',
+          ],
+        },
+      },
+      orderBy: { profile: { lastName: 'asc' } },
+      select: {
+        id: true,
+        role: true,
+        equipment: {
+          select: {
+            name: true,
+            workStation: true,
+          },
+        },
+        profile: {
+          select: {
+            firstName: true,
+            lastName: true,
+            dni: true,
+            phone: true,
+            room: true,
+            userPc: true,
+          },
+        },
+        list: {
+          where: {
+            list: {
+              createdAt: {
+                gte: startOfDay,
+                lte: endOfDay,
+              },
+            },
+          },
+          orderBy: {
+            assignedAt: 'asc',
+          },
+          select: {
+            status: true,
+            usersId: true,
+            list: {
+              select: {
+                createdAt: true,
+                title: true,
+                timer: true,
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return [...listAdmin, ...listEmploye];
   }
   static async deleteManyList() {
     const today = new Date();
