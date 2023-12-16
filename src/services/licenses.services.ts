@@ -32,12 +32,28 @@ class LicenseServices {
   }
   static async update(
     id: Licenses['id'],
-    { reason, startDate, untilDate, usersId, feedback, status }: Licenses
+    {
+      reason,
+      startDate,
+      untilDate,
+      usersId,
+      feedback,
+      status,
+      checkout,
+    }: Licenses
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateList = await prisma.licenses.update({
       where: { id },
-      data: { reason, startDate, untilDate, usersId, feedback, status },
+      data: {
+        reason,
+        startDate,
+        untilDate,
+        usersId,
+        feedback,
+        status,
+        checkout,
+      },
     });
     return updateList;
   }
