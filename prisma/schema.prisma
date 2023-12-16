@@ -383,6 +383,7 @@ model Licenses {
   feedback  String?
   status    LicensesStatus @default(PROCESS)
   startDate DateTime
+  checkout  DateTime?  
   untilDate DateTime
   createdAt DateTime       @default(now())
 }
