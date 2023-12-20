@@ -260,3 +260,7 @@ components:
         indexContract:
           type: string
           example: '{index:1,index2:23}'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2023-12-31T12:00:00Z'
