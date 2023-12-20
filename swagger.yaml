@@ -154,6 +154,34 @@ paths:
             application/json:
               example:
                 error: No se pudo encontrar el contrato
+    patch:
+      tags:
+        - contract
+      summary: Edit Contract
+      description: |-
+        Ingresar Los campos requeridos para crear un contrato
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del contrato
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contract'
+      responses:
+        '200':
+          description: Token generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtResponse'
     delete:
       tags:
         - contract
@@ -228,6 +256,8 @@ components:
         - bachelorCost
         - professionalCost
         - indexContract
+        - shortName
+        - difficulty
       type: object
       properties:
         cui:
@@ -236,9 +266,6 @@ components:
         name:
           type: string
           example: 'Proyecto de Mejora Continua'
-        number:
-          type: number
-          example: 23
         proyectName:
           type: string
           example: 'Proyecto de Mejora Continua'
@@ -257,6 +284,12 @@ components:
         bachelorCost:
           type: number
           example: 2300.12
+        shortName:
+          type: string
+          example: 'Proyecto de Mejora Continua'
+        difficulty:
+          type: integer
+          example: 1
         indexContract:
           type: string
           example: '{index:1,index2:23}'

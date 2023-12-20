@@ -480,15 +480,16 @@ model FilesMessageHistory {
 
 model Contratc {
   id               Int      @id @default(autoincrement())
-  number           Int
   cui              String
   name             String
   projectName      String
   department       String
   province         String
   district         String
-  bachelorCost     Decimal
-  professionalCost Decimal
+  bachelorCost     Float
+  professionalCost Float
+  shortName        String
+  difficulty       Int
   createdAt        DateTime @default(now())
   indexContract    String
 }

@@ -210,7 +210,6 @@ export interface usersCount {
 
 export type ContractForm = Pick<
   Contratc,
-  | 'number'
   | 'projectName'
   | 'name'
   | 'cui'
@@ -221,4 +220,6 @@ export type ContractForm = Pick<
   | 'department'
   | 'province'
   | 'district'
+  | 'difficulty'
+  | 'shortName'
 >;

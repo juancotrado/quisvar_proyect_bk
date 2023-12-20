@@ -36,9 +36,22 @@ class ContractController {
   ) {
     try {
       const { body } = req;
-      console.log('patito');
-      console.log(body);
       const result = await ContractServices.create(body);
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public static async updateContract(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { body } = req;
+      const { id } = req.params;
+      const result = await ContractServices.update(+id, body);
       res.status(201).json(result);
     } catch (error) {
       next(error);

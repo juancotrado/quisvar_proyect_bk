@@ -13,6 +13,7 @@ class ContractRoutes {
     this.router.get('/', ContractController.showContracts);
     this.router.get('/:id', ContractController.showContract);
     this.router.post('/', ContractController.createContract);
+    this.router.patch('/:id', ContractController.updateContract);
     this.router.delete('/:id', ContractController.deleteContract);
   }
 }

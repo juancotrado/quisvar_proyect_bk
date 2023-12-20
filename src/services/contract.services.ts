@@ -23,6 +23,15 @@ class ContractServices {
     return createContract;
   }
 
+  public static async update(id: Contratc['id'], data: ContractForm) {
+    if (!id) throw new AppError('Opps, id Invalida', 400);
+    const createContract = await prisma.contratc.update({
+      where: { id },
+      data,
+    });
+    return createContract;
+  }
+
   public static async delete(id: Contratc['id']) {
     if (!id) throw new AppError('Opps, id Invalida', 400);
     const deleteContract = await prisma.contratc.delete({ where: { id } });
