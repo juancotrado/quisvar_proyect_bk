@@ -1,0 +1,266 @@
+openapi: 3.0.3
+info:
+  title: DHYRIUM API
+  description: |-
+    Welcome to my DHYRIUM API
+  version: 1.0.0"
+externalDocs:
+  description: Repository
+  url: https://github.com/juancotrado/quisvar_proyect_bk
+servers:
+  - url: http://localhost:8081/api/v1
+#   # - url: https://dev.aqku.pe/api/v1
+#   # - url: https://api.aqku.pe/api/v1
+tags:
+  - name: auth
+    description: Authentication and security
+#   - name: user
+#     description: Operations about user
+#   - name: Change user
+#   - name: recovery password
+#     description: Recovery your password
+#   - name: configurations
+#   - name: blockchain
+#     description: Interaction with blockchains
+#   - name: blockchain - swap
+#   - name: blockchain - aqu pay
+#   - name: blockchain - nft
+#   - name: promotions
+#   - name: izipay
+#     description: Interaction with Izipay proyect
+paths:
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Login with a valid account
+      description: |-
+        Para poder iniciar sesión la cuenta debe estar creada previamente. Además
+        debe de tener validado el correo y el número de celular
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: Token generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtResponse'
+        '400':
+          description: |-
+            The invalid messages can be:
+            - For validation of inputs
+            - Email  is incorrect
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Phone  is incorrect o Email is incorrect'
+        '401':
+          description: |-
+            The invalid messages can be:
+
+            - Invalid Password
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid Password'
+        '500':
+          description: Validation exception
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Error de servidor'
+      security:
+        - basicAuth: []
+  /contract:
+    get:
+      tags:
+        - contract
+      summary: Show Contracts
+      description: |-
+        Ver la lista de contratos por empresa
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Contrato Existe
+        '404':
+          description: No se pudo encontrar el contrato
+          content:
+            application/json:
+              example:
+                error: No se pudo encontrar el contrato
+    post:
+      tags:
+        - contract
+      summary: Create New Contract
+      description: |-
+        Ingresar Los campos requeridos para crear un contrato
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contract'
+      responses:
+        '200':
+          description: Token generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtResponse'
+  /contract/{id}:
+    get:
+      tags:
+        - contract
+      summary: Show Contract
+      description: |-
+        Ver contrato con detalles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del contrato
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Contrato Existe
+        '404':
+          description: No se pudo encontrar el contrato
+          content:
+            application/json:
+              example:
+                error: No se pudo encontrar el contrato
+    delete:
+      tags:
+        - contract
+      summary: Delete Contract
+      description: |-
+        Ingresar Los campos requeridos para eliminar un contrato
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del contrato
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Contrato Eliminado
+        '400':
+          description: No se pudo encontrar el contrato
+          content:
+            application/json:
+              example:
+                error: No se pudo eliminar el contrato
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Login:
+      required:
+        - dni
+        - password
+      type: object
+      properties:
+        dni:
+          type: string
+          example: '00000001'
+          # oneOf:
+          #   - type: string
+          #     example: "johndoe@gmail.com"
+        password:
+          type: string
+          example: 123456
+    JwtResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkOTM1MjBiZC0zOWUzLTQ0NWItYTBmMC00ZWI0YWMxNTUyMzEiLCJpYXQiOjE2NjA2MzAyODksImV4cCI6MTY2MDYzMTE4OX0.MvCJf0cvKrOG0QIFB-QkGjT0_pjVe4dihpxS_w_6XsU'
+        refreshToken:
+          type: string
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkOTM1MjBiZC0zOWUzLTQ0NWItYTBmMC00ZWI0YWMxNTUyMzEiLCJpYXQiOjE2NjA2MzAyODksImV4cCI6MTY2MDYzMTE4OX0.MvCJf0cvKrOG0QIFB-QkGjT0_pjVe4dihpxS_w_6XsU'
+        expiresIn:
+          type: integer
+          example: 900
+    Contract:
+      required:
+        - cui
+        - name
+        - proyectName
+        - department
+        - province
+        - district
+        - bachelorCost
+        - professionalCost
+        - indexContract
+      type: object
+      properties:
+        cui:
+          type: string
+          example: '123213'
+        name:
+          type: string
+          example: 'Proyecto de Mejora Continua'
+        number:
+          type: number
+          example: 23
+        proyectName:
+          type: string
+          example: 'Proyecto de Mejora Continua'
+        department:
+          type: string
+          example: 'Puno'
+        province:
+          type: string
+          example: 'Puno'
+        district:
+          type: string
+          example: 'Puno'
+        professionalCost:
+          type: number
+          example: 2300.12
+        bachelorCost:
+          type: number
+          example: 2300.12
+        indexContract:
+          type: string
+          example: '{index:1,index2:23}'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2023-12-31T12:00:00Z'

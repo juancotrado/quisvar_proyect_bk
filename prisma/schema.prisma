@@ -383,7 +383,7 @@ model Licenses {
   feedback  String?
   status    LicensesStatus @default(PROCESS)
   startDate DateTime
-  checkout  DateTime?  
+  checkout  DateTime?
   untilDate DateTime
   createdAt DateTime       @default(now())
 }
@@ -476,6 +476,21 @@ model FilesMessageHistory {
   replyId   Int?
   reply     MessageHistory? @relation(fields: [replyId], references: [id])
   createdAt DateTime        @default(now())
+}
+
+model Contratc {
+  id               Int      @id @default(autoincrement())
+  number           Int
+  cui              String
+  name             String
+  proyectName      String
+  department       String
+  province         String
+  district         String
+  bachelorCost     Decimal
+  professionalCost Decimal
+  createdAt        DateTime @default(now())
+  indexContract    String
 }
 
 enum UserRole {

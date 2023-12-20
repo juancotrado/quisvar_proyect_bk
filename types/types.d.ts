@@ -1,4 +1,5 @@
 import {
+  Contratc,
   Files,
   FilesMessage,
   IndexTasks,
@@ -206,3 +207,18 @@ export interface usersCount {
   count: number;
   dni?: string;
 }
+
+export type ContractForm = Pick<
+  Contratc,
+  | 'number'
+  | 'proyectName'
+  | 'name'
+  | 'cui'
+  | 'createdAt'
+  | 'indexContract'
+  | 'bachelorCost'
+  | 'professionalCost'
+  | 'department'
+  | 'province'
+  | 'district'
+>;
