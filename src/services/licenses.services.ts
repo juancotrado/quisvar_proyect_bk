@@ -30,6 +30,43 @@ class LicenseServices {
     });
     return newLicence;
   }
+  static async createFreeForAll(data: Licenses) {
+    const getAllUsers = await prisma.users.findMany({
+      where: {
+        status: true,
+      },
+      select: {
+        id: true,
+      },
+    });
+    const allowLicense = await prisma.licenses.findMany({
+      where: {
+        status: 'ACTIVE',
+      },
+      select: {
+        usersId: true,
+      },
+    });
+    const usersWithoutActiveLicenses = getAllUsers.filter(user => {
+      return !allowLicense.some(activeUser => activeUser.usersId === user.id);
+    });
+    const GMT = 60 * 60 * 1000;
+    const _startDate = new Date(data.startDate).getTime();
+    const _untilDate = new Date(data.untilDate).getTime();
+    const startOfDay = new Date(_startDate - GMT * 5);
+    const endOfDay = new Date(_untilDate - GMT * 5);
+    console.log(usersWithoutActiveLicenses);
+    const newLicence = await prisma.licenses.createMany({
+      data: usersWithoutActiveLicenses.map(user => ({
+        usersId: user.id,
+        reason: data.reason,
+        status: 'ACTIVE',
+        startDate: startOfDay,
+        untilDate: endOfDay,
+      })),
+    });
+    return newLicence;
+  }
   static async update(
     id: Licenses['id'],
     {
