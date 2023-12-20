@@ -2,6 +2,7 @@ import { Router } from 'express';
 import authenticateHandler from '../middlewares/auth.middleware';
 import {
   createLicense,
+  createFreeForAll,
   updateLicense,
   getLicenseById,
   getLicensesByStatus,
@@ -15,6 +16,7 @@ router.use(authenticateHandler);
 router.use(_employee_role);
 router.get('/employee/:id', getLicensesEmployee);
 router.post('/', createLicense);
+router.post('/free', createFreeForAll);
 router.patch('/:id', updateLicense);
 //ADMIN ROLE
 router.use(_admin_role);

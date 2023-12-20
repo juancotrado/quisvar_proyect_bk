@@ -15,6 +15,19 @@ export const createLicense = async (
     next(error);
   }
 };
+export const createFreeForAll = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = req;
+    const query = await LicenseServices.createFreeForAll(body);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 export const updateLicense = async (
   req: Request,
   res: Response,

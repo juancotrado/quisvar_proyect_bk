@@ -104,6 +104,7 @@ import {
   updateMessage,
 } from './mail.controllers';
 import {
+  createFreeForAll,
   createLicense,
   expiredLicenses,
   getLicenseById,
@@ -262,6 +263,7 @@ export {
 //Licenses Controllers
 export {
   createLicense,
+  createFreeForAll,
   updateLicense,
   getLicenseById,
   getLicensesByStatus,
