@@ -32,6 +32,7 @@ import {
   trainingSpecialtyListRouter,
   workStationRouter,
   equipmentRouter,
+  contractRoutes,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -41,6 +42,7 @@ import { verifySecretEnv } from '../middlewares/auth.middleware';
 import TimerCron from './timer';
 import { setAdmin } from '../utils/tools';
 import path from 'path';
+import { docs } from '../middlewares';
 
 dotenv.config();
 class Server {
@@ -78,6 +80,7 @@ class Server {
     trainingSpecialtyList: `/${process.env.ROUTE}/trainingSpecialtyList`,
     workStation: `/${process.env.ROUTE}/workStation`,
     equipment: `/${process.env.ROUTE}/equipment`,
+    contract: `/${process.env.ROUTE}/contract`,
   };
 
   constructor() {
@@ -139,6 +142,8 @@ class Server {
     this.app.use(this.path.trainingSpecialtyList, trainingSpecialtyListRouter);
     this.app.use(this.path.workStation, workStationRouter);
     this.app.use(this.path.equipment, equipmentRouter);
+    this.app.use(this.path.contract, contractRoutes);
+    this.app.use(docs);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       res.locals.pageNotFound = this.rootDir + '/404_page/index.html';
       return next(

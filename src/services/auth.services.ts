@@ -32,7 +32,6 @@ export class authServices {
       },
     });
     if (!user) throw new AppError('Usuario inexistente', 404);
-    console.log(password, user);
     const verifyPassword = await bcrypt.compare(password, user.password);
     if (!verifyPassword) throw new AppError('contraseña incorrecta', 404);
     return user;
@@ -48,7 +47,6 @@ export class authServices {
   static async updatePassword(id: Users['id'], password: string) {
     if (!id || !password) throw new AppError('Oops!,ID invalido', 400);
     const passwordHash = await bcrypt.hash(password, 10);
-    console.log({ password, passwordHash });
     const updatePassword = await prisma.users.update({
       where: { id },
       data: { password: passwordHash },
@@ -68,7 +66,6 @@ export class authServices {
         },
       },
     });
-    console.log(updatePassword);
     return updatePassword;
   }
 }

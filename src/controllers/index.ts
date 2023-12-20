@@ -156,6 +156,7 @@ import {
   updateEquipment,
   deleteEquipment,
 } from './equipment.controller';
+import ContractController from './contract.controllers';
 // User Controllers
 export {
   showUsers,
@@ -311,3 +312,5 @@ export {
 export { createEquipment, getEquipment, updateEquipment, deleteEquipment };
 
 export { AuthController };
+
+export { ContractController };
