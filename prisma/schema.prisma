@@ -483,7 +483,7 @@ model Contratc {
   number           Int
   cui              String
   name             String
-  proyectName      String
+  projectName      String
   department       String
   province         String
   district         String
