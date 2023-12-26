@@ -31,6 +31,7 @@ model Users {
   messageReply MessageHistory[]
   feedbacks    UsersOnFeedbacks[]
   equipment    Equipment?
+  groups       GroupOnUsers[]
 }
 
 model WorkStation {
@@ -107,6 +108,21 @@ model TypeSpecialities {
   specialitiesId Int?
   projects       Projects[]
   Specialities   Specialities? @relation(fields: [specialitiesId], references: [id])
+}
+
+model Group {
+  id     Int            @id @default(autoincrement())
+  name   String
+  groups GroupOnUsers[]
+}
+
+model GroupOnUsers {
+  userId  Int
+  groupId Int
+  users   Users @relation(fields: [userId], references: [id])
+  groups  Group @relation(fields: [groupId], references: [id])
+
+  @@id([userId, groupId])
 }
 
 model Projects {
@@ -382,6 +398,7 @@ model Licenses {
   reason    String?
   feedback  String?
   status    LicensesStatus @default(PROCESS)
+  fine      ListDetails?
   startDate DateTime
   checkout  DateTime?
   untilDate DateTime
