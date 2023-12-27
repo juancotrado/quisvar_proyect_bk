@@ -1,7 +1,7 @@
 import { Files } from '@prisma/client';
 import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
-import { PathServices } from '../services';
+import { PathServices, _contractPath } from '../services';
 import AppError from '../utils/appError';
 import { existsSync, mkdirSync } from 'fs';
 import { TypeFileUser } from 'types/types';
@@ -82,6 +82,7 @@ const storageAreaSpecialty = multer.diskStorage({
     cb(null, Date.now() + '$$' + originalname);
   },
 });
+
 const storageAddWorkStation = multer.diskStorage({
   destination: function (req, file, cb) {
     let uploadPath = 'public/workStation';
@@ -95,6 +96,7 @@ const storageAddWorkStation = multer.diskStorage({
     cb(null, Date.now() + '$$' + originalname);
   },
 });
+
 const storageAddEquipment = multer.diskStorage({
   destination: function (req, file, cb) {
     console.log('here');
@@ -109,6 +111,7 @@ const storageAddEquipment = multer.diskStorage({
     cb(null, Date.now() + '$$' + originalname);
   },
 });
+
 const storageTrainingSpecialty = multer.diskStorage({
   destination: function (req, file, cb) {
     let uploadPath = 'public/training';
@@ -209,6 +212,34 @@ const storageReportUser = multer.diskStorage({
   },
 });
 
+const storageContractsFiles = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const { id } = req.params;
+    if (!existsSync(_contractPath)) {
+      mkdirSync(_contractPath, { recursive: true });
+    }
+    cb(null, `${_contractPath}/${id}`);
+  },
+  filename: async (req, file, callback) => {
+    try {
+      const { fileName } = req.body;
+      const ext = file.originalname.split('.').at(-1);
+      const name: string = fileName + '.' + ext;
+      // const uniqueSuffix = Date.now();
+      // const { originalname } = file;
+      // if (!originalname.includes('.pdf') || originalname.includes('$'))
+      //   throw new Error();
+      // const fileName = uniqueSuffix + '$' + originalname;
+      callback(null, name);
+    } catch (error) {
+      callback(
+        new AppError(`Oops! , archivo sin extension pdf o contiene "$"`, 404),
+        ''
+      );
+    }
+  },
+});
+
 export const upload = multer({
   storage: storage,
   limits: { fileSize: MAX_SIZE },
@@ -245,6 +276,9 @@ export const uploadFileEquipment = multer({
 });
 export const uploadFileTrainingSpecialty = multer({
   storage: storageTrainingSpecialty,
+});
+export const uploadFileContracts = multer({
+  storage: storageContractsFiles,
 });
 export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
   try {

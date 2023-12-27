@@ -60,3 +60,5 @@ export const _dirPath = `${rootPath}/projects`;
 export const _materialPath = `${rootPath}/models`;
 export const _reviewPath = `${rootPath}/reviews`;
 export const _editablePath = `${rootPath}/editables`;
+export const indexPath = './index';
+export const _contractPath = `${indexPath}/contracts`;

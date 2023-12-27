@@ -3,6 +3,7 @@ node_modules
 database/.env
 database
 uploads/**
+index/**
 file_model/**
 file_review/**
 .scannerwork

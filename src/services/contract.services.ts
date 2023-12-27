@@ -1,6 +1,8 @@
 import { ContractForm } from 'types/types';
 import { Contratc, prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
+import { existsSync, mkdirSync, rmdirSync } from 'fs';
+import { _contractPath } from '.';
 
 class ContractServices {
   public static async showAll() {
@@ -20,6 +22,7 @@ class ContractServices {
     const createContract = await prisma.contratc.create({
       data,
     });
+    if (createContract) mkdirSync(`${_contractPath}/${createContract.id}`);
     return createContract;
   }
 
@@ -35,6 +38,8 @@ class ContractServices {
   public static async delete(id: Contratc['id']) {
     if (!id) throw new AppError('Opps, id Invalida', 400);
     const deleteContract = await prisma.contratc.delete({ where: { id } });
+    const removePath = `${_contractPath}/${deleteContract.id}`;
+    if (existsSync(removePath)) rmdirSync(removePath);
     return deleteContract;
   }
 }
