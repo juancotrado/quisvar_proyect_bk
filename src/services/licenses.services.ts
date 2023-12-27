@@ -77,6 +77,7 @@ class LicenseServices {
       feedback,
       status,
       checkout,
+      fine,
     }: Licenses
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
@@ -90,6 +91,7 @@ class LicenseServices {
         feedback,
         status,
         checkout,
+        fine,
       },
     });
     return updateList;
@@ -130,6 +132,7 @@ class LicenseServices {
     usersId: Licenses['usersId'],
     status?: Licenses['status']
   ) {
+    await this.deleteExpiredLicenses();
     const licenses = await prisma.licenses.findMany({
       where: {
         usersId,
