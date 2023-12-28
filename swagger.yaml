@@ -210,7 +210,26 @@ paths:
             application/json:
               example:
                 error: No se pudo eliminar el contrato
-
+  /contract/{id}/files:
+    post:
+      tags:
+        - file contract
+      summary: Add new files
+      description: |-
+        Ingresar Los campos requeridos para añadir un archivo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Contract_File'
+      responses:
+        '201':
+          description: Contrato creado exitosamente
+        '400':
+          description: Datos no válidos
 components:
   securitySchemes:
     bearerAuth:
@@ -297,3 +316,16 @@ components:
           type: string
           format: date-time
           example: '2023-12-31T12:00:00Z'
+    Contract_File:
+      required:
+        - fileContract
+        - fileName
+      type: object
+      properties:
+        fileContract:
+          type: string
+          format: binary
+          example: [archivo_binario]
+        fileName:
+          type: string
+          example: 'nombre_del_archivo'

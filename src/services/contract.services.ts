@@ -37,9 +37,14 @@ class ContractServices {
 
   public static async delete(id: Contratc['id']) {
     if (!id) throw new AppError('Opps, id Invalida', 400);
+    const findContract = await prisma.contratc.findUnique({ where: { id } });
+    if (!findContract)
+      throw new AppError('No se puede encontrar el contrato', 404);
+    const removePath = `${_contractPath}/${findContract.id}`;
+    if (!existsSync(removePath))
+      throw new AppError('No se puede elimiar el contrato', 404);
     const deleteContract = await prisma.contratc.delete({ where: { id } });
-    const removePath = `${_contractPath}/${deleteContract.id}`;
-    if (existsSync(removePath)) rmdirSync(removePath);
+    rmdirSync(removePath);
     return deleteContract;
   }
 }

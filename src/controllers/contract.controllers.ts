@@ -86,5 +86,19 @@ class ContractController {
       next(error);
     }
   }
+  public static async deleteFiles(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      // const { id } = req.params;
+      const a = req.file;
+      // const result = await ContractServices.delete(+id);
+      res.status(204).json(a);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 export default ContractController;

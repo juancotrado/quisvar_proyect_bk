@@ -10,7 +10,7 @@ class ContractRoutes {
     this.setUpRoutes();
   }
   private setUpRoutes() {
-    // this.router.use(authenticateHandler);
+    this.router.use(authenticateHandler);
     this.router.get('/', ContractController.showContracts);
     this.router.get('/:id', ContractController.showContract);
     this.router.post('/', ContractController.createContract);
