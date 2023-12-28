@@ -215,6 +215,13 @@ paths:
       tags:
         - file contract
       summary: Add new files
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del contrato
+          schema:
+            type: integer
       description: |-
         Ingresar Los campos requeridos para añadir un archivo
       security:
@@ -285,7 +292,7 @@ components:
         name:
           type: string
           example: 'Proyecto de Mejora Continua'
-        proyectName:
+        projectName:
           type: string
           example: 'Proyecto de Mejora Continua'
         department:
