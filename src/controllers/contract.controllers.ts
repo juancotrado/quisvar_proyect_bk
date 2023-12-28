@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ContractServices, _contractPath } from '../services';
-import { rm } from 'fs';
+import { renameSync, rm } from 'fs';
 import AppError from '../utils/appError';
 
 class ContractController {
@@ -80,10 +80,15 @@ class ContractController {
     next: NextFunction
   ) {
     try {
-      // const { id } = req.params;
-      const a = req.file;
-      // const result = await ContractServices.delete(+id);
-      res.status(204).json(a);
+      const { fileName: newName } = req.body;
+      const file = req.file;
+      if (!file) throw new AppError('archivo no encontrado', 400);
+      const { destination, filename, originalname } = file;
+      const ext = originalname.split('.').at(-1);
+      const olDir = destination + '/' + filename;
+      const newDir = destination + '/' + newName + '.' + ext;
+      renameSync(olDir, newDir);
+      res.status(204).json(file);
     } catch (error) {
       next(error);
     }

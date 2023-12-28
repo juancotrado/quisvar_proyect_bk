@@ -222,9 +222,10 @@ const storageContractsFiles = multer.diskStorage({
   },
   filename: async (req, file, callback) => {
     try {
-      const { fileName } = req.body;
+      // const { fileName } = req.body;
+      const { id } = req.params;
       const ext = file.originalname.split('.').at(-1);
-      const name: string = fileName + '.' + ext;
+      const name: string = id + '.' + ext;
       // const uniqueSuffix = Date.now();
       // const { originalname } = file;
       // if (!originalname.includes('.pdf') || originalname.includes('$'))

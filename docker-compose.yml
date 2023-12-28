@@ -9,6 +9,7 @@ services:
     restart: always
     working_dir: /home/node/app
     environment:
+      TZ: America/Lima
       VIRTUAL_HOST: quisvar.sumak.digital, www.quisvar.sumak.digital
       NODE_ENV: production
     volumes:
