@@ -47,5 +47,23 @@ class ContractServices {
     rmdirSync(removePath);
     return deleteContract;
   }
+
+  public static async updateDetails(id: Contratc['id'], details: string) {
+    if (!id) throw new AppError('Opps, id Invalida', 400);
+    const updateDetails = await prisma.contratc.update({
+      where: { id },
+      data: { details },
+    });
+    return updateDetails;
+  }
+
+  public static async updateIndex(id: Contratc['id'], indexContract: string) {
+    if (!id) throw new AppError('Opps, id Invalida', 400);
+    const updateIndex = await prisma.contratc.update({
+      where: { id },
+      data: { indexContract },
+    });
+    return updateIndex;
+  }
 }
 export default ContractServices;

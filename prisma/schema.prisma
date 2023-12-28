@@ -509,6 +509,7 @@ model Contratc {
   difficulty       Int
   createdAt        DateTime @default(now())
   indexContract    String
+  details          String?
 }
 
 enum UserRole {

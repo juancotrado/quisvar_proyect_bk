@@ -12,6 +12,9 @@ class Docs {
 
   setUpRouter() {
     const swaggerDocument = YAML.load('./swagger.yaml');
+    // const options = {
+    //   customCssUrl: '/file-user/css/custom.css',
+    // };
     this.router.use(
       '/api-docs',
       swaggerUi.serve,

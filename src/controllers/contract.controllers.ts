@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { ContractServices } from '../services';
+import { ContractServices, _contractPath } from '../services';
+import { rm } from 'fs';
+import AppError from '../utils/appError';
 
 class ContractController {
   public static async showContracts(
@@ -86,16 +88,50 @@ class ContractController {
       next(error);
     }
   }
+
   public static async deleteFiles(
     req: Request,
     res: Response,
     next: NextFunction
   ) {
     try {
-      // const { id } = req.params;
-      const a = req.file;
-      // const result = await ContractServices.delete(+id);
-      res.status(204).json(a);
+      const { id } = req.params;
+      const filename = req.query;
+      const path = _contractPath + '/' + id + '/' + filename;
+      rm(path, () => {
+        throw new AppError('El Archivo no existe', 404);
+      });
+      res.status(204).json(filename);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public static async updateIndex(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params;
+      const { indexContract } = req.body;
+      const result = await ContractServices.updateIndex(+id, indexContract);
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public static async updateDetails(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params;
+      const { details } = req.body;
+      const result = await ContractServices.updateDetails(+id, details);
+      res.status(201).json(result);
     } catch (error) {
       next(error);
     }

@@ -237,6 +237,94 @@ paths:
           description: Contrato creado exitosamente
         '400':
           description: Datos no válidos
+    delete:
+      tags:
+        - file contract
+      summary: Add new files
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del contrato
+          schema:
+            type: integer
+        - name: filename
+          in: query
+          description: Nombre del archivo
+          required: true
+          schema:
+            type: string
+      description: |-
+        Ingresar Los campos requeridos para añadir un archivo
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Contrato creado exitosamente
+        '400':
+          description: Datos no válidos
+  /contract/{id}/index:
+    put:
+      tags:
+        - contract
+      summary: add or update index contract
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del contrato
+          schema:
+            type: integer
+      description: |-
+        Ingresar un json parseado en string
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                indexContract:
+                  type: string
+                  example: "{'indexName':'nombre_del_indice','fields':{'fieldName1':1,'fieldName2':1},'unique':true,'sparse':true}"
+      responses:
+        '201':
+          description: Indice creado o actualizado exitosamente
+        '400':
+          description: Datos no válidos
+  /contract/{id}/details:
+    put:
+      tags:
+        - contract
+      summary: add or update details contract
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del contrato
+          schema:
+            type: integer
+      description: |-
+        Ingresar un json parseado en string
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                details:
+                  type: string
+                  example: "{'indexName':'nombre_del_indice','fields':{'fieldName1':1,'fieldName2':1},'unique':true,'sparse':true}"
+      responses:
+        '201':
+          description: Detalles creado o actualizado exitosamente
+        '400':
+          description: Datos no válidos
 components:
   securitySchemes:
     bearerAuth:

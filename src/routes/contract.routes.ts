@@ -20,7 +20,10 @@ class ContractRoutes {
       ContractController.uploadFiles
     );
     this.router.patch('/:id', ContractController.updateContract);
+    this.router.put('/:id/index', ContractController.updateIndex);
+    this.router.put('/:id/details', ContractController.updateDetails);
     this.router.delete('/:id', ContractController.deleteContract);
+    this.router.delete('/:id/files', ContractController.deleteFiles);
   }
 }
 
