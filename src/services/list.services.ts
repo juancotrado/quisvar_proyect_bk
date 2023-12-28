@@ -90,10 +90,15 @@ class ListServices {
         id: true,
         title: true,
         timer: true,
-        users: true,
+        users: {
+          where: {
+            user: {
+              status: true,
+            },
+          },
+        },
       },
     });
-
     return list;
   }
   static async getListRange(startDate: string, endDate: string) {
@@ -105,6 +110,7 @@ class ListServices {
     const listAdmin = await prisma.users.findMany({
       where: {
         role: { in: ['SUPER_ADMIN', 'ADMIN'] },
+        status: true,
       },
       orderBy: { createdAt: 'asc' },
       select: {
@@ -164,6 +170,7 @@ class ListServices {
             'EMPLOYEE',
           ],
         },
+        status: true,
       },
       orderBy: { profile: { lastName: 'asc' } },
       select: {
