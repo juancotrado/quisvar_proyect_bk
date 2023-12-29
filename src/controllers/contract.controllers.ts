@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ContractServices, _contractPath } from '../services';
-import { renameSync, rm } from 'fs';
+import { existsSync, renameSync, rmSync } from 'fs';
 import AppError from '../utils/appError';
 
 class ContractController {
@@ -101,13 +101,14 @@ class ContractController {
   ) {
     try {
       const { id } = req.params;
-      const filename = req.query;
+      const { filename } = req.query;
       const path = _contractPath + '/' + id + '/' + filename;
-      rm(path, () => {
-        throw new AppError('El Archivo no existe', 404);
-      });
+      console.log(path);
+      if (existsSync(path)) throw new AppError('El Archivo no existe', 404);
+      rmSync(path);
       res.status(204).json(filename);
     } catch (error) {
+      console.log(error);
       next(error);
     }
   }

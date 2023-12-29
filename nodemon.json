@@ -1,7 +1,5 @@
 {
   "execMap": {
     "ts": "ts-node"
-  },
-  "ext": "js,yml,yaml",
-  "ignore": ["node_modules/"]
+  }
 }
