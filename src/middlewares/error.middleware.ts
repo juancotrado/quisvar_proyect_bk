@@ -16,7 +16,7 @@ const globalErrorHandler = (
       ? 'Variables incorrectas, ingrese los campos necesarios'
       : err.message;
   //---------------------------error_such_files----------------------------
-  if (req.url.includes('uploads')) {
+  if (req.url.includes('uploads') || req.url.includes('index')) {
     const pageNotFound = res.locals.pageNotFound as string;
     return res.sendFile(pageNotFound);
   }
