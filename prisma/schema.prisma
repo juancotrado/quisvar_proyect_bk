@@ -397,7 +397,7 @@ model Licenses {
   usersId   Int
   reason    String?
   feedback  String?
-  status    LicensesStatus @default(PROCESS)
+  status    LicensesStatus @default(PROCESO)
   fine      ListDetails?
   startDate DateTime
   checkout  DateTime?
@@ -548,10 +548,11 @@ enum ListDetails {
 }
 
 enum LicensesStatus {
-  ACTIVE
-  INACTIVE
-  PROCESS
-  DENIED
+  ACTIVO
+  ACEPTADO
+  INACTIVO
+  PROCESO
+  DENEGADO
 }
 
 enum MessageUser {

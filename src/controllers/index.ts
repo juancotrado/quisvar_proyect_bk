@@ -104,8 +104,10 @@ import {
   updateMessage,
 } from './mail.controllers';
 import {
+  activeLicenses,
   createFreeForAll,
   createLicense,
+  deleteLicense,
   expiredLicenses,
   getLicenseById,
   getLicensesByStatus,
@@ -269,7 +271,9 @@ export {
   getLicenseById,
   getLicensesByStatus,
   getLicensesEmployee,
+  activeLicenses,
   expiredLicenses,
+  deleteLicense,
 };
 //Companies Controllers
 export { createCompany, getCompany, getCompaniesById };
