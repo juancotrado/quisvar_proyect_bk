@@ -103,12 +103,10 @@ class ContractController {
       const { id } = req.params;
       const { filename } = req.query;
       const path = _contractPath + '/' + id + '/' + filename;
-      console.log(path);
-      if (existsSync(path)) throw new AppError('El Archivo no existe', 404);
+      if (!existsSync(path)) throw new AppError('El Archivo no existe', 404);
       rmSync(path);
       res.status(204).json(filename);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
