@@ -111,7 +111,10 @@ class Server {
     this.app.use(verifySecretEnv);
   }
   conectionCron() {
-    new TimerCron();
+    const time = new TimerCron('47 21 * * *');
+    time.crontimer(() => {
+      console.log('patito');
+    });
   }
   conectionWebSockect() {
     new Sockets(this.io);

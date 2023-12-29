@@ -225,18 +225,15 @@ const storageContractsFiles = multer.diskStorage({
       // const { fileName } = req.body;
       const { id } = req.params;
       const ext = file.originalname.split('.').at(-1);
+      if (!['pdf', 'PDF'].includes(`${ext}`)) throw new Error();
       const name: string = id + '.' + ext;
       // const uniqueSuffix = Date.now();
       // const { originalname } = file;
       // if (!originalname.includes('.pdf') || originalname.includes('$'))
-      //   throw new Error();
       // const fileName = uniqueSuffix + '$' + originalname;
       callback(null, name);
     } catch (error) {
-      callback(
-        new AppError(`Oops! , archivo sin extension pdf o contiene "$"`, 404),
-        ''
-      );
+      callback(new AppError(`Oops! , archivo sin extension pdf`, 404), '');
     }
   },
 });

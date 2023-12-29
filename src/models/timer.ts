@@ -1,16 +1,20 @@
 import cron from 'node-cron';
 
 class TimerCron {
-  constructor() {
-    this.crontimer();
+  public cronExpression: string;
+  protected options: cron.ScheduleOptions;
+
+  constructor(cronExpression: string, options?: cron.ScheduleOptions) {
+    this.cronExpression = cronExpression;
+    this.options = options || { timezone: 'America/Bogota' };
   }
-  crontimer() {
-    const value = '43 13 * * *';
-    const options: cron.ScheduleOptions = { timezone: 'America/Bogota' };
-    const schedule = () => {
-      console.log('running a task every minute patito');
-    };
-    cron.schedule(value, schedule, options);
+
+  crontimer(schedule: () => void) {
+    cron.schedule(this.cronExpression, schedule, this.options);
+  }
+
+  async crontimerAsync(schedule: () => Promise<void>) {
+    cron.schedule(this.cronExpression, schedule, this.options);
   }
 }
 
