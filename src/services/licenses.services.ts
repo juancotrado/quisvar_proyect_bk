@@ -9,7 +9,9 @@ class LicenseServices {
     const allowLicense = await prisma.licenses.findFirst({
       where: {
         usersId: data.usersId,
-        status: 'ACTIVE',
+        status: {
+          in: ['ACTIVO', 'ACEPTADO'],
+        },
       },
     });
     if (allowLicense)
@@ -41,7 +43,7 @@ class LicenseServices {
     });
     const allowLicense = await prisma.licenses.findMany({
       where: {
-        status: 'ACTIVE',
+        AND: [{ status: 'ACTIVO' }, { status: 'ACEPTADO' }],
       },
       select: {
         usersId: true,
@@ -60,7 +62,7 @@ class LicenseServices {
       data: usersWithoutActiveLicenses.map(user => ({
         usersId: user.id,
         reason: data.reason,
-        status: 'ACTIVE',
+        status: 'ACEPTADO',
         startDate: startOfDay,
         untilDate: endOfDay,
       })),
@@ -100,7 +102,7 @@ class LicenseServices {
     const licenses = await prisma.licenses.groupBy({
       by: ['usersId'],
       where: {
-        status: 'ACTIVE',
+        status: 'ACTIVO',
       },
     });
     const usersActive = await prisma.users.groupBy({
@@ -144,14 +146,39 @@ class LicenseServices {
     });
     return licenses;
   }
-  static async deleteExpiredLicenses() {
+  static async activeLicenses() {
     const GMT = 5 * 60 * 60 * 1000;
     const now = new Date();
     const gmtMinus5Time = new Date(now.getTime() - GMT);
 
     const licenses = await prisma.licenses.findMany({
       where: {
-        status: 'ACTIVE',
+        status: 'ACEPTADO',
+        startDate: { lte: gmtMinus5Time },
+        untilDate: { gte: gmtMinus5Time },
+      },
+      select: { id: true },
+    });
+    console.log(licenses);
+    const listIds = licenses.map(({ id }) => id);
+    await prisma.licenses.updateMany({
+      where: { id: { in: listIds } },
+      data: { status: 'ACTIVO' },
+    });
+    return licenses;
+  }
+  static async deleteExpiredLicenses() {
+    await this.activeLicenses();
+
+    const GMT = 5 * 60 * 60 * 1000;
+    const now = new Date();
+    const gmtMinus5Time = new Date(now.getTime() - GMT);
+
+    const licenses = await prisma.licenses.findMany({
+      where: {
+        status: {
+          in: ['ACTIVO', 'ACEPTADO'],
+        },
         untilDate: { lt: gmtMinus5Time },
       },
       select: { id: true },
@@ -159,8 +186,15 @@ class LicenseServices {
     const listIds = licenses.map(({ id }) => id);
     await prisma.licenses.updateMany({
       where: { id: { in: listIds } },
-      data: { status: 'INACTIVE' },
+      data: { status: 'INACTIVO' },
     });
+    return licenses;
+  }
+  static async deleteLicense(id: Licenses['id']) {
+    const licenses = await prisma.licenses.delete({
+      where: { id },
+    });
+
     return licenses;
   }
 }

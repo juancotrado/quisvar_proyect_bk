@@ -98,3 +98,28 @@ export const expiredLicenses = async (
     next(error);
   }
 };
+export const activeLicenses = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const query = await LicenseServices.activeLicenses();
+    res.status(201).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteLicense = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const query = await LicenseServices.deleteLicense(Number(id));
+    res.status(201).json(query);
+  } catch (error) {
+    next(error);
+  }
+};

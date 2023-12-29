@@ -8,6 +8,8 @@ import {
   getLicensesByStatus,
   getLicensesEmployee,
   expiredLicenses,
+  deleteLicense,
+  activeLicenses,
 } from '../controllers';
 import { _admin_role, _employee_role } from '../middlewares/role.middleware';
 const router = Router();
@@ -18,6 +20,8 @@ router.get('/employee/:id', getLicensesEmployee);
 router.post('/', createLicense);
 router.post('/free', createFreeForAll);
 router.patch('/:id', updateLicense);
+router.get('/active', activeLicenses);
+router.delete('/:id', deleteLicense);
 //ADMIN ROLE
 router.use(_admin_role);
 router.get('/', getLicenseById);
