@@ -553,6 +553,10 @@ enum LicensesStatus {
   INACTIVO
   PROCESO
   DENEGADO
+  ACTIVE
+  INACTIVE
+  PROCESS
+  DENIED
 }
 
 enum MessageUser {
