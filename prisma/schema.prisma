@@ -284,8 +284,9 @@ model Consortium {
   id        Int       @id @default(autoincrement())
   name      String
   manager   String
-  projectId Int       @unique
-  companies Company[]
+  projectId Int?       @unique
+  companies ConsortiumOnCompanies[]
+  // companies Company[]
   // project   Projects  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   stages    Stages[]
 }
@@ -298,7 +299,7 @@ model Company {
   percentage   Int         @default(100)
   consortiumId Int?
   projectId    Int?        @unique
-  Consortium   Consortium? @relation(fields: [consortiumId], references: [id])
+  // Consortium   Consortium? @relation(fields: [consortiumId], references: [id])
   // project      Projects?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   stages       Stages[]
 }
@@ -315,8 +316,17 @@ model Companies {
   SEE         DateTime?
   CCI         String    @unique
   description String?
+  consortium      ConsortiumOnCompanies[]
 }
 
+model ConsortiumOnCompanies {
+  consortiumId Int
+  companiesId  Int
+  consortium   Consortium @relation(fields: [consortiumId], references: [id])
+  companies    Companies  @relation(fields: [companiesId], references: [id])
+
+  @@id([consortiumId, companiesId])
+}
 model AreaSpecialty {
   id                  Int                   @id @default(autoincrement())
   institution         String

@@ -160,6 +160,14 @@ import {
   deleteEquipment,
 } from './equipment.controller';
 import ContractController from './contract.controllers';
+
+import {
+  createConsortium,
+  getAllConsortium,
+  getConsortiumById,
+  updateById,
+  deleteById,
+} from './consortium.controller';
 // User Controllers
 export {
   showUsers,
@@ -320,3 +328,11 @@ export { createEquipment, getEquipment, updateEquipment, deleteEquipment };
 export { AuthController };
 
 export { ContractController };
+//Consortium Controller
+export {
+  createConsortium,
+  getAllConsortium,
+  getConsortiumById,
+  updateById,
+  deleteById,
+};

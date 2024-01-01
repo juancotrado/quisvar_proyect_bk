@@ -25,6 +25,7 @@ import trainingSpecialtyListRouter from './trainingSpecialtyList.routes';
 import workStationRouter from './workStation.routes';
 import equipmentRouter from './equipment.routes';
 import contractRoutes from './contract.routes';
+import consortiumRoutes from './consortium.routes';
 export {
   userRouter,
   authRouter,
@@ -53,4 +54,5 @@ export {
   workStationRouter,
   equipmentRouter,
   contractRoutes,
+  consortiumRoutes,
 };

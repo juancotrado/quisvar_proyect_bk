@@ -326,6 +326,49 @@ paths:
           description: Detalles creado o actualizado exitosamente
         '400':
           description: Datos no válidos
+  /consortium:
+    get:
+      tags:
+        - consortium
+      summary: Show Contracts
+      description: |-
+        Ver la lista de contratos por empresa
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Contrato Existe
+        '404':
+          description: No se pudo encontrar el contrato
+          content:
+            application/json:
+              example:
+                error: No se pudo encontrar el contrato
+    post:
+      tags:
+        - contract
+      summary: Create New Contract
+      description: |-
+        Ingresar Los campos requeridos para crear un contrato
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contract'
+      responses:
+        '200':
+          description: Token generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtResponse'
 components:
   securitySchemes:
     bearerAuth:
