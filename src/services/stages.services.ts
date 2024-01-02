@@ -31,7 +31,7 @@ class StageServices {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const findStage = await prisma.stages.findUnique({
       where: { id },
-      include: { project: { select: { name: true, percentage: true } } },
+      include: { project: { select: { name: true } } },
     });
     if (!findStage)
       throw new AppError('Oops!,No se pudo encontrar la etapa', 400);
@@ -57,12 +57,7 @@ class StageServices {
         },
       },
     });
-    const list = LevelsServices.findList(
-      getList,
-      0,
-      0,
-      findStage.project.percentage
-    );
+    const list = LevelsServices.findList(getList, 0, 0);
     const nextLevel = calculateAndUpdateDataByLevel(list);
     const total = sumValues(nextLevel, 'total');
     const balance = sumValues(nextLevel, 'balance');

@@ -28,12 +28,7 @@ class DuplicatesServices {
     const getProyect = await prisma.projects.findUnique({
       where: { id },
       select: {
-        CUI: true,
         userId: true,
-        description: true,
-        department: true,
-        province: true,
-        district: true,
         typeSpecialityId: true,
         stages: { select: { id: true, name: true }, take: 1 },
       },

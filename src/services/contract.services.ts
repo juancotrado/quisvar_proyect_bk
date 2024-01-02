@@ -5,8 +5,10 @@ import { existsSync, mkdirSync, rmdirSync } from 'fs';
 import { _contractPath } from '.';
 
 class ContractServices {
-  public static async showAll() {
-    const showContract = await prisma.contratc.findMany();
+  public static async showAll(startsWith?: string) {
+    const showContract = await prisma.contratc.findMany({
+      where: { cui: { startsWith } },
+    });
     return showContract;
   }
 

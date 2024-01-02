@@ -10,7 +10,8 @@ class ContractController {
     next: NextFunction
   ) {
     try {
-      const result = await ContractServices.showAll();
+      const cui = req.query.cui as string;
+      const result = await ContractServices.showAll(cui);
       res.status(200).json(result);
     } catch (error) {
       next(error);

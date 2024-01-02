@@ -126,53 +126,43 @@ model GroupOnUsers {
 }
 
 model Projects {
-  id               Int                 @id @default(autoincrement())
-  CUI              String
-  name             String              @unique
-  description      String
-  department       String
-  province         String
-  district         String
-  percentage       Int                 @default(30)
-  // startDate        DateTime          @default(now())
-  // untilDate        DateTime
-  // status           Boolean           @default(false)
-  // unique           Boolean           @default(false)
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
+  id               Int              @id @default(autoincrement())
+  name             String?          @unique
   userId           Int?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
   typeSpecialityId Int
-  typeSpeciality   TypeSpecialities    @relation(fields: [typeSpecialityId], references: [id])
-  moderator        Users?              @relation(fields: [userId], references: [id])
+  typeSpeciality   TypeSpecialities @relation(fields: [typeSpecialityId], references: [id])
+  moderator        Users?           @relation(fields: [userId], references: [id])
+  contract         Contratc?
   stages           Stages[]
-  // company          Company?
-  // consortium       Consortium?
-  // specialists      PersonBussiness[]
-  specialists      ProjectSpecialist[] //
 }
 
 model Stages {
-  id           Int               @id @default(autoincrement())
-  name         String
+  id               Int               @id @default(autoincrement())
+  name             String
   //-----------------------------------------------------
-  startDate    DateTime          @default(now())
-  untilDate    DateTime          @default(now())
-  status       Boolean           @default(false)
-  isProject    Boolean           @default(false)
-  moderatorId  Int?
-  company      Company?          @relation(fields: [companyId], references: [id])
-  consortium   Consortium?       @relation(fields: [consortiumId], references: [id])
-  specialists  PersonBussiness[]
-  rootTypeItem TypeItem          @default(ROM)
-  moderator    Users?            @relation(fields: [moderatorId], references: [id])
+  startDate        DateTime          @default(now())
+  untilDate        DateTime          @default(now())
+  status           Boolean           @default(false)
+  isProject        Boolean           @default(false)
+  moderatorId      Int?
+  company          Company?          @relation(fields: [companyId], references: [id])
+  consortium       Consortium?       @relation(fields: [consortiumId], references: [id])
+  specialists      PersonBussiness[]
+  rootTypeItem     TypeItem          @default(ROM)
+  moderator        Users?            @relation(fields: [moderatorId], references: [id])
   //-----------------------------------------------------
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  project      Projects          @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId    Int
-  levels       Levels[]
-  companyId    Int?
-  consortiumId Int?
+  bachelorCost     Float?
+  professionalCost Float?
+  //-----------------------------------------------------
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  project          Projects          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        Int
+  levels           Levels[]
+  companyId        Int?
+  consortiumId     Int?
 }
 
 model Levels {
@@ -281,10 +271,10 @@ model PersonBussiness {
 }
 
 model Consortium {
-  id        Int       @id @default(autoincrement())
+  id        Int                     @id @default(autoincrement())
   name      String
   manager   String
-  projectId Int?       @unique
+  projectId Int?                    @unique
   companies ConsortiumOnCompanies[]
   // companies Company[]
   // project   Projects  @relation(fields: [projectId], references: [id], onDelete: Cascade)
@@ -292,31 +282,31 @@ model Consortium {
 }
 
 model Company {
-  id           Int         @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   name         String
   ruc          String
   manager      String
-  percentage   Int         @default(100)
+  percentage   Int      @default(100)
   consortiumId Int?
-  projectId    Int?        @unique
+  projectId    Int?     @unique
   // Consortium   Consortium? @relation(fields: [consortiumId], references: [id])
   // project      Projects?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   stages       Stages[]
 }
 
 model Companies {
-  id          Int       @id @default(autoincrement())
+  id          Int                     @id @default(autoincrement())
   name        String
-  ruc         String    @unique @db.VarChar(11)
+  ruc         String                  @unique @db.VarChar(11)
   manager     String
   address     String
   departure   String
   inscription DateTime?
   activities  DateTime?
   SEE         DateTime?
-  CCI         String    @unique
+  CCI         String                  @unique
   description String?
-  consortium      ConsortiumOnCompanies[]
+  consortium  ConsortiumOnCompanies[]
 }
 
 model ConsortiumOnCompanies {
@@ -327,6 +317,7 @@ model ConsortiumOnCompanies {
 
   @@id([consortiumId, companiesId])
 }
+
 model AreaSpecialty {
   id                  Int                   @id @default(autoincrement())
   institution         String
@@ -368,7 +359,6 @@ model ProjectSpecialist {
   specialistId Int
   projectId    Int
   specialist   Specialists @relation(fields: [specialistId], references: [id])
-  project      Projects    @relation(fields: [projectId], references: [id])
 
   @@unique([specialistId, projectId])
 }
@@ -506,20 +496,20 @@ model FilesMessageHistory {
 }
 
 model Contratc {
-  id               Int      @id @default(autoincrement())
-  cui              String
-  name             String
-  projectName      String
-  department       String
-  province         String
-  district         String
-  bachelorCost     Float
-  professionalCost Float
-  shortName        String
-  difficulty       Int
-  createdAt        DateTime @default(now())
-  indexContract    String
-  details          String?
+  id            Int       @id @default(autoincrement())
+  cui           String
+  name          String
+  projectName   String
+  department    String
+  province      String
+  district      String
+  shortName     String
+  difficulty    Int
+  createdAt     DateTime  @default(now())
+  indexContract String
+  details       String?
+  projectId     Int?      @unique
+  project       Projects? @relation(fields: [projectId], references: [id])
 }
 
 enum UserRole {
