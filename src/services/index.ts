@@ -26,6 +26,7 @@ import WorkStationServices from './workStation.services';
 import EquipmentServices from './equipment.services';
 import ContractServices from './contract.services';
 import ConsortiumServices from './consortium.services';
+import GroupServices from './groups.services';
 export {
   UsersServices,
   authServices,
@@ -56,6 +57,7 @@ export {
   EquipmentServices,
   ContractServices,
   ConsortiumServices,
+  GroupServices,
 };
 export const rootPath = './uploads';
 export const _dirPath = `${rootPath}/projects`;

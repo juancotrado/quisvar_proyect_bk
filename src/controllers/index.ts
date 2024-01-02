@@ -168,6 +168,16 @@ import {
   updateById,
   deleteById,
 } from './consortium.controller';
+import {
+  createGroup,
+  getAll,
+  getById,
+  updateGroup,
+  deleteGroup,
+  createRelation,
+  updateRelation,
+  deleteRelation,
+} from './groups.controller';
 // User Controllers
 export {
   showUsers,
@@ -335,4 +345,15 @@ export {
   getConsortiumById,
   updateById,
   deleteById,
+};
+//Groups Controller
+export {
+  createGroup,
+  getAll,
+  getById,
+  updateGroup,
+  deleteGroup,
+  createRelation,
+  updateRelation,
+  deleteRelation,
 };

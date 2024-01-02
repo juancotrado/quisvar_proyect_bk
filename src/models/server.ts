@@ -34,6 +34,7 @@ import {
   equipmentRouter,
   contractRoutes,
   consortiumRoutes,
+  groupsRoutes,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -83,6 +84,7 @@ class Server {
     equipment: `/${process.env.ROUTE}/equipment`,
     contract: `/${process.env.ROUTE}/contract`,
     consortium: `/${process.env.ROUTE}/consortium`,
+    groups: `/${process.env.ROUTE}/groups`,
   };
 
   constructor() {
@@ -150,6 +152,7 @@ class Server {
     this.app.use(this.path.equipment, equipmentRouter);
     this.app.use(this.path.contract, contractRoutes);
     this.app.use(this.path.consortium, consortiumRoutes);
+    this.app.use(this.path.groups, groupsRoutes);
     this.app.use(docs);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       res.locals.pageNotFound = this.rootDir + '/404_page/index.html';
