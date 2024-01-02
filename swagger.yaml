@@ -83,11 +83,46 @@ paths:
                   message: 'Error de servidor'
       security:
         - basicAuth: []
+  /projects:
+    post:
+      tags:
+        - project
+      summary: Create New Project
+      description: |-
+        Ingresar Los campos requeridos para crear un Proyecto
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Proyecto Creado
+        '404':
+          description: No se pudo crear el Proyecto
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el Proyecto
   /contract:
     get:
       tags:
         - contract
       summary: Show Contracts
+      parameters:
+        - name: cui
+          in: query
+          description: Nombre o codigo con que empieza el cui
+          # required: false
+          schema:
+            type: string
       description: |-
         Ver la lista de contratos por empresa
       security:
@@ -468,3 +503,19 @@ components:
         fileName:
           type: string
           example: 'nombre_del_archivo'
+    Project:
+      required:
+        - name
+        - typeSpecialityId
+        - contractId,
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'Proyecto De Mejora Continua'
+        typeSpecialityId:
+          type: integer
+          example: 1
+        contractId:
+          type: integer
+          example: 2
