@@ -3,6 +3,7 @@ import { Levels, SubTasks, TaskRole } from '@prisma/client';
 import {
   GetFilterLevels,
   Level,
+  ListCostType,
   PickSubtask,
   PriceAreaTask,
   PriceIndexTask,
@@ -23,7 +24,7 @@ import bcrypt from 'bcryptjs';
 export const sumValues = (list: any[], label: string) => {
   const sum = list.reduce((a: number, c) => a + +c[label], 0);
   if (Number.isNaN(sum)) return 0;
-  return sum;
+  return Math.round(sum * 100) / 100;
 };
 
 export const parseSubTasks = (
@@ -47,10 +48,16 @@ export const parseSubTasks = (
     };
   });
 };
+export const round2Decimal = (n: number) => Math.round((n / 30) * 100) / 100;
+
+const calculateCost = (percentage: number, cost?: number) => {
+  const price = ((cost ? cost : 1) * percentage) / 100;
+  return Math.round(price * 100) / 100;
+};
 
 export const percentageSubTasks = (
   listSubtask: SubTaskFilter[],
-  _percentage: number
+  priceTask?: ListCostType
 ) => {
   return listSubtask.map(({ users, ...subtask }) => {
     const percentage = sumValues(users, 'percentage');
@@ -65,19 +72,47 @@ export const percentageSubTasks = (
           const firstName = findUser?.user.profile?.firstName;
           const lastName = findUser?.user.profile?.lastName;
           const dni = findUser?.user.profile?.dni;
-          acc.push({ userId, count: 1, firstName, lastName, dni });
+          const degree = findUser?.user.profile?.degree || undefined;
+          const percentage = findUser?.percentage || 0;
+          acc.push({
+            userId,
+            count: 1,
+            firstName,
+            lastName,
+            dni,
+            degree,
+            percentage,
+          });
         }
         return acc;
       },
       []
     );
+    //---------------calculate-cost--------------------------------------
+    const newCost = listUsers.map(user => {
+      if (user.degree === 'Bachiller') {
+        return { total: calculateCost(user.percentage, priceTask?.bachelor) };
+      }
+      return { total: calculateCost(user.percentage, priceTask?.professional) };
+    });
+    const totalCostPerUser = sumValues(newCost, 'total');
+    //--------------------------------------------------------------------
+    const price = totalCostPerUser
+      ? totalCostPerUser
+      : priceTask?.cost
+      ? priceTask.cost * subtask.days
+      : // : subtask.price;
+        0;
+    //--------------------------------------------------------------------
     const spending =
       subtask.status === 'LIQUIDATION'
-        ? subtask.price
-        : subtask.status === 'DONE'
-        ? parseFloat(((+subtask.price * _percentage) / 100).toFixed(2))
-        : 0;
-    const balance = +subtask.price - +spending;
+        ? price
+        : // : subtask.status === 'DONE'
+          // ? parseFloat(((+subtask.price * _percentage) / 100).toFixed(2))
+          0;
+    const balance = +price - +spending;
+    //--------------------------------------------------------------------
+    // console.log(price, balance, spending);
     return {
       percentage,
       spending,
@@ -85,6 +120,7 @@ export const percentageSubTasks = (
       listUsers,
       users,
       ...subtask,
+      price,
     };
   });
 };

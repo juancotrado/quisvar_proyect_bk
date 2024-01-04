@@ -8,6 +8,7 @@ import {
 } from '../services';
 import { mkdirSync, rmSync } from 'fs';
 import { SubTasks } from '@prisma/client';
+import { TypeCost } from 'types/types';
 
 const dir = _dirPath;
 const model = _materialPath;
@@ -47,7 +48,8 @@ export const showStage = async (
     const { id } = req.params;
     const _stage_id = parseInt(id);
     const status = req.query.status as SubTasks['status'];
-    const query = await StageServices.find(_stage_id, status);
+    const typecost = req.query.typecost as TypeCost;
+    const query = await StageServices.find(_stage_id, status, typecost);
     return res.status(200).json(query);
   } catch (error) {
     next(error);
