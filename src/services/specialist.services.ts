@@ -49,17 +49,17 @@ class SpecialistServices {
         email: true,
         agreement: true,
         cv: true,
-        projects: {
-          include: {
-            project: {
-              select: {
-                CUI: true,
-                name: true,
-                stages: true,
-              },
-            },
-          },
-        },
+        // projects: {
+        //   include: {
+        //     project: {
+        //       select: {
+        //         CUI: true,
+        //         name: true,
+        //         stages: true,
+        //       },
+        //     },
+        //   },
+        // },
       },
     });
     return specialist;

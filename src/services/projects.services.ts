@@ -27,36 +27,25 @@ class ProjectsServices {
     return findProject;
   }
 
-  static async create({
-    CUI,
-    department,
-    description,
-    district,
-    name,
-    percentage,
-    province,
-    typeSpecialityId,
-  }: projectPick) {
+  static async create({ name, typeSpecialityId, contractId }: projectPick) {
     const newProject = await prisma.projects.create({
       data: {
-        CUI,
-        department,
-        description,
-        district,
         name,
-        percentage,
-        province,
         typeSpecialityId,
+        contract: { connect: { id: contractId } },
       },
     });
     return newProject;
   }
 
-  static async update(id: Projects['id'], data: UpdateProjectPick) {
+  static async update(
+    id: Projects['id'],
+    { contractId, ...data }: UpdateProjectPick
+  ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateProject = await prisma.projects.update({
       where: { id },
-      data,
+      data: { ...data, contract: { update: { id: contractId } } },
     });
     return updateProject;
   }

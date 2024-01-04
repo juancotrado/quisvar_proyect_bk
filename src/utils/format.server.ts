@@ -1,6 +1,7 @@
 import {
   Company,
   Consortium,
+  Contratc,
   PersonBussiness,
   Profiles,
   Projects,
@@ -38,19 +39,17 @@ export type userProfilePick = Pick<
 
 export type projectPick = Pick<
   Projects,
-  | 'name'
-  | 'description'
+  'name'
+  // | 'description'
   // | 'startDate'
   // | 'untilDate'
   // | 'unique'
-  | 'CUI'
-  | 'department'
-  | 'province'
-  | 'district'
-  | 'percentage'
+  // | 'CUI'
+  // | 'percentage'
 > & {
   userId: Users['id'];
   typeSpecialityId: TypeSpecialities['id'];
+  contractId: Contratc['id'];
   // specialistsInfo: PersonBussinessType[];
   // companyInfo: CompanyType;
   // consortiumInfo: ConsortiumType;
@@ -62,6 +61,7 @@ export type UpdateProjectPick = Omit<
   'typeSpecialityId' | 'unique' | 'stageName'
 > & {
   // status: Projects['status'];
+  contractId: Contratc['id'];
 };
 
 export type PersonBussinessType = Omit<PersonBussiness, 'id' | 'projectsId'>;

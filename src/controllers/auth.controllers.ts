@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { authServices } from '../services';
 import AppError from '../utils/appError';
 import { UserType } from '../middlewares/auth.middleware';
+import QueryServices from '../services/queries.services';
 
 class AuthController {
   public static async login(req: Request, res: Response, next: NextFunction) {
@@ -43,6 +44,16 @@ class AuthController {
     } catch (error) {
       next(error);
     }
+  }
+
+  public static async queryroute(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const query = new QueryServices();
+    const data = await query.updateData();
+    return res.json(data);
   }
 }
 

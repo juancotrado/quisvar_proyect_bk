@@ -70,9 +70,6 @@ class ReportsServices {
                       select: {
                         id: true,
                         name: true,
-                        description: true,
-                        CUI: true,
-                        percentage: true,
                       },
                     },
                   },
@@ -87,10 +84,6 @@ class ReportsServices {
       select: {
         id: true,
         name: true,
-        CUI: true,
-        description: true,
-        district: true,
-        percentage: true,
         moderator: {
           select: {
             profile: {

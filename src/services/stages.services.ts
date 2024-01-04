@@ -2,6 +2,7 @@ import AppError from '../utils/appError';
 import { Projects, Stages, SubTasks, prisma } from '../utils/prisma.server';
 import {
   calculateAndUpdateDataByLevel,
+  round2Decimal,
   sumPriceByStage,
   sumValues,
 } from '../utils/tools';
@@ -9,7 +10,7 @@ import LevelsServices from './levels.services';
 import { existsSync } from 'fs';
 import Queries from '../utils/queries';
 import PathServices from './paths.services';
-import { usersCount } from 'types/types';
+import { ListCostType, TypeCost, usersCount } from 'types/types';
 
 class StageServices {
   static async findMany(projectId: Projects['id']) {
@@ -27,15 +28,26 @@ class StageServices {
     return findStage;
   }
 
-  static async find(id: Stages['id'], status?: SubTasks['status']) {
+  static async find(
+    id: Stages['id'],
+    status?: SubTasks['status'],
+    typeCost?: TypeCost
+  ) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const findStage = await prisma.stages.findUnique({
       where: { id },
-      include: { project: { select: { name: true, percentage: true } } },
+      include: { project: { select: { name: true } } },
     });
     if (!findStage)
       throw new AppError('Oops!,No se pudo encontrar la etapa', 400);
-    const { name, project, rootTypeItem, isProject } = findStage;
+    const {
+      name,
+      project,
+      rootTypeItem,
+      isProject,
+      bachelorCost,
+      professionalCost,
+    } = findStage;
     const projectName = project.name;
     const getList = await prisma.levels.findMany({
       where: { stagesId: id },
@@ -57,12 +69,21 @@ class StageServices {
         },
       },
     });
-    const list = LevelsServices.findList(
-      getList,
-      0,
-      0,
-      findStage.project.percentage
-    );
+    //--------------------------------------------------------------------
+    const valueCost = () => {
+      const listCost: ListCostType = {
+        cost: 0,
+        bachelor: round2Decimal(bachelorCost),
+        professional: round2Decimal(professionalCost),
+      };
+      if (typeCost === 'bachelor')
+        return { ...listCost, cost: round2Decimal(bachelorCost) };
+      if (typeCost === 'professional')
+        return { ...listCost, cost: round2Decimal(professionalCost) };
+      return { ...listCost, cost: undefined };
+    };
+    //--------------------------------------------------------------------
+    const list = LevelsServices.findList(getList, 0, 0, valueCost());
     const nextLevel = calculateAndUpdateDataByLevel(list);
     const total = sumValues(nextLevel, 'total');
     const balance = sumValues(nextLevel, 'balance');
