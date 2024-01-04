@@ -18,6 +18,7 @@ export const _admin_role = roleHandler([
   'ADMIN',
   'ASSISTANT',
   'ASSISTANT_ADMINISTRATIVE',
+  'AREA_MOD',
 ]);
 export const _mod_role = roleHandler([
   'SUPER_ADMIN',
