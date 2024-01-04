@@ -11,7 +11,8 @@ class AuthRouter {
   }
 
   public setUp() {
-    const { login, recoverPassword } = AuthController;
+    const { login, recoverPassword, queryroute } = AuthController;
+    this.router.get('/query', queryroute);
     this.router.post('/login', login);
     this.router.use(authenticateHandler);
     this.router.post('/recovery', recoverPassword);
