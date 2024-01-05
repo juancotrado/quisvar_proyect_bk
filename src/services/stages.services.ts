@@ -10,7 +10,7 @@ import LevelsServices from './levels.services';
 import { existsSync } from 'fs';
 import Queries from '../utils/queries';
 import PathServices from './paths.services';
-import { ListCostType, TypeCost, usersCount } from 'types/types';
+import { ListCostType, StageUpdate, TypeCost, usersCount } from 'types/types';
 
 class StageServices {
   static async findMany(projectId: Projects['id']) {
@@ -25,6 +25,30 @@ class StageServices {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const findStage = await prisma.stages.findUnique({ where: { id } });
     if (!findStage) throw new AppError('Oops!, ID invalido', 400);
+    return findStage;
+  }
+
+  public static async findDetails(id: Stages['id']) {
+    if (!id) throw new AppError('Oops!, ID invalido', 400);
+    const findStage = await prisma.stages.findUnique({
+      where: { id },
+      include: {
+        group: {
+          select: {
+            id: true,
+            name: true,
+            groups: { select: { users: Queries.selectProfileUser } },
+          },
+        },
+        project: {
+          select: {
+            contract: Queries.selectContractStage,
+          },
+        },
+      },
+    });
+    if (!findStage)
+      throw new AppError('Oops!, No se pudo encontrar la etapa', 400);
     return findStage;
   }
 
@@ -218,6 +242,23 @@ class StageServices {
     const updateStage = await prisma.stages.update({
       where: { id },
       data: { name },
+      include: { project: { select: { name: true } } },
+    });
+    return updateStage;
+  }
+
+  static async updateDetails(
+    id: Stages['id'],
+    { groupId, ...data }: StageUpdate
+  ) {
+    if (!id) throw new AppError('Oops!, ID invalido', 400);
+    // const duplicated = await this.duplicate(id, name, 'ID');
+    // if (duplicated) throw new AppError('Ops!,Nombre repetido', 400);
+    // const path = await PathServices.stage(id, 'UPLOADS');
+    // if (!existsSync(path)) throw new AppError('Ops!,carpeta no existe', 404);
+    const updateStage = await prisma.stages.update({
+      where: { id },
+      data: { ...data, groupId },
       include: { project: { select: { name: true } } },
     });
     return updateStage;

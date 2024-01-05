@@ -114,6 +114,7 @@ model Group {
   id        Int            @id @default(autoincrement())
   name      String
   createdAt DateTime       @default(now())
+  stage     Stages[]
   groups    GroupOnUsers[]
 }
 
@@ -140,27 +141,29 @@ model Projects {
 }
 
 model Stages {
-  id               Int               @id @default(autoincrement())
+  id               Int      @id @default(autoincrement())
   name             String
   //-----------------------------------------------------
-  startDate        DateTime          @default(now())
-  untilDate        DateTime          @default(now())
-  status           Boolean           @default(false)
-  isProject        Boolean           @default(false)
+  startDate        DateTime @default(now())
+  untilDate        DateTime @default(now())
+  status           Boolean  @default(false)
+  isProject        Boolean  @default(false)
   moderatorId      Int?
-  rootTypeItem     TypeItem          @default(ROM)
+  rootTypeItem     TypeItem @default(ROM)
   //-----------------------------------------------------
   // company          Company?          @relation(fields: [companyId], references: [id])
   // consortium       Consortium?       @relation(fields: [consortiumId], references: [id])
   // specialists      PersonBussiness[]
-  moderator        Users?            @relation(fields: [moderatorId], references: [id])
+  moderator        Users?   @relation(fields: [moderatorId], references: [id])
   //-----------------------------------------------------
-  bachelorCost     Float             @default(0)
-  professionalCost Float             @default(0)
+  bachelorCost     Float    @default(0)
+  professionalCost Float    @default(0)
+  groupId          Int?
+  group            Group?   @relation(fields: [groupId], references: [id])
   //-----------------------------------------------------
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  project          Projects          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  project          Projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId        Int
   levels           Levels[]
   // companyId        Int?
@@ -285,13 +288,13 @@ model Consortium {
 }
 
 model Company {
-  id           Int      @id @default(autoincrement())
+  id           Int    @id @default(autoincrement())
   name         String
   ruc          String
   manager      String
-  percentage   Int      @default(100)
+  percentage   Int    @default(100)
   consortiumId Int?
-  projectId    Int?     @unique
+  projectId    Int?   @unique
   // Consortium   Consortium? @relation(fields: [consortiumId], references: [id])
   // project      Projects?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   // stages       Stages[]

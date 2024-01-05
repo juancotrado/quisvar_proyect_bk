@@ -54,13 +54,7 @@ import {
   duplicateStages,
   duplicateSubtask,
 } from './duplicates.controllers';
-import {
-  createStage,
-  deleteStage,
-  showListStages,
-  showStage,
-  updateStage,
-} from './stages.controllers';
+
 import {
   createSector,
   deleteSector,
@@ -178,6 +172,7 @@ import {
   updateRelation,
   deleteRelation,
 } from './groups.controller';
+import StagesControllers from './stages.controllers';
 // User Controllers
 export {
   showUsers,
@@ -232,15 +227,7 @@ export { createFeedback, findFeedbacks };
 //Duplicates Controllers
 export { duplicateProject, duplicateLevels, duplicateSubtask };
 //Stages Controllers
-export {
-  showListStages,
-  createStage,
-  updateStage,
-  deleteStage,
-  showStage,
-  addNewStage,
-  duplicateStages,
-};
+export { StagesControllers, addNewStage, duplicateStages };
 //Sector Controllers
 export { showSectors, createSector, updateSector, deleteSector };
 

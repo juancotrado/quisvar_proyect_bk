@@ -7,6 +7,7 @@ import {
   Mail,
   MessageHistory,
   Messages,
+  Stages,
   SubTasks,
   Supervisor,
   Task_lvl_2,
@@ -232,3 +233,8 @@ export interface ListCostType {
   bachelor: number;
   professional: number;
 }
+
+export type StageUpdate = Pick<
+  Stages,
+  'bachelorCost' | 'professionalCost' | 'groupId'
+>;

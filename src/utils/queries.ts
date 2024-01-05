@@ -108,5 +108,21 @@ class Queries {
       },
     },
   };
+  static selectContractStage = {
+    select: {
+      createdAt: true,
+      cui: true,
+      department: true,
+      details: true,
+      difficulty: true,
+      district: true,
+      id: true,
+      name: true,
+      projectId: true,
+      projectName: true,
+      province: true,
+      shortName: true,
+    },
+  };
 }
 export default Queries;
