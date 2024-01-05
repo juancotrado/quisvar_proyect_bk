@@ -156,6 +156,71 @@ paths:
             application/json:
               example:
                 error: No se pudo encontrar la etapa
+  /stages/details/{id}:
+    get:
+      tags:
+        - stages
+      summary: Show stages details
+      parameters:
+        - name: id
+          in: path
+          description: ID de la etapa
+          required: true
+          schema:
+            type: number
+            example: 30
+      description: |-
+        Ver detalles de la etapa
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Operación exitosa
+        '404':
+          description: No se pudo encontrar la etapa
+          content:
+            application/json:
+              example:
+                error: No se pudo encontrar la etapa
+    patch:
+      tags:
+        - stages
+      summary: Update stages details
+      parameters:
+        - name: id
+          in: path
+          description: ID de la etapa
+          required: true
+          schema:
+            type: number
+            example: 30
+      description: |-
+        Editar detalles de etapa
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StagesDetails'
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Operación exitosa
+        '404':
+          description: No se pudo actualizar la etapa
+          content:
+            application/json:
+              example:
+                error: No se pudo actualizar la etapa
   /contract:
     get:
       tags:
@@ -562,5 +627,21 @@ components:
           type: integer
           example: 1
         contractId:
+          type: integer
+          example: 2
+    StagesDetails:
+      required:
+        - bachelorCost
+        - professionalCost
+        - groupId
+      type: object
+      properties:
+        bachelorCost:
+          type: integer
+          example: 14000
+        professionalCost:
+          type: integer
+          example: 14000
+        groupId:
           type: integer
           example: 2
