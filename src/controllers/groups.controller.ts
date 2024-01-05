@@ -47,8 +47,8 @@ export const updateGroup = async (
 ) => {
   try {
     const { id } = req.params;
-    const body = req.body;
-    const query = await GroupServices.update(+id, body);
+    const { name } = req.body;
+    const query = await GroupServices.update(+id, name);
     res.status(200).json(query);
   } catch (error) {
     next(error);

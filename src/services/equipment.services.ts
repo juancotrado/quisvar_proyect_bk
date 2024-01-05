@@ -1,5 +1,4 @@
 import AppError from '../utils/appError';
-import { enviarCorreoAgradecimiento } from '../utils/mailer';
 import { Equipment, prisma } from '../utils/prisma.server';
 // import Queries from '../utils/queries';
 
@@ -23,10 +22,6 @@ class EquipmentServices {
     const equipment = await prisma.equipment.create({
       data,
     });
-    enviarCorreoAgradecimiento(
-      'j1mer0528@gmail.com',
-      `Remoto asignado en ${data.name}`
-    );
     return equipment;
   }
   static async getEquipment(id: Equipment['id']) {

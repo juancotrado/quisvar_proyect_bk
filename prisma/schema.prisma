@@ -111,9 +111,10 @@ model TypeSpecialities {
 }
 
 model Group {
-  id     Int            @id @default(autoincrement())
-  name   String
-  groups GroupOnUsers[]
+  id        Int            @id @default(autoincrement())
+  name      String
+  createdAt DateTime       @default(now())
+  groups    GroupOnUsers[]
 }
 
 model GroupOnUsers {

@@ -13,14 +13,61 @@ class GroupServices {
       select: {
         id: true,
         name: true,
-        groups: true,
+        groups: {
+          select: {
+            users: {
+              select: {
+                profile: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    userPc: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
       },
     });
     return groups;
   }
   static async getById(id: Group['id']) {
     if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
-    const groups = await prisma.group.findUnique({ where: { id } });
+    const groups = await prisma.group.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        groups: {
+          orderBy: {
+            users: {
+              profile: {
+                lastName: 'asc',
+              },
+            },
+          },
+          select: {
+            users: {
+              select: {
+                id: true,
+                role: true,
+                profile: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                    userPc: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
     return groups;
   }
   static async update(id: Group['id'], name: Group['name']) {
@@ -42,6 +89,21 @@ class GroupServices {
     groupId: GroupOnUsers['groupId']
   ) {
     if (!userId || !groupId) throw new AppError(`Oops!, algo salio mal`, 400);
+    const hasGroup = await prisma.groupOnUsers.findFirst({
+      where: { userId },
+      select: {
+        groups: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+    if (hasGroup)
+      throw new AppError(
+        `Oops!, Usuario ya cuenta con un grupo (${hasGroup.groups.name})`,
+        400
+      );
     const groups = await prisma.groupOnUsers.create({
       data: {
         userId,
