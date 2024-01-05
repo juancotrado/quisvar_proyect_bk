@@ -13,7 +13,12 @@ import {
   percentageSubTasks,
   sumValues,
 } from '../utils/tools';
-import { DuplicateLevel, GetFilterLevels, UpdateLevelBlock } from 'types/types';
+import {
+  DuplicateLevel,
+  GetFilterLevels,
+  ListCostType,
+  UpdateLevelBlock,
+} from 'types/types';
 import { existsSync, renameSync } from 'fs';
 import Queries from '../utils/queries';
 import PathServices from './paths.services';
@@ -354,7 +359,7 @@ class LevelsServices {
     array: GetFilterLevels[],
     _rootId: number,
     _rootLevel: number,
-    percentageProject?: number
+    listCost?: ListCostType
   ) {
     const findList = array.filter(
       ({ rootId, rootLevel }) => rootId === _rootId && rootLevel === _rootLevel
@@ -374,7 +379,7 @@ class LevelsServices {
         ...value,
       };
       if (subTasks && subTasks.length) {
-        const subtasks = percentageSubTasks(subTasks, percentageProject || 30);
+        const subtasks = percentageSubTasks(subTasks, listCost);
         const price = sumValues(subtasks, 'price');
         const days = sumValues(subtasks, 'days');
         const spending = sumValues(subtasks, 'spending');
@@ -406,7 +411,12 @@ class LevelsServices {
           subTasks: subtasks,
         };
       }
-      const nextLevel: typeof findList = this.findList(list, id, level);
+      const nextLevel: typeof findList = this.findList(
+        list,
+        id,
+        level,
+        listCost
+      );
       if (!nextLevel.length) return data;
       return { ...data, nextLevel };
     });

@@ -206,6 +206,8 @@ export interface usersCount {
   lastName?: string;
   count: number;
   dni?: string;
+  degree?: string;
+  percentage: number;
 }
 
 export type ContractForm = Pick<
@@ -223,3 +225,10 @@ export type ContractForm = Pick<
   | 'difficulty'
   | 'shortName'
 >;
+
+export type TypeCost = 'bachelor' | 'professional';
+export interface ListCostType {
+  cost?: number;
+  bachelor: number;
+  professional: number;
+}
