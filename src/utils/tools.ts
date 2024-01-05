@@ -105,7 +105,7 @@ export const percentageSubTasks = (
         0;
     //--------------------------------------------------------------------
     const spending =
-      subtask.status === 'LIQUIDATION'
+      subtask.status === 'DONE'
         ? price
         : // : subtask.status === 'DONE'
           // ? parseFloat(((+subtask.price * _percentage) / 100).toFixed(2))

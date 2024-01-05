@@ -15,6 +15,6 @@ router.use(_mod_role);
 router.post('/', StagesControllers.create);
 router.post('/new/:id', addNewStage);
 router.patch('/:id', StagesControllers.update);
-router.patch('/details:id', StagesControllers.updateDetails);
+router.patch('/details/:id', StagesControllers.updateDetails);
 router.delete('/:id', StagesControllers.delete);
 export default router;
