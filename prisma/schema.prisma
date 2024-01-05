@@ -148,10 +148,11 @@ model Stages {
   status           Boolean           @default(false)
   isProject        Boolean           @default(false)
   moderatorId      Int?
-  company          Company?          @relation(fields: [companyId], references: [id])
-  consortium       Consortium?       @relation(fields: [consortiumId], references: [id])
-  specialists      PersonBussiness[]
   rootTypeItem     TypeItem          @default(ROM)
+  //-----------------------------------------------------
+  // company          Company?          @relation(fields: [companyId], references: [id])
+  // consortium       Consortium?       @relation(fields: [consortiumId], references: [id])
+  // specialists      PersonBussiness[]
   moderator        Users?            @relation(fields: [moderatorId], references: [id])
   //-----------------------------------------------------
   bachelorCost     Float             @default(0)
@@ -162,8 +163,8 @@ model Stages {
   project          Projects          @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId        Int
   levels           Levels[]
-  companyId        Int?
-  consortiumId     Int?
+  // companyId        Int?
+  // consortiumId     Int?
 }
 
 model Levels {
@@ -268,8 +269,8 @@ model PersonBussiness {
   pdf        String?
   projectsId Int?
   // Projects   Projects? @relation(fields: [projectsId], references: [id])
-  stages     Stages? @relation(fields: [stagesId], references: [id])
-  stagesId   Int?
+  // stages     Stages? @relation(fields: [stagesId], references: [id])
+  // stagesId   Int?
 }
 
 model Consortium {
@@ -280,7 +281,7 @@ model Consortium {
   companies ConsortiumOnCompanies[]
   // companies Company[]
   // project   Projects  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  stages    Stages[]
+  // stages    Stages[]
 }
 
 model Company {
@@ -293,7 +294,7 @@ model Company {
   projectId    Int?     @unique
   // Consortium   Consortium? @relation(fields: [consortiumId], references: [id])
   // project      Projects?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  stages       Stages[]
+  // stages       Stages[]
 }
 
 model Companies {
