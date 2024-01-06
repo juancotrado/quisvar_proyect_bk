@@ -16,6 +16,23 @@ class Queries {
       },
     },
   };
+  static selectProfileUserForStage = {
+    select: {
+      id: true,
+      role: true,
+      profile: {
+        select: {
+          firstName: true,
+          lastName: true,
+          dni: true,
+          phone: true,
+          job: true,
+          degree: true,
+          description: true,
+        },
+      },
+    },
+  };
   static selectProfileShort = {
     select: {
       id: true,

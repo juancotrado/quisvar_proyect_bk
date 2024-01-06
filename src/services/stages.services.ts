@@ -37,7 +37,7 @@ class StageServices {
           select: {
             id: true,
             name: true,
-            groups: { select: { users: Queries.selectProfileUser } },
+            groups: { select: { users: Queries.selectProfileUserForStage } },
           },
         },
         project: {
