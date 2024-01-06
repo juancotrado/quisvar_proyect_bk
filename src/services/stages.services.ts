@@ -270,7 +270,7 @@ class StageServices {
     if (!existsSync(path)) throw new AppError('Ops!,carpeta no existe', 404);
     const deleteStage = await prisma.stages.delete({
       where: { id },
-      include: { project: { select: { name: true } } },
+      include: { project: { select: { name: true, id: true } } },
     });
     return deleteStage;
   }

@@ -109,11 +109,16 @@ export const deleteProject = async (
   try {
     const { id } = req.params;
     const project_id = parseInt(id);
-    const { name, path, ...query } = await ProjectsServices.delete(project_id);
+    const {
+      name,
+      id: projectId,
+      path,
+      ...query
+    } = await ProjectsServices.delete(project_id);
     rmSync(path, { recursive: true });
-    rmSync(`${model}/${name}`, { recursive: true });
-    rmSync(`${review}/${name}`, { recursive: true });
-    rmSync(`${editables}/${name}`, { recursive: true });
+    rmSync(`${model}/${projectId}`, { recursive: true });
+    rmSync(`${review}/${projectId}`, { recursive: true });
+    rmSync(`${editables}/${projectId}`, { recursive: true });
     res.status(204).json({ name, path, ...query });
   } catch (error) {
     next(error);

@@ -115,7 +115,7 @@ class StagesControllers {
       const { id } = req.params;
       const _stage_id = parseInt(id);
       const { project, ...query } = await StageServices.delete(_stage_id);
-      const path = project.name + '/' + query.name;
+      const path = project.id + '/' + query.id;
       if (query) deleteFiles([model, dir, review, editables], path);
       res.status(200).json(query);
     } catch (error) {
