@@ -89,21 +89,21 @@ class GroupServices {
     groupId: GroupOnUsers['groupId']
   ) {
     if (!userId || !groupId) throw new AppError(`Oops!, algo salio mal`, 400);
-    const hasGroup = await prisma.groupOnUsers.findFirst({
-      where: { userId },
-      select: {
-        groups: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    });
-    if (hasGroup)
-      throw new AppError(
-        `Oops!, Usuario ya cuenta con un grupo (${hasGroup.groups.name})`,
-        400
-      );
+    // const hasGroup = await prisma.groupOnUsers.findFirst({
+    //   where: { userId },
+    //   select: {
+    //     groups: {
+    //       select: {
+    //         name: true,
+    //       },
+    //     },
+    //   },
+    // });
+    // if (hasGroup)
+    //   throw new AppError(
+    //     `Oops!, Usuario ya cuenta con un grupo (${hasGroup.groups.name})`,
+    //     400
+    //   );
     const groups = await prisma.groupOnUsers.create({
       data: {
         userId,
