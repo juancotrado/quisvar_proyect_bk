@@ -46,5 +46,21 @@ class ConsortiumServices {
     });
     return consortiums;
   }
+  //GET CONSORTIUM AND COMPANIES
+  static async getBoth() {
+    const companies = await prisma.companies.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+    const consortiums = await prisma.consortium.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+    return { ...consortiums, ...companies };
+  }
 }
 export default ConsortiumServices;

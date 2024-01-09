@@ -161,6 +161,7 @@ import {
   getConsortiumById,
   updateById,
   deleteById,
+  getBoth,
 } from './consortium.controller';
 import {
   createGroup,
@@ -343,4 +344,5 @@ export {
   createRelation,
   updateRelation,
   deleteRelation,
+  getBoth,
 };
