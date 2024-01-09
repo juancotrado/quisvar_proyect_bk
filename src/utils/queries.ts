@@ -50,6 +50,19 @@ class Queries {
     Levels: {
       select: {
         userId: true,
+        stages: {
+          select: {
+            group: {
+              select: {
+                id: true,
+                name: true,
+                groups: {
+                  select: { users: Queries.selectProfileUserForStage },
+                },
+              },
+            },
+          },
+        },
       },
     },
     feedBacks: {
