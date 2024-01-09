@@ -52,3 +52,21 @@ docker restat "name"
 ```sh
 docker exec -it "name_contenr" bash
 ```
+
+## Docker command database Backup
+
+```sh
+docker exec -it ${container_name} bash
+```
+
+create backup with datetime
+
+```sh
+pg_dump -U ${user} -d ${database_name} > backup.sql
+```
+
+copy backup out container
+
+```sh
+docker cp ${container_name}:/backup.sql ${root}/backup_$(date +"%Y%m%d_%H%M%S").sql
+```
