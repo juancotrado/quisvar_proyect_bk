@@ -60,7 +60,18 @@ class ConsortiumServices {
         name: true,
       },
     });
-    return { ...consortiums, ...companies };
+
+    const companiesWithProperty = companies.map(company => ({
+      ...company,
+      type: 'company',
+    }));
+
+    const consortiumsWithProperty = consortiums.map(consortium => ({
+      ...consortium,
+      type: 'consortium',
+    }));
+
+    return [...consortiumsWithProperty, ...companiesWithProperty];
   }
 }
 export default ConsortiumServices;
