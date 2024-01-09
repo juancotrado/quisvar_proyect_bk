@@ -218,13 +218,13 @@ export type ContractForm = Pick<
   | 'cui'
   | 'createdAt'
   | 'indexContract'
-  | 'bachelorCost'
-  | 'professionalCost'
   | 'department'
   | 'province'
   | 'district'
   | 'difficulty'
   | 'shortName'
+  | 'companyId'
+  | 'consortiumId'
 >;
 
 export type TypeCost = 'bachelor' | 'professional';

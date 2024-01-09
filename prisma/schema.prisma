@@ -281,24 +281,25 @@ model Consortium {
   name      String
   manager   String
   projectId Int?                    @unique
+  contracts Contratc[]
   companies ConsortiumOnCompanies[]
   // companies Company[]
   // project   Projects  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   // stages    Stages[]
 }
 
-model Company {
-  id           Int    @id @default(autoincrement())
-  name         String
-  ruc          String
-  manager      String
-  percentage   Int    @default(100)
-  consortiumId Int?
-  projectId    Int?   @unique
-  // Consortium   Consortium? @relation(fields: [consortiumId], references: [id])
-  // project      Projects?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  // stages       Stages[]
-}
+// model Company {
+//   id           Int    @id @default(autoincrement())
+//   name         String
+//   ruc          String
+//   manager      String
+//   percentage   Int    @default(100)
+//   consortiumId Int?
+//   projectId    Int?   @unique
+//   // Consortium   Consortium? @relation(fields: [consortiumId], references: [id])
+//   // project      Projects?   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+//   // stages       Stages[]
+// }
 
 model Companies {
   id          Int                     @id @default(autoincrement())
@@ -313,6 +314,7 @@ model Companies {
   CCI         String                  @unique
   description String?
   consortium  ConsortiumOnCompanies[]
+  contracts   Contratc[]
 }
 
 model ConsortiumOnCompanies {
@@ -502,7 +504,7 @@ model FilesMessageHistory {
 }
 
 model Contratc {
-  id            Int       @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   cui           String
   name          String
   projectName   String
@@ -511,11 +513,15 @@ model Contratc {
   district      String
   shortName     String
   difficulty    Int
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime    @default(now())
   indexContract String
   details       String?
-  projectId     Int?      @unique
-  project       Projects? @relation(fields: [projectId], references: [id])
+  projectId     Int?        @unique
+  consortiumId  Int?
+  companyId     Int?
+  project       Projects?   @relation(fields: [projectId], references: [id])
+  consortium    Consortium? @relation(fields: [consortiumId], references: [id])
+  company       Companies?  @relation(fields: [companyId], references: [id])
 }
 
 enum UserRole {
