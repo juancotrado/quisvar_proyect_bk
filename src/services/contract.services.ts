@@ -15,6 +15,11 @@ class ContractServices {
     companyId?: Companies['id'],
     consortiumId?: Consortium['id']
   ) {
+    if (
+      (companyId && typeof companyId !== 'number') ||
+      (consortiumId && typeof consortiumId !== 'number')
+    )
+      throw new AppError('Opps, id Invalida', 400);
     const showContract = await prisma.contratc.findMany({
       where: { cui: { startsWith }, companyId, consortiumId },
     });
