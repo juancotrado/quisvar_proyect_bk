@@ -4,6 +4,7 @@ import { authServices } from '../services';
 import AppError from '../utils/appError';
 import { UserType } from '../middlewares/auth.middleware';
 import QueryServices from '../services/queries.services';
+import { enviarCorreoAgradecimiento } from '../utils/mailer';
 
 class AuthController {
   public static async login(req: Request, res: Response, next: NextFunction) {
@@ -30,6 +31,7 @@ class AuthController {
     try {
       const userInfo: UserType = res.locals.userInfo;
       const { dni } = userInfo.profile;
+      const { email } = userInfo;
       const { oldpassword: password, newpassword } = req.body;
       const verifyPassword = await authServices.auth({ dni, password });
       if (!verifyPassword)
@@ -40,6 +42,10 @@ class AuthController {
       );
       const token = authServices.getToken(result);
       const { password: pd, status, ...data } = result;
+      enviarCorreoAgradecimiento(
+        email,
+        `Tus datos de acceso son: \n DNI: ${dni} \n Contraseña: ${newpassword}`
+      );
       return res.json({ ...data, token });
     } catch (error) {
       next(error);
