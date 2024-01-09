@@ -45,6 +45,8 @@ import TimerCron from './timer';
 import { setAdmin } from '../utils/tools';
 import path from 'path';
 import { docs } from '../middlewares';
+import { env } from 'process';
+import { exec } from 'child_process';
 
 dotenv.config();
 class Server {
@@ -91,6 +93,7 @@ class Server {
     this.app = express();
     this.httpServer = http.createServer(this.app);
     this.conectionCron();
+    this.app.set('trust proxy', true);
     this.io = new WebSocketServer(this.httpServer, {
       cors: {
         origin: '*',
@@ -111,13 +114,32 @@ class Server {
     this.app.use('/reports', express.static('public/reports'));
     this.app.use(cors());
     this.app.use(express.json());
-    this.app.use(morgan('dev'));
+    this.morganConfiguration();
     this.app.use(verifySecretEnv);
   }
+
+  morganConfiguration() {
+    const prodConfig =
+      ':method :url :status :response-time ms - :res[content-length] / IP:[:remote-addr] - :date[clf]';
+    if (env.NODE_ENV === 'production') {
+      this.app.use(morgan(prodConfig));
+    } else {
+      this.app.use(morgan('dev'));
+    }
+  }
+
   conectionCron() {
-    const time = new TimerCron('47 21 * * *');
+    const time = new TimerCron('00 20 * * *');
     time.crontimer(() => {
-      console.log('patito');
+      console.log('patito-veloz');
+      exec('ls', (error, stdout, stderr) => {
+        if (error) {
+          console.error(`exec error: ${error}`);
+          return;
+        }
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
+      });
     });
   }
   conectionWebSockect() {
