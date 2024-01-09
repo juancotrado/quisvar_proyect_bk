@@ -66,3 +66,16 @@ export const deleteById = async (
     next(error);
   }
 };
+//GET CONSORTIUM AND COMPANIES
+export const getBoth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const query = await ConsortiumServices.getBoth();
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
