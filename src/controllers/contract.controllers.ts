@@ -11,7 +11,11 @@ class ContractController {
   ) {
     try {
       const cui = req.query.cui as string;
-      const result = await ContractServices.showAll(cui);
+      const company = req.query.companyId as string;
+      const consortium = req.query.consortiumId as string;
+      const compId = parseInt(company);
+      const consortId = parseInt(consortium);
+      const result = await ContractServices.showAll(cui, compId, consortId);
       res.status(200).json(result);
     } catch (error) {
       next(error);

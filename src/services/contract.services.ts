@@ -1,13 +1,27 @@
 import { ContractForm } from 'types/types';
-import { Contratc, prisma } from '../utils/prisma.server';
+import {
+  Companies,
+  Consortium,
+  Contratc,
+  prisma,
+} from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import { existsSync, mkdirSync, rmdirSync } from 'fs';
 import { _contractPath } from '.';
 
 class ContractServices {
-  public static async showAll(startsWith?: string) {
+  public static async showAll(
+    startsWith?: string,
+    companyId?: Companies['id'],
+    consortiumId?: Consortium['id']
+  ) {
+    if (
+      (companyId && typeof companyId !== 'number') ||
+      (consortiumId && typeof consortiumId !== 'number')
+    )
+      throw new AppError('Opps, id Invalida', 400);
     const showContract = await prisma.contratc.findMany({
-      where: { cui: { startsWith } },
+      where: { cui: { startsWith }, companyId, consortiumId },
     });
     return showContract;
   }
@@ -28,7 +42,10 @@ class ContractServices {
     return createContract;
   }
 
-  public static async update(id: Contratc['id'], data: ContractForm) {
+  public static async update(
+    id: Contratc['id'],
+    data: Omit<ContractForm, 'companyId' | 'consortiumId'>
+  ) {
     if (!id) throw new AppError('Opps, id Invalida', 400);
     const createContract = await prisma.contratc.update({
       where: { id },
