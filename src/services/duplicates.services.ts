@@ -2,6 +2,7 @@
 import { copyFileSync, mkdirSync } from 'fs';
 import AppError from '../utils/appError';
 import {
+  Contratc,
   Files,
   Levels,
   Projects,
@@ -23,8 +24,13 @@ import SubTasksServices from './subtasks.services';
 import StageServices from './stages.services';
 
 class DuplicatesServices {
-  static async project(id: Projects['id'], name: string) {
+  static async project(
+    id: Projects['id'],
+    name: string,
+    contractId: Contratc['id']
+  ) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
+    if (!contractId) throw new AppError('Oops!, ID invalido', 400);
     const getProyect = await prisma.projects.findUnique({
       where: { id },
       select: {
@@ -37,7 +43,7 @@ class DuplicatesServices {
       throw new AppError('No se pudo encontrar el proyecto', 404);
     //----------------------------create_project--------------------------------------
     const { stages, ..._data } = getProyect;
-    const data = { name, ..._data };
+    const data = { name, contractId, ..._data };
     const createNewProject = await prisma.projects.create({ data });
     const { id: projectId } = createNewProject;
     //----------------------------create_files--------------------------------------
@@ -59,7 +65,9 @@ class DuplicatesServices {
 
   static async stage(id: Stages['id'], name: string, projectId?: number) {
     if (!id) throw new AppError('Oops!,ID invalido?', 400);
-    const duplicate = await StageServices.duplicate(id, name, 'ID');
+    const param: 'ID' | 'ROOT' = projectId ? 'ROOT' : 'ID';
+    const _id = projectId ? projectId : id;
+    const duplicate = await StageServices.duplicate(_id, name, param);
     if (duplicate)
       throw new AppError(
         'Oops!,Ya se registro esta etapa en este proyecto',

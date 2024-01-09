@@ -9,8 +9,12 @@ export const duplicateProject = async (
   try {
     const { id } = req.params;
     const _project_id = parseInt(id);
-    const { name } = req.body;
-    const duplicate = await DuplicatesServices.project(_project_id, name);
+    const { name, contractId } = req.body;
+    const duplicate = await DuplicatesServices.project(
+      _project_id,
+      name,
+      contractId
+    );
     res.status(201).json(duplicate);
   } catch (error) {
     next(error);
