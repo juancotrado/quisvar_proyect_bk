@@ -502,20 +502,21 @@ model FilesMessageHistory {
 }
 
 model Contratc {
-  id            Int       @id @default(autoincrement())
-  cui           String
-  name          String
-  projectName   String
-  department    String
-  province      String
-  district      String
-  shortName     String
-  difficulty    Int
-  createdAt     DateTime  @default(now())
-  indexContract String
-  details       String?
-  projectId     Int?      @unique
-  project       Projects? @relation(fields: [projectId], references: [id])
+  id             Int       @id @default(autoincrement())
+  cui            String
+  name           String
+  contractNumber String    @default("")
+  projectName    String
+  department     String
+  province       String
+  district       String
+  shortName      String
+  difficulty     Int
+  createdAt      DateTime  @default(now())
+  indexContract  String
+  details        String?
+  projectId      Int?      @unique
+  project        Projects? @relation(fields: [projectId], references: [id])
 }
 
 enum UserRole {
