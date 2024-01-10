@@ -280,6 +280,7 @@ model Consortium {
   id        Int                     @id @default(autoincrement())
   name      String
   manager   String
+  img       String?
   projectId Int?                    @unique
   contracts Contratc[]
   companies ConsortiumOnCompanies[]
@@ -313,6 +314,7 @@ model Companies {
   SEE         DateTime?
   CCI         String                  @unique
   description String?
+  img         String?
   consortium  ConsortiumOnCompanies[]
   contracts   Contratc[]
 }
@@ -504,25 +506,25 @@ model FilesMessageHistory {
 }
 
 model Contratc {
-  id             Int       @id @default(autoincrement())
+  id             Int         @id @default(autoincrement())
   cui            String
   name           String
-  contractNumber String    @default("")
+  contractNumber String      @default("")
   projectName    String
   department     String
   province       String
   district       String
   shortName      String
   difficulty     Int
-  createdAt      DateTime  @default(now())
+  createdAt      DateTime    @default(now())
   indexContract  String
   details        String?
-  projectId      Int?      @unique
-  project        Projects? @relation(fields: [projectId], references: [id])
-  consortiumId  Int?
-  companyId     Int?
-  consortium    Consortium? @relation(fields: [consortiumId], references: [id])
-  company       Companies?  @relation(fields: [companyId], references: [id])
+  projectId      Int?        @unique
+  project        Projects?   @relation(fields: [projectId], references: [id])
+  consortiumId   Int?
+  companyId      Int?
+  consortium     Consortium? @relation(fields: [consortiumId], references: [id])
+  company        Companies?  @relation(fields: [companyId], references: [id])
 }
 
 enum UserRole {

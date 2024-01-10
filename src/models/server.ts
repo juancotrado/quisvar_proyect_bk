@@ -112,6 +112,7 @@ class Server {
     this.app.use('/file-user', express.static('public'));
     this.app.use('/general', express.static('public/general'));
     this.app.use('/reports', express.static('public/reports'));
+    this.app.use('/images', express.static('public'));
     this.app.use(cors());
     this.app.use(express.json());
     this.morganConfiguration();

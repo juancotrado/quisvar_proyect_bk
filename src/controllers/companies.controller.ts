@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { CompaniesServices } from '../services';
+type FilesProps = { [fieldname: string]: Express.Multer.File[] };
 
 export const createCompany = async (
   req: Request,
@@ -8,7 +9,13 @@ export const createCompany = async (
 ) => {
   try {
     const { body } = req;
-    const query = await CompaniesServices.createCompany(body);
+    const { img } = req.files as FilesProps;
+    console.log(img[0].filename);
+    console.log('aqui');
+    const query = await CompaniesServices.createCompany({
+      ...body,
+      img: img[0].filename ?? '',
+    });
     res.status(200).json(query);
   } catch (error) {
     next(error);
