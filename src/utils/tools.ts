@@ -21,6 +21,8 @@ import { PathServices } from '../services';
 import { existsSync } from 'fs';
 import bcrypt from 'bcryptjs';
 
+export const URL_HOST = `http://${process.env.HOST}:${process.env.PORT}`;
+
 export const sumValues = (list: any[], label: string) => {
   const sum = list.reduce((a: number, c) => a + +c[label], 0);
   if (Number.isNaN(sum)) return 0;
