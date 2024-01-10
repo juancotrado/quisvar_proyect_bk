@@ -13,8 +13,8 @@ class ContractController {
       const cui = req.query.cui as string;
       const company = req.query.companyId as string;
       const consortium = req.query.consortiumId as string;
-      const compId = parseInt(company);
-      const consortId = parseInt(consortium);
+      const compId = company ? parseInt(company) : undefined;
+      const consortId = consortium ? parseInt(consortium) : undefined;
       const result = await ContractServices.showAll(cui, compId, consortId);
       res.status(200).json(result);
     } catch (error) {
