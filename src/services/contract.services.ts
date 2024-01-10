@@ -8,6 +8,7 @@ import {
 import AppError from '../utils/appError';
 import { existsSync, mkdirSync, rmdirSync } from 'fs';
 import { _contractPath } from '.';
+import Queries from '../utils/queries';
 
 class ContractServices {
   public static async showAll(
@@ -16,12 +17,14 @@ class ContractServices {
     consortiumId?: Consortium['id']
   ) {
     if (
-      (companyId && typeof companyId !== 'number') ||
-      (consortiumId && typeof consortiumId !== 'number')
+      (companyId && isNaN(companyId)) ||
+      (consortiumId && isNaN(consortiumId))
     )
       throw new AppError('Opps, id Invalida', 400);
     const showContract = await prisma.contratc.findMany({
       where: { cui: { startsWith }, companyId, consortiumId },
+      orderBy: { name: 'asc' },
+      select: Queries.selectContract.select,
     });
     return showContract;
   }

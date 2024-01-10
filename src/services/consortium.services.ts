@@ -65,12 +65,14 @@ class ConsortiumServices {
 
     const companiesWithProperty = companies.map(company => ({
       ...company,
-      type: 'company',
+      type: 'companyId',
+      newId: 'companyId-' + company.id,
     }));
 
     const consortiumsWithProperty = consortiums.map(consortium => ({
       ...consortium,
-      type: 'consortium',
+      type: 'consortiumId',
+      newId: 'consortiumId-' + consortium.id,
     }));
 
     return [...consortiumsWithProperty, ...companiesWithProperty];

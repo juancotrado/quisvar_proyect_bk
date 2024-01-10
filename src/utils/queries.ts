@@ -154,5 +154,22 @@ class Queries {
       shortName: true,
     },
   };
+  static selectContract = {
+    select: {
+      createdAt: true,
+      cui: true,
+      department: true,
+      difficulty: true,
+      district: true,
+      id: true,
+      name: true,
+      projectId: true,
+      projectName: true,
+      province: true,
+      shortName: true,
+      consortiumId: true,
+      companyId: true,
+    },
+  };
 }
 export default Queries;
