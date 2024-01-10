@@ -252,6 +252,13 @@ class StageServices {
     { groupId, ...data }: StageUpdate
   ) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
+    if (groupId) {
+      const quantityUsers = await prisma.taskOnUsers.count({
+        where: { subtask: { Levels: { stages: { id } } } },
+      });
+      if (quantityUsers <= 0)
+        throw new AppError('El grupo, tiene tareas asignadas', 400);
+    }
     // const duplicated = await this.duplicate(id, name, 'ID');
     // if (duplicated) throw new AppError('Ops!,Nombre repetido', 400);
     // const path = await PathServices.stage(id, 'UPLOADS');
