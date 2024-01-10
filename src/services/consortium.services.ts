@@ -52,12 +52,14 @@ class ConsortiumServices {
       select: {
         id: true,
         name: true,
+        img: true,
       },
     });
     const consortiums = await prisma.consortium.findMany({
       select: {
         id: true,
         name: true,
+        img: true,
       },
     });
 
