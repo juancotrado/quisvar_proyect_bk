@@ -169,6 +169,7 @@ class Queries {
       shortName: true,
       consortiumId: true,
       companyId: true,
+      contractNumber: true,
     },
   };
 }
