@@ -43,8 +43,10 @@ class DuplicatesServices {
       throw new AppError('No se pudo encontrar el proyecto', 404);
     //----------------------------create_project--------------------------------------
     const { stages, ..._data } = getProyect;
-    const data = { name, contractId, ..._data };
-    const createNewProject = await prisma.projects.create({ data });
+    const data = { name, ..._data };
+    const createNewProject = await prisma.projects.create({
+      data: { ...data, contract: { connect: { id: contractId } } },
+    });
     const { id: projectId } = createNewProject;
     //----------------------------create_files--------------------------------------
     const path = await getPathProject(projectId, 'UPLOADS');
