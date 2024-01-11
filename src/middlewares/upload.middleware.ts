@@ -4,6 +4,7 @@ import multer from 'multer';
 import { PathServices, _contractPath } from '../services';
 import AppError from '../utils/appError';
 import { existsSync, mkdirSync } from 'fs';
+import { TypeFileUser } from 'types/types';
 
 const MAX_SIZE = 1024 * 1000 * 1000 * 1000;
 // const FILE_TYPES = ['.rar', '.zip'];
@@ -22,9 +23,6 @@ const storage = multer.diskStorage({
   },
   filename: async (req, file, callback) => {
     try {
-      // const { id } = req.params;
-      // const _subtask_id = parseInt(id);
-      // const { item, name } = await FilesServices.getSubTask(_subtask_id);
       const uniqueSuffix = Date.now();
       const { originalname } = file;
       if (originalname.includes('$')) throw new Error();
@@ -40,11 +38,16 @@ const storage = multer.diskStorage({
 
 const storageFileUser = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadPath =
-      file.fieldname === 'fileUserDeclaration'
-        ? 'public/declaration'
-        : `public/cv`;
-
+    const typeFileUser = req.query.typeFile as TypeFileUser;
+    let uploadPath;
+    if (typeFileUser) {
+      uploadPath = `public/${typeFileUser}`;
+    } else {
+      uploadPath =
+        file.fieldname === 'fileUserDeclaration'
+          ? 'public/declaration'
+          : `public/cv`;
+    }
     if (!existsSync(uploadPath)) {
       mkdirSync(uploadPath, { recursive: true });
     }

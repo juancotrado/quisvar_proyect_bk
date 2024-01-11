@@ -23,7 +23,10 @@ export type CheckRoleType = (
   res: Response,
   next: NextFunction
 ) => void;
-export type TypeFileUser = 'contract' | 'cv' | 'declaration' | 'agreement';
+export type TypeFileUser = keyof Pick<
+  User,
+  'contract' | 'cv' | 'declaration' | 'withdrawalDeclaration'
+>;
 
 export type PickSubtask = Pick<
   SubTasks,
