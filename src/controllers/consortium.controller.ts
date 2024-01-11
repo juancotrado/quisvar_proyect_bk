@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ConsortiumServices } from '../services';
+type FilesProps = { [fieldname: string]: Express.Multer.File[] };
 
 export const createConsortium = async (
   req: Request,
@@ -7,8 +8,12 @@ export const createConsortium = async (
   next: NextFunction
 ) => {
   try {
-    const body = req.body;
-    const query = await ConsortiumServices.create(body);
+    const { body } = req;
+    const { img } = req.files as FilesProps;
+    const query = await ConsortiumServices.create({
+      ...body,
+      img: img[0].filename ?? '',
+    });
     res.status(200).json(query);
   } catch (error) {
     next(error);

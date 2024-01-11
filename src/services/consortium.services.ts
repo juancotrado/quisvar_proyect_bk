@@ -1,5 +1,6 @@
 import AppError from '../utils/appError';
 import { Consortium, prisma } from '../utils/prisma.server';
+import { URL_HOST } from '../utils/tools';
 
 class ConsortiumServices {
   static async create(data: Consortium) {
@@ -52,23 +53,29 @@ class ConsortiumServices {
       select: {
         id: true,
         name: true,
+        img: true,
       },
     });
     const consortiums = await prisma.consortium.findMany({
       select: {
         id: true,
         name: true,
+        img: true,
       },
     });
 
     const companiesWithProperty = companies.map(company => ({
       ...company,
-      type: 'company',
+      type: 'companyId',
+      newId: 'companyId-' + company.id,
+      urlImg: `${URL_HOST}/images/img/companies/${company.img}`,
     }));
 
     const consortiumsWithProperty = consortiums.map(consortium => ({
       ...consortium,
-      type: 'consortium',
+      type: 'consortiumId',
+      newId: 'consortiumId-' + consortium.id,
+      urlImg: `${URL_HOST}/images/img/consortiums/${consortium.img}`,
     }));
 
     return [...consortiumsWithProperty, ...companiesWithProperty];

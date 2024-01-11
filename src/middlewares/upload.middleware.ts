@@ -96,10 +96,38 @@ const storageAddWorkStation = multer.diskStorage({
     cb(null, Date.now() + '$$' + originalname);
   },
 });
+const storageImgCompanies = multer.diskStorage({
+  destination: function (req, file, cb) {
+    console.log('aqui');
+    let uploadPath = 'public/img/companies';
+    if (!existsSync(uploadPath)) {
+      mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: function (req, files, cb) {
+    const { originalname } = files;
+    console.log(originalname);
+
+    cb(null, Date.now() + '$$' + originalname);
+  },
+});
+const storageImgConsortium = multer.diskStorage({
+  destination: function (req, file, cb) {
+    let uploadPath = 'public/img/consortium';
+    if (!existsSync(uploadPath)) {
+      mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: function (req, files, cb) {
+    const { originalname } = files;
+    cb(null, Date.now() + '$$' + originalname);
+  },
+});
 
 const storageAddEquipment = multer.diskStorage({
   destination: function (req, file, cb) {
-    console.log('here');
     let uploadPath = 'public/equipment';
     if (!existsSync(uploadPath)) {
       mkdirSync(uploadPath, { recursive: true });
@@ -277,6 +305,12 @@ export const uploadFileTrainingSpecialty = multer({
 });
 export const uploadFileContracts = multer({
   storage: storageContractsFiles,
+});
+export const uploadImgCompanies = multer({
+  storage: storageImgCompanies,
+});
+export const uploadImgConsortium = multer({
+  storage: storageImgConsortium,
 });
 export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
   try {

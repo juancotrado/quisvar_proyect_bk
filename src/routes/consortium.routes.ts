@@ -9,11 +9,16 @@ import {
   updateById,
 } from '../controllers';
 import { _admin_role } from '../middlewares/role.middleware';
+import { uploadImgConsortium } from '../middlewares/upload.middleware';
 const router = Router();
 router.use(authenticateHandler);
 //Admin role
 router.use(_admin_role);
-router.post('/', createConsortium);
+router.post(
+  '/',
+  uploadImgConsortium.fields([{ name: 'img' }]),
+  createConsortium
+);
 router.get('/all', getAllConsortium);
 router.get('/both', getBoth);
 router.get('/:id', getConsortiumById);
