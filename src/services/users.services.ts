@@ -51,12 +51,7 @@ class UsersServices {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findUser = await prisma.users.findUnique({
       where: { id },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        status: true,
-        createdAt: true,
+      include: {
         profile: true,
       },
     });
