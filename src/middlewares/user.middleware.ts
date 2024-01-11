@@ -2,6 +2,7 @@ import { Response, Request, NextFunction } from 'express';
 import AppError from '../utils/appError';
 import { UserType } from './auth.middleware';
 import { prisma } from '../utils/prisma.server';
+import { userProfilePick } from '../utils/format.server';
 
 const taskVerify = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -39,6 +40,40 @@ export const verifyStatusUser = async (
         400
       );
     }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyUniqueParam = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const body: userProfilePick = req.body;
+    const { dni, phone, email } = body;
+    const findUserByDNI = await prisma.profiles.findUnique({
+      where: { dni },
+    });
+    if (findUserByDNI)
+      throw new AppError('Oops!, Este DNI ya ha sido registrado', 404);
+    if (phone) {
+      const findUserByCell = await prisma.profiles.findUnique({
+        where: { phone },
+      });
+      if (findUserByCell)
+        throw new AppError(
+          'Oops!, Este Numero de Celular ya ha sido registrado',
+          404
+        );
+    }
+    const findUserByEmail = await prisma.users.findUnique({
+      where: { email },
+    });
+    if (findUserByEmail)
+      throw new AppError('Oops!, Este Correo ya ha sido registrado', 404);
     next();
   } catch (error) {
     next(error);

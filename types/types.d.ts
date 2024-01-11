@@ -161,7 +161,7 @@ export interface SubTaskFilter extends SubTasks {
 export interface SubTaskFiles extends SubTasks {
   files: Files[];
 }
-
+export type FilesProps = { [fieldname: string]: Express.Multer.File[] };
 export interface ParametersMail {
   skip?: number;
   limit?: number;

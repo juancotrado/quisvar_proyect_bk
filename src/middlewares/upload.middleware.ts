@@ -4,7 +4,6 @@ import multer from 'multer';
 import { PathServices, _contractPath } from '../services';
 import AppError from '../utils/appError';
 import { existsSync, mkdirSync } from 'fs';
-import { TypeFileUser } from 'types/types';
 
 const MAX_SIZE = 1024 * 1000 * 1000 * 1000;
 // const FILE_TYPES = ['.rar', '.zip'];
@@ -41,8 +40,11 @@ const storage = multer.diskStorage({
 
 const storageFileUser = multer.diskStorage({
   destination: function (req, file, cb) {
-    const typeFileUser = req.query.typeFile as TypeFileUser;
-    const uploadPath = `public/${typeFileUser}`;
+    const uploadPath =
+      file.fieldname === 'fileUserDeclaration'
+        ? 'public/declaration'
+        : `public/cv`;
+
     if (!existsSync(uploadPath)) {
       mkdirSync(uploadPath, { recursive: true });
     }
@@ -98,7 +100,6 @@ const storageAddWorkStation = multer.diskStorage({
 });
 const storageImgCompanies = multer.diskStorage({
   destination: function (req, file, cb) {
-    console.log('aqui');
     let uploadPath = 'public/img/companies';
     if (!existsSync(uploadPath)) {
       mkdirSync(uploadPath, { recursive: true });
@@ -107,7 +108,6 @@ const storageImgCompanies = multer.diskStorage({
   },
   filename: function (req, files, cb) {
     const { originalname } = files;
-    console.log(originalname);
 
     cb(null, Date.now() + '$$' + originalname);
   },
@@ -265,6 +265,8 @@ const storageContractsFiles = multer.diskStorage({
     }
   },
 });
+
+export const acceptFormData = multer().any();
 
 export const upload = multer({
   storage: storage,

@@ -3,7 +3,7 @@ import { UsersServices } from '../services';
 import { userProfilePick } from '../utils/format.server';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
-import { copyFileSync } from 'fs';
+import { FilesProps } from 'types/types';
 
 export const showUsers = async (
   req: Request,
@@ -72,17 +72,13 @@ export const createUser = async (
   try {
     if (!req.files)
       throw new AppError('Oops!, no se pudo subir los archivos', 400);
-    const [cv, declaration] = req.files as Express.Multer.File[];
+    const { fileUserCv, fileUserDeclaration } = req.files as FilesProps;
     const body: userProfilePick = req.body;
     const query = await UsersServices.create({
       ...body,
-      cv: cv.filename,
-      declaration: declaration.filename,
+      cv: fileUserCv[0].filename,
+      declaration: fileUserDeclaration[0].filename,
     });
-    copyFileSync(
-      `public/cv/${declaration.filename}`,
-      `public/declaration/${declaration.filename}`
-    );
     res.status(201).json(query);
   } catch (error) {
     next(error);
