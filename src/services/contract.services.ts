@@ -23,7 +23,7 @@ class ContractServices {
       throw new AppError('Opps, id Invalida', 400);
     const showContract = await prisma.contratc.findMany({
       where: { cui: { startsWith }, companyId, consortiumId },
-      orderBy: { name: 'asc' },
+      orderBy: { createdAt: 'asc' },
       select: Queries.selectContract.select,
     });
     return showContract;
