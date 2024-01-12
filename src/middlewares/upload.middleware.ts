@@ -98,7 +98,6 @@ const storageAddWorkStation = multer.diskStorage({
 });
 const storageImgCompanies = multer.diskStorage({
   destination: function (req, file, cb) {
-    console.log('aqui');
     let uploadPath = 'public/img/companies';
     if (!existsSync(uploadPath)) {
       mkdirSync(uploadPath, { recursive: true });

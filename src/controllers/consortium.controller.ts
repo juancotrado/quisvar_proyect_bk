@@ -12,7 +12,7 @@ export const createConsortium = async (
     const { img } = req.files as FilesProps;
     const query = await ConsortiumServices.create({
       ...body,
-      img: img[0].filename ?? '',
+      img: img ? img[0].filename : '',
     });
     res.status(200).json(query);
   } catch (error) {
@@ -71,6 +71,35 @@ export const deleteById = async (
     next(error);
   }
 };
+//CONSORTIUM IMG
+export const updateImg = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const { img } = req.files as FilesProps;
+    const image = img ? img[0].filename : '';
+    const query = await ConsortiumServices.updateImg(image, +id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteImg = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const query = await ConsortiumServices.deleteImg(+id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 //GET CONSORTIUM AND COMPANIES
 export const getBoth = async (
   req: Request,
@@ -79,6 +108,39 @@ export const getBoth = async (
 ) => {
   try {
     const query = await ConsortiumServices.getBoth();
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+//CONSORTIUM RELATION
+export const createRelationConsortium = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { companiesId, consortiumId } = req.params;
+    const query = await ConsortiumServices.createRelation(
+      +companiesId,
+      +consortiumId
+    );
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteRelationConsortium = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { companiesId, consortiumId } = req.params;
+    const query = await ConsortiumServices.deleteRelation(
+      +companiesId,
+      +consortiumId
+    );
     res.status(200).json(query);
   } catch (error) {
     next(error);

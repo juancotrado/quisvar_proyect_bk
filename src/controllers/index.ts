@@ -110,8 +110,11 @@ import {
 } from './licenses.controllers';
 import {
   createCompany,
+  deleteImgCompanies,
   getCompaniesById,
   getCompany,
+  updateCompaniesById,
+  updateImgCompanies,
 } from './companies.controller';
 import {
   createSpecialist,
@@ -162,6 +165,10 @@ import {
   updateById,
   deleteById,
   getBoth,
+  deleteImg,
+  updateImg,
+  createRelationConsortium,
+  deleteRelationConsortium,
 } from './consortium.controller';
 import {
   createGroup,
@@ -282,7 +289,14 @@ export {
   deleteLicense,
 };
 //Companies Controllers
-export { createCompany, getCompany, getCompaniesById };
+export {
+  createCompany,
+  getCompany,
+  getCompaniesById,
+  updateImgCompanies,
+  updateCompaniesById,
+  deleteImgCompanies,
+};
 //Specialists Controllers
 export {
   createSpecialist,
@@ -333,6 +347,11 @@ export {
   getConsortiumById,
   updateById,
   deleteById,
+  getBoth,
+  updateImg,
+  deleteImg,
+  createRelationConsortium,
+  deleteRelationConsortium,
 };
 //Groups Controller
 export {
@@ -344,5 +363,4 @@ export {
   createRelation,
   updateRelation,
   deleteRelation,
-  getBoth,
 };

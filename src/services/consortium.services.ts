@@ -1,5 +1,6 @@
+import { unlinkSync } from 'fs';
 import AppError from '../utils/appError';
-import { Consortium, prisma } from '../utils/prisma.server';
+import { Companies, Consortium, prisma } from '../utils/prisma.server';
 import { URL_HOST } from '../utils/tools';
 
 class ConsortiumServices {
@@ -15,6 +16,10 @@ class ConsortiumServices {
         companies: true,
         name: true,
         manager: true,
+        img: true,
+      },
+      orderBy: {
+        name: 'desc',
       },
     });
     return consortiums;
@@ -26,8 +31,19 @@ class ConsortiumServices {
       select: {
         id: true,
         manager: true,
-        companies: true,
+        companies: {
+          select: {
+            companies: {
+              select: {
+                id: true,
+                name: true,
+                img: true,
+              },
+            },
+          },
+        },
         name: true,
+        img: true,
       },
     });
     return consortiums;
@@ -44,6 +60,32 @@ class ConsortiumServices {
     if (!id) throw new AppError(`Oops!, id no encontrado`, 400);
     const consortiums = await prisma.consortium.delete({
       where: { id },
+    });
+    return consortiums;
+  }
+  //CONSORTIUM IMG
+  static async updateImg(img: Consortium['img'], id: Consortium['id']) {
+    if (!img) throw new AppError(`Oops!, imagen no encontrada`, 400);
+    const consortiums = await prisma.consortium.update({
+      where: { id },
+      data: { img },
+    });
+    return consortiums;
+  }
+  static async deleteImg(id: Consortium['id']) {
+    if (!id) throw new AppError(`Oops!, id no encontrado`, 400);
+    const res = await prisma.consortium.findUnique({
+      where: { id },
+      select: {
+        img: true,
+      },
+    });
+    if (res?.img) unlinkSync(`public/img/consortium/${res.img}`);
+    const consortiums = await prisma.consortium.update({
+      where: { id },
+      data: {
+        img: null,
+      },
     });
     return consortiums;
   }
@@ -75,10 +117,52 @@ class ConsortiumServices {
       ...consortium,
       type: 'consortiumId',
       newId: 'consortiumId-' + consortium.id,
-      urlImg: `${URL_HOST}/images/img/consortiums/${consortium.img}`,
+      urlImg: `${URL_HOST}/images/img/consortium/${consortium.img}`,
     }));
 
     return [...consortiumsWithProperty, ...companiesWithProperty];
+  }
+  //CONSORTIUM RELATION
+  static async createRelation(
+    companiesId: Companies['id'],
+    consortiumId: Consortium['id']
+  ) {
+    if (!companiesId || !consortiumId)
+      throw new AppError(`Oops!, id no encontrado`, 400);
+    const alreadyAdded = await prisma.consortiumOnCompanies.findFirst({
+      where: {
+        companiesId,
+        consortiumId,
+      },
+    });
+    if (alreadyAdded)
+      throw new AppError(
+        `Esta empresa ya se encuentra registrada en este consorcio`,
+        400
+      );
+    const relation = await prisma.consortiumOnCompanies.create({
+      data: {
+        companiesId,
+        consortiumId,
+      },
+    });
+    return relation;
+  }
+  static async deleteRelation(
+    companiesId: Companies['id'],
+    consortiumId: Consortium['id']
+  ) {
+    if (!companiesId || !consortiumId)
+      throw new AppError(`Oops!, id no encontrado`, 400);
+    const relation = await prisma.consortiumOnCompanies.delete({
+      where: {
+        consortiumId_companiesId: {
+          companiesId,
+          consortiumId,
+        },
+      },
+    });
+    return relation;
   }
 }
 export default ConsortiumServices;
