@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import authenticateHandler from '../middlewares/auth.middleware';
 import { ContractController } from '../controllers';
-import { uploadFileContracts } from '../middlewares/upload.middleware';
+import { uploads } from '../middlewares';
+// import { uploadFileContracts } from '../middlewares/upload.middleware';
 
 class ContractRoutes {
   public router: Router;
@@ -16,7 +17,7 @@ class ContractRoutes {
     this.router.post('/', ContractController.createContract);
     this.router.post(
       '/:id/files',
-      uploadFileContracts.single('fileContract'),
+      uploads.contractFile.single('fileContract'),
       ContractController.uploadFiles
     );
     this.router.patch('/:id', ContractController.updateContract);

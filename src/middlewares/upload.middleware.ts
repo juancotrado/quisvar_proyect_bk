@@ -1,5 +1,4 @@
 import { Files } from '@prisma/client';
-import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { PathServices, _contractPath } from '../services';
 import AppError from '../utils/appError';
@@ -8,6 +7,80 @@ import { TypeFileUser } from 'types/types';
 
 const MAX_SIZE = 1024 * 1000 * 1000 * 1000;
 // const FILE_TYPES = ['.rar', '.zip'];
+
+class StorageConfig {
+  public setUp(path: string, name?: string) {
+    return multer.diskStorage({
+      destination: (req, file, callback) => {
+        if (!existsSync(path)) mkdirSync(path, { recursive: true });
+        callback(null, path);
+      },
+      filename: (req, { originalname }, callback) => {
+        const parseFileName = Date.now() + '$$' + originalname;
+        const fileName = name ? name : parseFileName;
+        callback(null, fileName);
+      },
+    });
+  }
+
+  public setUpPDF(path: string, name?: string) {
+    return multer.diskStorage({
+      destination: function (req, file, cb) {
+        const { id } = req.params;
+        if (!existsSync(path)) {
+          mkdirSync(path, { recursive: true });
+        }
+        cb(null, `${path}/${id}`);
+      },
+      filename: async (req, { originalname }, callback) => {
+        try {
+          const { id } = req.params;
+          const ext = originalname.split('.').at(-1);
+          if (!['pdf', 'PDF'].includes(`${ext}`)) throw new Error();
+          const parseName: string = id + '.' + ext;
+          const fileName = name ? name : parseName;
+          callback(null, fileName);
+        } catch (error) {
+          callback(new AppError(`Oops! , archivo sin extension pdf`, 404), '');
+        }
+      },
+    });
+  }
+}
+
+class Stogares extends StorageConfig {
+  public companies: multer.Multer = multer({
+    storage: this.setUp('public/img/companies'),
+  });
+
+  public consortium: multer.Multer = multer({
+    storage: this.setUp('public/img/consortium'),
+  });
+
+  public equipment: multer.Multer = multer({
+    storage: this.setUp('public/equipment'),
+  });
+
+  public trainingSpecialty: multer.Multer = multer({
+    storage: this.setUp('public/training'),
+  });
+
+  public generalFiles: multer.Multer = multer({
+    storage: this.setUp('public/general'),
+  });
+
+  public contractFile: multer.Multer = multer({
+    storage: this.setUpPDF(_contractPath),
+  });
+
+  public areaSpecialty: multer.Multer = multer({
+    storage: this.setUpPDF('public/specialty'),
+  });
+
+  public workStation: multer.Multer = multer({
+    storage: this.setUpPDF('public/workStation'),
+  });
+}
 
 const storage = multer.diskStorage({
   destination: async (req, file, callback) => {
@@ -64,88 +137,6 @@ const storageFileSpecialist = multer.diskStorage({
     if (file.fieldname === 'fileAgreement') {
       uploadPath = `public/agreement`;
     }
-    if (!existsSync(uploadPath)) {
-      mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: function (req, files, cb) {
-    const { originalname } = files;
-    cb(null, Date.now() + '$$' + originalname);
-  },
-});
-const storageAreaSpecialty = multer.diskStorage({
-  destination: function (req, file, cb) {
-    let uploadPath = 'public/specialty';
-    if (!existsSync(uploadPath)) {
-      mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: function (req, files, cb) {
-    const { originalname } = files;
-    cb(null, Date.now() + '$$' + originalname);
-  },
-});
-
-const storageAddWorkStation = multer.diskStorage({
-  destination: function (req, file, cb) {
-    let uploadPath = 'public/workStation';
-    if (!existsSync(uploadPath)) {
-      mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: function (req, files, cb) {
-    const { originalname } = files;
-    cb(null, Date.now() + '$$' + originalname);
-  },
-});
-const storageImgCompanies = multer.diskStorage({
-  destination: function (req, file, cb) {
-    let uploadPath = 'public/img/companies';
-    if (!existsSync(uploadPath)) {
-      mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: function (req, files, cb) {
-    const { originalname } = files;
-
-    cb(null, Date.now() + '$$' + originalname);
-  },
-});
-const storageImgConsortium = multer.diskStorage({
-  destination: function (req, file, cb) {
-    let uploadPath = 'public/img/consortium';
-    if (!existsSync(uploadPath)) {
-      mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: function (req, files, cb) {
-    const { originalname } = files;
-    cb(null, Date.now() + '$$' + originalname);
-  },
-});
-
-const storageAddEquipment = multer.diskStorage({
-  destination: function (req, file, cb) {
-    let uploadPath = 'public/equipment';
-    if (!existsSync(uploadPath)) {
-      mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: function (req, files, cb) {
-    const { originalname } = files;
-    cb(null, Date.now() + '$$' + originalname);
-  },
-});
-
-const storageTrainingSpecialty = multer.diskStorage({
-  destination: function (req, file, cb) {
-    let uploadPath = 'public/training';
     if (!existsSync(uploadPath)) {
       mkdirSync(uploadPath, { recursive: true });
     }
@@ -243,32 +234,6 @@ const storageReportUser = multer.diskStorage({
   },
 });
 
-const storageContractsFiles = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const { id } = req.params;
-    if (!existsSync(_contractPath)) {
-      mkdirSync(_contractPath, { recursive: true });
-    }
-    cb(null, `${_contractPath}/${id}`);
-  },
-  filename: async (req, file, callback) => {
-    try {
-      // const { fileName } = req.body;
-      const { id } = req.params;
-      const ext = file.originalname.split('.').at(-1);
-      if (!['pdf', 'PDF'].includes(`${ext}`)) throw new Error();
-      const name: string = id + '.' + ext;
-      // const uniqueSuffix = Date.now();
-      // const { originalname } = file;
-      // if (!originalname.includes('.pdf') || originalname.includes('$'))
-      // const fileName = uniqueSuffix + '$' + originalname;
-      callback(null, name);
-    } catch (error) {
-      callback(new AppError(`Oops! , archivo sin extension pdf`, 404), '');
-    }
-  },
-});
-
 export const acceptFormData = multer().any();
 
 export const upload = multer({
@@ -296,31 +261,143 @@ export const uploadFileVoucher = multer({
 export const uploadFileSpecialist = multer({
   storage: storageFileSpecialist,
 });
-export const uploadFileAreaSpecialty = multer({
-  storage: storageAreaSpecialty,
-});
-export const uploadFileWorkStation = multer({
-  storage: storageAddWorkStation,
-});
-export const uploadFileEquipment = multer({
-  storage: storageAddEquipment,
-});
-export const uploadFileTrainingSpecialty = multer({
-  storage: storageTrainingSpecialty,
-});
-export const uploadFileContracts = multer({
-  storage: storageContractsFiles,
-});
-export const uploadImgCompanies = multer({
-  storage: storageImgCompanies,
-});
-export const uploadImgConsortium = multer({
-  storage: storageImgConsortium,
-});
-export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
-  try {
-    res.status(200).json({ message: 'Archivo subido exitosamente' });
-  } catch (error) {
-    next(error);
-  }
-};
+
+export const uploads = new Stogares();
+
+// const storageImgCompanies = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     let uploadPath = 'public/img/companies';
+//     if (!existsSync(uploadPath)) {
+//       mkdirSync(uploadPath, { recursive: true });
+//     }
+//     cb(null, uploadPath);
+//   },
+//   filename: function (req, files, cb) {
+//     const { originalname } = files;
+
+//     cb(null, Date.now() + '$$' + originalname);
+//   },
+// });
+
+// const storageImgConsortium = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     let uploadPath = 'public/img/consortium';
+//     if (!existsSync(uploadPath)) {
+//       mkdirSync(uploadPath, { recursive: true });
+//     }
+//     cb(null, uploadPath);
+//   },
+//   filename: function (req, files, cb) {
+//     const { originalname } = files;
+//     cb(null, Date.now() + '$$' + originalname);
+//   },
+// });
+
+// const storageAddEquipment = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     let uploadPath = 'public/equipment';
+//     if (!existsSync(uploadPath)) {
+//       mkdirSync(uploadPath, { recursive: true });
+//     }
+//     cb(null, uploadPath);
+//   },
+//   filename: function (req, files, cb) {
+//     const { originalname } = files;
+//     cb(null, Date.now() + '$$' + originalname);
+//   },
+// });
+
+// const storageTrainingSpecialty = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     let uploadPath = 'public/training';
+//     if (!existsSync(uploadPath)) {
+//       mkdirSync(uploadPath, { recursive: true });
+//     }
+//     cb(null, uploadPath);
+//   },
+//   filename: function (req, files, cb) {
+//     const { originalname } = files;
+//     cb(null, Date.now() + '$$' + originalname);
+//   },
+// });
+// const storageAreaSpecialty = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     let uploadPath = 'public/specialty';
+//     if (!existsSync(uploadPath)) {
+//       mkdirSync(uploadPath, { recursive: true });
+//     }
+//     cb(null, uploadPath);
+//   },
+//   filename: function (req, files, cb) {
+//     const { originalname } = files;
+//     cb(null, Date.now() + '$$' + originalname);
+//   },
+// });
+
+// const storageAddWorkStation = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     let uploadPath = 'public/workStation';
+//     if (!existsSync(uploadPath)) {
+//       mkdirSync(uploadPath, { recursive: true });
+//     }
+//     cb(null, uploadPath);
+//   },
+//   filename: function (req, files, cb) {
+//     const { originalname } = files;
+//     cb(null, Date.now() + '$$' + originalname);
+//   },
+// });
+// const storageContractsFiles = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     const { id } = req.params;
+//     if (!existsSync(_contractPath)) {
+//       mkdirSync(_contractPath, { recursive: true });
+//     }
+//     cb(null, `${_contractPath}/${id}`);
+//   },
+//   filename: async (req, file, callback) => {
+//     try {
+//       // const { fileName } = req.body;
+//       const { id } = req.params;
+//       const ext = file.originalname.split('.').at(-1);
+//       if (!['pdf', 'PDF'].includes(`${ext}`)) throw new Error();
+//       const name: string = id + '.' + ext;
+//       // const uniqueSuffix = Date.now();
+//       // const { originalname } = file;
+//       // if (!originalname.includes('.pdf') || originalname.includes('$'))
+//       // const fileName = uniqueSuffix + '$' + originalname;
+//       callback(null, name);
+//     } catch (error) {
+//       callback(new AppError(`Oops! , archivo sin extension pdf`, 404), '');
+//     }
+//   },
+// });
+
+// export const uploadFileAreaSpecialty = multer({
+//   storage: storageAreaSpecialty,
+// });
+// export const uploadFileWorkStation = multer({
+//   storage: storageAddWorkStation,
+// });
+// export const uploadFileEquipment = multer({
+//   storage: storageAddEquipment,
+// });
+// export const uploadFileTrainingSpecialty = multer({
+//   storage: storageTrainingSpecialty,
+// });
+// export const uploadFileContracts = multer({
+//   storage: storageContractsFiles,
+// });
+// export const uploadImgCompanies = multer({
+//   storage: storageImgCompanies,
+// });
+// export const uploadImgConsortium = multer({
+//   storage: storageImgConsortium,
+// });
+// export const uploadFile = (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     res.status(200).json({ message: 'Archivo subido exitosamente' });
+//   } catch (error) {
+//     next(error);
+//   }
+// };

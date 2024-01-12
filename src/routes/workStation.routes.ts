@@ -7,14 +7,14 @@ import {
   deleteWorkStation,
 } from '../controllers';
 import { _admin_role } from '../middlewares/role.middleware';
-import { uploadFileWorkStation } from '../middlewares/upload.middleware';
+import { uploads } from '../middlewares';
 const router = Router();
 router.use(authenticateHandler);
 router.use(_admin_role);
 router.get('/', getWorkStation);
 router.post(
   '/',
-  uploadFileWorkStation.fields([{ name: 'file' }]),
+  uploads.workStation.fields([{ name: 'file' }]),
   createWorkStation
 );
 router.patch('/:id', updateWorkStation);

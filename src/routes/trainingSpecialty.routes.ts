@@ -7,14 +7,14 @@ import {
   updateTrainingSpecialty,
 } from '../controllers';
 import { _admin_role } from '../middlewares/role.middleware';
-import { uploadFileTrainingSpecialty } from '../middlewares/upload.middleware';
+import { uploads } from '../middlewares';
 const router = Router();
 router.use(authenticateHandler);
 router.use(_admin_role);
 router.get('/:id', getTrainingSpecialty);
 router.post(
   '/',
-  uploadFileTrainingSpecialty.fields([{ name: 'trainingFile' }]),
+  uploads.trainingSpecialty.fields([{ name: 'trainingFile' }]),
   createTrainingSpecialty
 );
 router.patch('/:id', updateTrainingSpecialty);
