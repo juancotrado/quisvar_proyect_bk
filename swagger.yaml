@@ -526,6 +526,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JwtResponse'
+  /companies/img/{id}:
+    patch:
+      tags:
+        - company
+      summary: Add new files
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del contrato
+          schema:
+            type: integer
+      description: |-
+        Ingresar Los campos requeridos para añadir un archivo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompanyImage'
+      responses:
+        '201':
+          description: Imagen actualizada exitosamente
+        '400':
+          description: Datos no válidos
+    delete:
+      tags:
+        - company
+      summary: Delete company image
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la empresa
+          schema:
+            type: integer
+      description: |-
+        Ingresar Los campos requeridos para eliminar un archivo
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Imagen eliminada exitosamente
+        '400':
+          description: Datos no válidos
 components:
   securitySchemes:
     bearerAuth:
@@ -625,6 +672,15 @@ components:
         fileName:
           type: string
           example: 'nombre_del_archivo'
+    CompanyImage:
+      required:
+        - img
+      type: object
+      properties:
+        img:
+          type: string
+          format: binary
+          example: [archivo_binario]
     Project:
       required:
         - name
