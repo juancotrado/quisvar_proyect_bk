@@ -3,8 +3,6 @@ import { Licenses, prisma } from '../utils/prisma.server';
 
 class LicenseServices {
   static async create(data: Licenses) {
-    console.log(data);
-
     if (!data) throw new AppError(`Datos incorrectos`, 400);
     const allowLicense = await prisma.licenses.findFirst({
       where: {
@@ -21,7 +19,6 @@ class LicenseServices {
     const _untilDate = new Date(data.untilDate).getTime();
     const startOfDay = new Date(_startDate - GMT * 5);
     const endOfDay = new Date(_untilDate - GMT * 5);
-    console.log(startOfDay, endOfDay);
     const newLicence = await prisma.licenses.create({
       data: {
         usersId: data.usersId,
@@ -57,7 +54,6 @@ class LicenseServices {
     const _untilDate = new Date(data.untilDate).getTime();
     const startOfDay = new Date(_startDate - GMT * 5);
     const endOfDay = new Date(_untilDate - GMT * 5);
-    console.log(usersWithoutActiveLicenses);
     const newLicence = await prisma.licenses.createMany({
       data: usersWithoutActiveLicenses.map(user => ({
         usersId: user.id,
@@ -159,7 +155,6 @@ class LicenseServices {
       },
       select: { id: true },
     });
-    console.log(licenses);
     const listIds = licenses.map(({ id }) => id);
     await prisma.licenses.updateMany({
       where: { id: { in: listIds } },

@@ -32,8 +32,6 @@ class EquipmentServices {
     return equipment;
   }
   static async updateEquipment(id: Equipment['id'], data: Equipment) {
-    console.log(data, id);
-
     const equipment = await prisma.equipment.update({
       where: { id },
       data,

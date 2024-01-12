@@ -11,8 +11,6 @@ export const createTrainingSpecialtyList = async (
       await TrainingSpecialtyListServices.createTrainingSpecialtyList(body);
     res.status(201).json(query);
   } catch (error) {
-    console.log(error);
-
     next(error);
   }
 };

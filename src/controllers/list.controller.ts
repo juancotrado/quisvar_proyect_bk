@@ -83,8 +83,6 @@ export const getAllListByDate = async (
     const query = await ListServices.getAllListByDate(startDate);
     res.status(200).json(query);
   } catch (error) {
-    console.log(error);
-
     next(error);
   }
 };
@@ -99,8 +97,6 @@ export const getListRange = async (
     const query = await ListServices.getListRange(startDate, endDate);
     res.status(200).json(query);
   } catch (error) {
-    console.log(error);
-
     next(error);
   }
 };
@@ -113,8 +109,6 @@ export const deleteManyList = async (
     await ListServices.deleteManyList();
     res.status(200).json({ message: 'Eliminados' });
   } catch (error) {
-    console.log(error);
-
     next(error);
   }
 };

@@ -6,7 +6,6 @@ class ListServices {
   static async create({ title, timer }: List) {
     await LicenseServices.deleteExpiredLicenses();
     if (!title || !timer) throw new AppError(`Oops!, algo salio mal`, 400);
-    console.log(title, timer);
     const lastList = await prisma.list.findMany({
       orderBy: {
         createdAt: 'desc',
