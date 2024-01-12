@@ -51,12 +51,7 @@ class UsersServices {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findUser = await prisma.users.findUnique({
       where: { id },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        status: true,
-        createdAt: true,
+      include: {
         profile: true,
       },
     });
@@ -91,7 +86,6 @@ class UsersServices {
           },
         },
       });
-      console.log(JSON.stringify({ subTaskGeneral }, null, 2));
       if (!subTaskGeneral)
         throw new AppError('No se pudo encontrar las tareas', 404);
       const list = subTaskGeneral.map(s => s.subtask);
@@ -143,26 +137,7 @@ class UsersServices {
     description,
   }: userProfilePick) {
     const passwordHash = await bcrypt.hash(password, 10);
-    const findUserByDNI = await prisma.profiles.findUnique({
-      where: { dni },
-    });
-    if (findUserByDNI)
-      throw new AppError('Oops!, Este DNI ya ha sido registrado', 404);
-    if (phone) {
-      const findUserByCell = await prisma.profiles.findUnique({
-        where: { phone },
-      });
-      if (findUserByCell)
-        throw new AppError(
-          'Oops!, Este Numero de Celular ya ha sido registrado',
-          404
-        );
-    }
-    const findUserByEmail = await prisma.users.findUnique({
-      where: { email },
-    });
-    if (findUserByEmail)
-      throw new AppError('Oops!, Este Correo ya ha sido registrado', 404);
+
     const newUser = await prisma.users.create({
       data: {
         email,

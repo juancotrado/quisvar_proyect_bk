@@ -18,6 +18,6 @@ router.get('/:id', showProject);
 //MOD ROLE
 router.use(_mod_role);
 router.post('/', createProject);
-router.patch('/:id', updateProject);
+router.put('/:id', updateProject);
 router.delete('/:id', deleteProject);
 export default router;

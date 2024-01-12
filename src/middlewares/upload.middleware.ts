@@ -23,9 +23,6 @@ const storage = multer.diskStorage({
   },
   filename: async (req, file, callback) => {
     try {
-      // const { id } = req.params;
-      // const _subtask_id = parseInt(id);
-      // const { item, name } = await FilesServices.getSubTask(_subtask_id);
       const uniqueSuffix = Date.now();
       const { originalname } = file;
       if (originalname.includes('$')) throw new Error();
@@ -42,7 +39,15 @@ const storage = multer.diskStorage({
 const storageFileUser = multer.diskStorage({
   destination: function (req, file, cb) {
     const typeFileUser = req.query.typeFile as TypeFileUser;
-    const uploadPath = `public/${typeFileUser}`;
+    let uploadPath;
+    if (typeFileUser) {
+      uploadPath = `public/${typeFileUser}`;
+    } else {
+      uploadPath =
+        file.fieldname === 'fileUserDeclaration'
+          ? 'public/declaration'
+          : `public/cv`;
+    }
     if (!existsSync(uploadPath)) {
       mkdirSync(uploadPath, { recursive: true });
     }
@@ -106,7 +111,6 @@ const storageImgCompanies = multer.diskStorage({
   },
   filename: function (req, files, cb) {
     const { originalname } = files;
-    console.log(originalname);
 
     cb(null, Date.now() + '$$' + originalname);
   },
@@ -264,6 +268,8 @@ const storageContractsFiles = multer.diskStorage({
     }
   },
 });
+
+export const acceptFormData = multer().any();
 
 export const upload = multer({
   storage: storage,

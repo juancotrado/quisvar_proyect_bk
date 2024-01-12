@@ -23,7 +23,10 @@ export type CheckRoleType = (
   res: Response,
   next: NextFunction
 ) => void;
-export type TypeFileUser = 'contract' | 'cv' | 'declaration' | 'agreement';
+export type TypeFileUser = keyof Pick<
+  User,
+  'contract' | 'cv' | 'declaration' | 'withdrawalDeclaration'
+>;
 
 export type PickSubtask = Pick<
   SubTasks,
@@ -161,7 +164,7 @@ export interface SubTaskFilter extends SubTasks {
 export interface SubTaskFiles extends SubTasks {
   files: Files[];
 }
-
+export type FilesProps = { [fieldname: string]: Express.Multer.File[] };
 export interface ParametersMail {
   skip?: number;
   limit?: number;

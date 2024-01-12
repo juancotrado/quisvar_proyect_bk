@@ -9,29 +9,30 @@ datasource db {
 }
 
 model Users {
-  id           Int                @id @default(autoincrement())
-  status       Boolean            @default(false)
-  role         UserRole           @default(EMPLOYEE)
-  password     String
-  email        String             @unique
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  contract     String?
-  cv           String?
-  declaration  String?
-  ruc          String?
-  address      String?
-  profile      Profiles?
-  project      Projects[]
-  subTasks     TaskOnUsers[]
-  Levels       Levels[]
-  list         ListOnUsers[]
-  stages       Stages[]
-  message      Mail[]
-  messageReply MessageHistory[]
-  feedbacks    UsersOnFeedbacks[]
-  equipment    Equipment?
-  groups       GroupOnUsers[]
+  id                    Int                @id @default(autoincrement())
+  status                Boolean            @default(false)
+  role                  UserRole           @default(EMPLOYEE)
+  password              String
+  email                 String             @unique
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  contract              String?
+  cv                    String?
+  declaration           String?
+  withdrawalDeclaration String?
+  ruc                   String?
+  address               String?
+  profile               Profiles?
+  project               Projects[]
+  subTasks              TaskOnUsers[]
+  Levels                Levels[]
+  list                  ListOnUsers[]
+  stages                Stages[]
+  message               Mail[]
+  messageReply          MessageHistory[]
+  feedbacks             UsersOnFeedbacks[]
+  equipment             Equipment?
+  groups                GroupOnUsers[]
 }
 
 model WorkStation {
@@ -514,7 +515,7 @@ model Contratc {
   department     String
   province       String
   district       String
-  shortName      String
+  shortName      String?
   difficulty     Int
   createdAt      DateTime    @default(now())
   indexContract  String

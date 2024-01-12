@@ -14,10 +14,13 @@ import {
   _mod_role,
   _employee_role,
 } from '../middlewares/role.middleware';
-import { uploadFileUser } from '../middlewares/upload.middleware';
+import {
+  acceptFormData,
+  uploadFileUser,
+} from '../middlewares/upload.middleware';
+import { verifyUniqueParam } from '../middlewares/user.middleware';
 
 const router = Router();
-
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);
@@ -29,7 +32,16 @@ router.use(_mod_role);
 router.get('/:id', showUser);
 //ADMIN ROLE
 router.use(_admin_role);
-router.post('/', uploadFileUser.array('fileUser'), createUser);
+router.post(
+  '/',
+  acceptFormData,
+  verifyUniqueParam,
+  uploadFileUser.fields([
+    { name: 'fileUserCv' },
+    { name: 'fileUserDeclaration' },
+  ]),
+  createUser
+);
 router.patch('/:id', updateUser);
 router.delete('/:id', deleteUser);
 export default router;

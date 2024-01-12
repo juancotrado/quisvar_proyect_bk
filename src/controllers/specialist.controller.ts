@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { SpecialistServices } from '../services';
 import AppError from '../utils/appError';
-type FilesProps = { [fieldname: string]: Express.Multer.File[] };
+import { FilesProps } from 'types/types';
+
 export const createSpecialist = async (
   req: Request,
   res: Response,
@@ -19,8 +20,6 @@ export const createSpecialist = async (
     });
     res.status(201).json(query);
   } catch (error) {
-    console.log(error);
-
     next(error);
   }
 };
