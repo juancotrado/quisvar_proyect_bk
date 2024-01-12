@@ -1,3 +1,5 @@
+import { Mail } from '@prisma/client';
+
 class Queries {
   static selectProfileUser = {
     select: {
@@ -172,5 +174,34 @@ class Queries {
       contractNumber: true,
     },
   };
+  static PayMail(): PayMailQueries {
+    return new PayMailQueries();
+  }
 }
+
+class PayMailQueries {
+  public selectMessage(role: Mail['role'], type?: Mail['type']) {
+    return {
+      select: {
+        id: true,
+        header: true,
+        status: true,
+        type: true,
+        title: true,
+        createdAt: true,
+        updatedAt: true,
+        users: {
+          where: { type, role },
+          select: {
+            type: true,
+            role: true,
+            status: true,
+            user: Queries.selectProfileUser,
+          },
+        },
+      },
+    };
+  }
+}
+
 export default Queries;

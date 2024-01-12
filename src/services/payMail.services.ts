@@ -9,17 +9,14 @@ import {
 import Queries from '../utils/queries';
 import AppError from '../utils/appError';
 
-class MailServices {
-  static PickType(type?: Mail['type']) {
-    if (type === 'SENDER') {
-      return 'RECEIVER' as Mail['type'];
-    }
-    if (type === 'RECEIVER') {
-      return 'SENDER' as Mail['type'];
-    }
+class PayMailServices {
+  public static PickType(type?: Mail['type']): Mail['type'] | undefined {
+    if (type === 'SENDER') return 'RECEIVER';
+    if (type === 'RECEIVER') return 'SENDER';
     return undefined;
   }
-  static async getByUser(
+
+  public static async getByUser(
     userId: Users['id'],
     { skip, type, status, typeMessage }: ParametersMail
   ) {
@@ -45,6 +42,7 @@ class MailServices {
     });
     return { total, mail };
   }
+
   static async getMessage(id: Messages['id']) {
     if (!id) throw new AppError('Ops!, ID invalido', 400);
     const getMessage = await prisma.messages.findUnique({
@@ -143,6 +141,7 @@ class MailServices {
     });
     return createMessage;
   }
+
   static async createReply(
     {
       title,
@@ -229,6 +228,7 @@ class MailServices {
     });
     return createForward;
   }
+
   static async updateMessage(
     id: Messages['id'],
     {
@@ -265,6 +265,7 @@ class MailServices {
 
     return updateMessage;
   }
+
   static async archived(id: Messages['id'], senderId: number) {
     const archived = await prisma.messages.update({
       where: { id },
@@ -286,6 +287,7 @@ class MailServices {
     //------------------------------------------------------------------
     return archived;
   }
+
   static async done(
     id: Messages['id'],
     senderId: number,
@@ -319,6 +321,7 @@ class MailServices {
     });
     return done;
   }
+
   static async updateStatus(id: Messages['id'], status: Messages['status']) {
     const updateStatus = await prisma.messages.update({
       where: { id },
@@ -326,6 +329,7 @@ class MailServices {
     });
     return updateStatus;
   }
+
   static async archivedItem(messageId: Messages['id']) {
     const archivedList = await prisma.mail.updateMany({
       where: { messageId, type: 'RECEIVER' },
@@ -333,6 +337,7 @@ class MailServices {
     });
     return archivedList;
   }
+
   static async quantityFiles(userId: Users['id']) {
     const quantity = await prisma.messages.groupBy({
       by: ['type'],
@@ -412,4 +417,4 @@ class MailServices {
     return denied;
   }
 }
-export default MailServices;
+export default PayMailServices;

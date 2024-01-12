@@ -43,15 +43,16 @@ class CompaniesServices {
     return companies;
   }
   //COMPANIES IMG
-  static async updateImg(img: Companies['img'], id: Companies['id']) {
-    if (!img) throw new AppError(`Oops!, imagen no encontrada`, 400);
+  public static async updateImg(img: Companies['img'], id: Companies['id']) {
+    if (!id) throw new AppError(`Oops!, id no encontrado`, 400);
     const consortiums = await prisma.companies.update({
       where: { id },
       data: { img },
     });
     return consortiums;
   }
-  static async deleteImg(id: Companies['id']) {
+
+  public static async deleteImg(id: Companies['id']) {
     if (!id) throw new AppError(`Oops!, id no encontrado`, 400);
     const res = await prisma.companies.findUnique({
       where: { id },

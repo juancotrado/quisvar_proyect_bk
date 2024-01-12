@@ -38,6 +38,7 @@ export const getConsortiumById = async (
 ) => {
   try {
     const { id } = req.params;
+    console.log(id);
     const query = await ConsortiumServices.getConsortiumById(+id);
     res.status(200).json(query);
   } catch (error) {
@@ -108,8 +109,10 @@ export const getBoth = async (
 ) => {
   try {
     const query = await ConsortiumServices.getBoth();
+    console.log(query);
     res.status(200).json(query);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };

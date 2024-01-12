@@ -108,13 +108,11 @@ import {
   getLicensesEmployee,
   updateLicense,
 } from './licenses.controllers';
-import {
+import CompanyController, {
   createCompany,
-  deleteImgCompanies,
   getCompaniesById,
   getCompany,
   updateCompaniesById,
-  updateImgCompanies,
 } from './companies.controller';
 import {
   createSpecialist,
@@ -293,9 +291,8 @@ export {
   createCompany,
   getCompany,
   getCompaniesById,
-  updateImgCompanies,
   updateCompaniesById,
-  deleteImgCompanies,
+  CompanyController,
 };
 //Specialists Controllers
 export {

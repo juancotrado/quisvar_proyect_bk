@@ -1,7 +1,42 @@
 import { NextFunction, Request, Response } from 'express';
 import { CompaniesServices } from '../services';
+import { FilesProps } from 'types/types';
+import AppError from '../utils/appError';
 // import { unlinkSync } from 'fs';
-type FilesProps = { [fieldname: string]: Express.Multer.File[] };
+
+class CompanyController {
+  public static async updateImg(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      if (!req.file) throw new AppError('No existe imagen', 404);
+      const { filename } = req.file as Express.Multer.File;
+      const image = filename;
+      const query = await CompaniesServices.updateImg(image, +id);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public static async deleteImg(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const query = await CompaniesServices.deleteImg(+id);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  }
+}
+export default CompanyController;
 
 export const createCompany = async (
   req: Request,
@@ -20,6 +55,7 @@ export const createCompany = async (
     next(error);
   }
 };
+
 export const getCompany = async (
   req: Request,
   res: Response,
@@ -60,31 +96,3 @@ export const updateCompaniesById = async (
   }
 };
 //COMPANIES IMG
-export const updateImgCompanies = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const { img } = req.files as FilesProps;
-    const image = img ? img[0].filename : '';
-    const query = await CompaniesServices.updateImg(image, +id);
-    res.status(200).json(query);
-  } catch (error) {
-    next(error);
-  }
-};
-export const deleteImgCompanies = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const query = await CompaniesServices.deleteImg(+id);
-    res.status(200).json(query);
-  } catch (error) {
-    next(error);
-  }
-};
