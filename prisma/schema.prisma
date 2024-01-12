@@ -515,7 +515,7 @@ model Contratc {
   department     String
   province       String
   district       String
-  shortName      String
+  shortName      String?
   difficulty     Int
   createdAt      DateTime    @default(now())
   indexContract  String
