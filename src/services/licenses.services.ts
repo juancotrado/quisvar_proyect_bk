@@ -142,6 +142,42 @@ class LicenseServices {
     });
     return licenses;
   }
+  static async getLicensesFee(
+    startDate: string,
+    endDate: string,
+    usersId?: Licenses['usersId']
+  ) {
+    const GMT = 60 * 60 * 1000;
+    const _startDate = new Date(startDate).getTime();
+    const _endDate = new Date(endDate).getTime();
+    const startOfDay = new Date(_startDate + GMT * 5);
+    const endOfDay = new Date(_endDate + GMT * 29 - 1);
+    const licenses = await prisma.licenses.findMany({
+      where: {
+        usersId,
+        createdAt: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+      select: {
+        checkout: true,
+        fine: true,
+      },
+    });
+    function countFee(
+      data: Pick<Licenses, 'fine' | 'checkout'>[]
+    ): Record<string, number> {
+      return data.reduce((fee, item) => {
+        const fine = item.fine;
+        if (fine) {
+          fee[fine] = (fee[fine] || 0) + 1;
+        }
+        return fee;
+      }, {} as Record<string, number>);
+    }
+    return countFee(licenses);
+  }
   static async activeLicenses() {
     const GMT = 5 * 60 * 60 * 1000;
     const now = new Date();

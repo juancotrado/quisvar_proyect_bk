@@ -86,6 +86,24 @@ export const getLicensesEmployee = async (
     next(error);
   }
 };
+export const getLicensesFee = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const { startDate, endDate } = req.query;
+    const query = await LicenseServices.getLicensesFee(
+      startDate as string,
+      endDate as string,
+      Number(id)
+    );
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 export const expiredLicenses = async (
   req: Request,
   res: Response,

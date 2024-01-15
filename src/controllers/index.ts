@@ -106,6 +106,7 @@ import {
   getLicenseById,
   getLicensesByStatus,
   getLicensesEmployee,
+  getLicensesFee,
   updateLicense,
 } from './licenses.controllers';
 import CompanyController, {
@@ -282,6 +283,7 @@ export {
   getLicenseById,
   getLicensesByStatus,
   getLicensesEmployee,
+  getLicensesFee,
   activeLicenses,
   expiredLicenses,
   deleteLicense,
