@@ -51,13 +51,15 @@ class SpecialistServices {
         cv: true,
         // projects: {
         //   include: {
-        //     project: {
-        //       select: {
-        //         CUI: true,
-        //         name: true,
-        //         stages: true,
-        //       },
-        //     },
+        //     specialist: {
+        //       include: {
+        //         projects: {
+        //           select: {
+
+        //           }
+        //         }
+        //       }
+        //     }
         //   },
         // },
       },
