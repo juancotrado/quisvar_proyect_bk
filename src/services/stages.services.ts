@@ -256,7 +256,7 @@ class StageServices {
       const quantityUsers = await prisma.taskOnUsers.count({
         where: { subtask: { Levels: { stages: { id } } } },
       });
-      if (quantityUsers <= 0)
+      if (quantityUsers > 0)
         throw new AppError('El grupo, tiene tareas asignadas', 400);
     }
     // const duplicated = await this.duplicate(id, name, 'ID');
