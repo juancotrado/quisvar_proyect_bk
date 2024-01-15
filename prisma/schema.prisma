@@ -33,6 +33,7 @@ model Users {
   feedbacks             UsersOnFeedbacks[]
   equipment             Equipment?
   groups                GroupOnUsers[]
+  moderatorOfGroup     Group[]
 }
 
 model WorkStation {
@@ -117,6 +118,8 @@ model Group {
   createdAt DateTime       @default(now())
   stage     Stages[]
   groups    GroupOnUsers[]
+  modId     Int?
+  moderator Users?         @relation(fields: [modId], references: [id])
 }
 
 model GroupOnUsers {

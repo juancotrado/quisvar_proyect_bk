@@ -91,7 +91,6 @@ class ConsortiumServices {
   }
   //GET CONSORTIUM AND COMPANIES
   static async getBoth() {
-    console.log('patito');
     const companies = await prisma.companies.findMany({
       select: {
         id: true,
@@ -113,7 +112,6 @@ class ConsortiumServices {
       newId: 'companyId-' + company.id,
       urlImg: `${URL_HOST}/images/img/companies/${company.img}`,
     }));
-    console.log(companiesWithProperty);
     const consortiumsWithProperty = consortiums.map(consortium => ({
       ...consortium,
       type: 'consortiumId',
