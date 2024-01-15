@@ -45,7 +45,7 @@ class DuplicatesServices {
     const { stages, ..._data } = getProyect;
     const data = { name, ..._data };
     const createNewProject = await prisma.projects.create({
-      data: { ...data, contract: { connect: { id: contractId } } },
+      data: { ...data, contractId },
     });
     const { id: projectId } = createNewProject;
     //----------------------------create_files--------------------------------------

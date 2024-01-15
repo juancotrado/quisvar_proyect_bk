@@ -1,4 +1,4 @@
-import { FilesPayment, Mail, Messages, Users } from '@prisma/client';
+import { Mail, Messages, Users } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import {
   FileMessagePick,
@@ -10,16 +10,13 @@ import Queries from '../utils/queries';
 import AppError from '../utils/appError';
 
 class MailServices {
-  static PickType(type?: Mail['type']) {
-    if (type === 'SENDER') {
-      return 'RECEIVER' as Mail['type'];
-    }
-    if (type === 'RECEIVER') {
-      return 'SENDER' as Mail['type'];
-    }
+  public static PickType(type?: Mail['type']): Mail['type'] | undefined {
+    if (type === 'SENDER') return 'RECEIVER';
+    if (type === 'RECEIVER') return 'SENDER' as Mail['type'];
     return undefined;
   }
-  static async getByUser(
+
+  public static async getByUser(
     userId: Users['id'],
     { skip, type, status, typeMessage }: ParametersMail
   ) {
@@ -45,7 +42,8 @@ class MailServices {
     });
     return { total, mail };
   }
-  static async getMessage(id: Messages['id']) {
+
+  public static async getMessage(id: Messages['id']) {
     if (!id) throw new AppError('Ops!, ID invalido', 400);
     const getMessage = await prisma.messages.findUnique({
       where: { id },
@@ -60,24 +58,19 @@ class MailServices {
             user: Queries.selectProfileUser,
           },
         },
-        filesPay: {
-          select: {
-            files: true,
-          },
-        },
         files: {
           orderBy: { id: 'desc' },
           select: { id: true, name: true, path: true, attempt: true },
         },
-        history: {
-          include: {
-            files: {
-              orderBy: { id: 'desc' },
-              select: { id: true, name: true, path: true },
-            },
-            user: Queries.selectProfileUser,
-          },
-        },
+        // history: {
+        //   include: {
+        //     files: {
+        //       orderBy: { id: 'desc' },
+        //       select: { id: true, name: true, path: true },
+        //     },
+        //     user: Queries.selectProfileUser,
+        //   },
+        // },
       },
     });
 
@@ -87,7 +80,7 @@ class MailServices {
     return { ...getMessage, userInit };
   }
 
-  static async getMessagePreview(id: Messages['id']) {
+  public static async getMessagePreview(id: Messages['id']) {
     if (!id) throw new AppError('Ops!, ID invalido', 400);
     const getMessage = await prisma.messages.findUnique({
       where: { id },
@@ -107,7 +100,7 @@ class MailServices {
     return getMessage;
   }
 
-  static async create(
+  public static async create(
     {
       title,
       description,
@@ -143,7 +136,8 @@ class MailServices {
     });
     return createMessage;
   }
-  static async createReply(
+
+  public static async createReply(
     {
       title,
       receiverId,
@@ -229,7 +223,8 @@ class MailServices {
     });
     return createForward;
   }
-  static async updateMessage(
+
+  public static async updateMessage(
     id: Messages['id'],
     {
       header,
@@ -265,7 +260,8 @@ class MailServices {
 
     return updateMessage;
   }
-  static async archived(id: Messages['id'], senderId: number) {
+
+  public static async archived(id: Messages['id'], senderId: number) {
     const archived = await prisma.messages.update({
       where: { id },
       data: { status: 'ARCHIVADO' },
@@ -286,7 +282,8 @@ class MailServices {
     //------------------------------------------------------------------
     return archived;
   }
-  static async done(
+
+  public static async done(
     id: Messages['id'],
     senderId: number,
     paymentPdfData: string
@@ -319,26 +316,31 @@ class MailServices {
     });
     return done;
   }
-  static async updateStatus(id: Messages['id'], status: Messages['status']) {
+
+  public static async updateStatus(
+    id: Messages['id'],
+    status: Messages['status']
+  ) {
     const updateStatus = await prisma.messages.update({
       where: { id },
       data: { status },
     });
     return updateStatus;
   }
-  static async archivedItem(messageId: Messages['id']) {
+
+  public static async archivedItem(messageId: Messages['id']) {
     const archivedList = await prisma.mail.updateMany({
       where: { messageId, type: 'RECEIVER' },
       data: { status: false },
     });
     return archivedList;
   }
-  static async quantityFiles(userId: Users['id']) {
+
+  public static async quantityFiles(userId: Users['id']) {
     const quantity = await prisma.messages.groupBy({
       by: ['type'],
       _count: { type: true },
       where: {
-        // status: true,
         users: {
           some: { userId },
         },
@@ -346,39 +348,7 @@ class MailServices {
     });
     return quantity;
   }
-  static async createVoucher(
-    id: Messages['id'],
-    { senderId }: { senderId: number },
-    files: Pick<FilesPayment, 'name' | 'path'>[]
-  ) {
-    //------------------------------------------------------------------
-    const getReceiver = await prisma.mail.findFirst({
-      where: { messageId: id, type: 'SENDER', role: 'MAIN' },
-    });
-    if (!getReceiver) throw new AppError('error', 400);
-    const { userId: receiverId } = getReceiver;
-    //------------------------------------------------------------------
-    const newVoucher = await prisma.messages.update({
-      where: { id },
-      data: {
-        status: 'POR_PAGAR',
-        filesPay: {
-          create: { files: { createMany: { data: files } } },
-        },
-      },
-    });
-    //------------------------------------------------------------------
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: senderId } },
-      data: { type: 'SENDER' },
-    });
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: receiverId } },
-      data: { type: 'RECEIVER' },
-    });
-    //------------------------------------------------------------------
-    return newVoucher;
-  }
+
   static async updateVoucher(
     id: Messages['id'],
     { status, senderId }: Pick<Messages, 'status'> & { senderId: number }
