@@ -556,7 +556,7 @@ model Contratc {
   createdAt      DateTime    @default(now())
   indexContract  String
   details        String?
-  projectId      Int?        @unique
+  projectId      Int? //@unique
   project        Projects?
   // project        Projects?   @relation(fields: [projectId], references: [id])
   consortiumId   Int?
