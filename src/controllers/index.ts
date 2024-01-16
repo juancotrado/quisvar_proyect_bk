@@ -178,6 +178,7 @@ import {
   createRelation,
   updateRelation,
   deleteRelation,
+  deleteMod,
 } from './groups.controller';
 import StagesControllers from './stages.controllers';
 // User Controllers
@@ -362,4 +363,5 @@ export {
   createRelation,
   updateRelation,
   deleteRelation,
+  deleteMod,
 };
