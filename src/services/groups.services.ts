@@ -8,11 +8,33 @@ class GroupServices {
     const groups = await prisma.group.create({ data });
     return groups;
   }
+  static async deleteMod(id: Group['id']) {
+    if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
+    const groups = await prisma.group.update({
+      where: { id },
+      data: {
+        modId: null,
+      },
+    });
+    return groups;
+  }
   static async getAll() {
     const groups = await prisma.group.findMany({
       select: {
         id: true,
         name: true,
+        modId: true,
+        moderator: {
+          select: {
+            profile: {
+              select: {
+                firstName: true,
+                lastName: true,
+                userPc: true,
+              },
+            },
+          },
+        },
         groups: {
           select: {
             users: {
@@ -42,6 +64,18 @@ class GroupServices {
       select: {
         id: true,
         name: true,
+        modId: true,
+        moderator: {
+          select: {
+            profile: {
+              select: {
+                firstName: true,
+                lastName: true,
+                userPc: true,
+              },
+            },
+          },
+        },
         groups: {
           orderBy: {
             users: {
@@ -70,11 +104,15 @@ class GroupServices {
     });
     return groups;
   }
-  static async update(id: Group['id'], name: Group['name']) {
+  static async update(
+    id: Group['id'],
+    name: Group['name'],
+    modId?: Group['modId']
+  ) {
     if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
     const groups = await prisma.group.update({
       where: { id },
-      data: { name },
+      data: { name, modId },
     });
     return groups;
   }

@@ -15,6 +15,19 @@ export const createGroup = async (
     next(error);
   }
 };
+export const deleteMod = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const query = await GroupServices.deleteMod(+id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 export const getAll = async (
   req: Request,
   res: Response,
@@ -47,8 +60,8 @@ export const updateGroup = async (
 ) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
-    const query = await GroupServices.update(+id, name);
+    const { name, modId } = req.body;
+    const query = await GroupServices.update(+id, name, modId);
     res.status(200).json(query);
   } catch (error) {
     next(error);
