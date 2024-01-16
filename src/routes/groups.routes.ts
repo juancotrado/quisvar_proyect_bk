@@ -9,6 +9,7 @@ import {
   createRelation,
   updateRelation,
   deleteRelation,
+  deleteMod,
 } from '../controllers';
 import { _admin_role } from '../middlewares/role.middleware';
 const router = Router();
@@ -20,6 +21,7 @@ router.use(_admin_role);
 router.post('/', createGroup);
 router.get('/:id', getById);
 router.patch('/:id', updateGroup);
+router.delete('/mod/:id', deleteMod);
 router.delete('/:id', deleteGroup);
 router.post('/relation/:userId/:groupId', createRelation);
 router.patch('/relation/:userId/:groupId', updateRelation);
