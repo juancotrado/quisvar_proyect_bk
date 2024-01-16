@@ -64,6 +64,19 @@ class StagesControllers {
       next(error);
     }
   }
+  public static async showReport(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params;
+      const query = await StageServices.findReport(+id);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  }
 
   public static async create(req: Request, res: Response, next: NextFunction) {
     try {
