@@ -29,10 +29,12 @@ model Users {
   list                  ListOnUsers[]
   stages                Stages[]
   message               Mail[]
+  paymessage            PayMail[]
   messageReply          MessageHistory[]
   feedbacks             UsersOnFeedbacks[]
   equipment             Equipment?
   groups                GroupOnUsers[]
+  moderatorOfGroup     Group[]
 }
 
 model WorkStation {
@@ -117,6 +119,8 @@ model Group {
   createdAt DateTime       @default(now())
   stage     Stages[]
   groups    GroupOnUsers[]
+  modId     Int?
+  moderator Users?         @relation(fields: [modId], references: [id])
 }
 
 model GroupOnUsers {
@@ -137,7 +141,8 @@ model Projects {
   typeSpecialityId Int
   typeSpeciality   TypeSpecialities @relation(fields: [typeSpecialityId], references: [id])
   moderator        Users?           @relation(fields: [userId], references: [id])
-  contract         Contratc?
+  contractId       Int              @unique
+  contract         Contratc         @relation(fields: [contractId], references: [id])
   stages           Stages[]
 }
 
@@ -441,13 +446,43 @@ model Mail {
   @@id([userId, messageId])
 }
 
-model Messages {
+model PayMail {
+  paymessageId Int
+  userId       Int
+  paymessage   PayMessages @relation(fields: [paymessageId], references: [id], onDelete: Cascade)
+  user         Users       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type         MessageUser @default(RECEIVER)
+  status       Boolean     @default(false)
+  role         MessageRole @default(SECONDARY)
+  assignedAt   DateTime    @default(now())
+  userInit     Boolean     @default(false)
+
+  @@id([userId, paymessageId])
+}
+
+model PayMessages {
   id             Int              @id @default(autoincrement())
   title          String
   header         String           @default("")
   paymentPdfData String           @default("")
   description    String
   filesPay       Payment[]
+  status         MessageStatus    @default(PROCESO)
+  type           MessageType      @default(INFORME)
+  files          FilesMessage[]
+  users          PayMail[]
+  history        MessageHistory[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model Messages {
+  id             Int              @id @default(autoincrement())
+  title          String
+  header         String           @default("")
+  paymentPdfData String           @default("")
+  description    String
+  // filesPay       Payment[]
   status         MessageStatus    @default(PROCESO)
   type           MessageType      @default(INFORME)
   files          FilesMessage[]
@@ -458,34 +493,38 @@ model Messages {
 }
 
 model MessageHistory {
-  id          Int                   @id @default(autoincrement())
-  title       String
-  header      String                @default("")
-  description String
-  userId      Int
-  user        Users                 @relation(fields: [userId], references: [id])
-  files       FilesMessageHistory[]
-  message     Messages?             @relation(fields: [messageId], references: [id])
-  messageId   Int?
-  createdAt   DateTime              @default(now())
+  id           Int                   @id @default(autoincrement())
+  title        String
+  header       String                @default("")
+  description  String
+  userId       Int
+  user         Users                 @relation(fields: [userId], references: [id])
+  files        FilesMessageHistory[]
+  paymessage   PayMessages?          @relation(fields: [paymessageId], references: [id])
+  paymessageId Int?
+  message      Messages?             @relation(fields: [messageId], references: [id])
+  messageId    Int?
+  createdAt    DateTime              @default(now())
 }
 
 model FilesMessage {
-  id        Int       @id @default(autoincrement())
-  attempt   String    @default("") //Date.getTime()
-  name      String
-  path      String
-  messageId Int?
-  message   Messages? @relation(fields: [messageId], references: [id])
-  createdAt DateTime  @default(now())
+  id           Int          @id @default(autoincrement())
+  attempt      String       @default("") //Date.getTime()
+  name         String
+  path         String
+  message      Messages?    @relation(fields: [messageId], references: [id])
+  paymessage   PayMessages? @relation(fields: [paymessageId], references: [id])
+  messageId    Int?
+  paymessageId Int?
+  createdAt    DateTime     @default(now())
 }
 
 model Payment {
-  id        Int            @id @default(autoincrement())
-  createdAt DateTime       @default(now())
-  messageId Int?
-  message   Messages?      @relation(fields: [messageId], references: [id])
-  files     FilesPayment[]
+  id           Int            @id @default(autoincrement())
+  createdAt    DateTime       @default(now())
+  paymessageId Int?
+  paymessage   PayMessages?   @relation(fields: [paymessageId], references: [id])
+  files        FilesPayment[]
 }
 
 model FilesPayment {
@@ -521,7 +560,8 @@ model Contratc {
   indexContract  String
   details        String?
   projectId      Int?        @unique
-  project        Projects?   @relation(fields: [projectId], references: [id])
+  project        Projects?
+  // project        Projects?   @relation(fields: [projectId], references: [id])
   consortiumId   Int?
   companyId      Int?
   consortium     Consortium? @relation(fields: [consortiumId], references: [id])

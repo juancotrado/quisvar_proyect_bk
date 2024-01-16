@@ -32,7 +32,7 @@ class ProjectsServices {
       data: {
         name,
         typeSpecialityId,
-        contract: { connect: { id: contractId } },
+        contractId,
       },
     });
     return newProject;
@@ -45,7 +45,7 @@ class ProjectsServices {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateProject = await prisma.projects.update({
       where: { id },
-      data: { ...data, contract: { update: { id: contractId } } },
+      data: { ...data, contractId },
     });
     return updateProject;
   }

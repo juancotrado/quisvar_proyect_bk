@@ -34,8 +34,8 @@ router.get('/:id', showUser);
 router.use(_admin_role);
 router.post(
   '/',
-  acceptFormData,
-  verifyUniqueParam,
+  // acceptFormData,
+  // verifyUniqueParam,
   uploadFileUser.fields([
     { name: 'fileUserCv' },
     { name: 'fileUserDeclaration' },
