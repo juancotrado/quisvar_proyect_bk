@@ -210,11 +210,7 @@ export const createVoucher = async (
       return { name, path };
     });
     //--------------------------------------------------------------------------
-    // const query = await MailServices.createVoucher(
-    //   _messageId,
-    //   { senderId },
-    //   parseFiles
-    // );
+    await PayMailServices.createVoucher(_messageId, { senderId }, parseFiles);
     res.status(200).json(parseFiles);
   } catch (error) {
     next(error);

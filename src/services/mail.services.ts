@@ -1,11 +1,6 @@
-import { Mail, Messages, Users } from '@prisma/client';
+import { Messages, Users } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
-import {
-  FileMessagePick,
-  ParametersMail,
-  PickMail,
-  PickMessageReply,
-} from 'types/types';
+import { ParametersMail } from 'types/types';
 import Queries from '../utils/queries';
 import AppError from '../utils/appError';
 
