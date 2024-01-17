@@ -1,8 +1,8 @@
-import { FilesPayment, Mail, Messages, Users } from '@prisma/client';
+import { FilesPayment, PayMail, PayMessages, Users } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import {
   FileMessagePick,
-  ParametersMail,
+  ParametersPayMail,
   PickMail,
   PickMessageReply,
 } from 'types/types';
@@ -10,7 +10,7 @@ import Queries from '../utils/queries';
 import AppError from '../utils/appError';
 
 class PayMailServices {
-  public static PickType(type?: Mail['type']): Mail['type'] | undefined {
+  public static PickType(type?: PayMail['type']): PayMail['type'] | undefined {
     if (type === 'SENDER') return 'RECEIVER';
     if (type === 'RECEIVER') return 'SENDER';
     return undefined;
@@ -18,34 +18,34 @@ class PayMailServices {
 
   public static async getByUser(
     userId: Users['id'],
-    { skip, type, status, typeMessage }: ParametersMail
+    { skip, type, status, typeMessage }: ParametersPayMail
   ) {
     const typeMail = this.PickType(type);
-    const mail = await prisma.mail.findMany({
+    const mail = await prisma.payMail.findMany({
       where: {
         userId,
         type,
-        message: { type: typeMessage, status },
+        paymessage: { type: typeMessage, status },
       },
-      orderBy: { message: { updatedAt: 'desc' } },
+      orderBy: { paymessage: { updatedAt: 'desc' } },
       skip,
       take: 20,
       select: {
-        messageId: true,
+        paymessageId: true,
         status: true,
         type: true,
-        message: Queries.PayMail().selectMessage('MAIN', typeMail),
+        paymessage: Queries.PayMail().selectMessage('MAIN', typeMail),
       },
     });
-    const total = await prisma.mail.count({
-      where: { userId, type, message: { status, type: typeMessage } },
+    const total = await prisma.payMail.count({
+      where: { userId, type, paymessage: { status, type: typeMessage } },
     });
     return { total, mail };
   }
 
-  static async getMessage(id: Messages['id']) {
+  static async getMessage(id: PayMessages['id']) {
     if (!id) throw new AppError('Ops!, ID invalido', 400);
-    const getMessage = await prisma.messages.findUnique({
+    const getPayMessage = await prisma.payMessages.findUnique({
       where: { id },
       include: {
         users: {
@@ -79,15 +79,15 @@ class PayMailServices {
       },
     });
 
-    if (!getMessage)
+    if (!getPayMessage)
       throw new AppError('No se pudo encontrar datos del mensaje', 404);
-    const userInit = getMessage.users.find(user => user.userInit);
-    return { ...getMessage, userInit };
+    const userInit = getPayMessage.users.find(user => user.userInit);
+    return { ...getPayMessage, userInit };
   }
 
-  static async getMessagePreview(id: Messages['id']) {
+  static async getMessagePreview(id: PayMessages['id']) {
     if (!id) throw new AppError('Ops!, ID invalido', 400);
-    const getMessage = await prisma.messages.findUnique({
+    const getPayMessage = await prisma.payMessages.findUnique({
       where: { id },
       select: {
         id: true,
@@ -100,9 +100,9 @@ class PayMailServices {
         files: { select: { id: true, name: true, path: true } },
       },
     });
-    if (!getMessage)
+    if (!getPayMessage)
       throw new AppError('No se pudo encontrar datos del mensaje', 404);
-    return getMessage;
+    return getPayMessage;
   }
 
   static async create(
@@ -117,10 +117,10 @@ class PayMailServices {
     }: PickMail,
     files: FileMessagePick[]
   ) {
-    const typeMail: Mail['type'] = 'SENDER';
-    const role: Mail['role'] = 'MAIN';
+    const typeMail: PayMail['type'] = 'SENDER';
+    const role: PayMail['role'] = 'MAIN';
     const status = true;
-    const createMessage = await prisma.messages.create({
+    const createPayMessage = await prisma.payMessages.create({
       data: {
         title,
         header,
@@ -139,7 +139,7 @@ class PayMailServices {
         files: { createMany: { data: files } },
       },
     });
-    return createMessage;
+    return createPayMessage;
   }
 
   static async createReply(
@@ -150,28 +150,26 @@ class PayMailServices {
       header,
       description,
       status,
-      messageId,
+      paymessageId,
     }: PickMessageReply,
     files: Pick<FileMessagePick, 'name' | 'path'>[]
   ) {
     if (!receiverId || !senderId)
       throw new AppError('Ingrese Destinatario', 400);
     if (status === 'RECHAZADO') {
-      await prisma.messages.update({
-        where: { id: messageId },
+      await prisma.payMessages.update({
+        where: { id: paymessageId },
         data: { status },
       });
       //------------------------------------------------------------------
-      const uno = await prisma.mail.update({
-        where: { userId_messageId: { messageId, userId: senderId } },
+      await prisma.payMail.update({
+        where: { userId_paymessageId: { paymessageId, userId: senderId } },
         data: { type: 'SENDER', status: false },
       });
-      const dos = await prisma.mail.update({
-        where: { userId_messageId: { messageId, userId: receiverId } },
+      await prisma.payMail.update({
+        where: { userId_paymessageId: { paymessageId, userId: receiverId } },
         data: { type: 'RECEIVER', status: true },
       });
-      console.log(uno, dos);
-
       //------------------------------------------------------------------
       const createReply = await prisma.messageHistory.create({
         data: {
@@ -179,7 +177,7 @@ class PayMailServices {
           header,
           description,
           user: { connect: { id: senderId } },
-          message: { connect: { id: messageId } },
+          message: { connect: { id: paymessageId } },
           files: { createMany: { data: files } },
         },
       });
@@ -187,15 +185,15 @@ class PayMailServices {
     }
     //------------------------------------------------------------------
     if (status === 'PROCESO') {
-      await prisma.messages.update({
-        where: { id: messageId },
+      await prisma.payMessages.update({
+        where: { id: paymessageId },
         data: { status },
       });
     }
-    await prisma.mail.upsert({
+    await prisma.payMail.upsert({
       where: {
-        userId_messageId: {
-          messageId,
+        userId_paymessageId: {
+          paymessageId,
           userId: receiverId,
         },
       },
@@ -205,15 +203,15 @@ class PayMailServices {
         status: true,
       },
       create: {
-        messageId,
+        paymessageId,
         userId: receiverId,
         type: 'RECEIVER',
         role: 'MAIN',
         status: true,
       },
     });
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId, userId: senderId } },
+    await prisma.payMail.update({
+      where: { userId_paymessageId: { paymessageId, userId: senderId } },
       data: { type: 'SENDER', status: false, role: 'MAIN' },
     });
     const createForward = await prisma.messageHistory.create({
@@ -222,7 +220,7 @@ class PayMailServices {
         header,
         description,
         user: { connect: { id: senderId } },
-        message: { connect: { id: messageId } },
+        message: { connect: { id: paymessageId } },
         files: { createMany: { data: files } },
       },
     });
@@ -230,19 +228,19 @@ class PayMailServices {
   }
 
   static async updateMessage(
-    id: Messages['id'],
+    id: PayMessages['id'],
     {
       header,
       title,
       description,
       senderId,
       receiverId,
-    }: Messages & { senderId: number; receiverId: number },
+    }: PayMessages & { senderId: number; receiverId: number },
     files: FileMessagePick[]
   ) {
     if (!receiverId || !senderId)
       throw new AppError('Ingrese Destinatario', 400);
-    const updateMessage = await prisma.messages.update({
+    const updateMessage = await prisma.payMessages.update({
       where: { id },
       data: {
         header,
@@ -253,12 +251,12 @@ class PayMailServices {
       },
     });
     //------------------------------------------------------------------
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: senderId } },
+    await prisma.payMail.update({
+      where: { userId_paymessageId: { paymessageId: id, userId: senderId } },
       data: { type: 'SENDER', status: false },
     });
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: receiverId } },
+    await prisma.payMail.update({
+      where: { userId_paymessageId: { paymessageId: id, userId: receiverId } },
       data: { type: 'RECEIVER', status: true },
     });
     //------------------------------------------------------------------
@@ -266,22 +264,22 @@ class PayMailServices {
     return updateMessage;
   }
 
-  static async archived(id: Messages['id'], senderId: number) {
-    const archived = await prisma.messages.update({
+  static async archived(id: PayMessages['id'], senderId: number) {
+    const archived = await prisma.payMessages.update({
       where: { id },
       data: { status: 'ARCHIVADO' },
     });
-    await prisma.mail.updateMany({
-      where: { messageId: id },
+    await prisma.payMail.updateMany({
+      where: { paymessageId: id },
       data: { status: false },
     });
     //------------------------------------------------------------------
-    await prisma.mail.updateMany({
-      where: { messageId: id, role: 'MAIN' },
+    await prisma.payMail.updateMany({
+      where: { paymessageId: id, role: 'MAIN' },
       data: { type: 'RECEIVER' },
     });
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: senderId } },
+    await prisma.payMail.update({
+      where: { userId_paymessageId: { paymessageId: id, userId: senderId } },
       data: { type: 'SENDER' },
     });
     //------------------------------------------------------------------
@@ -289,57 +287,62 @@ class PayMailServices {
   }
 
   static async done(
-    id: Messages['id'],
+    id: PayMessages['id'],
     senderId: number,
     paymentPdfData: string
   ) {
     if (!id) throw new AppError('Ops, ID invalido', 400);
     if (!senderId) throw new AppError('Ingrese Destinatario', 400);
-    const done = await prisma.messages.update({
+    const done = await prisma.payMessages.update({
       where: { id },
       data: { status: 'FINALIZADO', paymentPdfData },
     });
     //------------------------------------------------------------------
-    await prisma.mail.updateMany({
-      where: { messageId: id },
+    await prisma.payMail.updateMany({
+      where: { paymessageId: id },
       data: { type: 'RECEIVER', role: 'SECONDARY', status: false },
     });
     //------------------------------------------------------------------
-    const getFirst = await prisma.mail.findFirst({
-      where: { messageId: id },
+    const getFirst = await prisma.payMail.findFirst({
+      where: { paymessageId: id },
       orderBy: { assignedAt: 'asc' },
     });
     if (!getFirst) throw new AppError('error', 400);
     //------------------------------------------------------------------
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: senderId } },
+    await prisma.payMail.update({
+      where: { userId_paymessageId: { paymessageId: id, userId: senderId } },
       data: { type: 'SENDER', role: 'MAIN' },
     });
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: getFirst.userId } },
+    await prisma.payMail.update({
+      where: {
+        userId_paymessageId: { paymessageId: id, userId: getFirst.userId },
+      },
       data: { type: 'RECEIVER', role: 'MAIN' },
     });
     return done;
   }
 
-  static async updateStatus(id: Messages['id'], status: Messages['status']) {
-    const updateStatus = await prisma.messages.update({
+  static async updateStatus(
+    id: PayMessages['id'],
+    status: PayMessages['status']
+  ) {
+    const updateStatus = await prisma.payMessages.update({
       where: { id },
       data: { status },
     });
     return updateStatus;
   }
 
-  static async archivedItem(messageId: Messages['id']) {
-    const archivedList = await prisma.mail.updateMany({
-      where: { messageId, type: 'RECEIVER' },
+  static async archivedItem(paymessageId: PayMessages['id']) {
+    const archivedList = await prisma.payMail.updateMany({
+      where: { paymessageId, type: 'RECEIVER' },
       data: { status: false },
     });
     return archivedList;
   }
 
   static async quantityFiles(userId: Users['id']) {
-    const quantity = await prisma.messages.groupBy({
+    const quantity = await prisma.payMessages.groupBy({
       by: ['type'],
       _count: { type: true },
       where: {
@@ -352,18 +355,18 @@ class PayMailServices {
     return quantity;
   }
   static async createVoucher(
-    id: Messages['id'],
+    id: PayMessages['id'],
     { senderId }: { senderId: number },
     files: Pick<FilesPayment, 'name' | 'path'>[]
   ) {
     //------------------------------------------------------------------
-    const getReceiver = await prisma.mail.findFirst({
-      where: { messageId: id, type: 'SENDER', role: 'MAIN' },
+    const getReceiver = await prisma.payMail.findFirst({
+      where: { paymessageId: id, type: 'SENDER', role: 'MAIN' },
     });
     if (!getReceiver) throw new AppError('error', 400);
     const { userId: receiverId } = getReceiver;
     //------------------------------------------------------------------
-    const newVoucher = await prisma.messages.update({
+    const newVoucher = await prisma.payMessages.update({
       where: { id },
       data: {
         status: 'POR_PAGAR',
@@ -373,40 +376,41 @@ class PayMailServices {
       },
     });
     //------------------------------------------------------------------
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: senderId } },
+    await prisma.payMail.update({
+      where: { userId_paymessageId: { paymessageId: id, userId: senderId } },
       data: { type: 'SENDER' },
     });
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: receiverId } },
+    await prisma.payMail.update({
+      where: { userId_paymessageId: { paymessageId: id, userId: receiverId } },
       data: { type: 'RECEIVER' },
     });
     //------------------------------------------------------------------
     return newVoucher;
   }
+
   static async updateVoucher(
-    id: Messages['id'],
-    { status, senderId }: Pick<Messages, 'status'> & { senderId: number }
+    id: PayMessages['id'],
+    { status, senderId }: Pick<PayMessages, 'status'> & { senderId: number }
   ) {
     if (!['FINALIZADO', 'PAGADO'].includes(status))
       throw new AppError('Ingrese un estado valido para este proceso', 400);
-    const denied = await prisma.messages.update({
+    const denied = await prisma.payMessages.update({
       where: { id },
       data: { status },
     });
     //------------------------------------------------------------------
-    const getReceiver = await prisma.mail.findFirst({
-      where: { messageId: id, type: 'SENDER', role: 'MAIN' },
+    const getReceiver = await prisma.payMail.findFirst({
+      where: { paymessageId: id, type: 'SENDER', role: 'MAIN' },
     });
     if (!getReceiver) throw new AppError('error', 400);
     const { userId: receiverId } = getReceiver;
     //------------------------------------------------------------------
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: senderId } },
+    await prisma.payMail.update({
+      where: { userId_paymessageId: { paymessageId: id, userId: senderId } },
       data: { type: 'SENDER' },
     });
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: receiverId } },
+    await prisma.payMail.update({
+      where: { userId_paymessageId: { paymessageId: id, userId: receiverId } },
       data: { type: 'RECEIVER' },
     });
     //------------------------------------------------------------------

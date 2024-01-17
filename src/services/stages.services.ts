@@ -205,6 +205,65 @@ class StageServices {
     // return calculateAndUpdateDataByLevel(transformData);
   }
 
+  static async findReport(id: Projects['id']) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const findStage = await prisma.stages.findUnique({
+      where: { id },
+      select: {
+        group: {
+          select: {
+            moderator: {
+              select: {
+                profile: {
+                  select: {
+                    lastName: true,
+                    firstName: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        project: {
+          select: {
+            contract: {
+              select: {
+                cui: true,
+                projectName: true,
+                district: true,
+                department: true,
+                province: true,
+                createdAt: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!findStage)
+      throw new AppError('No se pudo encontrar el informe .', 404);
+    const { group, project } = findStage;
+    const { createdAt, cui, department, district, projectName, province } =
+      project.contract;
+    let moderatorName = 'Aun no asignado';
+    if (group?.moderator?.profile) {
+      const { firstName, lastName } = group.moderator.profile;
+      moderatorName = `${firstName} ${lastName}`;
+    }
+
+    return {
+      initialDate: createdAt,
+      cui,
+      department,
+      district,
+      projectName,
+      province,
+      moderatorName,
+      finishDate: '-',
+    };
+  }
+
   static async duplicate(id: number, name: string, type: 'ID' | 'ROOT') {
     let projectId: number = id;
     if (name.includes('projects')) throw new AppError('Nombre reservado', 404);

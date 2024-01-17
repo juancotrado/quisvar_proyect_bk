@@ -34,7 +34,7 @@ model Users {
   feedbacks             UsersOnFeedbacks[]
   equipment             Equipment?
   groups                GroupOnUsers[]
-  moderatorOfGroup     Group[]
+  moderatorOfGroup      Group[]
 }
 
 model WorkStation {
@@ -467,7 +467,7 @@ model PayMessages {
   paymentPdfData String           @default("")
   description    String
   filesPay       Payment[]
-  status         MessageStatus    @default(PROCESO)
+  status         PayMessageStatus @default(PROCESO)
   type           MessageType      @default(INFORME)
   files          FilesMessage[]
   users          PayMail[]
@@ -477,19 +477,17 @@ model PayMessages {
 }
 
 model Messages {
-  id             Int              @id @default(autoincrement())
-  title          String
-  header         String           @default("")
-  paymentPdfData String           @default("")
-  description    String
-  // filesPay       Payment[]
-  status         MessageStatus    @default(PROCESO)
-  type           MessageType      @default(INFORME)
-  files          FilesMessage[]
-  users          Mail[]
-  history        MessageHistory[]
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  id          Int              @id @default(autoincrement())
+  title       String
+  header      String
+  description String
+  status      MessageStatus    @default(PENDIENTE)
+  type        MessageType      @default(INFORME)
+  files       FilesMessage[]
+  users       Mail[]
+  history     MessageHistory[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 }
 
 model MessageHistory {
@@ -546,26 +544,28 @@ model FilesMessageHistory {
 }
 
 model Contratc {
-  id             Int         @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   cui            String
   name           String
-  contractNumber String      @default("")
+  contractNumber String   @default("")
   projectName    String
   department     String
   province       String
   district       String
   shortName      String?
   difficulty     Int
-  createdAt      DateTime    @default(now())
+  createdAt      DateTime @default(now())
   indexContract  String
   details        String?
-  projectId      Int? //@unique
-  project        Projects?
+
+  phases       String      @default("[]")
+  projectId    Int? //@unique
+  project      Projects?
   // project        Projects?   @relation(fields: [projectId], references: [id])
-  consortiumId   Int?
-  companyId      Int?
-  consortium     Consortium? @relation(fields: [consortiumId], references: [id])
-  company        Companies?  @relation(fields: [companyId], references: [id])
+  consortiumId Int?
+  companyId    Int?
+  consortium   Consortium? @relation(fields: [consortiumId], references: [id])
+  company      Companies?  @relation(fields: [companyId], references: [id])
 }
 
 enum UserRole {
@@ -635,7 +635,7 @@ enum MessageRole {
   SECONDARY
 }
 
-enum MessageStatus {
+enum PayMessageStatus {
   PROCESO
   RECHAZADO
   ARCHIVADO
@@ -643,6 +643,14 @@ enum MessageStatus {
   POR_PAGAR
   PAGADO
   GUARDADO
+}
+
+enum MessageStatus {
+  PENDIENTE
+  RECHAZADO
+  FINALIZADO
+  ARCHIVADO
+  ELIMINADO
 }
 
 enum TypeItem {

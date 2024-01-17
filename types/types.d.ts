@@ -4,7 +4,7 @@ import {
   FilesMessage,
   IndexTasks,
   Levels,
-  Mail,
+  PayMail,
   MessageHistory,
   Messages,
   Stages,
@@ -15,6 +15,7 @@ import {
   Tasks,
   Users,
   WorkAreas,
+  PayMessages,
 } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 
@@ -165,6 +166,15 @@ export interface SubTaskFiles extends SubTasks {
   files: Files[];
 }
 export type FilesProps = { [fieldname: string]: Express.Multer.File[] };
+export interface ParametersPayMail {
+  skip?: number;
+  limit?: number;
+  type?: PayMail['type'];
+  // status?: boolean;
+  typeMessage?: PayMessages['type'];
+  status?: PayMessages['status'];
+  assignedAt?: 'asc' | 'desc';
+}
 export interface ParametersMail {
   skip?: number;
   limit?: number;
@@ -174,7 +184,7 @@ export interface ParametersMail {
   status?: Messages['status'];
   assignedAt?: 'asc' | 'desc';
 }
-export interface PickMail extends Messages {
+export interface PickMail extends PayMessages {
   senderId: Users['id'];
   receiverId: Users['id'];
   idMessageReply?: number;
@@ -185,8 +195,8 @@ export interface PickMessageReply extends MessageHistory {
   // type?: Mail['type'];
   senderId: Users['id'];
   receiverId: Users['id'];
-  status?: Messages['status'];
-  messageId: Messages['id'];
+  status?: PayMessages['status'];
+  paymessageId: PayMessages['id'];
 }
 export type FileMessagePick = Pick<FilesMessage, 'name' | 'path' | 'attempt'>;
 export type UpdateLevelBlock = Levels & {
