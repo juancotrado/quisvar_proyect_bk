@@ -7,7 +7,6 @@ import {
   showTaskByUser,
   showSubTasksByUser,
 } from './users.controllers';
-import AuthController from './auth.controllers';
 
 // updateTaskStatus,
 // assignedTask,
@@ -155,7 +154,6 @@ import {
   updateEquipment,
   deleteEquipment,
 } from './equipment.controller';
-import ContractController from './contract.controllers';
 
 import {
   createConsortium,
@@ -180,7 +178,6 @@ import {
   deleteRelation,
   deleteMod,
 } from './groups.controller';
-import StagesControllers from './stages.controllers';
 // User Controllers
 export {
   showUsers,
@@ -235,7 +232,7 @@ export { createFeedback, findFeedbacks };
 //Duplicates Controllers
 export { duplicateProject, duplicateLevels, duplicateSubtask };
 //Stages Controllers
-export { StagesControllers, addNewStage, duplicateStages };
+export { addNewStage, duplicateStages };
 //Sector Controllers
 export { showSectors, createSector, updateSector, deleteSector };
 
@@ -337,9 +334,6 @@ export {
 //Equipment Controller
 export { createEquipment, getEquipment, updateEquipment, deleteEquipment };
 
-export { AuthController };
-
-export { ContractController };
 //Consortium Controller
 export {
   createConsortium,
@@ -365,3 +359,8 @@ export {
   deleteRelation,
   deleteMod,
 };
+
+export { default as ContractController } from './contract.controllers';
+export { default as PayMailControllers } from './paymail.controllers';
+export { default as AuthController } from './auth.controllers';
+export { default as StagesControllers } from './stages.controllers';

@@ -198,7 +198,9 @@ export interface PickMessageReply extends MessageHistory {
   status?: PayMessages['status'];
   paymessageId: PayMessages['id'];
 }
-export type FileMessagePick = Pick<FilesMessage, 'name' | 'path' | 'attempt'>;
+export type FileMessagePick = Pick<FilesMessage, 'name' | 'path'> & {
+  attempt?: string;
+};
 export type UpdateLevelBlock = Levels & {
   subTasks: {
     id: number;

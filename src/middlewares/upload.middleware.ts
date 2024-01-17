@@ -9,14 +9,15 @@ const MAX_SIZE = 1024 * 1000 * 1000 * 1000;
 // const FILE_TYPES = ['.rar', '.zip'];
 
 class StorageConfig {
-  public setUp(path: string, name?: string) {
+  public setUp(path: string, pattern?: string, name?: string) {
     return multer.diskStorage({
       destination: (req, file, callback) => {
         if (!existsSync(path)) mkdirSync(path, { recursive: true });
         callback(null, path);
       },
       filename: (req, { originalname }, callback) => {
-        const parseFileName = Date.now() + '$$' + originalname;
+        const patt = pattern ? pattern : '$$';
+        const parseFileName = Date.now() + patt + originalname;
         const fileName = name ? name : parseFileName;
         callback(null, fileName);
       },
@@ -79,6 +80,14 @@ class Stogares extends StorageConfig {
 
   public workStation: multer.Multer = multer({
     storage: this.setUpPDF('public/workStation'),
+  });
+
+  public fileVoucher: multer.Multer = multer({
+    storage: this.setUp('public/voucher', '$'),
+  });
+
+  public fileMail: multer.Multer = multer({
+    storage: this.setUp('public/mail', '$'),
   });
 }
 
@@ -262,7 +271,7 @@ export const uploadFileSpecialist = multer({
   storage: storageFileSpecialist,
 });
 
-export const uploads = new Stogares();
+export default new Stogares();
 
 // const storageImgCompanies = multer.diskStorage({
 //   destination: function (req, file, cb) {

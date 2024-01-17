@@ -1,64 +1,33 @@
-import UsersServices from './users.services';
-import authServices from './auth.services';
-import ProjectsServices from './projects.services';
-import SubTasksServices from './subtasks.services';
-import ProfileServices from './profile.services';
-import SpecialitiesServices from './specialities.services';
-import PathServices from './paths.services';
-import FilesServices from './files.services';
-import ReportsServices from './reports.services';
-import FeedBackServices from './feedbacks.services';
-import DuplicatesServices from './duplicates.services';
-import StageServices from './stages.services';
-import SectorServices from './sector.services';
-import TypeSpecialitiesServices from './typeSpecialities.services';
-import LevelsServices from './levels.services';
-import ListServices from './list.services';
-import PayMailServices from './payMail.services';
-import LicenseServices from './licenses.services';
-import CompaniesServices from './companies.services';
-import SpecialistServices from './specialist.services';
-import AreaSpecialtyServices from './areaSpecialty.services';
-import TrainingSpecialtyServices from './trainingSpecialty.services';
-import AreaSpecialtyListServices from './areaSpecialtyList.services';
-import TrainingSpecialtyListServices from './trainingSpecialtyList.services';
-import WorkStationServices from './workStation.services';
-import EquipmentServices from './equipment.services';
-import ContractServices from './contract.services';
-import ConsortiumServices from './consortium.services';
-import GroupServices from './groups.services';
-export {
-  UsersServices,
-  authServices,
-  ProjectsServices,
-  SubTasksServices,
-  ProfileServices,
-  SpecialitiesServices,
-  PathServices,
-  FilesServices,
-  ReportsServices,
-  FeedBackServices,
-  DuplicatesServices,
-  StageServices,
-  SectorServices,
-  TypeSpecialitiesServices,
-  LevelsServices,
-  // PathLevelServices,
-  ListServices,
-  PayMailServices,
-  LicenseServices,
-  CompaniesServices,
-  SpecialistServices,
-  AreaSpecialtyServices,
-  AreaSpecialtyListServices,
-  TrainingSpecialtyServices,
-  TrainingSpecialtyListServices,
-  WorkStationServices,
-  EquipmentServices,
-  ContractServices,
-  ConsortiumServices,
-  GroupServices,
-};
+export { default as UsersServices } from './users.services';
+export { default as authServices } from './auth.services';
+export { default as ProjectsServices } from './projects.services';
+export { default as SubTasksServices } from './subtasks.services';
+export { default as ProfileServices } from './profile.services';
+export { default as SpecialitiesServices } from './specialities.services';
+export { default as PathServices } from './paths.services';
+export { default as FilesServices } from './files.services';
+export { default as ReportsServices } from './reports.services';
+export { default as FeedBackServices } from './feedbacks.services';
+export { default as DuplicatesServices } from './duplicates.services';
+export { default as StageServices } from './stages.services';
+export { default as SectorServices } from './sector.services';
+export { default as TypeSpecialitiesServices } from './typeSpecialities.services';
+export { default as LevelsServices } from './levels.services';
+export { default as ListServices } from './list.services';
+export { default as PayMailServices } from './payMail.services';
+export { default as LicenseServices } from './licenses.services';
+export { default as CompaniesServices } from './companies.services';
+export { default as SpecialistServices } from './specialist.services';
+export { default as AreaSpecialtyServices } from './areaSpecialty.services';
+export { default as TrainingSpecialtyServices } from './trainingSpecialty.services';
+export { default as AreaSpecialtyListServices } from './areaSpecialtyList.services';
+export { default as TrainingSpecialtyListServices } from './trainingSpecialtyList.services';
+export { default as WorkStationServices } from './workStation.services';
+export { default as EquipmentServices } from './equipment.services';
+export { default as ContractServices } from './contract.services';
+export { default as ConsortiumServices } from './consortium.services';
+export { default as GroupServices } from './groups.services';
+
 export const rootPath = './uploads';
 export const _dirPath = `${rootPath}/projects`;
 export const _materialPath = `${rootPath}/models`;

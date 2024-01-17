@@ -7,7 +7,7 @@ import {
   deleteEquipment,
 } from '../controllers';
 import { _admin_role } from '../middlewares/role.middleware';
-import { uploads } from '../middlewares/upload.middleware';
+import uploads from '../middlewares/upload.middleware';
 const router = Router();
 router.use(authenticateHandler);
 router.use(_admin_role);

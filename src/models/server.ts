@@ -35,6 +35,7 @@ import {
   contractRoutes,
   consortiumRoutes,
   groupsRoutes,
+  payMailRoutes,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -76,6 +77,7 @@ class Server {
     list: `/${process.env.ROUTE}/list`,
     license: `/${process.env.ROUTE}/license`,
     mail: `/${process.env.ROUTE}/mail`,
+    paymail: `/${process.env.ROUTE}/paymail`,
     companies: `/${process.env.ROUTE}/companies`,
     specialists: `/${process.env.ROUTE}/specialists`,
     areaSpecialty: `/${process.env.ROUTE}/areaSpecialty`,
@@ -165,6 +167,7 @@ class Server {
     this.app.use(this.path.list, listRouter);
     this.app.use(this.path.license, licenseRouter);
     this.app.use(this.path.mail, mailRouter);
+    this.app.use(this.path.paymail, payMailRoutes);
     this.app.use(this.path.companies, companiesRouter);
     this.app.use(this.path.specialists, specialistRouter);
     this.app.use(this.path.areaSpecialty, areaSpecialtyRouter);
