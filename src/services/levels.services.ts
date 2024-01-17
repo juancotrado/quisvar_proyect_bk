@@ -11,6 +11,7 @@ import {
   getRootPath,
   numberToConvert,
   percentageSubTasks,
+  roundTwoDecimail,
   sumValues,
 } from '../utils/tools';
 import {
@@ -381,24 +382,27 @@ class LevelsServices {
       if (subTasks && subTasks.length) {
         const subtasks = percentageSubTasks(subTasks, listCost);
         const price = sumValues(subtasks, 'price');
-        const days = sumValues(subtasks, 'days');
+        const days = roundTwoDecimail(sumValues(subtasks, 'days'));
         const spending = sumValues(subtasks, 'spending');
-        const percentage = sumValues(subtasks, 'percentage') / subTasks.length;
-        //---------------------------------------------------------------------
-        const list = subtasks.map(({ listUsers }) => listUsers).flat(2);
-        const listUsers = list.reduce(
-          (acc: typeof list, { count, userId, ...data }) => {
-            const exist = acc.findIndex(u => u.userId === userId);
-            exist > 0
-              ? (acc[exist].count += count)
-              : acc.push({ userId, count, ...data });
-            return acc;
-          },
-          []
+        const percentage = roundTwoDecimail(
+          sumValues(subtasks, 'percentage') / subTasks.length
         );
         //---------------------------------------------------------------------
+        const list = subtasks.map(({ listUsers }) => listUsers).flat(2);
+        // const listUsers = list.reduce(
+        //   (acc: typeof list, { count, userId, ...data }) => {
+        //     const exist = acc.findIndex(u => u.userId === userId);
+        //     exist > 0
+        //       ? (acc[exist].count += count)
+        //       : acc.push({ userId, count, ...data });
+        //     return acc;
+        //   },
+        //   []
+        // );
+        const listUsers: any = [];
+        //---------------------------------------------------------------------
         const total = subTasks.length;
-        const balance = price - spending;
+        const balance = roundTwoDecimail(price - spending);
         data = {
           price,
           spending,
