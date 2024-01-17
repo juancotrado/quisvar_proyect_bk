@@ -11,6 +11,7 @@ import {
   getRootPath,
   numberToConvert,
   percentageSubTasks,
+  roundTwoDecimail,
   sumValues,
 } from '../utils/tools';
 import {
@@ -398,7 +399,7 @@ class LevelsServices {
         );
         //---------------------------------------------------------------------
         const total = subTasks.length;
-        const balance = price - spending;
+        const balance = roundTwoDecimail(price - spending);
         data = {
           price,
           spending,

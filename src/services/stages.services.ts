@@ -111,6 +111,7 @@ class StageServices {
     const nextLevel = calculateAndUpdateDataByLevel(list);
     const total = sumValues(nextLevel, 'total');
     const balance = sumValues(nextLevel, 'balance');
+    const price = sumValues(nextLevel, 'price');
     const spending = sumValues(nextLevel, 'spending');
     const _percentage = sumValues(nextLevel, 'percentage') / nextLevel.length;
     const lists = nextLevel.map(l => l.listUsers).flat(2);
@@ -124,19 +125,6 @@ class StageServices {
       },
       []
     );
-    // const listIdUsers = listUsers.map(({ userId }) => userId);
-    // const pato = await prisma.profiles.findMany({
-    //   where: { userId: { in: listIdUsers } },
-    //   select: { userId: true, firstName: true, lastName: true },
-    // });
-    // const combinedData = pato.map(user => {
-    //   const matchingCount = listUsers.find(
-    //     count => count.userId === user.userId
-    //   );
-    //   const count = matchingCount ? matchingCount.count : 0;
-    //   return { ...user, count };
-    // });
-    // console.log(combinedData);
     const percentage = Math.round(_percentage * 100) / 100;
     const totalValues = sumPriceByStage(getList);
     return {
@@ -149,60 +137,11 @@ class StageServices {
       rootTypeItem,
       ...totalValues,
       balance,
+      price,
       listUsers,
       spending,
       nextLevel,
     };
-    // const newFindStage = findStage.levels.map(async level => {
-    //   const levelCopy = { ...level, nextLevel: {} };
-    //   const nextLevel = await LevelsServices.find(level.id);
-    //   if (Object.keys(levelCopy).length) levelCopy.nextLevel = nextLevel;
-    //   return {
-    //     ...levelCopy,
-    //     spending: 0,
-    //     balance: 0,
-    //     price: 0,
-    //     details: {
-    //       UNRESOLVED: 0,
-    //       PROCESS: 0,
-    //       INREVIEW: 0,
-    //       DENIED: 0,
-    //       DONE: 0,
-    //       LIQUIDATION: 0,
-    //       TOTAL: 0,
-    //     },
-    //   };
-    // });
-    // const result = (await Promise.all(newFindStage)) as Level[];
-    // const transformData: Level[] = [
-    //   {
-    //     id: 0,
-    //     item: '',
-    //     rootId: 0,
-    //     spending: 0,
-    //     balance: 0,
-    //     price: 0,
-    //     level: 0,
-    //     rootLevel: 0,
-    //     stagesId: 0,
-    //     isInclude: false,
-    //     userId: null,
-    //     isArea: false,
-    //     isProject: false,
-    //     details: {
-    //       UNRESOLVED: 0,
-    //       PROCESS: 0,
-    //       INREVIEW: 0,
-    //       DENIED: 0,
-    //       DONE: 0,
-    //       LIQUIDATION: 0,
-    //       TOTAL: 0,
-    //     },
-    //     name: findStage.project?.name || 'lEVEL',
-    //     nextLevel: result,
-    //   },
-    // ];
-    // return calculateAndUpdateDataByLevel(transformData);
   }
 
   static async findReport(id: Projects['id']) {

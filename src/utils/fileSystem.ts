@@ -1,16 +1,21 @@
 import fs from 'fs';
+import mv from 'mv';
 import { StageParse } from 'types/types';
+import AppError from './appError';
 export const renameDir = (oldDir: string, newDir: string) => {
   if (oldDir !== newDir) {
     const subDir = fs
       .readdirSync(oldDir)
       .some(file => fs.statSync(oldDir + '/' + file).isDirectory());
     if (subDir) {
-      // mv(oldDir, newDir, () => {
-      //   throw new AppError('Error en copiar', 404);
-      // });
-      fs.cpSync(oldDir, newDir, { recursive: true });
-      fs.rmSync(oldDir, { recursive: true });
+      if (process.env.NODE_ENV === 'production') {
+        mv(oldDir, newDir, () => {
+          throw new AppError('Error en copiar', 404);
+        });
+      } else {
+        fs.cpSync(oldDir, newDir, { recursive: true });
+        fs.rmSync(oldDir, { recursive: true });
+      }
     } else {
       fs.renameSync(oldDir, newDir);
     }

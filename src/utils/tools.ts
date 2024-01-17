@@ -51,7 +51,7 @@ export const parseSubTasks = (
   });
 };
 export const round2Decimal = (n: number) => Math.round((n / 30) * 100) / 100;
-
+export const roundTwoDecimail = (n: number) => Math.round(n * 100) / 100;
 const calculateCost = (percentage: number, cost?: number) => {
   const price = ((cost ? cost : 1) * percentage) / 100;
   return Math.round(price * 100) / 100;
@@ -114,7 +114,6 @@ export const percentageSubTasks = (
           0;
     const balance = +price - +spending;
     //--------------------------------------------------------------------
-    // console.log(price, balance, spending);
     return {
       percentage,
       spending,
@@ -320,7 +319,7 @@ const calculateSumTotal = (
       sumaBalance += calculateSumTotal(subLevel, type);
     }
   }
-  return sumaBalance;
+  return roundTwoDecimail(sumaBalance);
 };
 const calculateQuantityUser = (level: Level, type: keyof Level) => {
   let sumListUsers = level[type] as usersCount[];
