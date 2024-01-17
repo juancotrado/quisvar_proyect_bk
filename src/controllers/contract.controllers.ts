@@ -4,6 +4,13 @@ import { existsSync, renameSync, rmSync } from 'fs';
 import AppError from '../utils/appError';
 
 class ContractController {
+  static INIT_VALUES_PHASE = {
+    name: '',
+    days: 0,
+    isActive: false,
+    id: new Date().getTime(),
+  };
+
   public static async showContracts(
     req: Request,
     res: Response,
@@ -43,7 +50,11 @@ class ContractController {
   ) {
     try {
       const { body } = req;
-      const result = await ContractServices.create(body);
+      const newBody = {
+        ...body,
+        phases: JSON.stringify([ContractController.INIT_VALUES_PHASE]),
+      };
+      const result = await ContractServices.create(newBody);
       res.status(201).json(result);
     } catch (error) {
       next(error);
@@ -140,6 +151,21 @@ class ContractController {
       const { id } = req.params;
       const { details } = req.body;
       const result = await ContractServices.updateDetails(+id, details);
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public static async updatePhases(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params;
+      const { phases } = req.body;
+      const result = await ContractServices.updatePhases(+id, phases);
       res.status(201).json(result);
     } catch (error) {
       next(error);

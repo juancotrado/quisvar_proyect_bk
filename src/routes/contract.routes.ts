@@ -23,6 +23,7 @@ class ContractRoutes {
     this.router.patch('/:id', ContractController.updateContract);
     this.router.put('/:id/index', ContractController.updateIndex);
     this.router.put('/:id/details', ContractController.updateDetails);
+    this.router.put('/:id/phases', ContractController.updatePhases);
     this.router.delete('/:id', ContractController.deleteContract);
     this.router.delete('/:id/files', ContractController.deleteFiles);
   }

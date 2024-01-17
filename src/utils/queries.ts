@@ -172,6 +172,7 @@ class Queries {
       consortiumId: true,
       companyId: true,
       contractNumber: true,
+      phases: true,
     },
   };
   static PayMail(): PayMailQueries {

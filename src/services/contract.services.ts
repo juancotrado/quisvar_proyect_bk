@@ -78,6 +78,17 @@ class ContractServices {
     });
     return updateDetails;
   }
+  public static async updatePhases(
+    id: Contratc['id'],
+    phases: Contratc['phases']
+  ) {
+    if (!id) throw new AppError('Opps, id Invalida', 400);
+    const updateDetails = await prisma.contratc.update({
+      where: { id },
+      data: { phases },
+    });
+    return updateDetails;
+  }
 
   public static async updateIndex(id: Contratc['id'], indexContract: string) {
     if (!id) throw new AppError('Opps, id Invalida', 400);
