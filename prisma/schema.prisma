@@ -34,7 +34,7 @@ model Users {
   feedbacks             UsersOnFeedbacks[]
   equipment             Equipment?
   groups                GroupOnUsers[]
-  moderatorOfGroup     Group[]
+  moderatorOfGroup      Group[]
 }
 
 model WorkStation {
@@ -559,6 +559,7 @@ model Contratc {
   createdAt      DateTime    @default(now())
   indexContract  String
   details        String?
+  phases         String      @default("[]")
   projectId      Int?        @unique
   project        Projects?
   // project        Projects?   @relation(fields: [projectId], references: [id])
