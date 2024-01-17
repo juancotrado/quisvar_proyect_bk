@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { MailServices } from '../services';
+import { PayMailServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
-import { ParametersMail, PickMail, PickMessageReply } from 'types/types';
+import { ParametersPayMail, PickMail, PickMessageReply } from 'types/types';
 import { existsSync, mkdirSync, renameSync } from 'fs';
-import { Messages } from '@prisma/client';
+import { PayMessages } from '@prisma/client';
 
 export const showMessages = async (
   req: Request,
@@ -12,13 +12,13 @@ export const showMessages = async (
   next: NextFunction
 ) => {
   try {
-    const { skip, ...params } = req.query as ParametersMail;
+    const { skip, ...params } = req.query as ParametersPayMail;
     const userInfo: UserType = res.locals.userInfo;
     const userId = userInfo.id;
     const offset = parseInt(`${skip}`);
     const _skip = !isNaN(offset) ? offset : undefined;
     const newParams = { skip: _skip, ...params };
-    const query = await MailServices.getByUser(userId, newParams);
+    const query = await PayMailServices.getByUser(userId, newParams);
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -33,7 +33,7 @@ export const showMessage = async (
   try {
     const { id } = req.params;
     const messageId = parseInt(id);
-    const query = await MailServices.getMessage(messageId);
+    const query = await PayMailServices.getMessage(messageId);
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -48,7 +48,7 @@ export const createReplyMessage = async (
   try {
     const userInfo: UserType = res.locals.userInfo;
     const senderId = userInfo.id;
-    const { status } = req.query as ParametersMail;
+    const { status } = req.query as ParametersPayMail;
     // const attempt = `${new Date().getTime()}`;
     if (!req.files)
       throw new AppError('Oops!, no se pudo subir los archivos', 400);
@@ -61,7 +61,7 @@ export const createReplyMessage = async (
     });
     const { body } = req;
     const data = JSON.parse(body.data) as PickMessageReply;
-    const query = await MailServices.createReply(
+    const query = await PayMailServices.createReply(
       { ...data, status, senderId },
       parseFiles
     );
@@ -93,7 +93,7 @@ export const updateMessage = async (
     });
     const { body } = req;
     const data = JSON.parse(body.data) as PickMail;
-    const query = await MailServices.updateMessage(
+    const query = await PayMailServices.updateMessage(
       _messageId,
       { ...data, senderId },
       parseFiles
@@ -125,7 +125,10 @@ export const createMessage = async (
     //--------------------------------------------------------------------------
     const { body } = req;
     const data = JSON.parse(body.data) as PickMail;
-    const query = await MailServices.create({ ...data, senderId }, parseFiles);
+    const query = await PayMailServices.create(
+      { ...data, senderId },
+      parseFiles
+    );
     res.status(201).json(query);
   } catch (error) {
     next(error);
@@ -142,7 +145,7 @@ export const archivedMessage = async (
     const senderId = userInfo.id;
     const { id } = req.params;
     const _messageId = parseInt(id);
-    const query = await MailServices.archived(_messageId, senderId);
+    const query = await PayMailServices.archived(_messageId, senderId);
     res.status(201).json(query);
   } catch (error) {
     next(error);
@@ -160,7 +163,11 @@ export const doneMessage = async (
     const senderId = userInfo.id;
     const { id } = req.params;
     const _messageId = parseInt(id);
-    const query = await MailServices.done(_messageId, senderId, paymentPdfData);
+    const query = await PayMailServices.done(
+      _messageId,
+      senderId,
+      paymentPdfData
+    );
     res.status(201).json(query);
   } catch (error) {
     next(error);
@@ -175,7 +182,7 @@ export const quantityFiles = async (
   try {
     const userInfo: UserType = res.locals.userInfo;
     const { id } = userInfo;
-    const query = await MailServices.quantityFiles(id);
+    const query = await PayMailServices.quantityFiles(id);
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -223,9 +230,9 @@ export const declineVoucher = async (
     const userInfo: UserType = res.locals.userInfo;
     const { id: senderId } = userInfo;
     const { id } = req.params;
-    const status = req.query.status as Messages['status'];
+    const status = req.query.status as PayMessages['status'];
     const _messageId = parseInt(id);
-    const query = await MailServices.updateVoucher(_messageId, {
+    const query = await PayMailServices.updateVoucher(_messageId, {
       senderId,
       status,
     });

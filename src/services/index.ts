@@ -14,7 +14,7 @@ import SectorServices from './sector.services';
 import TypeSpecialitiesServices from './typeSpecialities.services';
 import LevelsServices from './levels.services';
 import ListServices from './list.services';
-import MailServices from './mail.services';
+import PayMailServices from './payMail.services';
 import LicenseServices from './licenses.services';
 import CompaniesServices from './companies.services';
 import SpecialistServices from './specialist.services';
@@ -45,7 +45,7 @@ export {
   LevelsServices,
   // PathLevelServices,
   ListServices,
-  MailServices,
+  PayMailServices,
   LicenseServices,
   CompaniesServices,
   SpecialistServices,
