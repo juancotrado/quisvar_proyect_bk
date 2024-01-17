@@ -114,7 +114,6 @@ export const percentageSubTasks = (
           0;
     const balance = +price - +spending;
     //--------------------------------------------------------------------
-    // console.log(price, balance, spending);
     return {
       percentage,
       spending,
@@ -320,7 +319,7 @@ const calculateSumTotal = (
       sumaBalance += calculateSumTotal(subLevel, type);
     }
   }
-  return sumaBalance;
+  return roundTwoDecimail(sumaBalance);
 };
 const calculateQuantityUser = (level: Level, type: keyof Level) => {
   let sumListUsers = level[type] as usersCount[];
