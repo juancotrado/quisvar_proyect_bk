@@ -83,11 +83,11 @@ class Stogares extends StorageConfig {
   });
 
   public fileVoucher: multer.Multer = multer({
-    storage: this.setUp('public/voucher', '$'),
+    storage: this.setUp('public/voucher'),
   });
 
   public fileMail: multer.Multer = multer({
-    storage: this.setUp('public/mail', '$'),
+    storage: this.setUp('public/mail'),
   });
 }
 
