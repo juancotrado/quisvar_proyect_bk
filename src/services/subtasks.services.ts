@@ -222,7 +222,8 @@ class SubTasksServices {
       //-------------------------------------------------------------------
       const _files = files.map(async file => {
         const ext = file.name.split('.').at(-1) || '';
-        const index = countExt[ext] ? ` (${countExt[ext]})` : '';
+        const index = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
+        countExt[ext] -= 1;
         const _name = item + name + index + '.' + ext;
 
         await prisma.files.update({
