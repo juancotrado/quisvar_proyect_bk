@@ -62,8 +62,8 @@ export const updateProfile = async (
       +id,
       profile,
       email,
-      ruc,
-      address
+      address,
+      ruc
     );
     res.status(201).json(query);
   } catch (error) {
