@@ -115,7 +115,7 @@ export const uploadFiles = async (
       dir,
       type,
       subTasksId,
-      name: convertToUtf8(filename),
+      name: filename,
       userId: userInfo.id,
     }));
     if (!req.files) return;

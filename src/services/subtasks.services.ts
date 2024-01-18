@@ -218,21 +218,22 @@ class SubTasksServices {
       const _files = files.map(async (file, index) => {
         const ext = file.name.split('.').at(-1);
         const _name = item + name + `_${index + 1}` + '.' + ext;
-        if (['pdf', 'PDF'].includes(ext!)) {
-          //--------------------------------------------------------------
-          // await prisma.files.update({
-          //   where: { id: file.id },
-          //   data: { type: 'EDITABLES', name: _name, dir: editablesPath },
-          // });
-          copyFileSync(`${dir}/${file.name}`, `${editablesPath}/${_name}`);
-          //--------------------------------------------------------------
-        }
+
         await prisma.files.update({
           where: { id: file.id },
           data: { type: 'UPLOADS', name: _name, dir: path },
         });
         //----------------------------------------------------------------
         renameSync(`${dir}/${file.name}`, `${path}/${_name}`);
+        if (['pdf', 'PDF'].includes(ext!)) {
+          //--------------------------------------------------------------
+          // await prisma.files.update({
+          //   where: { id: file.id },
+          //   data: { type: 'EDITABLES', name: _name, dir: editablesPath },
+          // });
+          copyFileSync(`${path}/${_name}`, `${editablesPath}/${_name}`);
+          //--------------------------------------------------------------
+        }
       });
       await Promise.all(_files);
       return SubTasksServices.find(id);

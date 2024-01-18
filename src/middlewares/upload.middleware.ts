@@ -4,6 +4,7 @@ import { PathServices, _contractPath } from '../services';
 import AppError from '../utils/appError';
 import { existsSync, mkdirSync } from 'fs';
 import { TypeFileUser } from 'types/types';
+import { convertToUtf8 } from '../utils/tools';
 
 const MAX_SIZE = 1024 * 1000 * 1000 * 1000;
 // const FILE_TYPES = ['.rar', '.zip'];
@@ -108,7 +109,7 @@ const storage = multer.diskStorage({
       const uniqueSuffix = Date.now();
       const { originalname } = file;
       if (originalname.includes('$')) throw new Error();
-      callback(null, uniqueSuffix + '$' + file.originalname);
+      callback(null, convertToUtf8(uniqueSuffix + '$$' + file.originalname));
     } catch (error) {
       callback(
         new AppError(`Oops! , envie archivos con extension no repetida`, 404),
@@ -137,7 +138,7 @@ const storageFileUser = multer.diskStorage({
   },
   filename: function (req, files, cb) {
     const { originalname } = files;
-    cb(null, Date.now() + '$$' + originalname);
+    cb(null, convertToUtf8(Date.now() + '$$' + originalname));
   },
 });
 const storageFileSpecialist = multer.diskStorage({
@@ -153,7 +154,7 @@ const storageFileSpecialist = multer.diskStorage({
   },
   filename: function (req, files, cb) {
     const { originalname } = files;
-    cb(null, Date.now() + '$$' + originalname);
+    cb(null, convertToUtf8(Date.now() + '$$' + originalname));
   },
 });
 
@@ -166,7 +167,7 @@ const storageGeneralFiles = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + '$' + file.originalname);
+    cb(null, Date.now() + '$$' + convertToUtf8(file.originalname));
   },
 });
 
@@ -233,7 +234,7 @@ const storageReportUser = multer.diskStorage({
       if (!originalname.includes('.pdf') || originalname.includes('$'))
         throw new Error();
       const nameFile = uniqueSuffix + '$' + originalname;
-      callback(null, nameFile);
+      callback(null, convertToUtf8(nameFile));
     } catch (error) {
       callback(
         new AppError(`Oops! , archivo sin extension pdf o contiene "$"`, 404),
