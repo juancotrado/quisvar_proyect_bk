@@ -250,7 +250,11 @@ class StageServices {
     { groupId, ...data }: StageUpdate
   ) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
-    if (groupId) {
+    const findGroup = await prisma.stages.findUnique({
+      where: { id },
+      select: { groupId: true },
+    });
+    if (groupId && groupId !== findGroup?.groupId) {
       const quantityUsers = await prisma.taskOnUsers.count({
         where: { subtask: { Levels: { stages: { id } } } },
       });
