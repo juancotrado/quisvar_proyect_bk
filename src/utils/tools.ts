@@ -4,6 +4,8 @@ import {
   GetFilterLevels,
   Level,
   ListCostType,
+  ObjectAny,
+  ObjectNumber,
   PickSubtask,
   PriceAreaTask,
   PriceIndexTask,
@@ -593,4 +595,16 @@ export const setAdmin = async () => {
     return true;
   }
   return true;
+};
+
+export const countByKey = (list: ObjectAny[], key: string): ObjectNumber => {
+  return list.reduce((acc: ObjectNumber, value) => {
+    let ext = value[key as keyof typeof value];
+    if (key == 'name') {
+      const extension = value[key] as string;
+      ext = extension.split('.').at(-1) || '';
+    }
+    acc[ext] = (acc[ext] || 0) + 1;
+    return acc;
+  }, {});
 };

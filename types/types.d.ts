@@ -253,3 +253,7 @@ export type StageUpdate = Pick<
   Stages,
   'bachelorCost' | 'professionalCost' | 'groupId'
 >;
+export type ObjectNumber = { [key: string]: number };
+export type ObjectAny = {
+  [key: string]: number | string;
+};

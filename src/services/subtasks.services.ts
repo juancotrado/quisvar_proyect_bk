@@ -4,8 +4,8 @@ import AppError from '../utils/appError';
 import { copyFileSync, renameSync } from 'fs';
 import PathServices from './paths.services';
 import Queries from '../utils/queries';
-import { getRootItem, numberToConvert } from '../utils/tools';
-import { UpdateLevelBlock } from 'types/types';
+import { countByKey, getRootItem, numberToConvert } from '../utils/tools';
+import { ObjectNumber, UpdateLevelBlock } from 'types/types';
 class SubTasksServices {
   static GMT = 60 * 60 * 1000;
   static today = new Date().getTime();
@@ -211,13 +211,19 @@ class SubTasksServices {
           subTasksId: id,
           type: 'REVIEW',
           id: { in: filesList },
-          // feedback: { comment: { equals: null } },
         },
       });
       //-------------------------------------------------------------------
-      const _files = files.map(async (file, index) => {
-        const ext = file.name.split('.').at(-1);
-        const _name = item + name + `_${index + 1}` + '.' + ext;
+      const countExt = files.reduce((acc: ObjectNumber, value) => {
+        const ext = value.name.split('.').at(-1) || '';
+        acc[ext] = (acc[ext] || 0) + 1;
+        return acc;
+      }, {});
+      //-------------------------------------------------------------------
+      const _files = files.map(async file => {
+        const ext = file.name.split('.').at(-1) || '';
+        const index = countExt[ext] ? ` (${countExt[ext]})` : '';
+        const _name = item + name + index + '.' + ext;
 
         await prisma.files.update({
           where: { id: file.id },
