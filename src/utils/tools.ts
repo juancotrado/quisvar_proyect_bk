@@ -102,7 +102,7 @@ export const percentageSubTasks = (
     const totalCostPerUser = sumValues(newCost, 'total');
     //--------------------------------------------------------------------
     const price = totalCostPerUser
-      ? totalCostPerUser
+      ? totalCostPerUser * subtask.days
       : priceTask?.cost
       ? priceTask.cost * subtask.days
       : // : subtask.price;

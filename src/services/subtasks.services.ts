@@ -4,7 +4,7 @@ import AppError from '../utils/appError';
 import { copyFileSync, renameSync } from 'fs';
 import PathServices from './paths.services';
 import Queries from '../utils/queries';
-import { countByKey, getRootItem, numberToConvert } from '../utils/tools';
+import { getRootItem, numberToConvert } from '../utils/tools';
 import { ObjectNumber, UpdateLevelBlock } from 'types/types';
 class SubTasksServices {
   static GMT = 60 * 60 * 1000;
@@ -292,7 +292,6 @@ class SubTasksServices {
             return { dir, name, ...file };
           })
         );
-        console.log(parseFiles);
         //-------------------------------------------------------------------------------
         const files = parseFiles.map(f => ({ id: 0, ...f }));
         return { item, files, ...subtask };

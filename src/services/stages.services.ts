@@ -95,15 +95,16 @@ class StageServices {
     });
     //--------------------------------------------------------------------
     const valueCost = () => {
+      const estadia = 1000;
       const listCost: ListCostType = {
         cost: 0,
-        bachelor: round2Decimal(bachelorCost),
-        professional: round2Decimal(professionalCost),
+        bachelor: round2Decimal(bachelorCost + estadia),
+        professional: round2Decimal(professionalCost + estadia),
       };
       if (typeCost === 'bachelor')
-        return { ...listCost, cost: round2Decimal(bachelorCost) };
+        return { ...listCost, cost: round2Decimal(bachelorCost + estadia) };
       if (typeCost === 'professional')
-        return { ...listCost, cost: round2Decimal(professionalCost) };
+        return { ...listCost, cost: round2Decimal(professionalCost + estadia) };
       return { ...listCost, cost: undefined };
     };
     //--------------------------------------------------------------------
