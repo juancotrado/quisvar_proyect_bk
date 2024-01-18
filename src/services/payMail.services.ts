@@ -119,7 +119,7 @@ class PayMailServices {
   ) {
     const typeMail: PayMail['type'] = 'SENDER';
     const role: PayMail['role'] = 'MAIN';
-    const status = true;
+    const status: PayMail['status'] = true;
     const createPayMessage = await prisma.payMessages.create({
       data: {
         title,

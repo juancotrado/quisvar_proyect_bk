@@ -170,53 +170,53 @@ const storageGeneralFiles = multer.diskStorage({
   },
 });
 
-const storageFileMail = multer.diskStorage({
-  destination: (req, file, callback) => {
-    try {
-      const uploadPath = `public/mail`;
-      if (!existsSync(uploadPath)) {
-        mkdirSync(uploadPath, { recursive: true });
-      }
-      callback(null, uploadPath);
-    } catch (error) {
-      callback(new AppError(`Oops! ,no existe la ruta`, 404), '');
-    }
-  },
-  filename: (req, file, callback) => {
-    try {
-      const uniqueSuffix = Date.now();
-      const { originalname } = file;
-      if (originalname.includes('$')) throw new Error();
-      const nameFile = uniqueSuffix + '$' + originalname;
-      callback(null, nameFile);
-    } catch (error) {
-      callback(new AppError(`Oops! , archivo contiene "$"`, 404), '');
-    }
-  },
-});
+// const storageFileMail = multer.diskStorage({
+//   destination: (req, file, callback) => {
+//     try {
+//       const uploadPath = `public/mail`;
+//       if (!existsSync(uploadPath)) {
+//         mkdirSync(uploadPath, { recursive: true });
+//       }
+//       callback(null, uploadPath);
+//     } catch (error) {
+//       callback(new AppError(`Oops! ,no existe la ruta`, 404), '');
+//     }
+//   },
+//   filename: (req, file, callback) => {
+//     try {
+//       const uniqueSuffix = Date.now();
+//       const { originalname } = file;
+//       if (originalname.includes('$')) throw new Error();
+//       const nameFile = uniqueSuffix + '$' + originalname;
+//       callback(null, nameFile);
+//     } catch (error) {
+//       callback(new AppError(`Oops! , archivo contiene "$"`, 404), '');
+//     }
+//   },
+// });
 
-const storageFileVoucher = multer.diskStorage({
-  destination: (req, file, callback) => {
-    try {
-      const uploadPath = `public/voucher`;
-      if (!existsSync(uploadPath)) mkdirSync(uploadPath, { recursive: true });
-      callback(null, uploadPath);
-    } catch (error) {
-      callback(new AppError(`Oops! ,no existe la ruta`, 404), '');
-    }
-  },
-  filename: (req, file, callback) => {
-    try {
-      const uniqueSuffix = Date.now();
-      const { originalname } = file;
-      if (originalname.includes('$')) throw new Error();
-      const nameFile = uniqueSuffix + '$' + originalname;
-      callback(null, nameFile);
-    } catch (error) {
-      callback(new AppError(`Oops! , archivo contiene "$"`, 404), '');
-    }
-  },
-});
+// const storageFileVoucher = multer.diskStorage({
+//   destination: (req, file, callback) => {
+//     try {
+//       const uploadPath = `public/voucher`;
+//       if (!existsSync(uploadPath)) mkdirSync(uploadPath, { recursive: true });
+//       callback(null, uploadPath);
+//     } catch (error) {
+//       callback(new AppError(`Oops! ,no existe la ruta`, 404), '');
+//     }
+//   },
+//   filename: (req, file, callback) => {
+//     try {
+//       const uniqueSuffix = Date.now();
+//       const { originalname } = file;
+//       if (originalname.includes('$')) throw new Error();
+//       const nameFile = uniqueSuffix + '$' + originalname;
+//       callback(null, nameFile);
+//     } catch (error) {
+//       callback(new AppError(`Oops! , archivo contiene "$"`, 404), '');
+//     }
+//   },
+// });
 
 const storageReportUser = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -261,12 +261,12 @@ export const uploadReportUser = multer({
   storage: storageReportUser,
 });
 
-export const uploadFileMail = multer({
-  storage: storageFileMail,
-});
-export const uploadFileVoucher = multer({
-  storage: storageFileVoucher,
-});
+// export const uploadFileMail = multer({
+//   storage: storageFileMail,
+// });
+// export const uploadFileVoucher = multer({
+//   storage: storageFileVoucher,
+// });
 export const uploadFileSpecialist = multer({
   storage: storageFileSpecialist,
 });

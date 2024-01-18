@@ -14,6 +14,7 @@ class Queries {
           phone: true,
           degree: true,
           description: true,
+          job: true,
         },
       },
     },

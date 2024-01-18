@@ -143,7 +143,7 @@ class SubTasksServices {
 
   static async updateStatus(
     id: SubTasks['id'],
-    { status }: SubTasks,
+    { status, filesId }: SubTasks & { filesId?: number[] },
     user: Users
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
@@ -205,11 +205,13 @@ class SubTasksServices {
       const editablesPath = path.replace('projects', 'editables');
       const dir = reviewPath.split('/').slice(0, 5).join('/');
       //------------------------------------------------------------------
+      const filesList = filesId ? filesId : [];
       const files = await prisma.files.findMany({
         where: {
           subTasksId: id,
           type: 'REVIEW',
-          feedback: { comment: { equals: null } },
+          id: { in: filesList },
+          // feedback: { comment: { equals: null } },
         },
       });
       //-------------------------------------------------------------------
