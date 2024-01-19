@@ -7,7 +7,7 @@ import {
   getSpecialistById,
 } from '../controllers';
 import { _admin_role } from '../middlewares/role.middleware';
-import { uploadFileSpecialist } from '../middlewares/upload.middleware';
+import { uploads } from '../middlewares';
 const router = Router();
 router.use(authenticateHandler);
 router.use(_admin_role);
@@ -16,7 +16,10 @@ router.get('/dni/:dni', getSpecialistByDNI);
 router.get('/information/:id', getSpecialistById);
 router.post(
   '/',
-  uploadFileSpecialist.fields([{ name: 'fileAgreement' }, { name: 'fileCv' }]),
+  uploads.fileSpecialist.fields([
+    { name: 'fileAgreement' },
+    { name: 'fileCv' },
+  ]),
   createSpecialist
 );
 export default router;

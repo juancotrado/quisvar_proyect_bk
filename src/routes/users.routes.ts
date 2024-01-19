@@ -14,11 +14,7 @@ import {
   _mod_role,
   _employee_role,
 } from '../middlewares/role.middleware';
-import {
-  acceptFormData,
-  uploadFileUser,
-} from '../middlewares/upload.middleware';
-import { verifyUniqueParam } from '../middlewares/user.middleware';
+import { uploads } from '../middlewares';
 
 const router = Router();
 router.use(authenticateHandler);
@@ -36,7 +32,7 @@ router.post(
   '/',
   // acceptFormData,
   // verifyUniqueParam,
-  uploadFileUser.fields([
+  uploads.fileUser.fields([
     { name: 'fileUserCv' },
     { name: 'fileUserDeclaration' },
   ]),

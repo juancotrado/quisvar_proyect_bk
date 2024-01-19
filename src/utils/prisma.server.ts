@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === 'production') {
   console.log('Database is under Production');
 } else {
   if (!global.db) {
-    console.log('Database is under Development');
+    console.log('🚧 Database is under development 🚧');
     global.db = new PrismaClient();
     global.db.$connect();
   }

@@ -8,8 +8,9 @@ import { convertToUtf8 } from '../utils/tools';
 
 const MAX_SIZE = 1024 * 1000 * 1000 * 1000;
 // const FILE_TYPES = ['.rar', '.zip'];
-
 class StorageConfig {
+  public ExtNotAllowed: string[] = ['exe', 'bat', 'sh'];
+
   public setUp(path: string, pattern?: string, name?: string) {
     return multer.diskStorage({
       destination: (req, file, callback) => {
@@ -17,10 +18,19 @@ class StorageConfig {
         callback(null, path);
       },
       filename: (req, { originalname }, callback) => {
-        const patt = pattern ? pattern : '$$';
-        const parseFileName = Date.now() + patt + originalname;
-        const fileName = name ? name : parseFileName;
-        callback(null, fileName);
+        const ext = originalname.split('.').at(-1);
+        try {
+          if (this.ExtNotAllowed.includes(`${ext}`)) throw new Error();
+          const patt = pattern ? pattern : '$$';
+          const parseFileName = Date.now() + patt + originalname;
+          const fileName = name ? name : convertToUtf8(parseFileName);
+          callback(null, fileName);
+        } catch (error) {
+          callback(
+            new AppError(`Oops! ,extension ${ext} no permitida`, 404),
+            ''
+          );
+        }
       },
     });
   }
@@ -49,6 +59,114 @@ class StorageConfig {
     });
   }
 }
+
+const BlackList = new StorageConfig().ExtNotAllowed;
+
+const storage = multer.diskStorage({
+  destination: async (req, file, callback) => {
+    try {
+      const { id } = req.params;
+      const _subtask_id = parseInt(id);
+      const status = req.query.status as Files['type'];
+      const path = await PathServices.subTask(_subtask_id, status);
+      callback(null, path);
+    } catch (error) {
+      callback(new AppError(`No se pudo encontrar la ruta`, 404), '');
+    }
+  },
+  filename: async (req, { originalname }, callback) => {
+    const ext = originalname.split('.').at(-1) || '';
+    try {
+      if (BlackList.includes(ext) || originalname.includes('$'))
+        throw new Error();
+      const uniqueSuffix = Date.now();
+      callback(null, convertToUtf8(uniqueSuffix + '$$' + originalname));
+    } catch (error) {
+      callback(
+        new AppError(`Oops! , envie archivos con extension no repetida`, 404),
+        ''
+      );
+    }
+  },
+});
+
+const storageFileUser = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const typeFileUser = req.query.typeFile as TypeFileUser;
+    let uploadPath;
+    if (typeFileUser) {
+      uploadPath = `public/${typeFileUser}`;
+    } else {
+      uploadPath =
+        file.fieldname === 'fileUserDeclaration'
+          ? 'public/declaration'
+          : `public/cv`;
+    }
+    if (!existsSync(uploadPath)) {
+      mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: function (req, { originalname }, cb) {
+    const ext = originalname.split('.').at(-1) || '';
+    try {
+      if (BlackList.includes(ext)) throw new Error();
+      cb(null, convertToUtf8(Date.now() + '$$' + originalname));
+    } catch (error) {
+      cb(
+        new AppError(`Oops! , envie archivos con extension no repetida`, 404),
+        ''
+      );
+    }
+  },
+});
+
+const storageFileSpecialist = multer.diskStorage({
+  destination: function (req, file, cb) {
+    let uploadPath = 'public/cv';
+    if (file.fieldname === 'fileAgreement') {
+      uploadPath = `public/agreement`;
+    }
+    if (!existsSync(uploadPath)) {
+      mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: function (req, { originalname }, cb) {
+    const ext = originalname.split('.').at(-1) || '';
+    try {
+      if (BlackList.includes(ext)) throw new Error();
+      cb(null, convertToUtf8(Date.now() + '$$' + originalname));
+    } catch (error) {
+      cb(new AppError(`Oops! ,extension ${ext} no permitida`, 404), '');
+    }
+  },
+});
+
+const storageReportUser = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = `public/reports`;
+    if (!existsSync(uploadPath)) {
+      mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: async (req, file, callback) => {
+    try {
+      const uniqueSuffix = Date.now();
+      const { originalname } = file;
+      if (!originalname.includes('.pdf') || originalname.includes('$'))
+        throw new Error();
+      const nameFile = uniqueSuffix + '$' + originalname;
+      callback(null, convertToUtf8(nameFile));
+    } catch (error) {
+      callback(
+        new AppError(`Oops! , archivo sin extension pdf o contiene "$"`, 404),
+        ''
+      );
+    }
+  },
+});
 
 class Stogares extends StorageConfig {
   public companies: multer.Multer = multer({
@@ -90,89 +208,62 @@ class Stogares extends StorageConfig {
   public fileMail: multer.Multer = multer({
     storage: this.setUp('public/mail'),
   });
+
   public fileGroup: multer.Multer = multer({
     storage: this.setUp('public/groups/daily'),
   });
+
+  public upload: multer.Multer = multer({
+    storage: storage,
+    limits: { fileSize: MAX_SIZE },
+  });
+
+  public fileUser: multer.Multer = multer({
+    storage: storageFileUser,
+  });
+
+  public reportUser: multer.Multer = multer({
+    storage: storageReportUser,
+  });
+
+  public fileSpecialist: multer.Multer = multer({
+    storage: storageFileSpecialist,
+  });
 }
 
-const storage = multer.diskStorage({
-  destination: async (req, file, callback) => {
-    try {
-      const { id } = req.params;
-      const _subtask_id = parseInt(id);
-      const status = req.query.status as Files['type'];
-      const path = await PathServices.subTask(_subtask_id, status);
-      callback(null, path);
-    } catch (error) {
-      callback(new AppError(`No se pudo encontrar la ruta`, 404), '');
-    }
-  },
-  filename: async (req, file, callback) => {
-    try {
-      const uniqueSuffix = Date.now();
-      const { originalname } = file;
-      if (originalname.includes('$')) throw new Error();
-      callback(null, convertToUtf8(uniqueSuffix + '$$' + file.originalname));
-    } catch (error) {
-      callback(
-        new AppError(`Oops! , envie archivos con extension no repetida`, 404),
-        ''
-      );
-    }
-  },
-});
+// export const acceptFormData = multer().any();
 
-const storageFileUser = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const typeFileUser = req.query.typeFile as TypeFileUser;
-    let uploadPath;
-    if (typeFileUser) {
-      uploadPath = `public/${typeFileUser}`;
-    } else {
-      uploadPath =
-        file.fieldname === 'fileUserDeclaration'
-          ? 'public/declaration'
-          : `public/cv`;
-    }
-    if (!existsSync(uploadPath)) {
-      mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: function (req, files, cb) {
-    const { originalname } = files;
-    cb(null, convertToUtf8(Date.now() + '$$' + originalname));
-  },
-});
-const storageFileSpecialist = multer.diskStorage({
-  destination: function (req, file, cb) {
-    let uploadPath = 'public/cv';
-    if (file.fieldname === 'fileAgreement') {
-      uploadPath = `public/agreement`;
-    }
-    if (!existsSync(uploadPath)) {
-      mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: function (req, files, cb) {
-    const { originalname } = files;
-    cb(null, convertToUtf8(Date.now() + '$$' + originalname));
-  },
-});
+export default new Stogares();
 
-const storageGeneralFiles = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadPath = `public/general`;
-    if (!existsSync(uploadPath)) {
-      mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '$$' + convertToUtf8(file.originalname));
-  },
-});
+// export const upload = multer({
+//   storage: storage,
+//   limits: { fileSize: MAX_SIZE },
+// });
+
+// export const uploadFileUser = multer({
+//   storage: storageFileUser,
+// });
+
+// export const uploadReportUser = multer({
+//   storage: storageReportUser,
+// });
+
+// export const uploadFileSpecialist = multer({
+//   storage: storageFileSpecialist,
+// });
+
+// const storageGeneralFiles = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     const uploadPath = `public/general`;
+//     if (!existsSync(uploadPath)) {
+//       mkdirSync(uploadPath, { recursive: true });
+//     }
+//     cb(null, uploadPath);
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, Date.now() + '$$' + convertToUtf8(file.originalname));
+//   },
+// });
 
 // const storageFileMail = multer.diskStorage({
 //   destination: (req, file, callback) => {
@@ -222,48 +313,9 @@ const storageGeneralFiles = multer.diskStorage({
 //   },
 // });
 
-const storageReportUser = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadPath = `public/reports`;
-    if (!existsSync(uploadPath)) {
-      mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: async (req, file, callback) => {
-    try {
-      const uniqueSuffix = Date.now();
-      const { originalname } = file;
-      if (!originalname.includes('.pdf') || originalname.includes('$'))
-        throw new Error();
-      const nameFile = uniqueSuffix + '$' + originalname;
-      callback(null, convertToUtf8(nameFile));
-    } catch (error) {
-      callback(
-        new AppError(`Oops! , archivo sin extension pdf o contiene "$"`, 404),
-        ''
-      );
-    }
-  },
-});
-
-export const acceptFormData = multer().any();
-
-export const upload = multer({
-  storage: storage,
-  limits: { fileSize: MAX_SIZE },
-});
-
-export const uploadFileUser = multer({
-  storage: storageFileUser,
-});
-export const uploadGeneralFiles = multer({
-  storage: storageGeneralFiles,
-});
-
-export const uploadReportUser = multer({
-  storage: storageReportUser,
-});
+// export const uploadGeneralFiles = multer({
+//   storage: storageGeneralFiles,
+// });
 
 // export const uploadFileMail = multer({
 //   storage: storageFileMail,
@@ -271,11 +323,6 @@ export const uploadReportUser = multer({
 // export const uploadFileVoucher = multer({
 //   storage: storageFileVoucher,
 // });
-export const uploadFileSpecialist = multer({
-  storage: storageFileSpecialist,
-});
-
-export default new Stogares();
 
 // const storageImgCompanies = multer.diskStorage({
 //   destination: function (req, file, cb) {
