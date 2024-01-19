@@ -13,6 +13,7 @@ import PathServices from './paths.services';
 import { ListCostType, StageUpdate, TypeCost, usersCount } from 'types/types';
 
 class StageServices {
+  public static estadia = 1000;
   static async findMany(projectId: Projects['id']) {
     const findStages = await prisma.stages.findMany({
       where: { projectId },
@@ -95,16 +96,21 @@ class StageServices {
     });
     //--------------------------------------------------------------------
     const valueCost = () => {
-      const estadia = 1000;
       const listCost: ListCostType = {
         cost: 0,
-        bachelor: round2Decimal(bachelorCost + estadia),
-        professional: round2Decimal(professionalCost + estadia),
+        bachelor: round2Decimal(bachelorCost + this.estadia),
+        professional: round2Decimal(professionalCost + this.estadia),
       };
       if (typeCost === 'bachelor')
-        return { ...listCost, cost: round2Decimal(bachelorCost + estadia) };
+        return {
+          ...listCost,
+          cost: round2Decimal(bachelorCost + this.estadia),
+        };
       if (typeCost === 'professional')
-        return { ...listCost, cost: round2Decimal(professionalCost + estadia) };
+        return {
+          ...listCost,
+          cost: round2Decimal(professionalCost + this.estadia),
+        };
       return { ...listCost, cost: undefined };
     };
     //--------------------------------------------------------------------
