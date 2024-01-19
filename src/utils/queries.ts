@@ -44,6 +44,7 @@ class Queries {
           firstName: true,
           lastName: true,
           dni: true,
+          description: true,
         },
       },
     },

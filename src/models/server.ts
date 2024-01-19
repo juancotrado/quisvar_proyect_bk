@@ -192,9 +192,9 @@ class Server {
     this.httpServer.listen(this.PORT, async () => {
       if (this.PORT && this.HOST) {
         prisma;
-        console.log(
-          `Servidor desplegado en 🚀 ==> http://${this.HOST}:${this.PORT}/`
-        );
+        const server = `http://${this.HOST}:${this.PORT}`;
+        console.log(`Servidor desplegado en 🚀 ==> ${server}`);
+        console.log(`Ver Docs en 🚀 ==> ${server}/api-docs`);
         await setAdmin();
       } else {
         console.log('No se pudo conectar al servidor 😥');

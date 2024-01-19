@@ -1,5 +1,8 @@
 import AppError from '../utils/appError';
 import { Projects, Users, prisma } from '../utils/prisma.server';
+import Queries from '../utils/queries';
+import { DEGREE_DATA, round2Decimal, roundTwoDecimail } from '../utils/tools';
+import StageServices from './stages.services';
 
 class ReportsServices {
   static async getReportByUser(
@@ -10,10 +13,14 @@ class ReportsServices {
   ) {
     if (!userId) throw new AppError('Oops!, ID invalido', 400);
     const GMT = 60 * 60 * 1000;
+    //----------------------- Time to 000Z --------------------------
     const _startDate = new Date(initialDate).getTime();
     const _endDate = new Date(untilDate).getTime();
     const startOfDay = new Date(_startDate + GMT * 5);
     const endOfDay = new Date(_endDate + GMT * 29 - 1);
+    /*---------------------- User Details ------------------------------------
+      This section deals with user information and details.
+    */
     const user = await prisma.users.findUnique({
       where: { id: userId },
       select: {
@@ -30,6 +37,34 @@ class ReportsServices {
         },
       },
     });
+    if (!user) throw new AppError('Oops!, ID invalido', 400);
+    /*------------------------ Get user degree ----------------------------------
+      This section deals show user details on attendance.
+    */
+    const findDegreeUser = DEGREE_DATA.find(({ values }) =>
+      values.some(({ value }) => value === user.profile?.degree)
+    );
+    /*------------------------ User Attendance ----------------------------------
+      This section deals show user details on attendance.
+    */
+    const list = await prisma.listOnUsers.groupBy({
+      by: ['status'],
+      where: {
+        usersId: userId,
+        assignedAt: { gte: startOfDay, lte: endOfDay },
+      },
+      _count: { status: true },
+    });
+    const attendance = list.reduce((acc: { [key: string]: number }, _list) => {
+      const status = _list.status;
+      if (!acc[status]) acc[status] = 0;
+      acc[status] = _list._count.status;
+      return acc;
+    }, {});
+    /* --------------------------- Subtasks by User ------------------------------
+      This section, user tasks are filtered based on their status, start date,
+      and until date.
+    */
     const reportList = await prisma.taskOnUsers.findMany({
       where: {
         assignedAt: { gte: startOfDay, lte: endOfDay },
@@ -45,31 +80,20 @@ class ReportsServices {
             item: true,
             days: true,
             status: true,
-            description: true,
-            price: true,
             name: true,
-            feedBacks: true,
+            // feedBacks: true,
             users: true,
             Levels: {
               select: {
                 stages: {
                   select: {
-                    moderator: {
-                      select: {
-                        profile: {
-                          select: {
-                            userId: true,
-                            firstName: true,
-                            lastName: true,
-                            description: true,
-                          },
-                        },
-                      },
-                    },
+                    name: true,
+                    bachelorCost: true,
+                    professionalCost: true,
+                    moderator: Queries.selectProfileShort,
                     project: {
                       select: {
                         id: true,
-                        name: true,
                       },
                     },
                   },
@@ -80,7 +104,16 @@ class ReportsServices {
         },
       },
     });
+    if (!reportList) new AppError('no se pudo encontrar los registros', 404);
+    /* ---------------------- Project List ----------------------------------------
+     This section details the list of existing projects
+    */
+    const getProjectIds = reportList.map(
+      ({ subtask }) => subtask.Levels.stages.project.id
+    );
+    const projectIdList = [...new Set(getProjectIds)];
     const projectList = await prisma.projects.findMany({
+      where: { id: { in: projectIdList } },
       select: {
         id: true,
         name: true,
@@ -96,44 +129,40 @@ class ReportsServices {
         },
       },
     });
-    //----------------------------------------------------------------------------
-    const list = await prisma.listOnUsers.groupBy({
-      by: ['status'],
-      where: {
-        usersId: userId,
-        assignedAt: { gte: startOfDay, lte: endOfDay },
-      },
-      _count: { status: true },
-    });
-    const attendance = list.reduce((acc: { [key: string]: number }, _list) => {
-      const status = _list.status;
-      if (!acc[status]) acc[status] = 0;
-      acc[status] = _list._count.status;
-      return acc;
-    }, {});
-    //----------------------------------------------------------------------------
-    if (!user) throw new AppError('Oops!, ID invalido', 400);
-    if (!reportList) new AppError('no se pudo encontrar los registros', 404);
+    /* ---------------------- Transform Data by Price per Role ----------------------
+      This section transforms the given data by accumulating prices for each bachelor
+      or professional role.
+    */
     const newReport = reportList.map(({ subtask, ...data }) => {
-      const project = subtask.Levels.stages.project;
-      const { Levels, ..._subTask } = subtask;
-      console.log(Levels);
-      return { ...data, ..._subTask, project };
+      const { stages } = subtask.Levels;
+      const { project, bachelorCost, professionalCost } = stages;
+      //------------------------ Calculate pricing per degree --------------------------
+      const degreePrice =
+        findDegreeUser?.degree == 'bachelor'
+          ? bachelorCost
+          : findDegreeUser?.degree === 'professional'
+          ? professionalCost
+          : 0;
+      //------------------------ Add pricing per degree --------------------------
+      const price = subtask.days * round2Decimal(degreePrice);
+      const stayPrice = round2Decimal(StageServices.estadia);
+      const totalPrice = roundTwoDecimail(price + stayPrice);
+      const pricing = { price, stayPrice, totalPrice };
+      //------------------------------------------------------------------------
+      return { ...data, ...pricing, ...subtask, project };
     });
-    const newReportByList = projectList.map(_project => {
-      const subtasks = newReport.filter(
-        ({ project }) => project.id === _project.id
-      );
+    /* ---------------------- Parsing Subtask per Projects ----------------------------------------
+     This section details the list of existing subtask by projects
+    */
+    const projects = projectList.map(({ id, ..._project }) => {
+      const subtasksList = newReport.filter(({ project }) => project.id === id);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const newSubTask = subtasks.map(({ project, ...a }) => ({
-        ...a,
-      }));
-
-      return { ..._project, subtasks: newSubTask };
+      const subtasks = subtasksList.map(({ project, ...sub }) => ({ ...sub }));
+      return { ..._project, subtasks };
     });
-    const projects = newReportByList.filter(
-      project => project.subtasks.length !== 0
-    );
+    // const projects = newReportByList.filter(
+    //   project => project.subtasks.length !== 0
+    // );
     return { user, attendance, projects };
   }
 

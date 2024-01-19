@@ -573,6 +573,54 @@ paths:
           description: Imagen eliminada exitosamente
         '400':
           description: Datos no válidos
+  /reports/user/{id}:
+    get:
+      tags:
+        - reports
+      summary: Show Report By User
+      description: |-
+        Ver detalles para reporte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: integer
+        - name: status
+          in: query
+          required: true
+          description: Ingresar los estados de <b>[DONE,LIQUIDATION]</b>
+          example: DONE
+          schema:
+            type: string
+        - name: initial
+          in: query
+          required: true
+          description: Ingresar fecha inicial de reporte
+          schema:
+            type: string
+        - name: until
+          in: query
+          required: true
+          description: Ingresar fecha final de reporte
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Reporte Existente
+        '404':
+          description: No se pudo encontrar el reporte del usuario
+          content:
+            application/json:
+              example:
+                error: No se pudo encontrar el reporte
 components:
   securitySchemes:
     bearerAuth:
