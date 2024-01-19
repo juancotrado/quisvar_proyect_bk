@@ -1,8 +1,10 @@
+import { DegreeTypes, ObjectNumber } from 'types/types';
 import AppError from '../utils/appError';
 import { Projects, Users, prisma } from '../utils/prisma.server';
 import Queries from '../utils/queries';
-import { DEGREE_DATA, round2Decimal, roundTwoDecimail } from '../utils/tools';
+import { findDegree, round2Decimal, roundTwoDecimail } from '../utils/tools';
 import StageServices from './stages.services';
+import LicenseServices from './licenses.services';
 
 class ReportsServices {
   static async getReportByUser(
@@ -41,9 +43,10 @@ class ReportsServices {
     /*------------------------ Get user degree ----------------------------------
       This section deals show user details on attendance.
     */
-    const findDegreeUser = DEGREE_DATA.find(({ values }) =>
-      values.some(({ value }) => value === user.profile?.degree)
-    );
+    // const findDegreeUser = DEGREE_DATA.find(({ values }) =>
+    //   values.some(({ value }) => value === user.profile?.degree)
+    // );
+    const findDegreeUser = findDegree(user.profile?.degree as DegreeTypes);
     /*------------------------ User Attendance ----------------------------------
       This section deals show user details on attendance.
     */
@@ -55,12 +58,29 @@ class ReportsServices {
       },
       _count: { status: true },
     });
-    const attendance = list.reduce((acc: { [key: string]: number }, _list) => {
+    const attendance = list.reduce((acc: ObjectNumber, _list) => {
       const status = _list.status;
       if (!acc[status]) acc[status] = 0;
       acc[status] = _list._count.status;
       return acc;
     }, {});
+    /*------------------------ User Attendance ----------------------------------
+      This section deals show user details on attendance.
+    */
+    const listLicenses = await prisma.licenses.findMany({
+      where: {
+        usersId: userId,
+        createdAt: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+      select: {
+        checkout: true,
+        fine: true,
+      },
+    });
+    const license = LicenseServices.countFee(listLicenses);
     /* --------------------------- Subtasks by User ------------------------------
       This section, user tasks are filtered based on their status, start date,
       and until date.
@@ -163,7 +183,7 @@ class ReportsServices {
     // const projects = newReportByList.filter(
     //   project => project.subtasks.length !== 0
     // );
-    return { user, attendance, projects };
+    return { user, attendance, license, projects };
   }
 
   static async getSubTasksByProyect(projectId: Projects['id']) {

@@ -77,7 +77,7 @@ model Profiles {
   phone        String?  @unique
   phoneRef     String?  @default("")
   updatedAt    DateTime @updatedAt
-  degree       String?
+  degree       String   @default("Egresado")
   job          String?
   description  String?
   department   String?

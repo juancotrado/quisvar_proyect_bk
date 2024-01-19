@@ -1,3 +1,4 @@
+import { ObjectNumber } from 'types/types';
 import AppError from '../utils/appError';
 import { Licenses, prisma } from '../utils/prisma.server';
 
@@ -29,6 +30,7 @@ class LicenseServices {
     });
     return newLicence;
   }
+
   static async createFreeForAll(data: Licenses) {
     const getAllUsers = await prisma.users.findMany({
       where: {
@@ -65,6 +67,7 @@ class LicenseServices {
     });
     return newLicence;
   }
+
   static async update(
     id: Licenses['id'],
     {
@@ -94,6 +97,7 @@ class LicenseServices {
     });
     return updateList;
   }
+
   static async getLicenceById() {
     const licenses = await prisma.licenses.groupBy({
       by: ['usersId'],
@@ -117,6 +121,7 @@ class LicenseServices {
     ];
     return { licenses, mainData };
   }
+
   static async getLicensesByStatus(status: Licenses['status']) {
     const licenses = await prisma.licenses.findMany({
       where: status ? { status } : {},
@@ -126,6 +131,7 @@ class LicenseServices {
     });
     return licenses;
   }
+
   static async getLicensesEmployee(
     usersId: Licenses['usersId'],
     status?: Licenses['status']
@@ -142,6 +148,7 @@ class LicenseServices {
     });
     return licenses;
   }
+
   static async getLicensesFee(
     startDate: string,
     endDate: string,
@@ -165,19 +172,18 @@ class LicenseServices {
         fine: true,
       },
     });
-    function countFee(
-      data: Pick<Licenses, 'fine' | 'checkout'>[]
-    ): Record<string, number> {
-      return data.reduce((fee, item) => {
-        const fine = item.fine;
-        if (fine) {
-          fee[fine] = (fee[fine] || 0) + 1;
-        }
-        return fee;
-      }, {} as Record<string, number>);
-    }
-    return countFee(licenses);
+    return this.countFee(licenses);
   }
+
+  public static countFee(data: Pick<Licenses, 'fine' | 'checkout'>[]) {
+    const result: ObjectNumber = data.reduce((fee: typeof result, item) => {
+      const fine = item.fine;
+      if (fine) fee[fine] = (fee[fine] || 0) + 1;
+      return fee;
+    }, {});
+    return result;
+  }
+
   static async activeLicenses() {
     const GMT = 5 * 60 * 60 * 1000;
     const now = new Date();
@@ -198,6 +204,7 @@ class LicenseServices {
     });
     return licenses;
   }
+
   static async deleteExpiredLicenses() {
     await this.activeLicenses();
 
@@ -221,6 +228,7 @@ class LicenseServices {
     });
     return licenses;
   }
+
   static async deleteLicense(id: Licenses['id']) {
     const licenses = await prisma.licenses.delete({
       where: { id },
