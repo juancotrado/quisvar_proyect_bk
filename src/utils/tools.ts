@@ -517,3 +517,25 @@ export const timerDay = (date: string) => {
   const endOfDay = new Date(today + GMT * 29 - 1);
   return { startOfDay, endOfDay };
 };
+export const DEGREE_DATA: DegreeList[] = [
+  {
+    degree: 'bachelor',
+    values: [
+      { id: 1, value: 'Egresado' },
+      { id: 2, value: 'Bachiller' },
+    ],
+  },
+  {
+    degree: 'professional',
+    values: [
+      { id: 3, value: 'Titulado' },
+      { id: 4, value: 'Magister' },
+      { id: 5, value: 'Doctorado' },
+    ],
+  },
+];
+export const findDegree = (degree?: DegreeTypes) => {
+  return DEGREE_DATA.find(({ values }) =>
+    values.some(({ value }) => value === degree)
+  );
+};
