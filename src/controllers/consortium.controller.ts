@@ -14,7 +14,7 @@ export const createConsortium = async (
       ...body,
       img: img ? img[0].filename : '',
     });
-    res.status(200).json(query);
+    res.status(201).json(query);
   } catch (error) {
     next(error);
   }
@@ -54,7 +54,7 @@ export const updateById = async (
     const { id } = req.params;
     const body = req.body;
     const query = await ConsortiumServices.updateById(+id, body);
-    res.status(200).json(query);
+    res.status(201).json(query);
   } catch (error) {
     next(error);
   }
@@ -83,7 +83,7 @@ export const updateImg = async (
     const { img } = req.files as FilesProps;
     const image = img ? img[0].filename : '';
     const query = await ConsortiumServices.updateImg(image, +id);
-    res.status(200).json(query);
+    res.status(201).json(query);
   } catch (error) {
     next(error);
   }

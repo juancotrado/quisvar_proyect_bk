@@ -510,25 +510,10 @@ export const countByKey = (list: ObjectAny[], key: string): ObjectNumber => {
   }, {});
 };
 
-export const DEGREE_DATA: DegreeList[] = [
-  {
-    degree: 'bachelor',
-    values: [
-      { id: 1, value: 'Egresado' },
-      { id: 2, value: 'Bachiller' },
-    ],
-  },
-  {
-    degree: 'professional',
-    values: [
-      { id: 3, value: 'Titulado' },
-      { id: 4, value: 'Magister' },
-      { id: 5, value: 'Doctorado' },
-    ],
-  },
-];
-export const findDegree = (degree?: DegreeTypes) => {
-  return DEGREE_DATA.find(({ values }) =>
-    values.some(({ value }) => value === degree)
-  );
+export const timerDay = (date: string) => {
+  const GMT = 60 * 60 * 1000;
+  const today = new Date(date).getTime();
+  const startOfDay = new Date(today + GMT * 5);
+  const endOfDay = new Date(today + GMT * 29 - 1);
+  return { startOfDay, endOfDay };
 };
