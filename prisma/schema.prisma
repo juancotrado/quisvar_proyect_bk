@@ -35,6 +35,7 @@ model Users {
   equipment             Equipment?
   groups                GroupOnUsers[]
   moderatorOfGroup      Group[]
+  Attendance            AttendanceGroup[]
 }
 
 model WorkStation {
@@ -119,17 +120,44 @@ model Group {
   createdAt DateTime       @default(now())
   stage     Stages[]
   groups    GroupOnUsers[]
+  active    Boolean        @default(true)
   modId     Int?
   moderator Users?         @relation(fields: [modId], references: [id])
+  GroupList GroupList[]
 }
 
 model GroupOnUsers {
   userId  Int
   groupId Int
-  users   Users @relation(fields: [userId], references: [id])
-  groups  Group @relation(fields: [groupId], references: [id])
+  active  Boolean @default(true)
+  // Attendance AttendanceGroup[]
+  users   Users   @relation(fields: [userId], references: [id])
+  groups  Group   @relation(fields: [groupId], references: [id])
 
   @@id([userId, groupId])
+}
+
+model GroupList {
+  id         Int               @id @default(autoincrement())
+  file       String?
+  nombre     String?
+  createdAt  DateTime          @default(now())
+  groupId    Int
+  groups     Group             @relation(fields: [groupId], references: [id])
+  attendance AttendanceGroup[]
+}
+
+model AttendanceGroup {
+  id          Int         @id @default(autoincrement())
+  userId      Int
+  groupListId Int
+  description String?
+  punish      String?
+  status      ListDetails
+  createdAt   DateTime    @default(now())
+  group       GroupList   @relation(fields: [groupListId], references: [id])
+  user        Users       @relation(fields: [userId], references: [id])
+  // GroupOnUser GroupOnUsers @relation(fields: [userId, groupId], references: [userId, groupId])
 }
 
 model Projects {

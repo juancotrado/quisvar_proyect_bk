@@ -90,6 +90,9 @@ class Stogares extends StorageConfig {
   public fileMail: multer.Multer = multer({
     storage: this.setUp('public/mail'),
   });
+  public fileGroup: multer.Multer = multer({
+    storage: this.setUp('public/groups/daily'),
+  });
 }
 
 const storage = multer.diskStorage({

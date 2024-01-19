@@ -608,3 +608,11 @@ export const countByKey = (list: ObjectAny[], key: string): ObjectNumber => {
     return acc;
   }, {});
 };
+
+export const timerDay = (date: string) => {
+  const GMT = 60 * 60 * 1000;
+  const today = new Date(date).getTime();
+  const startOfDay = new Date(today + GMT * 5);
+  const endOfDay = new Date(today + GMT * 29 - 1);
+  return { startOfDay, endOfDay };
+};

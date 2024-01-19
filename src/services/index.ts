@@ -27,6 +27,7 @@ export { default as EquipmentServices } from './equipment.services';
 export { default as ContractServices } from './contract.services';
 export { default as ConsortiumServices } from './consortium.services';
 export { default as GroupServices } from './groups.services';
+export { default as AttendanceGroupService } from './attendanceGroup.services';
 
 export const rootPath = './uploads';
 export const indexPath = './index';
