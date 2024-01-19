@@ -2,7 +2,6 @@ import {
   Contratc,
   Files,
   FilesMessage,
-  IndexTasks,
   Levels,
   PayMail,
   MessageHistory,
@@ -10,11 +9,7 @@ import {
   Stages,
   SubTasks,
   Supervisor,
-  Task_lvl_2,
-  Task_lvl_3,
-  Tasks,
   Users,
-  WorkAreas,
   PayMessages,
 } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
@@ -50,25 +45,6 @@ export type User = {
       phone: string | null;
     } | null;
   };
-};
-
-export type PriceAreaTask = Pick<WorkAreas, 'id' | 'name' | 'item'> & {
-  indexTasks: PriceIndexTask[];
-};
-export type PriceIndexTask = Pick<IndexTasks, 'id' | 'name' | 'item'> & {
-  subTasks: PickSubtask[];
-  tasks: PriceTask[];
-};
-export type PriceTask = Pick<Tasks, 'id' | 'name' | 'item'> & {
-  subTasks: PickSubtask[];
-  tasks_2: PriceTaskLvl2[];
-};
-export type PriceTaskLvl2 = Pick<Task_lvl_2, 'id' | 'name' | 'item'> & {
-  subTasks: PickSubtask[];
-  tasks_3: PriceTaskLvl3[];
-};
-export type PriceTaskLvl3 = Pick<Task_lvl_3, 'id' | 'name' | 'item'> & {
-  subTasks: PickSubtask[];
 };
 
 export type TypeTables =
@@ -257,3 +233,13 @@ export type ObjectNumber = { [key: string]: number };
 export type ObjectAny = {
   [key: string]: number | string;
 };
+export type DegreeTypes =
+  | 'Titulado'
+  | 'Magister'
+  | 'Doctorado'
+  | 'Egresado'
+  | 'Bachiller';
+export interface DegreeList {
+  degree: TypeCost;
+  values: { id: number; value: DegreeTypes }[];
+}

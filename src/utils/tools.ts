@@ -1,17 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Levels, SubTasks, TaskRole } from '@prisma/client';
 import {
+  DegreeList,
+  DegreeTypes,
   GetFilterLevels,
   Level,
   ListCostType,
   ObjectAny,
   ObjectNumber,
   PickSubtask,
-  PriceAreaTask,
-  PriceIndexTask,
-  PriceTask,
-  PriceTaskLvl2,
-  PriceTaskLvl3,
   ProjectDir,
   SubTaskFilter,
   UpdateLevelBlock,
@@ -124,102 +121,6 @@ export const percentageSubTasks = (
       users,
       ...subtask,
       price,
-    };
-  });
-};
-
-export const priceTotalArea = (list: PriceAreaTask[], percentage: number) => {
-  return list.map(area => {
-    const indexTasks = priceTotalIndexTask(area.indexTasks, percentage);
-    const price = sumValues(indexTasks, 'price');
-    const spending = sumValues(indexTasks, 'spending');
-    const balance = price - spending;
-    const taskInfo = getQuantityDetail(indexTasks);
-    return { price, spending, balance, taskInfo, ...area, indexTasks };
-  });
-};
-
-export const priceTotalIndexTask = (
-  list: PriceIndexTask[],
-  percentage: number
-) => {
-  return list.map(indextask => {
-    const subTasks = parseSubTasks(indextask.subTasks, percentage);
-    const tasks = priceTotalTask(indextask.tasks, percentage);
-    const price =
-      sumValues(indextask.subTasks, 'price') + sumValues(tasks, 'price');
-    const spending =
-      sumValues(subTasks, 'spending') + sumValues(tasks, 'spending');
-    const balance = price - spending;
-    const taskInfo = getDetailsSubtask(subTasks, tasks);
-    return {
-      price,
-      spending,
-      balance,
-      taskInfo,
-      ...indextask,
-      subTasks,
-      tasks,
-    };
-  });
-};
-
-export const priceTotalTask = (list: PriceTask[], percentage: number) => {
-  return list.map(task => {
-    const subTasks = parseSubTasks(task.subTasks, percentage);
-    const tasks_2 = priceTotalTaskLvl2(task.tasks_2, percentage);
-    const price =
-      sumValues(task.subTasks, 'price') + sumValues(tasks_2, 'price');
-    const spending =
-      sumValues(subTasks, 'spending') + sumValues(tasks_2, 'spending');
-    const balance = price - spending;
-    const taskInfo = getDetailsSubtask(subTasks, tasks_2);
-    return { price, spending, balance, taskInfo, ...task, subTasks, tasks_2 };
-  });
-};
-
-export const priceTotalTaskLvl2 = (
-  list: PriceTaskLvl2[],
-  percentage: number
-) => {
-  return list.map(task_lvl_2 => {
-    const subTasks = parseSubTasks(task_lvl_2.subTasks, percentage);
-    const tasks_3 = priceTotalTaskLvl3(task_lvl_2.tasks_3, percentage);
-    const price =
-      sumValues(task_lvl_2.subTasks, 'price') + sumValues(tasks_3, 'price');
-    const spending =
-      sumValues(subTasks, 'spending') + sumValues(tasks_3, 'spending');
-    const balance = price - spending;
-    const taskInfo = getDetailsSubtask(subTasks, tasks_3);
-    return {
-      price,
-      spending,
-      balance,
-      taskInfo,
-      ...task_lvl_2,
-      subTasks,
-      tasks_3,
-    };
-  });
-};
-
-export const priceTotalTaskLvl3 = (
-  list: PriceTaskLvl3[],
-  percentage: number
-) => {
-  return list.map(task_lvl_3 => {
-    const price = sumValues(task_lvl_3.subTasks, 'price');
-    const subTasks = parseSubTasks(task_lvl_3.subTasks, percentage);
-    const spending = sumValues(subTasks, 'spending');
-    const taskInfo = getDetailsSubtask(subTasks);
-    const balance = price - spending;
-    return {
-      price,
-      spending,
-      balance,
-      taskInfo,
-      ...task_lvl_3,
-      subTasks,
     };
   });
 };
@@ -607,4 +508,27 @@ export const countByKey = (list: ObjectAny[], key: string): ObjectNumber => {
     acc[ext] = (acc[ext] || 0) + 1;
     return acc;
   }, {});
+};
+
+export const DEGREE_DATA: DegreeList[] = [
+  {
+    degree: 'bachelor',
+    values: [
+      { id: 1, value: 'Egresado' },
+      { id: 2, value: 'Bachiller' },
+    ],
+  },
+  {
+    degree: 'professional',
+    values: [
+      { id: 3, value: 'Titulado' },
+      { id: 4, value: 'Magister' },
+      { id: 5, value: 'Doctorado' },
+    ],
+  },
+];
+export const findDegree = (degree?: DegreeTypes) => {
+  return DEGREE_DATA.find(({ values }) =>
+    values.some(({ value }) => value === degree)
+  );
 };
