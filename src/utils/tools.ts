@@ -579,7 +579,8 @@ export const setAdmin = async () => {
       data: {
         email: `admin${new Date().getTime()}@admin.com`,
         password,
-        role: 'SUPER_ADMIN',
+        // role: 'SUPER_ADMIN',
+        roleId: 1,
         status: true,
         profile: {
           create: {

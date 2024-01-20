@@ -11,7 +11,7 @@ datasource db {
 model Users {
   id                    Int                @id @default(autoincrement())
   status                Boolean            @default(false)
-  role                  UserRole           @default(EMPLOYEE)
+  // role                  UserRole           @default(EMPLOYEE)
   password              String
   email                 String             @unique
   createdAt             DateTime           @default(now())
@@ -35,6 +35,8 @@ model Users {
   equipment             Equipment?
   groups                GroupOnUsers[]
   moderatorOfGroup      Group[]
+  roleId                Int                @unique
+  role                  Role               @relation(fields: [roleId], references: [id])
 }
 
 model WorkStation {
@@ -566,6 +568,48 @@ model Contratc {
   companyId    Int?
   consortium   Consortium? @relation(fields: [consortiumId], references: [id])
   company      Companies?  @relation(fields: [companyId], references: [id])
+}
+
+model Role {
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
+  users      Users?
+  menuPoints MenuPoints[]
+}
+
+model MenuPoints {
+  id            Int             @id @default(autoincrement())
+  typeRol       MenuRol
+  menuId        Int
+  subMenuPoints SubMenuPoints[]
+  roleId        Int?
+  role          Role?           @relation(fields: [roleId], references: [id], onDelete: Cascade)
+}
+
+model SubMenuPoints {
+  id           Int         @id @default(autoincrement())
+  typeRol      MenuRol
+  menuId       Int
+  menuPointsId Int?
+  menuPoints   MenuPoints? @relation(fields: [menuPointsId], references: [id], onDelete: Cascade)
+}
+
+enum MenuRol {
+  MOD
+  MEMBER
+  VIEWER
+}
+
+enum Menus {
+  home
+  tramites
+  especialidades
+  asistencia
+  lista_de_usuarios
+  empresas
+  especialistas
+  indice_general
+  grupos
 }
 
 enum UserRole {

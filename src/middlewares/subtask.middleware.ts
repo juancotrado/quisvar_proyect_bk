@@ -5,7 +5,7 @@ import { SubTasks, Users } from '../utils/prisma.server';
 import { SubTasksServices } from '../services';
 
 const permStatus: SubTasks['status'][] = ['UNRESOLVED', 'PROCESS', 'INREVIEW'];
-const permRole: Users['role'][] = ['ADMIN', 'MOD'];
+// const permRole: Users['role'][] = ['ADMIN', 'MOD'];
 type StatusType = { status: SubTasks['status'] };
 
 export const statusVerify = async (
@@ -16,13 +16,13 @@ export const statusVerify = async (
   try {
     const body = req.body as StatusType;
     const userInfo: UserType = res.locals.userInfo;
-    const { role } = userInfo;
-    if (!permRole.includes(role) && !permStatus.includes(body.status)) {
-      throw new AppError(
-        `No cuenta con permisos con ${body.status} para esta ruta`,
-        400
-      );
-    }
+    // const { role } = userInfo;
+    // if (!permRole.includes(role) && !permStatus.includes(body.status)) {
+    //   throw new AppError(
+    //     `No cuenta con permisos con ${body.status} para esta ruta`,
+    //     400
+    //   );
+    // }
     next();
   } catch (error) {
     next(error);

@@ -28,3 +28,4 @@ export { default as contractRoutes } from './contract.routes';
 export { default as consortiumRoutes } from './consortium.routes';
 export { default as groupsRoutes } from './groups.routes';
 export { default as payMailRoutes } from './paymail.routes';
+export { default as roleRoutes } from './role.routes';

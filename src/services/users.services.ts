@@ -7,9 +7,9 @@ import bcrypt from 'bcryptjs';
 class UsersServices {
   static async getAll() {
     const usersAdmin = await prisma.users.findMany({
-      where: {
-        role: { in: ['SUPER_ADMIN', 'ADMIN'] },
-      },
+      // where: {
+      //   role: { in: ['SUPER_ADMIN', 'ADMIN'] },
+      // },
       orderBy: { createdAt: 'asc' },
       include: {
         profile: true,
@@ -21,17 +21,17 @@ class UsersServices {
       },
     });
     const usersEmployes = await prisma.users.findMany({
-      where: {
-        role: {
-          in: [
-            'ASSISTANT',
-            'ASSISTANT_ADMINISTRATIVE',
-            'SUPER_MOD',
-            'MOD',
-            'EMPLOYEE',
-          ],
-        },
-      },
+      // where: {
+      //   role: {
+      //     in: [
+      //       'ASSISTANT',
+      //       'ASSISTANT_ADMINISTRATIVE',
+      //       'SUPER_MOD',
+      //       'MOD',
+      //       'EMPLOYEE',
+      //     ],
+      //   },
+      // },
       orderBy: { profile: { lastName: 'asc' } },
       include: {
         profile: true,
@@ -121,7 +121,6 @@ class UsersServices {
     degree,
     job,
     cv,
-    role,
     declaration,
     department,
     district,
@@ -146,7 +145,7 @@ class UsersServices {
         ruc,
         address,
         declaration,
-        role,
+        roleId: 1,
         profile: {
           create: {
             firstName,
@@ -176,15 +175,11 @@ class UsersServices {
     return newUser;
   }
 
-  static async update(
-    id: Users['id'],
-    { role, status }: Pick<Users, 'role' | 'status'>
-  ) {
+  static async update(id: Users['id'], { status }: Pick<Users, 'status'>) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateUser = await prisma.users.update({
       where: { id },
       data: {
-        role,
         status,
       },
     });

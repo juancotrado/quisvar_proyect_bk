@@ -1,14 +1,25 @@
 import {
-  Company,
+  Companies,
+  // Company,
   Consortium,
   Contratc,
+  MenuPoints,
   PersonBussiness,
   Profiles,
   Projects,
+  Role,
+  SubMenuPoints,
   TypeSpecialities,
-  UserRole,
+  // UserRole,
   Users,
 } from '@prisma/client';
+
+type MenuPointPick = Pick<MenuPoints, 'id' | 'menuId' | 'typeRol'> & {
+  subMenuPoints: Pick<SubMenuPoints, 'id' | 'menuId' | 'typeRol'>[];
+};
+export type RoleForMenuPick = Pick<Role, 'name'> & {
+  menuPoints: MenuPointPick[];
+};
 
 export type userProfilePick = Pick<
   Users & Profiles,
@@ -34,7 +45,7 @@ export type userProfilePick = Pick<
   | 'phoneRef'
   | 'room'
   | 'userPc'
-  | 'role'
+  // | 'role'
 >;
 
 export type projectPick = Pick<
@@ -65,7 +76,7 @@ export type UpdateProjectPick = Omit<
 };
 
 export type PersonBussinessType = Omit<PersonBussiness, 'id' | 'projectsId'>;
-export type CompanyType = Omit<Company, 'id' | 'projectsId' | 'consortiumId'>;
+export type CompanyType = Omit<Companies, 'id' | 'projectsId' | 'consortiumId'>;
 export type ConsortiumPick = Omit<Consortium, 'id' | 'projectId'>;
 export interface ConsortiumType extends ConsortiumPick {
   companies: CompanyType;
@@ -73,6 +84,6 @@ export interface ConsortiumType extends ConsortiumPick {
 export interface userHash {
   password: string;
   id: number;
-  role: UserRole;
+  // role: UserRole;
   profile: Pick<Profiles, 'firstName' | 'lastName' | 'dni' | 'phone'> | null;
 }

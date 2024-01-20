@@ -1,27 +1,29 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserType } from './auth.middleware';
-import { UserRole } from '@prisma/client';
+// import { UserRole } from '@prisma/client';
 import AppError from '../utils/appError';
 
 const roleHandler =
-  (roles: UserRole[]) => (req: Request, res: Response, next: NextFunction) => {
+  (roles: any[]) => (req: Request, res: Response, next: NextFunction) => {
     const userInfo: UserType = res.locals.userInfo;
-    const { role } = userInfo;
-    if (!roles.includes(role)) {
-      throw new AppError(`${role} no tiene acceso a esta ruta`, 400);
-    }
+    console.log(roles);
+    // const { role } = userInfo;
+    // if (!roles.includes(role)) {
+    //   throw new AppError(`${role} no tiene acceso a esta ruta`, 400);
+    // }
     next();
   };
 
 class Role {
   private InitiHandler =
-    (roles: UserRole[]) =>
-    (req: Request, res: Response, next: NextFunction) => {
+    (roles: any[]) => (req: Request, res: Response, next: NextFunction) => {
       const userInfo: UserType = res.locals.userInfo;
-      const { role } = userInfo;
-      if (!roles.includes(role)) {
-        throw new AppError(`${role} no tiene acceso a esta ruta`, 400);
-      }
+      console.log(roles);
+
+      // const { role } = userInfo;
+      // if (!roles.includes(role)) {
+      //   throw new AppError(`${role} no tiene acceso a esta ruta`, 400);
+      // }
       next();
     };
 
