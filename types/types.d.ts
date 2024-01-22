@@ -218,11 +218,13 @@ export type ContractForm = Pick<
   | 'consortiumId'
 >;
 
-export type TypeCost = 'bachelor' | 'professional';
+export type TypeCost = 'bachelor' | 'professional' | 'intern' | 'graduate';
 export interface ListCostType {
   cost?: number;
   bachelor: number;
   professional: number;
+  intern: number;
+  graduate: number;
 }
 
 export type StageUpdate = Pick<
@@ -238,7 +240,8 @@ export type DegreeTypes =
   | 'Magister'
   | 'Doctorado'
   | 'Egresado'
-  | 'Bachiller';
+  | 'Bachiller'
+  | 'Practicante';
 export interface DegreeList {
   degree: TypeCost;
   values: { id: number; value: DegreeTypes }[];

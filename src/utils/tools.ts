@@ -89,8 +89,14 @@ export const percentageSubTasks = (
       },
       []
     );
-    //---------------calculate-cost--------------------------------------
+    //----------------------------- Calculate - Cost-----------------------
     const newCost = listUsers.map(user => {
+      if (user.degree === 'Practicante') {
+        return { total: calculateCost(user.percentage, priceTask?.intern) };
+      }
+      if (user.degree === 'Egresado') {
+        return { total: calculateCost(user.percentage, priceTask?.graduate) };
+      }
       if (user.degree === 'Bachiller') {
         return { total: calculateCost(user.percentage, priceTask?.bachelor) };
       }
@@ -530,6 +536,14 @@ export const timerDay = (date: string) => {
   return { startOfDay, endOfDay };
 };
 export const DEGREE_DATA: DegreeList[] = [
+  {
+    degree: 'intern',
+    values: [{ id: 1, value: 'Practicante' }],
+  },
+  {
+    degree: 'graduate',
+    values: [{ id: 1, value: 'Egresado' }],
+  },
   {
     degree: 'bachelor',
     values: [

@@ -205,6 +205,8 @@ model Stages {
   //-----------------------------------------------------
   bachelorCost     Float    @default(0)
   professionalCost Float    @default(0)
+  graduateCost     Float    @default(0)
+  internCost       Float    @default(0)
   groupId          Int?
   group            Group?   @relation(fields: [groupId], references: [id])
   //-----------------------------------------------------

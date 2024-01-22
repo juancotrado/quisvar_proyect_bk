@@ -110,6 +110,8 @@ class ReportsServices {
                     name: true,
                     bachelorCost: true,
                     professionalCost: true,
+                    graduateCost: true,
+                    internCost: true,
                     moderator: Queries.selectProfileShort,
                     project: {
                       select: {
@@ -155,11 +157,21 @@ class ReportsServices {
     */
     const newReport = reportList.map(({ subtask, ...data }) => {
       const { stages } = subtask.Levels;
-      const { project, bachelorCost, professionalCost } = stages;
+      const {
+        project,
+        bachelorCost,
+        professionalCost,
+        graduateCost,
+        internCost,
+      } = stages;
       //------------------------ Calculate pricing per degree --------------------------
       const degreePrice =
         findDegreeUser?.degree == 'bachelor'
           ? bachelorCost
+          : findDegreeUser?.degree === 'graduate'
+          ? graduateCost
+          : findDegreeUser?.degree === 'intern'
+          ? internCost
           : findDegreeUser?.degree === 'professional'
           ? professionalCost
           : 0;

@@ -72,6 +72,8 @@ class StageServices {
       isProject,
       bachelorCost,
       professionalCost,
+      graduateCost,
+      internCost,
     } = findStage;
     const projectName = project.name;
     const getList = await prisma.levels.findMany({
@@ -94,12 +96,14 @@ class StageServices {
         },
       },
     });
-    //--------------------------------------------------------------------
+    //------------------------- Value cost per degree ----------------------
     const valueCost = () => {
       const listCost: ListCostType = {
         cost: 0,
         bachelor: round2Decimal(bachelorCost + this.estadia),
         professional: round2Decimal(professionalCost + this.estadia),
+        graduate: round2Decimal(professionalCost + this.estadia),
+        intern: round2Decimal(professionalCost + this.estadia),
       };
       if (typeCost === 'bachelor')
         return {
@@ -110,6 +114,16 @@ class StageServices {
         return {
           ...listCost,
           cost: round2Decimal(professionalCost + this.estadia),
+        };
+      if (typeCost === 'graduate')
+        return {
+          ...listCost,
+          cost: round2Decimal(graduateCost + this.estadia),
+        };
+      if (typeCost === 'intern')
+        return {
+          ...listCost,
+          cost: round2Decimal(internCost + this.estadia),
         };
       return { ...listCost, cost: undefined };
     };
