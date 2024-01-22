@@ -229,7 +229,11 @@ export interface ListCostType {
 
 export type StageUpdate = Pick<
   Stages,
-  'bachelorCost' | 'professionalCost' | 'groupId'
+  | 'bachelorCost'
+  | 'professionalCost'
+  | 'groupId'
+  | 'graduateCost'
+  | 'internCost'
 >;
 export type ObjectNumber = { [key: string]: number };
 export type ObjectAny = {

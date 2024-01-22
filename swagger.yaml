@@ -133,7 +133,7 @@ paths:
             example: DONE
         - name: typecost
           in: query
-          description: Tipo de Pago, puede usar <b> [professional, bachelor]</b>
+          description: Tipo de Pago, puede usar <b> [professional, bachelor, intern, graduate]</b>
           # required: false
           schema:
             type: string
@@ -749,15 +749,23 @@ components:
       required:
         - bachelorCost
         - professionalCost
+        - graduateCost
+        - internCost
         - groupId
       type: object
       properties:
         bachelorCost:
           type: integer
-          example: 14000
+          example: 34000
         professionalCost:
           type: integer
+          example: 24000
+        graduateCost:
+          type: integer
           example: 14000
+        internCost:
+          type: integer
+          example: 4000
         groupId:
           type: integer
           example: 2
