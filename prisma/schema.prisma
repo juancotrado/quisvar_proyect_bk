@@ -141,10 +141,23 @@ model GroupList {
   id         Int               @id @default(autoincrement())
   file       String?
   nombre     String?
+  title      String?
   createdAt  DateTime          @default(now())
   groupId    Int
   groups     Group             @relation(fields: [groupId], references: [id])
   attendance AttendanceGroup[]
+  duty       Duty[]
+}
+
+model Duty {
+  id          Int       @id @default(autoincrement())
+  description String?
+  fullName    String
+  startDate   DateTime  @default(now())
+  untilDate   DateTime
+  listId      Int
+  createdAt   DateTime  @default(now())
+  groupList   GroupList @relation(fields: [listId], references: [id])
 }
 
 model AttendanceGroup {

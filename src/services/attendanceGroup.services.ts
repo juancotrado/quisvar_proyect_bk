@@ -52,19 +52,61 @@ class AttendanceGroupService {
     const transformedData = [
       {
         id: mod?.moderator?.id,
-        firstName: mod?.moderator?.profile?.firstName,
-        lastName: mod?.moderator?.profile?.lastName,
+        description: '',
         status: 'PUNTUAL',
-      }, // Cambiar 'PUNTUAL' según sea necesario
+        user: {
+          profile: {
+            firstName: mod?.moderator?.profile?.firstName,
+            lastName: mod?.moderator?.profile?.lastName,
+          },
+        },
+      },
       ...users.map(user => ({
         id: user.users.id,
-        firstName: user.users.profile?.firstName,
-        lastName: user.users.profile?.lastName,
+        description: '',
         status: 'PUNTUAL',
+        user: {
+          profile: {
+            firstName: user.users.profile?.firstName,
+            lastName: user.users.profile?.lastName,
+          },
+        },
       })),
     ];
     return transformedData;
   }
+  // test
+  static async getListById(id: number) {
+    const integrantes = await prisma.attendanceGroup.findMany({
+      where: { groupListId: id },
+      select: {
+        userId: true,
+        description: true,
+        status: true,
+        user: {
+          select: {
+            id: true,
+            profile: {
+              select: {
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    const integrantesArray = integrantes.map(integrante => ({
+      id: integrante.user.id,
+      firstName: integrante.user.profile?.firstName,
+      lastName: integrante.user.profile?.lastName,
+      status: integrante.status,
+      description: integrante.description,
+    }));
+
+    return integrantesArray;
+  }
+
   //Group List
   static async createList(data: GroupList) {
     if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
@@ -95,7 +137,23 @@ class AttendanceGroupService {
         id: true,
         nombre: true,
         groupId: true,
-        attendance: true,
+        attendance: {
+          select: {
+            id: true,
+            description: true,
+            status: true,
+            user: {
+              select: {
+                profile: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
     return groupList;
@@ -140,7 +198,7 @@ class AttendanceGroupService {
     return consortiums;
   }
   //Attendance Group
-  static async create(data: AttendanceGroup) {
+  static async create(data: AttendanceGroup[]) {
     if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
     const attendance = await prisma.attendanceGroup.createMany({ data });
     return attendance;

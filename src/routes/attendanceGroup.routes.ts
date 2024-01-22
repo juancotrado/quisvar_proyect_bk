@@ -32,7 +32,7 @@ class AttendanceGroupRoutes {
       AttendanceGroupControllers.deleteListFile
     );
     //Attendance Group
-    this.router.post('/:date', AttendanceGroupControllers.createAttendance);
+    this.router.post('/relation', AttendanceGroupControllers.createAttendance);
     this.router.patch('/:id', AttendanceGroupControllers.updateAttendance);
   }
 }
