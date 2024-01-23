@@ -38,6 +38,7 @@ class StageServices {
           select: {
             id: true,
             name: true,
+            moderator: Queries.selectProfileUserForStage,
             groups: { select: { users: Queries.selectProfileUserForStage } },
           },
         },
