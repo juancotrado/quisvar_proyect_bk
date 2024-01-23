@@ -10,6 +10,7 @@ interface subMenu {
   [key: number]: Menu[];
 }
 interface Role {
+  id: number;
   name: string;
   menuPoints: RoleMenu[];
 }
@@ -19,31 +20,58 @@ interface RoleMenu {
   menu?: Menu;
   subMenuPoints?: RoleMenu[];
 }
-
+interface MenuHeader {
+  id: number;
+  typeRol: MenuRol;
+  route: string;
+  title: string;
+  menu?: (MenuHeader | undefined)[] | null;
+}
 export class MenuPoints {
   private menuPoints: Menu[] = MENU_POINTS;
   private subMenuPoints: subMenu = SUBMENU_POINTS;
 
-  public getMenuPoints(data: Role) {
-    const menuPoints = data.menuPoints;
-    menuPoints.forEach(men => {
-      men.menu = this.menuPoints.find(({ id }) => id === men.menuId);
-      if (men.menu) {
-        const subMenus = this.subMenuPoints[men.menuId] ?? null;
-        if (subMenus) {
-          men.subMenuPoints?.forEach(subMen => {
-            subMen.menu = subMenus.find(({ id }) => id === subMen.menuId);
-          });
-          men.menu.menu = men.subMenuPoints;
+  public roleTransform(data: Role) {
+    const { menuPoints, name, id } = data;
+    const newMenuPoints: (MenuHeader | undefined)[] = menuPoints.map(
+      menuPoint => {
+        const { menuId, typeRol, subMenuPoints } = menuPoint;
+        const findMenu = this.menuPoints.find(({ id }) => id === menuId);
+        if (!findMenu) return;
+        const { id, route, title } = findMenu;
+        let menu: (MenuHeader | undefined)[] | null = null;
+        if (subMenuPoints && subMenuPoints.length > 0) {
+          const subMenus = this.subMenuPoints[menuId] ?? null;
+          if (subMenus) {
+            menu = subMenuPoints.map(subMenuPoint => {
+              const { menuId, typeRol } = subMenuPoint;
+              const findSubMenu = subMenus.find(({ id }) => id === menuId);
+              if (!findSubMenu) return;
+              const { id, route, title } = findSubMenu;
+              return { id, typeRol, route, title };
+            });
+          }
         }
+        const menuPointsValues: MenuHeader = { id, typeRol, route, title };
+        if (menu) {
+          menuPointsValues.menu = menu;
+        }
+        return menuPointsValues;
       }
-    });
-    const menuPointsFilter = menuPoints.map(({ menuId, typeRol, menu }) => ({
-      menuId,
+    );
+
+    return { name, id, menu: newMenuPoints };
+  }
+  public getHeadersOptions(data: Role) {
+    const { id, name, menu } = this.roleTransform(data);
+    const menuFilter = menu.filter(men => !!men) as MenuHeader[];
+    const menuPoints = menuFilter.map(({ id, route, title, typeRol }) => ({
+      id,
+      route,
+      title,
       typeRol,
-      menu,
     }));
-    return { ...data, menuPoints: menuPointsFilter };
+    return { id, name, menuPoints };
   }
 }
 

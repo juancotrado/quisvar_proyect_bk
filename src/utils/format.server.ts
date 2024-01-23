@@ -45,7 +45,7 @@ export type userProfilePick = Pick<
   | 'phoneRef'
   | 'room'
   | 'userPc'
-  // | 'role'
+  | 'roleId'
 >;
 
 export type projectPick = Pick<

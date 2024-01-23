@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
 import { userHash } from '../utils/format.server';
 import AppError from '../utils/appError';
+import RoleService from './role.service';
 
 dotenv.config();
 const secret = process.env.SECRET;
@@ -31,10 +32,12 @@ export class authServices {
         },
       },
     });
+
     if (!user) throw new AppError('Usuario inexistente', 404);
     const verifyPassword = await bcrypt.compare(password, user.password);
     if (!verifyPassword) throw new AppError('contraseña incorrecta', 404);
-    return user;
+    const role = await RoleService.findGeneral(user.role.id);
+    return { ...user, role };
   }
 
   static getToken(data: userHash) {

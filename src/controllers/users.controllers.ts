@@ -81,6 +81,7 @@ export const createUser = async (
     });
     res.status(201).json(query);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };

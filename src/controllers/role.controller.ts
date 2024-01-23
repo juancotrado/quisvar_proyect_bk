@@ -3,9 +3,17 @@ import RoleService from '../services/role.service';
 import { RoleForMenuPick } from '../utils/format.server';
 
 export class RoleController {
-  public shows: ControllerFunction = async (req, res, next) => {
+  public showMenus: ControllerFunction = async (req, res, next) => {
     try {
-      const result = await RoleService.getAll();
+      const result = await RoleService.getAllMenus();
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public showsForForm: ControllerFunction = async (req, res, next) => {
+    try {
+      const result = await RoleService.getAllForForm();
       res.status(200).json(result);
     } catch (error) {
       next(error);

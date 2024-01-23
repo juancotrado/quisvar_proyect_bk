@@ -5,7 +5,7 @@ import { Role, prisma } from '../utils/prisma.server';
 
 const menuPoints = new MenuPoints();
 class RoleService {
-  static async getAll() {
+  static async getAllMenus() {
     const roles = await prisma.role.findMany({
       include: {
         menuPoints: {
@@ -20,6 +20,16 @@ class RoleService {
             },
           },
         },
+      },
+    });
+    if (roles.length === 0) throw new AppError('Aun no se creo ningu rol', 404);
+    return roles;
+  }
+  static async getAllForForm() {
+    const roles = await prisma.role.findMany({
+      select: {
+        id: true,
+        name: true,
       },
     });
     if (roles.length === 0) throw new AppError('Aun no se creo ningu rol', 404);
@@ -51,8 +61,7 @@ class RoleService {
 
   static async findGeneral(id: Role['id']) {
     const role = await RoleService.find(id);
-    console.log(role);
-    const menusWithRole = menuPoints.getMenuPoints(role);
+    const menusWithRole = menuPoints.getHeadersOptions(role);
     return menusWithRole;
   }
   static async create({ name, menuPoints }: RoleForMenuPick) {
