@@ -522,6 +522,7 @@ model PayMessages {
 model Messages {
   id          Int              @id @default(autoincrement())
   title       String
+  category    MessageCategory
   header      String
   description String
   status      MessageStatus    @default(PENDIENTE)
@@ -700,4 +701,9 @@ enum TypeItem {
   ABC
   ROM
   NUM
+}
+
+enum MessageCategory {
+  GLOBAL
+  DIRECT
 }
