@@ -37,6 +37,7 @@ import {
   groupsRoutes,
   payMailRoutes,
   AttendanceGroupRoutes,
+  DutyRoutes,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -91,6 +92,7 @@ class Server {
     consortium: `/${process.env.ROUTE}/consortium`,
     groups: `/${process.env.ROUTE}/groups`,
     attendanceGroup: `/${process.env.ROUTE}/attendanceGroup`,
+    duty: `/${process.env.ROUTE}/duty`,
   };
 
   constructor() {
@@ -182,6 +184,7 @@ class Server {
     this.app.use(this.path.consortium, consortiumRoutes);
     this.app.use(this.path.groups, groupsRoutes);
     this.app.use(this.path.attendanceGroup, AttendanceGroupRoutes);
+    this.app.use(this.path.duty, DutyRoutes);
     this.app.use(docs);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       res.locals.pageNotFound = this.rootDir + '/404_page/index.html';

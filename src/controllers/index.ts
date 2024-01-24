@@ -365,3 +365,4 @@ export { default as PayMailControllers } from './paymail.controllers';
 export { default as AuthController } from './auth.controllers';
 export { default as StagesControllers } from './stages.controllers';
 export { default as AttendanceGroupControllers } from './attendanceGroup.controller';
+export { default as DutyControllers } from './duty.controllers';

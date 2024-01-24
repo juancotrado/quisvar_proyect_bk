@@ -137,6 +137,7 @@ class AttendanceGroupService {
         id: true,
         nombre: true,
         groupId: true,
+        duty: true,
         attendance: {
           select: {
             id: true,

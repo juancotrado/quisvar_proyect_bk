@@ -29,3 +29,4 @@ export { default as consortiumRoutes } from './consortium.routes';
 export { default as groupsRoutes } from './groups.routes';
 export { default as payMailRoutes } from './paymail.routes';
 export { default as AttendanceGroupRoutes } from './attendanceGroup.routes';
+export { default as DutyRoutes } from './duty.routes';
