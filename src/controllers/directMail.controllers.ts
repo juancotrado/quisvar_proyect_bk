@@ -1,1 +1,2 @@
-export const aña = 'aña';
+class DirectMailController {}
+export default DirectMailController;
