@@ -2,9 +2,46 @@ import { Request, Response, NextFunction } from 'express';
 import { PayMailServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
-import { ParametersPayMail, PickMail, PickMessageReply } from 'types/types';
+import {
+  ParametersMail,
+  ParametersPayMail,
+  PickMail,
+  PickMessageReply,
+} from 'types/types';
 import { existsSync, mkdirSync, renameSync } from 'fs';
 import { PayMessages } from '@prisma/client';
+import { ControllerFunction } from 'types/patterns';
+import MailServices from '../services/mail.services';
+
+class MailControllers {
+  public showMesssages: ControllerFunction = async (req, res, next) => {
+    try {
+      const { skip, ...params } = req.query as ParametersMail;
+      const { id: userId }: UserType = res.locals.userInfo;
+      const newParams = { skip, ...params };
+      const query = await MailServices.getByUser(userId, 'GLOBAL', newParams);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
+export class MailDirectControllers {
+  public showMesssages: ControllerFunction = async (req, res, next) => {
+    try {
+      const { skip, ...params } = req.query as ParametersMail;
+      const { id: userId }: UserType = res.locals.userInfo;
+      const newParams = { skip, ...params };
+      const query = await MailServices.getByUser(userId, 'DIRECT', newParams);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
+export default MailControllers;
 
 export const showMessages = async (
   req: Request,
@@ -13,8 +50,7 @@ export const showMessages = async (
 ) => {
   try {
     const { skip, ...params } = req.query as ParametersPayMail;
-    const userInfo: UserType = res.locals.userInfo;
-    const userId = userInfo.id;
+    const { id: userId }: UserType = res.locals.userInfo;
     const offset = parseInt(`${skip}`);
     const _skip = !isNaN(offset) ? offset : undefined;
     const newParams = { skip: _skip, ...params };

@@ -62,7 +62,10 @@ class StageServices {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const findStage = await prisma.stages.findUnique({
       where: { id },
-      include: { project: { select: { name: true } } },
+      include: {
+        group: { select: { id: true } },
+        project: { select: { name: true } },
+      },
     });
     if (!findStage)
       throw new AppError('Oops!,No se pudo encontrar la etapa', 400);

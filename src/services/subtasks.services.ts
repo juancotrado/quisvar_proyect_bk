@@ -93,10 +93,17 @@ class SubTasksServices {
       });
     }
     if (option == 'apply') {
+      // const findGroup = await prisma.subTasks.findUnique({
+      //   where: { id: subtaskId },
+      //   select: {
+      //     Levels: { select: { stages: { select: { groupId: true } } } },
+      //   },
+      // });
+      // //-------------------------------------------------------------------
+      // if (!findGroup?.Levels.stages.groupId)
+      //   throw new AppError('Error, asignar grupo primero', 400);
+      // //-------------------------------------------------------------------
       const status = 'PROCESS';
-      // const { days } = await this.find(subtaskId);
-      // const hours = days * this.GMT;
-      // const untilDate = new Date(this.today + hours);
       return await prisma.subTasks.update({
         where: { id: subtaskId },
         data: {
