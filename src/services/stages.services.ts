@@ -14,7 +14,7 @@ import { ListCostType, StageUpdate, TypeCost, usersCount } from 'types/types';
 
 class StageServices {
   public static estadia = 1000;
-  static async findMany(projectId: Projects['id']) {
+  public static async findMany(projectId: Projects['id']) {
     const findStages = await prisma.stages.findMany({
       where: { projectId },
       select: { id: true, name: true },
@@ -22,7 +22,7 @@ class StageServices {
     return findStages;
   }
 
-  static async findShort(id: Stages['id']) {
+  public static async findShort(id: Stages['id']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const findStage = await prisma.stages.findUnique({ where: { id } });
     if (!findStage) throw new AppError('Oops!, ID invalido', 400);
@@ -54,7 +54,7 @@ class StageServices {
     return findStage;
   }
 
-  static async find(
+  public static async find(
     id: Stages['id'],
     status?: SubTasks['status'],
     typeCost?: TypeCost

@@ -7,10 +7,10 @@ import Queries from '../utils/queries';
 import { getRootItem, numberToConvert } from '../utils/tools';
 import { ObjectNumber, UpdateLevelBlock } from 'types/types';
 class SubTasksServices {
-  static GMT = 60 * 60 * 1000;
-  static today = new Date().getTime();
+  protected static GMT = 60 * 60 * 1000;
+  protected static today = new Date().getTime();
 
-  static async find(id: SubTasks['id']) {
+  public static async find(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findSubTask = await prisma.subTasks.findUnique({
       where: { id },
@@ -20,7 +20,7 @@ class SubTasksServices {
     return findSubTask;
   }
 
-  static async findMany() {
+  public static async findMany() {
     const findSubTasks = await prisma.subTasks.findMany({
       include: {
         ...Queries.includeSubtask,
@@ -30,7 +30,11 @@ class SubTasksServices {
     return findSubTasks;
   }
 
-  static async findDuplicate(name: string, id: number, type: 'ROOT' | 'ID') {
+  public static async findDuplicate(
+    name: string,
+    id: number,
+    type: 'ROOT' | 'ID'
+  ) {
     let levels_Id, rootItem;
     levels_Id = id;
     if (name.includes('projects'))
@@ -62,7 +66,13 @@ class SubTasksServices {
     return { duplicated, quantity, levels_Id, rootItem, typeItem };
   }
 
-  static async create({ name, price, description, days, levels_Id }: SubTasks) {
+  public static async create({
+    name,
+    price,
+    description,
+    days,
+    levels_Id,
+  }: SubTasks) {
     const isDuplicated = await this.findDuplicate(name, levels_Id, 'ROOT');
     const { duplicated, rootItem, quantity, typeItem } = isDuplicated;
     if (duplicated) throw new AppError('Error, Nombre existente', 404);
@@ -79,7 +89,7 @@ class SubTasksServices {
     });
     return newSubTask;
   }
-  static async assigned(
+  public static async assigned(
     subtaskId: SubTasks['id'],
     userId: Users['id'],
     option: 'decline' | 'apply' | 'review'
@@ -123,7 +133,7 @@ class SubTasksServices {
     throw new AppError('Oops!, Necesitamos un status para esta consulta', 400);
   }
 
-  static async update(
+  public static async update(
     id: SubTasks['id'],
     {
       days,
@@ -148,7 +158,7 @@ class SubTasksServices {
     return updateTask;
   }
 
-  static async updateStatus(
+  public static async updateStatus(
     id: SubTasks['id'],
     { status, filesId }: SubTasks & { filesId?: number[] },
     user: Users
@@ -255,7 +265,7 @@ class SubTasksServices {
     return updateTaskStatus;
   }
 
-  static async updateBlock(
+  public static async updateBlock(
     subtasks: UpdateLevelBlock['subTasks'],
     rootItem: string,
     newPath: string,
@@ -291,10 +301,9 @@ class SubTasksServices {
                 data: { dir, name },
               })
               .then(() => {
-                if (['.pdf', '.PDF'].includes(ext) && newEditable) {
-                  renameSync(`${newEditable}/${n}`, `${newEditable}/${name}`);
-                }
                 renameSync(`${newPath}/${n}`, `${newPath}/${name}`);
+                if (['.pdf', '.PDF'].includes(ext) && newEditable)
+                  copyFileSync(`${newPath}/${name}`, `${newEditable}/${name}`);
               });
             return { dir, name, ...file };
           })
@@ -306,7 +315,56 @@ class SubTasksServices {
     );
     return subTasks;
   }
-  static async delete(id: SubTasks['id']) {
+
+  public static async addToUper(
+    id: SubTasks['id'],
+    {
+      name,
+      days,
+      description,
+    }: { name: string; days: number; description?: string }
+  ) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    //------------------------------------------------------------------
+    const findSubTaskLower = await prisma.subTasks.findUnique({
+      where: { id },
+      include: { Levels: { select: { item: true, id: true } } },
+    });
+    if (!findSubTaskLower) throw new AppError('No existe la tarea', 400);
+    const { levels_Id, index, Levels, item, typeItem } = findSubTaskLower;
+    //------------------------------------------------------------------
+    const data = { item, name, days, levels_Id, index, typeItem, description };
+    const newSubTask = await prisma.subTasks.create({
+      data: { ...data, typeItem },
+      include: { users: { select: { user: Queries.selectProfileUser } } },
+    });
+    const newPath = await PathServices.level(Levels.id);
+    const newEditables = newPath.replace('projects', 'editables');
+    //------------------------------------------------------------------
+    const list = await prisma.subTasks.findMany({
+      where: {
+        levels_Id,
+        index: { gte: index },
+      },
+      orderBy: { index: 'asc' },
+      include: {
+        files: {
+          where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] },
+          select: { id: true, dir: true, name: true, type: true },
+        },
+      },
+    });
+    const updateBlock = await this.updateBlock(
+      list,
+      Levels.item,
+      newPath,
+      newEditables,
+      index + 1
+    );
+    return [newSubTask, ...updateBlock];
+  }
+
+  public static async delete(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const subTaskDelete = await prisma.subTasks.delete({
       where: { id },
@@ -338,7 +396,7 @@ class SubTasksServices {
     return { ...subTaskDelete, tasks: updateBlock };
   }
 
-  static async updatePercentage(
+  public static async updatePercentage(
     subtaskId: SubTasks['id'],
     data: { userId: Users['id']; percentage: number }[]
   ) {
@@ -355,7 +413,7 @@ class SubTasksServices {
     return setPercentage;
   }
 
-  static async assignUserBySubtask(
+  public static async assignUserBySubtask(
     userData: { id: number; name: string }[],
     id: SubTasks['id']
   ) {
