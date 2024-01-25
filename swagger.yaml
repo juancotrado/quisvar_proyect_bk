@@ -657,14 +657,14 @@ components:
   parameters:
     stageId:
       name: stageId
-      in: query
+      in: path
       description: Ingresar id de etapa
       required: true
       schema:
         type: integer
     subtaskId:
       name: id
-      in: query
+      in: path
       description: Ingresar id de tarea
       required: true
       schema:
