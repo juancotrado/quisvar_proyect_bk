@@ -221,6 +221,33 @@ paths:
             application/json:
               example:
                 error: No se pudo actualizar la etapa
+  /subtasks/{id}/{stageid}:
+    post:
+      tags:
+        - subtask
+      parameters:
+        - $ref: '#/components/parameters/stageId'
+        - $ref: '#/components/parameters/subtaskId'
+        - $ref: '#/components/parameters/typeUpperorLower'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpperOrLower'
+      responses:
+        '201':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Operación exitosa
+        '404':
+          description: No se pudo crear la tarea
+          content:
+            application/json:
+              example:
+                error: No se pudo crear la tarea
   /contract:
     get:
       tags:
@@ -627,6 +654,28 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  parameters:
+    stageId:
+      name: stageId
+      in: query
+      description: Ingresar id de etapa
+      required: true
+      schema:
+        type: integer
+    subtaskId:
+      name: id
+      in: query
+      description: Ingresar id de tarea
+      required: true
+      schema:
+        type: integer
+    typeUpperorLower:
+      name: type
+      in: query
+      description: Usar las siguientes variables <b>[upper,lower]</b>
+      required: true
+      schema:
+        type: integer
   schemas:
     Login:
       required:
@@ -769,3 +818,18 @@ components:
         groupId:
           type: integer
           example: 2
+    CreateUpperOrLower:
+      required:
+        - name
+        - days
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'nueva_tarea_creada'
+        days:
+          type: integer
+          example: 2
+        description:
+          type: string
+          example: 'Lorem ipsum'
