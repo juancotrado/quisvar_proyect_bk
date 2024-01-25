@@ -239,8 +239,8 @@ class SubTasksServices {
       //-------------------------------------------------------------------
       const _files = files.map(async file => {
         const ext = file.name.split('.').at(-1) || '';
-        const index = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
         countExt[ext] -= 1;
+        const index = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
         const _name = item + name + index + '.' + ext;
 
         await prisma.files.update({
@@ -300,8 +300,8 @@ class SubTasksServices {
             // const dir = file.type === 'UPLOADS' ? newPath : newEditable;
             const dir = newPath;
             const ext = n.split('.').at(-1) || '';
-            const index = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
             countExt[ext] -= 1;
+            const index = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
             const name = _i + _n + index + '.' + ext;
             // const ext = `.${n.split('.').at(-1)}`;
             // const name = _i + _n + `_${i + 1}${ext}`;
