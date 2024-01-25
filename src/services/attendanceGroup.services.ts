@@ -119,6 +119,14 @@ class AttendanceGroupService {
     });
     return groupList;
   }
+  static async editTitle(id: GroupList['id'], title: GroupList['title']) {
+    if (!id) throw new AppError('Oops!, Id no encontrado', 400);
+    const titleUpdated = await prisma.groupList.update({
+      where: { id },
+      data: { title },
+    });
+    return titleUpdated;
+  }
   static async getList(date: string, groupId: GroupList['groupId']) {
     if (!date) throw new AppError(`Oops!, algo salio mal`, 400);
     const { startOfDay, endOfDay } = timerDay(date);

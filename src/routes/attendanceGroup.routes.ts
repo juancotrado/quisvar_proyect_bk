@@ -16,6 +16,7 @@ class AttendanceGroupRoutes {
     );
     //Group List
     this.router.post('/list', AttendanceGroupControllers.createList);
+    this.router.patch('/list/title/:id', AttendanceGroupControllers.editTitle);
     this.router.get('/list/:id', AttendanceGroupControllers.getList);
     this.router.delete(
       '/list/:id',
