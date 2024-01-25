@@ -367,7 +367,6 @@ class SubTasksServices {
           not: newSubTask.id,
         },
       },
-
       orderBy: { index: 'asc' },
       include: {
         files: {

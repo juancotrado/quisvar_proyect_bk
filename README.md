@@ -16,40 +16,72 @@ Before running the backend, ensure that you have the following dependencies inst
 - npm (v6 or higher)
 - PostgreSQL (make sure you have a running PostgreSQL instance)
 
-## Tools
+## Tools Dev
 
 Backend made with TS, Express and Prisma
 
 - [Express](https://expressjs.com/en/guide/routing.html)
 - [Prisma](https://www.prisma.io/)
 
-## Development
+## Installation
 
-Install dependences
+1. Clone this repository:
 
-```sh
-npm install
-```
+   ```bash
+   git clone https://github.com/jeancarlos324/coursesAPI.git
+   ```
 
-Start the development asset server and the Express server by running:
+2. Install dependences:
 
-```sh
-npm run dev
-```
+   ```bash
+   npm install
+   ```
 
-initialize with seed with next command:
+## Running
 
-```sh
-npm run seed
-```
+### Run Development
 
-## Deployment
+- Command to run in development mode
 
-Then run the app in production mode:
+  ```bash
+  npm run dev
+  ```
 
-```sh
-npm run start
-```
+### Run Production
+
+- Command to run in production mode
+
+  ```bash
+  npm run start
+  ```
+
+  ### Run Production
+
+- Initialize with seed with next command
+
+  ```sh
+  npm run seed
+  ```
+
+## Migrate with prisma
+
+1. Initialize schema on database and project:
+
+   ```bash
+    npx prisma generate
+   ```
+
+2. Migrate schema to database:
+
+   ```bash
+   npx prisma db push
+   ```
+
+3. If you need pull schema from database:
+
+   ```bash
+   npx prisma db pull
+   ```
 
 ## Deployment with Docker Compose
 
