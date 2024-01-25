@@ -287,14 +287,24 @@ class SubTasksServices {
           where: { id: subtask.id },
           data: { item, index },
         });
+        //-------------------------------------------------------------------
+        const countExt = _files.reduce((acc: ObjectNumber, value) => {
+          const ext = value.name.split('.').at(-1) || '';
+          acc[ext] = (acc[ext] || 0) + 1;
+          return acc;
+        }, {});
         //-------------------------------------------------------------------------------
         const parseFiles = await Promise.all(
-          _files.map(async ({ dir: d, id: _id, name: n, ...file }, i) => {
+          _files.map(async ({ dir: d, id: _id, name: n, ...file }) => {
             const { item: _i, name: _n } = updateSubtask;
             // const dir = file.type === 'UPLOADS' ? newPath : newEditable;
             const dir = newPath;
-            const ext = `.${n.split('.').at(-1)}`;
-            const name = _i + _n + `_${i + 1}${ext}`;
+            const ext = n.split('.').at(-1) || '';
+            const index = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
+            countExt[ext] -= 1;
+            const name = _i + _n + index + '.' + ext;
+            // const ext = `.${n.split('.').at(-1)}`;
+            // const name = _i + _n + `_${i + 1}${ext}`;
             await prisma.files
               .update({
                 where: { id: _id },
@@ -343,7 +353,7 @@ class SubTasksServices {
     let newSubTask;
     if (typeGte === 'lower') {
       const { rootItem } = getRootItem(item);
-      const newItem = rootItem + '.' + `${index + 1}`;
+      const newItem = rootItem + '.' + numberToConvert(index + 1, typeItem);
       newSubTask = await prisma.subTasks.create({
         data: { ...data, typeItem, index: index + 1, item: newItem },
         include: { users: { select: { user: Queries.selectProfileUser } } },
