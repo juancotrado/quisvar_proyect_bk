@@ -251,4 +251,8 @@ export interface DegreeList {
   values: { id: number; value: DegreeTypes }[];
 }
 
-export interface UpperAddSubtask {}
+export interface UpperAddSubtask {
+  name: string;
+  days: number;
+  description?: string;
+}
