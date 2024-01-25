@@ -675,7 +675,7 @@ components:
       description: Usar las siguientes variables <b>[upper,lower]</b>
       required: true
       schema:
-        type: integer
+        type: string
   schemas:
     Login:
       required:
