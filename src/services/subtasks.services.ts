@@ -322,7 +322,7 @@ class SubTasksServices {
     { name, days, description }: UpperAddSubtask,
     typeGte: 'upper' | 'lower'
   ) {
-    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    if (!id || !typeGte) throw new AppError('Oops!,ID invalido', 400);
     //------------------------------------------------------------------
     const findSubTaskLower = await prisma.subTasks.findUnique({
       where: { id },
