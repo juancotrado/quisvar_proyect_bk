@@ -340,15 +340,16 @@ class SubTasksServices {
       description,
     };
     //------------------------------------------------------------------
+    let newSubTask;
     if (typeGte === 'lower') {
-      const { lastItem } = getRootItem(item);
-      const newItem = lastItem + '.' + `${index + 1}`;
-      const newSubTask = await prisma.subTasks.create({
+      const { rootItem } = getRootItem(item);
+      const newItem = rootItem + '.' + `${index + 1}`;
+      newSubTask = await prisma.subTasks.create({
         data: { ...data, typeItem, index: index + 1, item: newItem },
         include: { users: { select: { user: Queries.selectProfileUser } } },
       });
     } else {
-      const newSubTask = await prisma.subTasks.create({
+      newSubTask = await prisma.subTasks.create({
         data: { ...data, typeItem, index },
         include: { users: { select: { user: Queries.selectProfileUser } } },
       });
@@ -362,7 +363,11 @@ class SubTasksServices {
       where: {
         levels_Id,
         index: typeFilter,
+        id: {
+          not: newSubTask.id,
+        },
       },
+
       orderBy: { index: 'asc' },
       include: {
         files: {
@@ -371,6 +376,7 @@ class SubTasksServices {
         },
       },
     });
+
     const aux = typeGte === 'lower' ? 2 : 1;
     const updateBlock = await this.updateBlock(
       list,
