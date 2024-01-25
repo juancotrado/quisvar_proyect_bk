@@ -19,7 +19,20 @@ class ProjectsServices {
       where: { id },
       include: {
         moderator: Queries.selectProfileUser,
-        stages: { orderBy: { createdAt: 'asc' } },
+        stages: {
+          select: {
+            id: true,
+            name: true,
+            group: {
+              select: {
+                id: true,
+                name: true,
+                moderator: Queries.selectProfileUserForStage,
+              },
+            },
+          },
+          orderBy: { createdAt: 'asc' },
+        },
       },
     });
     if (!findProject)
