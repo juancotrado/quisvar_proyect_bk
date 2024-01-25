@@ -28,7 +28,7 @@ Backend made with TS, Express and Prisma
 1. Clone this repository:
 
    ```bash
-   git clone https://github.com/jeancarlos324/coursesAPI.git
+   git clone https://github.com/juancotrado/quisvar_proyect_bk.git
    ```
 
 2. Install dependences:
