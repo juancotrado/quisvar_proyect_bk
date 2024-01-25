@@ -330,12 +330,29 @@ class SubTasksServices {
     });
     if (!findSubTaskLower) throw new AppError('No existe la tarea', 400);
     const { levels_Id, index, Levels, item, typeItem } = findSubTaskLower;
+
+    const data = {
+      item,
+      name,
+      days,
+      levels_Id,
+      typeItem,
+      description,
+    };
     //------------------------------------------------------------------
-    const data = { item, name, days, levels_Id, index, typeItem, description };
-    const newSubTask = await prisma.subTasks.create({
-      data: { ...data, typeItem },
-      include: { users: { select: { user: Queries.selectProfileUser } } },
-    });
+    if (typeGte === 'lower') {
+      const { lastItem } = getRootItem(item);
+      const newItem = lastItem + '.' + `${index + 1}`;
+      const newSubTask = await prisma.subTasks.create({
+        data: { ...data, typeItem, index: index + 1, item: newItem },
+        include: { users: { select: { user: Queries.selectProfileUser } } },
+      });
+    } else {
+      const newSubTask = await prisma.subTasks.create({
+        data: { ...data, typeItem, index },
+        include: { users: { select: { user: Queries.selectProfileUser } } },
+      });
+    }
     const newPath = await PathServices.level(Levels.id);
     const newEditables = newPath.replace('projects', 'editables');
     //------------------------------------------------------------------
@@ -354,14 +371,15 @@ class SubTasksServices {
         },
       },
     });
+    const aux = typeGte === 'lower' ? 2 : 1;
     const updateBlock = await this.updateBlock(
       list,
       Levels.item,
       newPath,
       newEditables,
-      index + 1
+      index + aux
     );
-    return [newSubTask, ...updateBlock];
+    return [...updateBlock];
   }
 
   public static async delete(id: SubTasks['id']) {
