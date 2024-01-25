@@ -101,8 +101,9 @@ class SubtaskControllers {
   public static addToUp: ControllerFunction = async (req, res, next) => {
     try {
       const { id: subtask_id, stageId } = req.params;
+      const type = req.query.type as 'upper' | 'lower';
       const { body } = req;
-      await SubTasksServices.addToUper(+subtask_id, { ...body });
+      await SubTasksServices.addToUper(+subtask_id, { ...body }, type);
       const query = await StageServices.find(+stageId);
       res.status(201).json({ ...query, stagesId: stageId });
     } catch (error) {

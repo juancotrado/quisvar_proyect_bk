@@ -250,3 +250,5 @@ export interface DegreeList {
   degree: TypeCost;
   values: { id: number; value: DegreeTypes }[];
 }
+
+export interface UpperAddSubtask {}

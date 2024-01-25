@@ -5,7 +5,7 @@ import { copyFileSync, renameSync } from 'fs';
 import PathServices from './paths.services';
 import Queries from '../utils/queries';
 import { getRootItem, numberToConvert } from '../utils/tools';
-import { ObjectNumber, UpdateLevelBlock } from 'types/types';
+import { ObjectNumber, UpdateLevelBlock, UpperAddSubtask } from 'types/types';
 class SubTasksServices {
   protected static GMT = 60 * 60 * 1000;
   protected static today = new Date().getTime();
@@ -319,11 +319,8 @@ class SubTasksServices {
 
   public static async addToUper(
     id: SubTasks['id'],
-    {
-      name,
-      days,
-      description,
-    }: { name: string; days: number; description?: string }
+    { name, days, description }: UpperAddSubtask,
+    typeGte: 'upper' | 'lower'
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     //------------------------------------------------------------------
@@ -342,10 +339,12 @@ class SubTasksServices {
     const newPath = await PathServices.level(Levels.id);
     const newEditables = newPath.replace('projects', 'editables');
     //------------------------------------------------------------------
+    const typeFilter = typeGte === 'upper' ? { gte: index } : { gt: index };
+    //------------------------------------------------------------------
     const list = await prisma.subTasks.findMany({
       where: {
         levels_Id,
-        index: { gte: index },
+        index: typeFilter,
       },
       orderBy: { index: 'asc' },
       include: {

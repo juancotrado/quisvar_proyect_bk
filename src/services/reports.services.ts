@@ -101,7 +101,7 @@ class ReportsServices {
             days: true,
             status: true,
             name: true,
-            // feedBacks: true,
+            feedBacks: true,
             users: true,
             Levels: {
               select: {
