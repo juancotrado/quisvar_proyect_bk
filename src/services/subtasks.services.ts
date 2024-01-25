@@ -303,7 +303,8 @@ class SubTasksServices {
               .then(() => {
                 renameSync(`${newPath}/${n}`, `${newPath}/${name}`);
                 if (['.pdf', '.PDF'].includes(ext) && newEditable)
-                  copyFileSync(`${newPath}/${name}`, `${newEditable}/${name}`);
+                  // copyFileSync(`${newPath}/${name}`, `${newEditable}/${name}`);
+                  renameSync(`${newEditable}/${n}`, `${newEditable}/${name}`);
               });
             return { dir, name, ...file };
           })
