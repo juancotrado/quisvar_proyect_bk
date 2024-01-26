@@ -236,7 +236,7 @@ class DuplicatesServices {
       Levels.item,
       newPath,
       newEditables,
-      index
+      index + 2
     );
     //--------------------------------------------------------------
     return { ...newSubTask, files: _files };
