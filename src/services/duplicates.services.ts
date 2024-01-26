@@ -206,7 +206,7 @@ class DuplicatesServices {
     const hash = new Date().getTime();
     const _files = files.map(
       ({ id, assignedAt, feedbackId, subTasksId, ...data }) => {
-        const nameFile = data.name.split('$')[1];
+        const nameFile = data.name.split('$$')[1];
         const name = `${hash}$$${nameFile}`;
         copyFileSync(`${data.dir}/${data.name}`, `${data.dir}/${name}`);
         return { ...data, name, subTasksId: newSubTask.id };
