@@ -248,6 +248,37 @@ paths:
             application/json:
               example:
                 error: No se pudo crear la tarea
+  /duplicates/subtask/{id}:
+    post:
+      tags:
+        - subtask
+      summary: Duplicate Subtask
+      description: |-
+        Duplicar tareas de nivel
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/subtaskId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DuplicatesRequestBody'
+
+      responses:
+        '201':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Operación exitosa
+        '404':
+          description: No se pudo duplicar la tarea
+          content:
+            application/json:
+              example:
+                error: No se pudo duplicar la tarea
   /contract:
     get:
       tags:
@@ -833,3 +864,11 @@ components:
         description:
           type: string
           example: 'Lorem ipsum'
+    DuplicatesRequestBody:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'nombre_de_tarea_duplicada'

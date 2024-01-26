@@ -282,29 +282,25 @@ class SubTasksServices {
           const _type = numberToConvert(index, subtask.typeItem) || '';
           item = rootItem + _type + '.';
         }
-        // const item = rootItem + lastItem + '.';
         const updateSubtask = await prisma.subTasks.update({
           where: { id: subtask.id },
           data: { item, index },
         });
-        //-------------------------------------------------------------------
+        //------------------------- Count files per task ------------------------------------------
         const countExt = _files.reduce((acc: ObjectNumber, value) => {
           const ext = value.name.split('.').at(-1) || '';
           acc[ext] = (acc[ext] || 0) + 1;
           return acc;
         }, {});
-        //-------------------------------------------------------------------------------
+        //-------------------------------------------------------------------
         const parseFiles = await Promise.all(
           _files.map(async ({ dir: d, id: _id, name: n, ...file }) => {
             const { item: _i, name: _n } = updateSubtask;
-            // const dir = file.type === 'UPLOADS' ? newPath : newEditable;
             const dir = newPath;
             const ext = n.split('.').at(-1) || '';
             countExt[ext] -= 1;
             const index = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
             const name = _i + _n + index + '.' + ext;
-            // const ext = `.${n.split('.').at(-1)}`;
-            // const name = _i + _n + `_${i + 1}${ext}`;
             await prisma.files
               .update({
                 where: { id: _id },
@@ -312,9 +308,9 @@ class SubTasksServices {
               })
               .then(() => {
                 renameSync(`${newPath}/${n}`, `${newPath}/${name}`);
-                if (['.pdf', '.PDF'].includes(ext) && newEditable)
-                  // copyFileSync(`${newPath}/${name}`, `${newEditable}/${name}`);
+                if (['.pdf', '.PDF'].includes(ext) && newEditable) {
                   renameSync(`${newEditable}/${n}`, `${newEditable}/${name}`);
+                }
               });
             return { dir, name, ...file };
           })
