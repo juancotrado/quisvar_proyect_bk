@@ -221,6 +221,32 @@ paths:
             application/json:
               example:
                 error: No se pudo actualizar la etapa
+  /levels/{id}:
+    post:
+      tags:
+        - levels
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+        - $ref: '#/components/parameters/typeUpperorLower'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpperOrLowerLevel'
+      responses:
+        '201':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Operación exitosa
+        '404':
+          description: No se pudo crear el nivel
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el nivel
   /subtasks/{id}/{stageId}:
     post:
       tags:
@@ -700,6 +726,13 @@ components:
       required: true
       schema:
         type: integer
+    levelId:
+      name: id
+      in: path
+      description: Ingresar id de tarea
+      required: true
+      schema:
+        type: integer
     typeUpperorLower:
       name: type
       in: query
@@ -864,6 +897,17 @@ components:
         description:
           type: string
           example: 'Lorem ipsum'
+    CreateUpperOrLowerLevel:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'nuevo_nivel_creada'
+        userId:
+          type: integer
+          example: undefined
     DuplicatesRequestBody:
       required:
         - name

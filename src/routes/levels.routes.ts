@@ -5,6 +5,7 @@ import {
   deleteLevel,
   showLevel,
   updateTypeItem,
+  LevelsControllers,
 } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 
@@ -13,8 +14,11 @@ import {
   // _admin_role,
   _mod_role,
 } from '../middlewares/role.middleware';
-
+const { addToUp } = LevelsControllers;
 const router = Router();
+
+console.log('patito');
+router.post('/:id', addToUp);
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);

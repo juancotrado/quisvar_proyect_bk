@@ -89,6 +89,7 @@ class SubTasksServices {
     });
     return newSubTask;
   }
+
   public static async assigned(
     subtaskId: SubTasks['id'],
     userId: Users['id'],
@@ -369,9 +370,7 @@ class SubTasksServices {
       where: {
         levels_Id,
         index: typeFilter,
-        id: {
-          not: newSubTask.id,
-        },
+        id: { not: newSubTask.id },
       },
       orderBy: { index: 'asc' },
       include: {

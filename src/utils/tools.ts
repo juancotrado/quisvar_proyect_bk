@@ -298,7 +298,7 @@ export const existRootLevelPath = async (rootId: number, stagesId: number) => {
   const rootPath = rootId
     ? await PathServices.level(rootId)
     : await PathServices.stage(stagesId, 'UPLOADS');
-  if (!existsSync(rootPath)) throw new AppError('Ops!,carpeta no existe', 404);
+  // if (!existsSync(rootPath)) throw new AppError('Ops!,carpeta no existe', 404);
   return rootPath;
 };
 

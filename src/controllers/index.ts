@@ -367,3 +367,4 @@ export { default as StagesControllers } from './stages.controllers';
 export { default as AttendanceGroupControllers } from './attendanceGroup.controller';
 export { default as DutyControllers } from './duty.controllers';
 export { default as SubtaskControllers } from './subtasks.controllers';
+export { default as LevelsControllers } from './levels.controllers';
