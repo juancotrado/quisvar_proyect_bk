@@ -56,15 +56,10 @@ export const updateProfile = async (
   next: NextFunction
 ) => {
   try {
-    const { ruc, address, email, ...profile } = req.body;
+    const { ruc, address, roleId, email, ...profile } = req.body;
     const { id } = req.params;
-    const query = await ProfileServices.update(
-      +id,
-      profile,
-      email,
-      address,
-      ruc
-    );
+    const dataUser = { ruc, address, roleId, email };
+    const query = await ProfileServices.update(+id, profile, dataUser);
     res.status(201).json(query);
   } catch (error) {
     next(error);

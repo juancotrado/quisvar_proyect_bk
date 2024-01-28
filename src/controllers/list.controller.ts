@@ -11,6 +11,7 @@ export const createList = async (
     const query = await ListServices.create(body);
     res.status(200).json(query);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };

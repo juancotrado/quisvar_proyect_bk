@@ -14,7 +14,7 @@ import { _admin_role } from '../middlewares/role.middleware';
 const router = Router();
 router.use(authenticateHandler);
 //Admin role
-router.use(_admin_role);
+// router.use(_admin_role);
 router.post('/', createList);
 router.delete('/', deleteManyList);
 router.patch('/:id', updateList);

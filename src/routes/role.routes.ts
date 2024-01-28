@@ -10,9 +10,12 @@ router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.get('/form', roleController.showsForForm);
 router.get('/menu', roleController.showMenus);
+router.get('/menuPoints', roleController.showMenusPoints);
 router.get('/menu/:id', roleController.showMenu);
+router.get('/menusGeneral', roleController.showMenusGeneral);
 router.get('/:id', roleController.show);
 router.put('/:id', roleController.update);
+router.delete('/:id', roleController.delete);
 
 router.post('/', roleController.create);
 export default router;

@@ -21,6 +21,8 @@ export type RoleForMenuPick = Pick<Role, 'name'> & {
   menuPoints: MenuPointPick[];
 };
 
+export type userPickEdit = Pick<Users, 'email' | 'address' | 'roleId' | 'ruc'>;
+
 export type userProfilePick = Pick<
   Users & Profiles,
   | 'email'

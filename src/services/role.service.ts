@@ -1,4 +1,4 @@
-import { MenuPoints } from './../models/menuPoints';
+import { MenuPoints, MenuRoles } from './../models/menuPoints';
 import AppError from '../utils/appError';
 import { RoleForMenuPick } from '../utils/format.server';
 import { Role, prisma } from '../utils/prisma.server';
@@ -10,16 +10,22 @@ class RoleService {
       include: {
         menuPoints: {
           select: {
+            id: true,
             menuId: true,
             typeRol: true,
             subMenuPoints: {
               select: {
+                id: true,
+
                 menuId: true,
                 typeRol: true,
               },
             },
           },
         },
+      },
+      orderBy: {
+        id: 'asc',
       },
     });
     if (roles.length === 0) throw new AppError('Aun no se creo ningu rol', 404);
@@ -58,14 +64,33 @@ class RoleService {
     if (!role) throw new AppError('No se pudo encontrar el rol', 404);
     return role;
   }
-
+  static async findAllGeneral() {
+    const allRoles = await RoleService.getAllMenus();
+    const allMenusWithRole = allRoles.map(role => ({
+      ...menuPoints.getHeadersOptions(role),
+      menuPointsDb: role.menuPoints,
+    }));
+    return allMenusWithRole;
+  }
+  static async getAllMenusForAccess() {
+    const allMenus = await RoleService.findAllGeneral();
+    const getAllMenusForAccess = allMenus.map(menuAux => {
+      return {
+        ...menuAux,
+        menuPoints: menuPoints.joinMenuRolAndMenuGeneral(
+          menuAux.menuPoints as MenuRoles[]
+        ),
+      };
+    });
+    return getAllMenusForAccess;
+  }
   static async findGeneral(id: Role['id']) {
     const role = await RoleService.find(id);
     const menusWithRole = menuPoints.getHeadersOptions(role);
     return menusWithRole;
   }
+
   static async create({ name, menuPoints }: RoleForMenuPick) {
-    console.log(name, menuPoints);
     const role = await prisma.role.create({
       data: {
         name,
@@ -91,7 +116,15 @@ class RoleService {
 
     return getRole;
   }
+  static async delete(id: number) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const deleteRole = await prisma.role.delete({
+      where: { id },
+    });
+    return deleteRole;
+  }
   static async edit({ name, menuPoints }: RoleForMenuPick, id: number) {
+    if (!name) throw new AppError('Asegurese de escribir un nombre', 404);
     const role = await prisma.role.upsert({
       where: { id },
       update: { name },
@@ -100,11 +133,34 @@ class RoleService {
       },
     });
 
+    const menuRoleDb = await RoleService.find(id);
+    menuRoleDb.menuPoints.forEach(async menu => {
+      const findMenuRol = menuPoints.find(
+        menuPoint => menuPoint.id === menu.id
+      );
+      console.log(menu.id, findMenuRol);
+      if (!findMenuRol) {
+        await prisma.menuPoints.delete({ where: { id: menu.id } });
+      } else {
+        menu.subMenuPoints.forEach(async subMenu => {
+          const findSubMenuRol = findMenuRol.subMenuPoints.find(
+            menuPoint => menuPoint.id === subMenu.id
+          );
+
+          if (!findSubMenuRol) {
+            await prisma.subMenuPoints.delete({ where: { id: subMenu.id } });
+          }
+        });
+      }
+    });
+
     for (const menuPointData of menuPoints) {
       const { id: menuPointId, menuId, typeRol, subMenuPoints } = menuPointData;
 
+      const existMenuPointId = menuPointId ?? 0;
+
       await prisma.menuPoints.upsert({
-        where: { id: menuPointId },
+        where: { id: existMenuPointId },
         update: {
           typeRol,
           menuId,
@@ -122,9 +178,10 @@ class RoleService {
           menuId: subMenuId,
           typeRol: subMenuTypeRol,
         } = subMenuPointData;
+        const existSubMenuPointId = id ?? 0;
 
         await prisma.subMenuPoints.upsert({
-          where: { id },
+          where: { id: existSubMenuPointId },
           update: {
             typeRol: subMenuTypeRol,
             menuId: subMenuId,
