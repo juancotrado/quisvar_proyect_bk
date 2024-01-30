@@ -25,10 +25,11 @@ class AttendanceGroupController {
   public editTitle: ControllerFunction = async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { body } = req;
-      const query = await AttendanceGroupService.editTitle(+id, body);
+      const { title } = req.body;
+      const query = await AttendanceGroupService.editTitle(+id, title);
       res.status(200).json(query);
     } catch (error) {
+      console.log(error);
       next(error);
     }
   };

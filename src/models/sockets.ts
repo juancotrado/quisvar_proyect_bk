@@ -53,6 +53,9 @@ class Sockets {
       socket.on('client:call-notification', () => {
         this.io.emit('server:call-notification');
       });
+      socket.on('client:action-button', () => {
+        this.io.emit('server:action-button');
+      });
 
       socket.on('disconnect', () => {
         console.log('User disconected ==>', socket.id);

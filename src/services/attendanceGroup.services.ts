@@ -111,6 +111,17 @@ class AttendanceGroupService {
   static async createList(data: GroupList) {
     if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
     const { nombre, groupId } = data;
+    const lastList = await prisma.groupList.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        attendance: true,
+      },
+      take: 1,
+    });
+    if (lastList[0].attendance.length === 0)
+      throw new AppError(`Oops!, Al parecer hay una lista en curso`, 400);
     const groupList = await prisma.groupList.create({
       data: {
         nombre,
@@ -146,6 +157,7 @@ class AttendanceGroupService {
         nombre: true,
         groupId: true,
         duty: true,
+        title: true,
         attendance: {
           select: {
             id: true,
