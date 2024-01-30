@@ -21,7 +21,7 @@ import {
   ObjectNumber,
   UpdateLevelBlock,
 } from 'types/types';
-import { existsSync, renameSync } from 'fs';
+import { existsSync, mkdirSync, renameSync } from 'fs';
 import Queries from '../utils/queries';
 import PathServices from './paths.services';
 
@@ -205,13 +205,22 @@ class LevelsServices {
     let newLevel;
     const { rootItem } = getRootItem(item);
     if (typeGte === 'lower') {
-      const newItem = rootItem + '.' + numberToConvert(index + 1, typeItem);
-      const pato = { ...data, index: index + 1, item: newItem, userId };
-      newLevel = await prisma.levels.create({ data: { ...pato } });
+      const newItem =
+        rootItem + '.' + numberToConvert(index + 1, typeItem) + '.';
+      const levelData = { ...data, index: index + 1, item: newItem, userId };
+      newLevel = await prisma.levels.create({ data: { ...levelData } });
     } else {
-      const pato = { ...data, index, userId };
-      newLevel = await prisma.levels.create({ data: { ...pato } });
+      const levelData = { ...data, index, userId };
+      newLevel = await prisma.levels.create({ data: { ...levelData } });
     }
+    //--------------------------- Create Folder Levels ------------------------------------
+    const path = await PathServices.level(newLevel.id);
+    const editablePath = path.replace('projects', 'editables');
+    if (newLevel) {
+      mkdirSync(path);
+      mkdirSync(editablePath);
+    }
+    //-----------------------------------------------------------------------------------
     const typeFilter = typeGte === 'upper' ? { gte: item } : { gt: item };
     const aux = typeGte === 'lower' ? 2 : 1;
     //--------------------------- Find Lower Levels ------------------------------------
@@ -238,12 +247,13 @@ class LevelsServices {
       },
       orderBy: { item: 'asc' },
     });
+    const _rootItem = rootItem.length ? rootItem + '.' : rootItem;
     const updateList = await this.updateBlock(
       getList,
       rootLevel,
       rootId,
       rootPath,
-      rootItem,
+      _rootItem,
       index + aux
     );
     return getList;
@@ -397,13 +407,13 @@ class LevelsServices {
                     data: { dir, name },
                   })
                   .then(() => {
-                    if (['.pdf', '.PDF'].includes(ext) && newEditable) {
+                    renameSync(`${newPath}/${n}`, `${newPath}/${name}`);
+                    if (['pdf', 'PDF'].includes(ext) && newEditable) {
                       renameSync(
                         `${newEditable}/${n}`,
                         `${newEditable}/${name}`
                       );
                     }
-                    renameSync(`${newPath}/${n}`, `${newPath}/${name}`);
                   });
                 return { dir, name, ...file };
               })

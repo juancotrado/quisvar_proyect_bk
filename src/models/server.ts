@@ -138,7 +138,6 @@ class Server {
   conectionCron() {
     const time = new TimerCron('00 20 * * *');
     time.crontimer(() => {
-      console.log('patito-veloz');
       // exec('ls', (error, stdout, stderr) => {
       //   if (error) {
       //     console.error(`exec error: ${error}`);

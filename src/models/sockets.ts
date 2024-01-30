@@ -2,7 +2,6 @@ import { SubTasks } from '@prisma/client';
 import { Server as WebSocketServer } from 'socket.io';
 import { Level } from 'types/types';
 // import { TasksServices } from '../services';
-
 interface DataProjectAndTask {
   project: Level;
   task: SubTasks;
@@ -15,13 +14,6 @@ class Sockets {
   }
   roomPlace(subTask: SubTasks) {
     const room = subTask.levels_Id;
-    //   ? subTask.indexTaskId + 'indextask'
-    //   : subTask.taskId
-    //   ? subTask.taskId + 'task'
-    //   : subTask.task_2_Id
-    //   ? subTask.task_2_Id + 'task2'
-    //   : subTask.task_3_Id + 'task3';
-    // const room = 'level';
     return room;
   }
   socketEvents() {
@@ -53,7 +45,6 @@ class Sockets {
       socket.on('client:call-notification', () => {
         this.io.emit('server:call-notification');
       });
-
       socket.on('disconnect', () => {
         console.log('User disconected ==>', socket.id);
       });

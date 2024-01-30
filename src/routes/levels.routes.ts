@@ -17,7 +17,6 @@ import {
 const { addToUp } = LevelsControllers;
 const router = Router();
 
-console.log('patito');
 router.post('/:id', addToUp);
 router.use(authenticateHandler);
 //EMPLOYEE ROLE

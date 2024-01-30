@@ -36,7 +36,6 @@ class LevelsControllers {
       // const query = await StageServices.find(+stageId);
       // const query = { pat: 'pat' };
       res.status(201).json({ ...query, stagesId: stageId });
-      res.status(201).json(query);
     } catch (error) {
       next(error);
     }
