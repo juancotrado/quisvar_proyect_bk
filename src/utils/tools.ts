@@ -567,7 +567,7 @@ export const findDegree = (degree?: DegreeTypes) => {
 };
 
 export const removeUnwantedCharacters = (str: string) => {
-  const regex = /[\\\/:*?"<>|]/g;
+  const regex = /[\\/:*?"<>|]/g;
   const result = str.replace(regex, '');
   return result;
 };
