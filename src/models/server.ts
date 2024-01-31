@@ -114,6 +114,7 @@ class Server {
     this.app.use('/projects', express.static('uploads/projects'));
     this.app.use('/index', express.static('index'));
     this.app.use('/models', express.static('uploads/models'));
+    this.app.use('/editables', express.static('uploads/editables'));
     this.app.use('/reviews', express.static('uploads/reviews'));
     this.app.use('/file-user', express.static('public'));
     this.app.use('/general', express.static('public/general'));
