@@ -5,12 +5,12 @@ import { copyFileSync, renameSync } from 'fs';
 import PathServices from './paths.services';
 import Queries from '../utils/queries';
 import { getRootItem, numberToConvert } from '../utils/tools';
-import { ObjectNumber, UpdateLevelBlock } from 'types/types';
+import { ObjectNumber, UpdateLevelBlock, UpperAddSubtask } from 'types/types';
 class SubTasksServices {
-  static GMT = 60 * 60 * 1000;
-  static today = new Date().getTime();
+  protected static GMT = 60 * 60 * 1000;
+  protected static today = new Date().getTime();
 
-  static async find(id: SubTasks['id']) {
+  public static async find(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findSubTask = await prisma.subTasks.findUnique({
       where: { id },
@@ -20,7 +20,7 @@ class SubTasksServices {
     return findSubTask;
   }
 
-  static async findMany() {
+  public static async findMany() {
     const findSubTasks = await prisma.subTasks.findMany({
       include: {
         ...Queries.includeSubtask,
@@ -30,7 +30,11 @@ class SubTasksServices {
     return findSubTasks;
   }
 
-  static async findDuplicate(name: string, id: number, type: 'ROOT' | 'ID') {
+  public static async findDuplicate(
+    name: string,
+    id: number,
+    type: 'ROOT' | 'ID'
+  ) {
     let levels_Id, rootItem;
     levels_Id = id;
     if (name.includes('projects'))
@@ -62,7 +66,13 @@ class SubTasksServices {
     return { duplicated, quantity, levels_Id, rootItem, typeItem };
   }
 
-  static async create({ name, price, description, days, levels_Id }: SubTasks) {
+  public static async create({
+    name,
+    price,
+    description,
+    days,
+    levels_Id,
+  }: SubTasks) {
     const isDuplicated = await this.findDuplicate(name, levels_Id, 'ROOT');
     const { duplicated, rootItem, quantity, typeItem } = isDuplicated;
     if (duplicated) throw new AppError('Error, Nombre existente', 404);
@@ -79,7 +89,8 @@ class SubTasksServices {
     });
     return newSubTask;
   }
-  static async assigned(
+
+  public static async assigned(
     subtaskId: SubTasks['id'],
     userId: Users['id'],
     option: 'decline' | 'apply' | 'review'
@@ -123,7 +134,7 @@ class SubTasksServices {
     throw new AppError('Oops!, Necesitamos un status para esta consulta', 400);
   }
 
-  static async update(
+  public static async update(
     id: SubTasks['id'],
     {
       days,
@@ -148,7 +159,7 @@ class SubTasksServices {
     return updateTask;
   }
 
-  static async updateStatus(
+  public static async updateStatus(
     id: SubTasks['id'],
     { status, filesId }: SubTasks & { filesId?: number[] },
     user: Users
@@ -229,8 +240,8 @@ class SubTasksServices {
       //-------------------------------------------------------------------
       const _files = files.map(async file => {
         const ext = file.name.split('.').at(-1) || '';
-        const index = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
         countExt[ext] -= 1;
+        const index = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
         const _name = item + name + index + '.' + ext;
 
         await prisma.files.update({
@@ -255,7 +266,7 @@ class SubTasksServices {
     return updateTaskStatus;
   }
 
-  static async updateBlock(
+  public static async updateBlock(
     subtasks: UpdateLevelBlock['subTasks'],
     rootItem: string,
     newPath: string,
@@ -272,29 +283,35 @@ class SubTasksServices {
           const _type = numberToConvert(index, subtask.typeItem) || '';
           item = rootItem + _type + '.';
         }
-        // const item = rootItem + lastItem + '.';
         const updateSubtask = await prisma.subTasks.update({
           where: { id: subtask.id },
           data: { item, index },
         });
-        //-------------------------------------------------------------------------------
+        //------------------------- Count files per task ------------------------------------------
+        const countExt = _files.reduce((acc: ObjectNumber, value) => {
+          const ext = value.name.split('.').at(-1) || '';
+          acc[ext] = (acc[ext] || 0) + 1;
+          return acc;
+        }, {});
+        //-------------------------------------------------------------------
         const parseFiles = await Promise.all(
-          _files.map(async ({ dir: d, id: _id, name: n, ...file }, i) => {
+          _files.map(async ({ dir: d, id: _id, name: n, ...file }) => {
             const { item: _i, name: _n } = updateSubtask;
-            // const dir = file.type === 'UPLOADS' ? newPath : newEditable;
             const dir = newPath;
-            const ext = `.${n.split('.').at(-1)}`;
-            const name = _i + _n + `_${i + 1}${ext}`;
+            const ext = n.split('.').at(-1) || '';
+            countExt[ext] -= 1;
+            const index = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
+            const name = _i + _n + index + '.' + ext;
             await prisma.files
               .update({
                 where: { id: _id },
                 data: { dir, name },
               })
               .then(() => {
-                if (['.pdf', '.PDF'].includes(ext) && newEditable) {
+                renameSync(`${newPath}/${n}`, `${newPath}/${name}`);
+                if (['pdf', 'PDF'].includes(ext) && newEditable) {
                   renameSync(`${newEditable}/${n}`, `${newEditable}/${name}`);
                 }
-                renameSync(`${newPath}/${n}`, `${newPath}/${name}`);
               });
             return { dir, name, ...file };
           })
@@ -306,7 +323,76 @@ class SubTasksServices {
     );
     return subTasks;
   }
-  static async delete(id: SubTasks['id']) {
+
+  public static async addToUper(
+    id: SubTasks['id'],
+    { name, days, description }: UpperAddSubtask,
+    typeGte: 'upper' | 'lower'
+  ) {
+    if (!id || !typeGte) throw new AppError('Oops!,ID invalido', 400);
+    //------------------------------------------------------------------
+    const findSubTaskLower = await prisma.subTasks.findUnique({
+      where: { id },
+      include: { Levels: { select: { item: true, id: true } } },
+    });
+    if (!findSubTaskLower) throw new AppError('No existe la tarea', 400);
+    const { levels_Id, index, Levels, item, typeItem } = findSubTaskLower;
+
+    const data = {
+      item,
+      name,
+      days,
+      levels_Id,
+      typeItem,
+      description,
+    };
+    //------------------------------------------------------------------
+    let newSubTask;
+    if (typeGte === 'lower') {
+      const { rootItem } = getRootItem(item);
+      const newItem = rootItem + '.' + numberToConvert(index + 1, typeItem);
+      newSubTask = await prisma.subTasks.create({
+        data: { ...data, typeItem, index: index + 1, item: newItem },
+        include: { users: { select: { user: Queries.selectProfileUser } } },
+      });
+    } else {
+      newSubTask = await prisma.subTasks.create({
+        data: { ...data, typeItem, index },
+        include: { users: { select: { user: Queries.selectProfileUser } } },
+      });
+    }
+    const newPath = await PathServices.level(Levels.id);
+    const newEditables = newPath.replace('projects', 'editables');
+    //------------------------------------------------------------------
+    const typeFilter = typeGte === 'upper' ? { gte: index } : { gt: index };
+    //------------------------------------------------------------------
+    const list = await prisma.subTasks.findMany({
+      where: {
+        levels_Id,
+        index: typeFilter,
+        id: { not: newSubTask.id },
+      },
+      orderBy: { index: 'asc' },
+      include: {
+        files: {
+          where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] },
+          select: { id: true, dir: true, name: true, type: true },
+        },
+      },
+    });
+
+    const aux = typeGte === 'lower' ? 2 : 1;
+    const updateBlock = await this.updateBlock(
+      list,
+      Levels.item,
+      newPath,
+      newEditables,
+      index + aux
+    );
+    return [...updateBlock];
+  }
+
+  public static async delete(id: SubTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const subTaskDelete = await prisma.subTasks.delete({
       where: { id },
@@ -338,7 +424,7 @@ class SubTasksServices {
     return { ...subTaskDelete, tasks: updateBlock };
   }
 
-  static async updatePercentage(
+  public static async updatePercentage(
     subtaskId: SubTasks['id'],
     data: { userId: Users['id']; percentage: number }[]
   ) {
@@ -355,7 +441,7 @@ class SubTasksServices {
     return setPercentage;
   }
 
-  static async assignUserBySubtask(
+  public static async assignUserBySubtask(
     userData: { id: number; name: string }[],
     id: SubTasks['id']
   ) {

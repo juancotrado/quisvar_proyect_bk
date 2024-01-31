@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { StageServices, SubTasksServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
+import { ControllerFunction } from 'types/patterns';
 
 export const showSubTask = async (
   req: Request,
@@ -96,6 +97,22 @@ export const updateStatusSubTask = async (
   }
 };
 
+class SubtaskControllers {
+  public static addToUp: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id: subtask_id, stageId } = req.params;
+      const type = req.query.type as 'upper' | 'lower';
+      const { body } = req;
+      await SubTasksServices.addToUper(+subtask_id, { ...body }, type);
+      const query = await StageServices.find(+stageId);
+      res.status(201).json({ ...query, stagesId: stageId });
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
+export default SubtaskControllers;
 export const deleteSubTasks = async (
   req: Request,
   res: Response,

@@ -6,6 +6,7 @@ import {
   updateSubTask,
   deleteSubTasks,
   updateStatusSubTask,
+  SubtaskControllers,
 } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 
@@ -19,6 +20,8 @@ import {
   assignUserBySubtask,
   updatePercentage,
 } from '../controllers/subtasks.controllers';
+
+const { addToUp } = SubtaskControllers;
 
 const router = Router();
 router.use(authenticateHandler);
@@ -39,6 +42,7 @@ router.use(_mod_role);
 router.post('/', createSubTask);
 router.patch('/:id', updateSubTask);
 router.patch('/assignUser/:id/:stageId', assignUserBySubtask);
+router.post('/:id/:stageId', addToUp);
 router.delete('/:id/:stageId', validSubtaskByIdAndStatus, deleteSubTasks);
 
 export default router;

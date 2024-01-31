@@ -3,6 +3,7 @@ import { LevelsServices, PathServices } from '../services';
 import { mkdirSync, rmSync } from 'fs';
 import { renameDir, setNewPath } from '../utils/fileSystem';
 import { Levels, SubTasks } from '@prisma/client';
+import { ControllerFunction } from 'types/patterns';
 // import mv from 'mv';
 
 export const showLevel = async (
@@ -20,6 +21,28 @@ export const showLevel = async (
     next(error);
   }
 };
+
+class LevelsControllers {
+  public static addToUp: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id: subtask_id, stageId } = req.params;
+      const type = req.query.type as 'upper' | 'lower';
+      const { body } = req;
+      const query = await LevelsServices.addToUper(
+        +subtask_id,
+        { ...body },
+        type
+      );
+      // const query = await StageServices.find(+stageId);
+      // const query = { pat: 'pat' };
+      res.status(201).json({ ...query, stagesId: stageId });
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
+export default LevelsControllers;
 
 export const createLevel = async (
   req: Request,

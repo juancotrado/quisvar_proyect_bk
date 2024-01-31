@@ -221,6 +221,90 @@ paths:
             application/json:
               example:
                 error: No se pudo actualizar la etapa
+  /levels/{id}:
+    post:
+      tags:
+        - levels
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+        - $ref: '#/components/parameters/typeUpperorLower'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpperOrLowerLevel'
+      responses:
+        '201':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Operación exitosa
+        '404':
+          description: No se pudo crear el nivel
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el nivel
+  /subtasks/{id}/{stageId}:
+    post:
+      tags:
+        - subtask
+      parameters:
+        - $ref: '#/components/parameters/stageId'
+        - $ref: '#/components/parameters/subtaskId'
+        - $ref: '#/components/parameters/typeUpperorLower'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpperOrLower'
+      responses:
+        '201':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Operación exitosa
+        '404':
+          description: No se pudo crear la tarea
+          content:
+            application/json:
+              example:
+                error: No se pudo crear la tarea
+  /duplicates/subtask/{id}:
+    post:
+      tags:
+        - subtask
+      summary: Duplicate Subtask
+      description: |-
+        Duplicar tareas de nivel
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/subtaskId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DuplicatesRequestBody'
+
+      responses:
+        '201':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Operación exitosa
+        '404':
+          description: No se pudo duplicar la tarea
+          content:
+            application/json:
+              example:
+                error: No se pudo duplicar la tarea
   /contract:
     get:
       tags:
@@ -627,6 +711,35 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  parameters:
+    stageId:
+      name: stageId
+      in: path
+      description: Ingresar id de etapa
+      required: true
+      schema:
+        type: integer
+    subtaskId:
+      name: id
+      in: path
+      description: Ingresar id de tarea
+      required: true
+      schema:
+        type: integer
+    levelId:
+      name: id
+      in: path
+      description: Ingresar id de tarea
+      required: true
+      schema:
+        type: integer
+    typeUpperorLower:
+      name: type
+      in: query
+      description: Usar las siguientes variables <b>[upper,lower]</b>
+      required: true
+      schema:
+        type: string
   schemas:
     Login:
       required:
@@ -769,3 +882,37 @@ components:
         groupId:
           type: integer
           example: 2
+    CreateUpperOrLower:
+      required:
+        - name
+        - days
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'nueva_tarea_creada'
+        days:
+          type: integer
+          example: 2
+        description:
+          type: string
+          example: 'Lorem ipsum'
+    CreateUpperOrLowerLevel:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'nuevo_nivel_creada'
+        userId:
+          type: integer
+          example: undefined
+    DuplicatesRequestBody:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'nombre_de_tarea_duplicada'

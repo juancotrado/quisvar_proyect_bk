@@ -18,9 +18,10 @@ import {
   DuplicateLevel,
   GetFilterLevels,
   ListCostType,
+  ObjectNumber,
   UpdateLevelBlock,
 } from 'types/types';
-import { existsSync, renameSync } from 'fs';
+import { existsSync, mkdirSync, renameSync } from 'fs';
 import Queries from '../utils/queries';
 import PathServices from './paths.services';
 
@@ -184,6 +185,80 @@ class LevelsServices {
     return levelType;
   }
 
+  public static async addToUper(
+    id: Levels['id'],
+    { name, userId }: Levels,
+    typeGte: 'upper' | 'lower'
+  ) {
+    if (!id || !typeGte) throw new AppError('Oops!,ID invalido', 400);
+    //--------------------------- Find level ------------------------------------
+    const getInfoLevel = await getRootPath(id);
+    const { rootPath, rootId, stagesId, rootLevel, ..._level } = getInfoLevel;
+    const { typeItem, index, _item: item, ...levelData } = _level;
+    const { id: _i, name: _n, ...parseData } = levelData;
+    //------------------------------------------------------------------
+    const { duplicated } = await this.duplicate(rootId, stagesId, name, 'ROOT');
+    if (duplicated) throw new AppError('Error al crear, Nombre existente', 404);
+    //--------------------------create_level---------------------------------------
+    const rootData = { rootId, rootLevel, stagesId };
+    const data = { typeItem, name, item, ...parseData, ...rootData };
+    let newLevel;
+    const { rootItem } = getRootItem(item);
+    if (typeGte === 'lower') {
+      const newItem =
+        rootItem + '.' + numberToConvert(index + 1, typeItem) + '.';
+      const levelData = { ...data, index: index + 1, item: newItem, userId };
+      newLevel = await prisma.levels.create({ data: { ...levelData } });
+    } else {
+      const levelData = { ...data, index, userId };
+      newLevel = await prisma.levels.create({ data: { ...levelData } });
+    }
+    //--------------------------- Create Folder Levels ------------------------------------
+    const path = await PathServices.level(newLevel.id);
+    const editablePath = path.replace('projects', 'editables');
+    if (newLevel) {
+      mkdirSync(path);
+      mkdirSync(editablePath);
+    }
+    //-----------------------------------------------------------------------------------
+    const typeFilter = typeGte === 'upper' ? { gte: item } : { gt: item };
+    const aux = typeGte === 'lower' ? 2 : 1;
+    //--------------------------- Find Lower Levels ------------------------------------
+    const getList = await prisma.levels.findMany({
+      where: {
+        stagesId,
+        level: { gt: rootLevel },
+        item: typeFilter,
+        id: { not: newLevel.id },
+      },
+      include: {
+        subTasks: {
+          select: {
+            index: true,
+            id: true,
+            item: true,
+            typeItem: true,
+            files: {
+              where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] },
+              select: { id: true, dir: true, name: true, type: true },
+            },
+          },
+        },
+      },
+      orderBy: { item: 'asc' },
+    });
+    const _rootItem = rootItem.length ? rootItem + '.' : rootItem;
+    const updateList = await this.updateBlock(
+      getList,
+      rootLevel,
+      rootId,
+      rootPath,
+      _rootItem,
+      index + aux
+    );
+    return getList;
+  }
+
   static async delete(id: Levels['id']) {
     //----------------------------verify_exist------------------------------------
     const getInfoLevel = await getRootPath(id);
@@ -311,27 +386,34 @@ class LevelsServices {
               where: { id: subtask.id },
               data: { item },
             });
+            //------------------------- Count files per task ------------------------------------------
+            const countExt = _files.reduce((acc: ObjectNumber, value) => {
+              const ext = value.name.split('.').at(-1) || '';
+              acc[ext] = (acc[ext] || 0) + 1;
+              return acc;
+            }, {});
             //-------------------------------------------------------------------------------
             const parseFiles = await Promise.all(
               _files.map(async ({ dir: d, id: _id, name: n, ...file }, i) => {
                 const { item: _i, name: _n } = updateSubtask;
-                // const dir = file.type === 'UPLOADS' ? newPath : newEditable;
                 const dir = newPath;
-                const ext = `.${n.split('.').at(-1)}`;
-                const name = _i + _n + `_${i + 1}${ext}`;
+                const ext = n.split('.').at(-1) || '';
+                countExt[ext] -= 1;
+                const index = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
+                const name = _i + _n + index + '.' + ext;
                 await prisma.files
                   .update({
                     where: { id: _id },
                     data: { dir, name },
                   })
                   .then(() => {
-                    if (['.pdf', '.PDF'].includes(ext) && newEditable) {
+                    renameSync(`${newPath}/${n}`, `${newPath}/${name}`);
+                    if (['pdf', 'PDF'].includes(ext) && newEditable) {
                       renameSync(
                         `${newEditable}/${n}`,
                         `${newEditable}/${name}`
                       );
                     }
-                    renameSync(`${newPath}/${n}`, `${newPath}/${name}`);
                   });
                 return { dir, name, ...file };
               })
@@ -341,6 +423,7 @@ class LevelsServices {
             return { item, files, ...subtask };
           })
         );
+        //-------------------------------------------------------------------------------
         const nextLevel: UpdateLevelBlock[] = await this.updateBlock(
           list,
           level,

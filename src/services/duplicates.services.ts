@@ -176,36 +176,70 @@ class DuplicatesServices {
         typeItem: true,
         price: true,
         days: true,
+        index: true,
         files: { where: { type: 'MODEL' } },
         Levels: { select: { id: true, item: true } },
       },
     });
     if (!getSubTask) throw new AppError('Ops!, no se pudo encontrar', 404);
-    const { files, Levels, ..._data } = getSubTask;
+    const { files, Levels, index, ...subTaskData } = getSubTask;
+    const newPath = await PathServices.level(Levels.id);
+    const newEditables = newPath.replace('projects', 'editables');
     //--------------------------set_new_item-----------------------------
     const { item: rootItem, id: levels_Id } = Levels;
     const parseItem = rootItem ? rootItem : '';
-    const index = quantity + 1;
-    const _type = numberToConvert(index, _data.typeItem);
-    if (!_type) throw new AppError('excediste Limite de conversion', 400);
-    const item = parseItem + _type + '.';
+    const lastItem = numberToConvert(index + 1, subTaskData.typeItem);
+    if (!lastItem) throw new AppError('excediste Limite de conversion', 400);
+    const item = parseItem + lastItem + '.';
     //--------------------------set_new_subtasks-------------------------
     const status: SubTasks['status'] = 'UNRESOLVED';
-    const data = { ..._data, status, name, item, levels_Id, index };
-    const _newSubTaks = await prisma.subTasks.create({ data });
+    const data = {
+      ...subTaskData,
+      status,
+      name,
+      item,
+      levels_Id,
+      index: index + 1,
+    };
+    const newSubTask = await prisma.subTasks.create({ data });
     //--------------------------set_new_files----------------------------
     const hash = new Date().getTime();
     const _files = files.map(
       ({ id, assignedAt, feedbackId, subTasksId, ...data }) => {
-        const nameFile = data.name.split('$')[1];
-        const name = `${hash}$${nameFile}`;
+        const nameFile = data.name.split('$$')[1];
+        const name = `${hash}$$${nameFile}`;
         copyFileSync(`${data.dir}/${data.name}`, `${data.dir}/${name}`);
-        return { ...data, name, subTasksId: _newSubTaks.id };
+        return { ...data, name, subTasksId: newSubTask.id };
       }
     );
     await prisma.files.createMany({ data: _files });
     //------------------------------------------------------------------
-    return { ..._newSubTaks, files: _files };
+    const list = await prisma.subTasks.findMany({
+      where: {
+        levels_Id,
+        index: { gt: index },
+        id: {
+          not: newSubTask.id,
+        },
+      },
+      orderBy: { index: 'asc' },
+      include: {
+        files: {
+          where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] },
+          select: { id: true, dir: true, name: true, type: true },
+        },
+      },
+    });
+    //--------------------------------------------------------------
+    await SubTasksServices.updateBlock(
+      list,
+      Levels.item,
+      newPath,
+      newEditables,
+      index + 2
+    );
+    //--------------------------------------------------------------
+    return { ...newSubTask, files: _files };
   }
 
   static async listSubtask(

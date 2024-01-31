@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { PathServices } from '../services';
 import { archiverFolder } from '../utils/archiver';
 import fs from 'fs';
+import { removeUnwantedCharacters } from '../utils/tools';
 
 const TYPE_PATH = {
   projects: PathServices.project,
@@ -24,11 +25,15 @@ export const archiverPath = async (
     const pathReplace = path.replace('projects', typeZip as string);
     const normalicePath = pathReplace.split('/').slice(0, -1).join('/');
     const folderPath = pathReplace.slice(2);
-    const zipFilePath = `${normalicePath}/${nameZip ?? 'defaultName'}.zip`;
+    const normalizeName = removeUnwantedCharacters(nameZip as string);
+    const zipFilePath = `${normalicePath}/${
+      normalizeName ?? 'defaultName'
+    }.zip`;
     const resArchiver = await archiverFolder(folderPath, zipFilePath);
     res.status(201).json({
       result: resArchiver,
-      url: zipFilePath,
+      urlFile: zipFilePath.replace('./uploads/', ''),
+      urlFileDelete: zipFilePath,
     });
   } catch (error) {
     next(error);
