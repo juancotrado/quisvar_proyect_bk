@@ -204,9 +204,10 @@ class LevelsServices {
     const data = { typeItem, name, item, ...parseData, ...rootData };
     let newLevel;
     const { rootItem } = getRootItem(item);
+    const _rootItem = rootItem.length ? rootItem + '.' : rootItem;
     if (typeGte === 'lower') {
       const newItem =
-        rootItem + '.' + numberToConvert(index + 1, typeItem) + '.';
+        _rootItem + '.' + numberToConvert(index + 1, typeItem) + '.';
       const levelData = { ...data, index: index + 1, item: newItem, userId };
       newLevel = await prisma.levels.create({ data: { ...levelData } });
     } else {
@@ -247,7 +248,6 @@ class LevelsServices {
       },
       orderBy: { item: 'asc' },
     });
-    const _rootItem = rootItem.length ? rootItem + '.' : rootItem;
     const updateList = await this.updateBlock(
       getList,
       rootLevel,
