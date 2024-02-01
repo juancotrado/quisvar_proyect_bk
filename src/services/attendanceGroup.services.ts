@@ -108,7 +108,7 @@ class AttendanceGroupService {
   }
 
   //Group List
-  static async createList(data: GroupList) {
+  static async createList(data: GroupList, id: number, date: string) {
     if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
     const { nombre, groupId } = data;
     const lastList = await prisma.groupList.findMany({
@@ -122,13 +122,14 @@ class AttendanceGroupService {
     });
     if (lastList[0].attendance.length === 0)
       throw new AppError(`Oops!, Al parecer hay una lista en curso`, 400);
-    const groupList = await prisma.groupList.create({
+    await prisma.groupList.create({
       data: {
         nombre,
         groupId,
       },
     });
-    return groupList;
+    const list = await this.getList(date, id);
+    return list;
   }
   static async editTitle(id: GroupList['id'], title: GroupList['title']) {
     if (!id) throw new AppError('Oops!, Id no encontrado', 400);
