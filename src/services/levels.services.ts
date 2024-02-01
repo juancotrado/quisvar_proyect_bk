@@ -222,15 +222,29 @@ class LevelsServices {
       mkdirSync(editablePath);
     }
     //-----------------------------------------------------------------------------------
-    const typeFilter = typeGte === 'upper' ? { gte: item } : { gt: item };
+    const typeFilter =
+      typeGte === 'upper' ? { not: getInfoLevel.id } : { not: 0 };
     const aux = typeGte === 'lower' ? 2 : 1;
     //--------------------------- Find Lower Levels ------------------------------------
+    const filterLevelList = await prisma.levels.groupBy({
+      by: ['id', 'item', 'index'],
+      where: {
+        stagesId,
+        rootId: getInfoLevel.rootId,
+        level: getInfoLevel.level,
+        id: typeFilter,
+        index: { lte: index },
+      },
+    });
+
+    //-----------------------------------------------------------------
+    const blackList = filterLevelList.map(({ id }) => id);
     const getList = await prisma.levels.findMany({
       where: {
         stagesId,
         level: { gt: rootLevel },
-        item: typeFilter,
-        id: { not: newLevel.id },
+        item: { startsWith: _rootItem },
+        id: { notIn: [...blackList, newLevel.id] },
       },
       include: {
         subTasks: {
@@ -246,8 +260,9 @@ class LevelsServices {
           },
         },
       },
-      orderBy: { item: 'asc' },
+      orderBy: { index: 'asc' },
     });
+
     const updateList = await this.updateBlock(
       getList,
       rootLevel,
@@ -268,13 +283,30 @@ class LevelsServices {
     if (_count) throw new AppError('Error al eliminar, contiene tareas', 400);
     //----------------------------delete_level------------------------------------
     const deleteLevel = await prisma.levels.delete({ where: { id } });
+    // if (!deleteLevel) throw new AppError('Error al eliminar, contiene tareas', 400);
     const deleteDir = rootPath + parsePath(_item, deleteLevel.name);
-    await this.verifyTasks(stagesId, deleteLevel.item, deleteLevel.level);
+    // await this.verifyTasks(stagesId, deleteLevel.item, deleteLevel.level);
+
+    const filterLevelList = await prisma.levels.groupBy({
+      by: ['id'],
+      where: {
+        stagesId,
+        rootId: getInfoLevel.rootId,
+        level: getInfoLevel.level,
+        index: { lte: getInfoLevel.index },
+      },
+    });
+    //-------------------------- get root id -------------------------
+    const { rootItem } = getRootItem(_item);
+    const _rootItem = rootItem ? rootItem + '.' : rootItem;
+    //-----------------------------------------------------------------
+    const blackList = filterLevelList.map(({ id }) => id);
     const getList = await prisma.levels.findMany({
       where: {
         stagesId,
         level: { gt: rootLevel },
-        item: { gt: _item, not: { startsWith: _item } },
+        item: { startsWith: _rootItem },
+        id: { notIn: blackList },
       },
       include: {
         subTasks: {
@@ -290,11 +322,10 @@ class LevelsServices {
           },
         },
       },
-      orderBy: { item: 'asc' },
+      orderBy: { index: 'asc' },
     });
-    // //-----------------------update_some_levels----------------------------------
-    const { rootItem } = getRootItem(_item);
-    const _rootItem = rootItem ? rootItem + '.' : rootItem;
+
+    //-----------------------update_some_levels----------------------------------
     const updateList = await this.updateBlock(
       getList,
       rootLevel,
@@ -304,8 +335,8 @@ class LevelsServices {
       getInfoLevel.index
     );
     // //-------------------------return_delete_dir---------------------------------
-    const result = await Promise.all(updateList).then(() => {
-      // deleteList();
+    const result = await Promise.all(updateList).then(async () => {
+      await this.deleteBlock(stagesId, getInfoLevel._item, getInfoLevel.level);
       return deleteDir;
     });
     return result;
