@@ -22,6 +22,7 @@ export interface MenuRoles {
   title: string;
   route: MenuAccess;
   typeRol: MenuRole;
+  menu?: MenuRoles[];
 }
 interface Menu extends MenuGeneral {
   route: MenuAccess;
@@ -108,12 +109,13 @@ export class MenuPoints {
     const { id, name, menu } = this.roleTransform(data);
     const menuFilter = menu.filter(men => !!men) as MenuHeader[];
     const menuPoints = menuFilter.map(
-      ({ id, route, title, typeRol, idRelation }) => ({
+      ({ id, route, title, typeRol, idRelation, menu }) => ({
         id,
         route,
         title,
         typeRol,
         idRelation,
+        menu,
       })
     );
     return { id, name, menuPoints };
@@ -122,7 +124,15 @@ export class MenuPoints {
   public joinMenuRolAndMenuGeneral(menuRol: MenuRoles[]) {
     const newMenuPoint = this.getMenuPoints().map(menuPoint => {
       const findMenuRol = menuRol.find(menu => menu.id === menuPoint.id);
-      return findMenuRol ? { ...menuPoint, ...findMenuRol } : menuPoint;
+      const newSubMenu = menuPoint.menu?.map(subMenu => {
+        const findSubMenuRol = findMenuRol?.menu?.find(
+          menu => menu.id === subMenu.id
+        );
+        return findMenuRol ? { ...subMenu, ...findSubMenuRol } : menuPoint;
+      });
+      return findMenuRol
+        ? { ...menuPoint, ...{ ...findMenuRol, menu: newSubMenu } }
+        : menuPoint;
     });
     return newMenuPoint;
   }

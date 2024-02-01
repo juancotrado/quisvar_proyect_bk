@@ -159,7 +159,7 @@ class RoleService {
 
       const existMenuPointId = menuPointId ?? 0;
 
-      await prisma.menuPoints.upsert({
+      const menuUpsert = await prisma.menuPoints.upsert({
         where: { id: existMenuPointId },
         update: {
           typeRol,
@@ -189,7 +189,7 @@ class RoleService {
           create: {
             typeRol: subMenuTypeRol,
             menuId: subMenuId,
-            menuPointsId: menuPointId,
+            menuPointsId: menuUpsert.id,
           },
         });
       }
