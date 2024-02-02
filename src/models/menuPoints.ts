@@ -108,12 +108,15 @@ export class MenuPoints {
   public getHeadersOptions(data: Role) {
     const { id, name, menu } = this.roleTransform(data);
     const menuFilter = menu.filter(men => !!men) as MenuHeader[];
-    const menuPoints = menuFilter.map(({ id, route, title, menu }) => ({
-      id,
-      route,
-      title,
-      menu,
-    }));
+    const menuPoints = menuFilter.map(
+      ({ id, route, title, menu, typeRol }) => ({
+        id,
+        route,
+        title,
+        menu,
+        typeRol,
+      })
+    );
     const menuPointsOrder = menuPoints.sort((a, b) => a.id - b.id);
     return { id, name, menuPoints: menuPointsOrder };
   }
