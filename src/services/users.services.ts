@@ -61,7 +61,7 @@ class UsersServices {
       },
     });
     if (!findUser) throw new AppError('No se pudo encontrar el usuario', 404);
-    const role = await RoleService.findGeneral(findUser.roleId);
+    const role = await RoleService.findGeneral(findUser.roleId!);
     return { ...findUser, role };
   }
 
@@ -152,7 +152,7 @@ class UsersServices {
         ruc,
         address,
         declaration,
-        roleId: +roleId,
+        roleId: +roleId!,
         profile: {
           create: {
             firstName,

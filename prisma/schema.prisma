@@ -36,8 +36,8 @@ model Users {
   groups                GroupOnUsers[]
   moderatorOfGroup      Group[]
   Attendance            AttendanceGroup[]
-  roleId                Int
-  role                  Role               @relation(fields: [roleId], references: [id])
+  roleId                Int?
+  role                  Role?               @relation(fields: [roleId], references: [id])
 }
 
 model WorkStation {

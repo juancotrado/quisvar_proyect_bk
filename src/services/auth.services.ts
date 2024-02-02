@@ -36,7 +36,7 @@ export class authServices {
     if (!user) throw new AppError('Usuario inexistente', 404);
     const verifyPassword = await bcrypt.compare(password, user.password);
     if (!verifyPassword) throw new AppError('contraseña incorrecta', 404);
-    const role = await RoleService.findGeneral(user.role.id);
+    const role = await RoleService.findGeneral(user.role!.id);
     return { ...user, role };
   }
 
