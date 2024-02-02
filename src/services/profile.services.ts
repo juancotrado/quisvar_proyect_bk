@@ -1,6 +1,7 @@
 import { Profiles, Users } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
+import { userPickEdit } from '../utils/format.server';
 class ProfileServices {
   static async update(
     id: Users['id'],
@@ -22,9 +23,8 @@ class ProfileServices {
       room,
       userPc,
     }: Profiles,
-    email: Users['email'],
-    address: Users['address'],
-    ruc: Users['ruc']
+
+    { email, address, ruc, roleId }: userPickEdit
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateUser = await prisma.users.update({
@@ -33,6 +33,7 @@ class ProfileServices {
         email,
         address,
         ruc,
+        roleId,
         profile: {
           update: {
             firstName,

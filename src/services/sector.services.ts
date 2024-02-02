@@ -34,8 +34,7 @@ class SectorServices {
         },
       },
     });
-    if (getSectors.length == 0)
-      throw new AppError('No se pudo encontrar los sectores de trabajo', 404);
+
     return getSectors;
   }
   static async create({ name }: Sector) {

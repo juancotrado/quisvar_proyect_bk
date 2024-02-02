@@ -3,38 +3,20 @@ import { userProfilePick } from '../utils/format.server';
 import { enviarCorreoAgradecimiento } from '../utils/mailer';
 import { Users, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
+import RoleService from './role.service';
 
 class UsersServices {
   static async getAll() {
-    const usersAdmin = await prisma.users.findMany({
-      where: {
-        role: { in: ['SUPER_ADMIN', 'ADMIN'] },
-      },
+    const users = await prisma.users.findMany({
       orderBy: { createdAt: 'asc' },
       include: {
         profile: true,
-        equipment: {
-          include: {
-            workStation: true,
-          },
-        },
-      },
-    });
-    const usersEmployes = await prisma.users.findMany({
-      where: {
         role: {
-          in: [
-            'ASSISTANT',
-            'ASSISTANT_ADMINISTRATIVE',
-            'SUPER_MOD',
-            'MOD',
-            'EMPLOYEE',
-          ],
+          select: {
+            id: true,
+            name: true,
+          },
         },
-      },
-      orderBy: { profile: { lastName: 'asc' } },
-      include: {
-        profile: true,
         equipment: {
           include: {
             workStation: true,
@@ -42,9 +24,32 @@ class UsersServices {
         },
       },
     });
-    if (usersAdmin.length == 0 && usersEmployes.length == 0)
+    // const usersEmployes = await prisma.users.findMany({
+    //   // where: {
+    //   //   role: {
+    //   //     in: [
+    //   //       'ASSISTANT',
+    //   //       'ASSISTANT_ADMINISTRATIVE',
+    //   //       'SUPER_MOD',
+    //   //       'MOD',
+    //   //       'EMPLOYEE',
+    //   //     ],
+    //   //   },
+    //   // },
+    //   orderBy: { profile: { lastName: 'asc' } },
+    //   include: {
+    //     profile: true,
+    //     equipment: {
+    //       include: {
+    //         workStation: true,
+    //       },
+    //     },
+    //   },
+    // });
+    // console.log("entre")
+    if (users.length == 0)
       throw new AppError('No se pudo encontrar el registro de usuarios', 404);
-    return [...usersAdmin, ...usersEmployes];
+    return users;
   }
 
   static async find(id: Users['id']) {
@@ -56,7 +61,8 @@ class UsersServices {
       },
     });
     if (!findUser) throw new AppError('No se pudo encontrar el usuario', 404);
-    return findUser;
+    const role = await RoleService.findGeneral(findUser.roleId);
+    return { ...findUser, role };
   }
 
   static async findListTask(id: Users['id']) {
@@ -121,7 +127,6 @@ class UsersServices {
     degree,
     job,
     cv,
-    role,
     declaration,
     department,
     district,
@@ -135,6 +140,7 @@ class UsersServices {
     lastNameRef,
     phoneRef,
     description,
+    roleId,
   }: userProfilePick) {
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -146,7 +152,7 @@ class UsersServices {
         ruc,
         address,
         declaration,
-        role,
+        roleId: +roleId,
         profile: {
           create: {
             firstName,
@@ -176,15 +182,11 @@ class UsersServices {
     return newUser;
   }
 
-  static async update(
-    id: Users['id'],
-    { role, status }: Pick<Users, 'role' | 'status'>
-  ) {
+  static async update(id: Users['id'], { status }: Pick<Users, 'status'>) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateUser = await prisma.users.update({
       where: { id },
       data: {
-        role,
         status,
       },
     });

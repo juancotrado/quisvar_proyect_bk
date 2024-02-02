@@ -15,7 +15,7 @@ class ListServices {
       },
       take: 1,
     });
-    if (lastList[0].users.length === 0)
+    if (lastList[0]?.users?.length === 0)
       throw new AppError(`Oops!, Al parecer hay una lista en curso`, 400);
     const newList = await prisma.list.create({
       data: {
@@ -109,10 +109,10 @@ class ListServices {
     const startOfDay = new Date(_startDate + GMT * 5);
     const endOfDay = new Date(_endDate + GMT * 29 - 1);
     const listAdmin = await prisma.users.findMany({
-      where: {
-        role: { in: ['SUPER_ADMIN', 'ADMIN'] },
-        status: true,
-      },
+      // where: {
+      //   role: { in: ['SUPER_ADMIN', 'ADMIN'] },
+      //   status: true,
+      // },
       orderBy: { createdAt: 'asc' },
       select: {
         id: true,
@@ -161,18 +161,18 @@ class ListServices {
       },
     });
     const listEmploye = await prisma.users.findMany({
-      where: {
-        role: {
-          in: [
-            'ASSISTANT',
-            'ASSISTANT_ADMINISTRATIVE',
-            'SUPER_MOD',
-            'MOD',
-            'EMPLOYEE',
-          ],
-        },
-        status: true,
-      },
+      // where: {
+      //   role: {
+      //     in: [
+      //       'ASSISTANT',
+      //       'ASSISTANT_ADMINISTRATIVE',
+      //       'SUPER_MOD',
+      //       'MOD',
+      //       'EMPLOYEE',
+      //     ],
+      //   },
+      //   status: true,
+      // },
       orderBy: { profile: { lastName: 'asc' } },
       select: {
         id: true,
