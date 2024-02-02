@@ -67,7 +67,7 @@ class RoleService {
   static async findAllGeneral() {
     const allRoles = await RoleService.getAllMenus();
     const allMenusWithRole = allRoles.map(role => ({
-      ...menuPoints.getHeadersOptions(role),
+      ...menuPoints.getMenuOptions(role),
       menuPointsDb: role.menuPoints,
     }));
     return allMenusWithRole;

@@ -11,6 +11,12 @@ class UsersServices {
       orderBy: { createdAt: 'asc' },
       include: {
         profile: true,
+        role: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         equipment: {
           include: {
             workStation: true,

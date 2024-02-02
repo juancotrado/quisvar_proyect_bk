@@ -35,7 +35,7 @@ model Users {
   equipment             Equipment?
   groups                GroupOnUsers[]
   moderatorOfGroup      Group[]
-  roleId                Int                @unique
+  roleId                Int
   role                  Role               @relation(fields: [roleId], references: [id])
 }
 
@@ -573,7 +573,7 @@ model Contratc {
 model Role {
   id         Int          @id @default(autoincrement())
   name       String       @unique
-  users      Users?
+  users      Users[]
   menuPoints MenuPoints[]
 }
 

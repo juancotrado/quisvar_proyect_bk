@@ -108,6 +108,18 @@ export class MenuPoints {
   public getHeadersOptions(data: Role) {
     const { id, name, menu } = this.roleTransform(data);
     const menuFilter = menu.filter(men => !!men) as MenuHeader[];
+    const menuPoints = menuFilter.map(({ id, route, title, menu }) => ({
+      id,
+      route,
+      title,
+      menu,
+    }));
+    const menuPointsOrder = menuPoints.sort((a, b) => a.id - b.id);
+    return { id, name, menuPoints: menuPointsOrder };
+  }
+  public getMenuOptions(data: Role) {
+    const { id, name, menu } = this.roleTransform(data);
+    const menuFilter = menu.filter(men => !!men) as MenuHeader[];
     const menuPoints = menuFilter.map(
       ({ id, route, title, typeRol, idRelation, menu }) => ({
         id,
@@ -182,19 +194,19 @@ const MENU_POINTS: Menu[] = [
 ];
 
 export const INDICE_GENERAL_OPTIONS: SubMenu[] = [
-  { id: 1, title: 'DTI', route: 'contratos8', access: ['MOD'] },
-  { id: 2, title: 'AC', route: 'contratos8', access: ['MOD'] },
-  { id: 3, title: 'DPP', route: 'contratos8', access: ['MOD'] },
-  { id: 4, title: 'DRP', route: 'contratos8', access: ['MOD'] },
-  { id: 5, title: 'DIEB', route: 'contratos8', access: ['MOD'] },
-  { id: 6, title: 'CPE', route: 'contratos8', access: ['MOD'] },
-  { id: 7, title: 'Imagen Inst', route: 'contratos7', access: ['MOD'] },
-  { id: 8, title: 'OSCE', route: 'contratos6', access: ['MOD'] },
-  { id: 9, title: 'SUNAT', route: 'contratos5', access: ['MOD'] },
-  { id: 10, title: 'DCA,CC', route: 'contratos4', access: ['MOD'] },
-  { id: 11, title: 'CF', route: 'contratos3', access: ['MOD'] },
-  { id: 12, title: 'DEP', route: 'contratos2', access: ['MOD'] },
-  { id: 13, title: 'DEE', route: 'contratos1', access: ['MOD'] },
+  { id: 1, title: 'DTI', route: 'contratos', access: ['MOD'] },
+  { id: 2, title: 'AC', route: 'contratos', access: ['MOD'] },
+  { id: 3, title: 'DPP', route: 'contratos', access: ['MOD'] },
+  { id: 4, title: 'DRP', route: 'contratos', access: ['MOD'] },
+  { id: 5, title: 'DIEB', route: 'contratos', access: ['MOD'] },
+  { id: 6, title: 'CPE', route: 'contratos', access: ['MOD'] },
+  { id: 7, title: 'Imagen Inst', route: 'contratos', access: ['MOD'] },
+  { id: 8, title: 'OSCE', route: 'contratos', access: ['MOD'] },
+  { id: 9, title: 'SUNAT', route: 'contratos', access: ['MOD'] },
+  { id: 10, title: 'DCA,CC', route: 'contratos', access: ['MOD'] },
+  { id: 11, title: 'CF', route: 'contratos', access: ['MOD'] },
+  { id: 12, title: 'DEP', route: 'contratos', access: ['MOD'] },
+  { id: 13, title: 'DEE', route: 'contratos', access: ['MOD'] },
   { id: 14, title: 'CAEC', route: 'contratos', access: ['MOD'] },
 ];
 
