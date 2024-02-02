@@ -3,8 +3,14 @@ import { config } from 'dotenv';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import AppError from '../utils/appError';
+import { MenuRoles } from '../models/menuPoints';
 
-export type UserType = Users & { profile: Profiles };
+interface RoleAuht {
+  id: number;
+  name: string;
+  menuPoints: MenuRoles[];
+}
+export type UserType = Users & { profile: Profiles } & { role: RoleAuht };
 
 config();
 const SECRET = process.env.SECRET;

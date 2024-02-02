@@ -9,7 +9,7 @@ class AttendanceGroupRoutes {
   }
   protected setUpRouter(): void {
     this.router.use(authenticateHandler);
-    this.router.use(role.mod);
+    // this.router.use(role.mod);
     this.router.get(
       '/users/:groupId',
       AttendanceGroupControllers.getUsersGroup

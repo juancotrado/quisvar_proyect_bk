@@ -10,6 +10,8 @@ const router = Router();
 // router.post('/upload', upload.single('awa'), uploadFile);
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
+router.use(_admin_role);
+
 router.use(_employee_role);
 router.put('/:id', updateProfile);
 router.get('/', showProfile);

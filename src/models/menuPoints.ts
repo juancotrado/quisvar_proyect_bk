@@ -11,7 +11,7 @@ export type MenuAccess =
   | 'indice-general'
   | 'grupos';
 
-type MenuRole = 'MOD' | 'MEMBER' | 'VIEWER';
+export type MenuRole = 'MOD' | 'MEMBER' | 'VIEWER';
 interface MenuGeneral {
   id: number;
   title: string;
@@ -34,7 +34,7 @@ interface SubMenu extends MenuGeneral {
 interface RelationMenu {
   [key: number]: SubMenu[];
 }
-interface Role {
+export interface Role {
   id: number;
   name: string;
   menuPoints: RoleMenu[];
@@ -108,12 +108,15 @@ export class MenuPoints {
   public getHeadersOptions(data: Role) {
     const { id, name, menu } = this.roleTransform(data);
     const menuFilter = menu.filter(men => !!men) as MenuHeader[];
-    const menuPoints = menuFilter.map(({ id, route, title, menu }) => ({
-      id,
-      route,
-      title,
-      menu,
-    }));
+    const menuPoints = menuFilter.map(
+      ({ id, route, title, typeRol, menu }) => ({
+        id,
+        route,
+        title,
+        menu,
+        typeRol,
+      })
+    );
     const menuPointsOrder = menuPoints.sort((a, b) => a.id - b.id);
     return { id, name, menuPoints: menuPointsOrder };
   }

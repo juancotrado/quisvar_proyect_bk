@@ -2,11 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import { UserType } from './auth.middleware';
 // import { UserRole } from '@prisma/client';
 import AppError from '../utils/appError';
+import { MenuAccess, MenuRole } from '../models/menuPoints';
 
 const roleHandler =
   (roles: any[]) => (req: Request, res: Response, next: NextFunction) => {
     const userInfo: UserType = res.locals.userInfo;
-    console.log(roles);
+    // console.log(roles);
+    console.log('userInfo', JSON.stringify(userInfo, null, 2));
     // const { role } = userInfo;
     // if (!roles.includes(role)) {
     //   throw new AppError(`${role} no tiene acceso a esta ruta`, 400);
@@ -15,41 +17,45 @@ const roleHandler =
   };
 
 class Role {
-  private InitiHandler =
-    (roles: any[]) => (req: Request, res: Response, next: NextFunction) => {
+  public RoleHandler =
+    (route: MenuAccess, typeRol: MenuRole) =>
+    (req: Request, res: Response, next: NextFunction) => {
       const userInfo: UserType = res.locals.userInfo;
-      console.log(roles);
-
-      // const { role } = userInfo;
-      // if (!roles.includes(role)) {
-      //   throw new AppError(`${role} no tiene acceso a esta ruta`, 400);
-      // }
+      const hasAccess = userInfo.role.menuPoints.some(
+        menuPoint => menuPoint.route === route && menuPoint.typeRol === typeRol
+      );
+      if (hasAccess) {
+        throw new AppError(
+          `Rol: ${userInfo.role.name} no tiene acceso a esta ruta`,
+          400
+        );
+      }
       next();
     };
 
-  public admin = this.InitiHandler([
-    'SUPER_ADMIN',
-    'ADMIN',
-    'ASSISTANT',
-    'ASSISTANT_ADMINISTRATIVE',
-    'AREA_MOD',
-  ]);
-  public mod = roleHandler([
-    'SUPER_ADMIN',
-    'ADMIN',
-    'ASSISTANT',
-    'SUPER_MOD',
-    'MOD',
-  ]);
-  public employee = roleHandler([
-    'SUPER_ADMIN',
-    'ADMIN',
-    'ASSISTANT',
-    'SUPER_MOD',
-    'MOD',
-    'EMPLOYEE',
-    'ASSISTANT_ADMINISTRATIVE',
-  ]);
+  // public admin = this.InitiHandler([
+  //   'SUPER_ADMIN',
+  //   'ADMIN',
+  //   'ASSISTANT',
+  //   'ASSISTANT_ADMINISTRATIVE',
+  //   'AREA_MOD',
+  // ]);
+  // public mod = roleHandler([
+  //   'SUPER_ADMIN',
+  //   'ADMIN',
+  //   'ASSISTANT',
+  //   'SUPER_MOD',
+  //   'MOD',
+  // ]);
+  // public employee = roleHandler([
+  //   'SUPER_ADMIN',
+  //   'ADMIN',
+  //   'ASSISTANT',
+  //   'SUPER_MOD',
+  //   'MOD',
+  //   'EMPLOYEE',
+  //   'ASSISTANT_ADMINISTRATIVE',
+  // ]);
 }
 export default new Role();
 
