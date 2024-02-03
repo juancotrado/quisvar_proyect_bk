@@ -11,7 +11,7 @@ export type MenuAccess =
   | 'indice-general'
   | 'grupos';
 
-type MenuRole = 'MOD' | 'MEMBER' | 'VIEWER' | 'USER';
+export type MenuRole = 'MOD' | 'MEMBER' | 'VIEWER' | 'USER';
 interface MenuGeneral {
   id: number;
   title: string;
