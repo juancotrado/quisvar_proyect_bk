@@ -642,6 +642,7 @@ enum MenuRol {
   MOD
   MEMBER
   VIEWER
+  USER
 }
 
 enum Menus {
