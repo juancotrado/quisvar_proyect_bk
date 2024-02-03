@@ -9,7 +9,8 @@ class DutyRoutes {
   }
   protected setUpRouter(): void {
     this.router.use(authenticateHandler);
-    this.router.use(role.mod);
+
+    this.router.use(role.RoleHandler('grupos', 'MOD'));
     this.router.post('/', DutyControllers.createDuty);
     this.router.patch('/:id', DutyControllers.updateDuty);
   }

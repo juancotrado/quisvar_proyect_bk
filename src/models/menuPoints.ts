@@ -34,7 +34,7 @@ interface SubMenu extends MenuGeneral {
 interface RelationMenu {
   [key: number]: SubMenu[];
 }
-interface Role {
+export interface Role {
   id: number;
   name: string;
   menuPoints: RoleMenu[];
@@ -109,7 +109,7 @@ export class MenuPoints {
     const { id, name, menu } = this.roleTransform(data);
     const menuFilter = menu.filter(men => !!men) as MenuHeader[];
     const menuPoints = menuFilter.map(
-      ({ id, route, title, menu, typeRol }) => ({
+      ({ id, route, title, typeRol, menu }) => ({
         id,
         route,
         title,
