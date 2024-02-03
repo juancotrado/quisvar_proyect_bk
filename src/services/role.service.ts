@@ -123,6 +123,29 @@ class RoleService {
     });
     return deleteRole;
   }
+  static async editHierarchy(id: number, hierarchy: number) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const roleToMove = await prisma.role.findUnique({ where: { id } });
+    await prisma.role.update({
+      where: { id },
+      data: { hierarchy },
+    });
+    const roles = await prisma.role.updateMany({
+      where: {
+        hierarchy: {
+          gt: hierarchy,
+          lt: roleToMove?.hierarchy,
+        },
+      },
+      data: {
+        hierarchy: {
+          increment: 1,
+        },
+      },
+    });
+
+    return roles;
+  }
   static async edit({ name, menuPoints }: RoleForMenuPick, id: number) {
     if (!name) throw new AppError('Asegurese de escribir un nombre', 404);
     const role = await prisma.role.upsert({

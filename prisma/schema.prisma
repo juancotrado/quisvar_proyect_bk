@@ -37,7 +37,7 @@ model Users {
   moderatorOfGroup      Group[]
   Attendance            AttendanceGroup[]
   roleId                Int?
-  role                  Role?               @relation(fields: [roleId], references: [id])
+  role                  Role?              @relation(fields: [roleId], references: [id])
 }
 
 model WorkStation {
@@ -617,6 +617,7 @@ model Contratc {
 model Role {
   id         Int          @id @default(autoincrement())
   name       String       @unique
+  hierarchy  Int          @default(1)
   users      Users[]
   menuPoints MenuPoints[]
 }

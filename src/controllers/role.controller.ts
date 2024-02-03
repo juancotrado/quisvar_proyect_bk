@@ -51,6 +51,16 @@ export class RoleController {
       next(error);
     }
   };
+  public updateHierarchy: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id, hierarchy } = req.params;
+      const query = await RoleService.editHierarchy(+id, +hierarchy);
+      res.status(201).json(query);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
   public delete: ControllerFunction = async (req, res, next) => {
     try {
       const { id } = req.params;

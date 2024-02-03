@@ -15,6 +15,7 @@ router.get('/menu/:id', roleController.showMenu);
 router.get('/menusGeneral', roleController.showMenusGeneral);
 router.get('/:id', roleController.show);
 router.put('/:id', roleController.update);
+router.put('/hierarchy/:id/:hierarchy', roleController.updateHierarchy);
 router.delete('/:id', roleController.delete);
 
 router.post('/', roleController.create);
