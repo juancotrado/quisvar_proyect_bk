@@ -147,7 +147,7 @@ model GroupList {
   createdAt  DateTime          @default(now())
   groupId    Int
   groups     Group             @relation(fields: [groupId], references: [id])
-  attendance AttendanceGroup[]
+  attendance AttendanceGroup[] 
   duty       Duty[]
 }
 
@@ -159,7 +159,7 @@ model Duty {
   untilDate   DateTime
   listId      Int
   createdAt   DateTime  @default(now())
-  groupList   GroupList @relation(fields: [listId], references: [id])
+  groupList   GroupList @relation(fields: [listId], references: [id], onDelete: Cascade)
 }
 
 model AttendanceGroup {

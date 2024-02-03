@@ -5,6 +5,7 @@ import LicenseServices from './licenses.services';
 class ListServices {
   static async create({ title, timer }: List) {
     await LicenseServices.deleteExpiredLicenses();
+    await this.deleteManyList();
     if (!title || !timer) throw new AppError(`Oops!, algo salio mal`, 400);
     const lastList = await prisma.list.findMany({
       orderBy: {

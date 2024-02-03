@@ -111,17 +111,26 @@ class AttendanceGroupService {
   static async createList(data: GroupList, id: number, date: string) {
     if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
     const { nombre, groupId } = data;
+    const today = new Date();
+    today.setDate(today.getDate());
+    today.setHours(0, 0, 0, 0);
+    const _today = today.getTime();
+    const startOfDay = new Date(_today);
     const lastList = await prisma.groupList.findMany({
       orderBy: {
         createdAt: 'desc',
       },
       select: {
+        id: true,
         attendance: true,
+        createdAt: true,
       },
       take: 1,
     });
-    if (lastList[0].attendance.length === 0)
-      throw new AppError(`Oops!, Al parecer hay una lista en curso`, 400);
+    if (startOfDay > lastList[0].createdAt)
+      await this.deleteList(lastList[0].id);
+    // if (lastList[0].attendance.length === 0)
+    //   throw new AppError(`Oops!, Al parecer hay una lista en curso`, 400);
     await prisma.groupList.create({
       data: {
         nombre,
