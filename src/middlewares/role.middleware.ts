@@ -24,7 +24,7 @@ class Role {
       const hasAccess = userInfo.role.menuPoints.some(
         menuPoint => menuPoint.route === route && menuPoint.typeRol === typeRol
       );
-      if (hasAccess) {
+      if (!hasAccess) {
         throw new AppError(
           `Rol: ${userInfo.role.name} no tiene acceso a esta ruta`,
           400

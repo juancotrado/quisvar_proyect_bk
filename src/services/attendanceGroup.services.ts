@@ -127,8 +127,13 @@ class AttendanceGroupService {
       },
       take: 1,
     });
-    if (startOfDay > lastList[0].createdAt)
+    if (
+      lastList[0].attendance.length === 0 &&
+      startOfDay > lastList[0].createdAt
+    ) {
       await this.deleteList(lastList[0].id);
+    }
+
     // if (lastList[0].attendance.length === 0)
     //   throw new AppError(`Oops!, Al parecer hay una lista en curso`, 400);
     await prisma.groupList.create({
@@ -166,8 +171,24 @@ class AttendanceGroupService {
         id: true,
         nombre: true,
         groupId: true,
+        groups: {
+          select: {
+            name: true,
+            moderator: {
+              select: {
+                profile: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                  },
+                },
+              },
+            },
+          },
+        },
         duty: true,
         title: true,
+        createdAt: true,
         attendance: {
           select: {
             id: true,
