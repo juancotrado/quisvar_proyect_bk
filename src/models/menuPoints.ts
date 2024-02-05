@@ -214,7 +214,7 @@ export const INDICE_GENERAL_OPTIONS: SubMenu[] = [
 ];
 
 export const TRAMITES_OPTIONS: SubMenu[] = [
-  { id: 1, title: 'Salidas', route: 'contratos8', access: ['MOD', 'USER'] },
+  { id: 1, title: 'Salidas', route: 'salidas', access: ['MOD', 'USER'] },
   { id: 2, title: 'Proceso unilateral', route: 'contratos8', access: ['MOD'] },
   { id: 3, title: 'Trámite interactivo', route: 'contratos8', access: ['MOD'] },
   { id: 4, title: 'Trámite de pagos', route: 'contratos8', access: ['MOD'] },
