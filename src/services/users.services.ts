@@ -8,13 +8,25 @@ import RoleService from './role.service';
 class UsersServices {
   static async getAll() {
     const users = await prisma.users.findMany({
-      orderBy: { createdAt: 'asc' },
+      orderBy: [
+        {
+          role: {
+            hierarchy: 'asc',
+          },
+        },
+        {
+          profile: {
+            lastName: 'asc',
+          },
+        },
+      ],
       include: {
         profile: true,
         role: {
           select: {
             id: true,
             name: true,
+            hierarchy: true,
           },
         },
         equipment: {
