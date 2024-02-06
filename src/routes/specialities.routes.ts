@@ -7,17 +7,16 @@ import {
   updateSpeciality,
 } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
-import { _mod_role, _employee_role } from '../middlewares/role.middleware';
 import { role } from '../middlewares';
 
 const router = Router();
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
-router.use(role.RoleHandler('especialidades', 'MEMBER'));
+router.use(role.RoleHandler('MEMBER', 'especialidades'));
 router.get('/', showSpecialities);
 router.get('/:id', showSpeciality);
 //MOD ROLE
-router.use(role.RoleHandler('especialidades', 'MOD'));
+router.use(role.RoleHandler('MOD', 'especialidades'));
 router.post('/', createSpeciality);
 router.put('/:id', updateSpeciality);
 router.delete('/:id', deleteSpeciality);

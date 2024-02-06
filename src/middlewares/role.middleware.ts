@@ -18,12 +18,25 @@ const roleHandler =
 
 class Role {
   public RoleHandler =
-    (route: MenuAccess, typeRol: MenuRole) =>
+    (typeRol: MenuRole, menu: MenuAccess, subMenu?: string) =>
     (req: Request, res: Response, next: NextFunction) => {
       const userInfo: UserType = res.locals.userInfo;
-      const hasAccess = userInfo.role.menuPoints.some(
-        menuPoint => menuPoint.route === route && menuPoint.typeRol === typeRol
-      );
+      let hasAccess: boolean | undefined = false;
+
+      if (subMenu) {
+        const findMenu = userInfo.role.menuPoints.find(
+          menuPoint => menuPoint.route === menu
+        );
+        hasAccess = findMenu?.menu?.some(
+          menuPoint =>
+            menuPoint.route === subMenu && menuPoint.typeRol === typeRol
+        );
+      } else {
+        hasAccess = userInfo.role.menuPoints.some(
+          menuPoint => menuPoint.route === menu && menuPoint.typeRol === typeRol
+        );
+      }
+
       if (!hasAccess) {
         throw new AppError(
           `Rol: ${userInfo.role.name} no tiene acceso a esta ruta`,

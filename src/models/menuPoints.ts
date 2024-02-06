@@ -214,10 +214,25 @@ export const INDICE_GENERAL_OPTIONS: SubMenu[] = [
 ];
 
 export const TRAMITES_OPTIONS: SubMenu[] = [
-  { id: 1, title: 'Salidas', route: 'salidas', access: ['MOD', 'USER'] },
-  { id: 2, title: 'Proceso unilateral', route: 'contratos8', access: ['MOD'] },
-  { id: 3, title: 'Trámite interactivo', route: 'contratos8', access: ['MOD'] },
-  { id: 4, title: 'Trámite de pagos', route: 'contratos8', access: ['MOD'] },
+  {
+    id: 1,
+    title: 'Trámite de pagos',
+    route: 'tramite-de-pago',
+    access: ['MOD'],
+  },
+  {
+    id: 2,
+    title: 'Trámite regulares',
+    route: 'tramite-regulare',
+    access: ['MOD'],
+  },
+  {
+    id: 3,
+    title: 'Proceso unilateral',
+    route: 'proceso-unilateral',
+    access: ['MOD'],
+  },
+  { id: 4, title: 'Salidas', route: 'salidas', access: ['MOD', 'USER'] },
 ];
 
 const SUBMENU_POINTS: RelationMenu = {
