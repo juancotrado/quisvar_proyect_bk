@@ -186,7 +186,11 @@ class AttendanceGroupService {
             },
           },
         },
-        duty: true,
+        duty: {
+          orderBy: {
+            id: 'asc',
+          },
+        },
         title: true,
         createdAt: true,
         attendance: {

@@ -12,7 +12,7 @@ class DutyRoutes {
 
     this.router.use(role.RoleHandler('MOD', 'grupos'));
     this.router.post('/', DutyControllers.createDuty);
-    this.router.patch('/:id', DutyControllers.updateDuty);
+    this.router.patch('/items', DutyControllers.updateDuty);
   }
 }
 const { router } = new DutyRoutes();
