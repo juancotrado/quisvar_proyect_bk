@@ -218,7 +218,7 @@ export const TRAMITES_OPTIONS: SubMenu[] = [
     id: 1,
     title: 'Trámite de pagos',
     route: 'tramite-de-pago',
-    access: ['MOD'],
+    access: ['MOD', 'USER'],
   },
   {
     id: 2,

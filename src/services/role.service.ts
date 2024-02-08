@@ -98,7 +98,6 @@ class RoleService {
     });
 
     for (const { menuId, typeRol, subMenuPoints } of menuPoints) {
-      console.log(menuId, typeRol, subMenuPoints);
       await prisma.menuPoints.create({
         data: {
           menuId,
@@ -161,7 +160,6 @@ class RoleService {
       const findMenuRol = menuPoints.find(
         menuPoint => menuPoint.id === menu.id
       );
-      console.log(menu.id, findMenuRol);
       if (!findMenuRol) {
         await prisma.menuPoints.delete({ where: { id: menu.id } });
       } else {

@@ -113,6 +113,7 @@ class Server {
   }
 
   middlewares() {
+    this.app.use(cors());
     this.app.use('/projects', express.static('uploads/projects'));
     this.app.use('/index', express.static('index'));
     this.app.use('/models', express.static('uploads/models'));
@@ -122,7 +123,7 @@ class Server {
     this.app.use('/general', express.static('public/general'));
     this.app.use('/reports', express.static('public/reports'));
     this.app.use('/images', express.static('public'));
-    this.app.use(cors());
+
     this.app.use(express.json());
     this.morganConfiguration();
     this.app.use(verifySecretEnv);
