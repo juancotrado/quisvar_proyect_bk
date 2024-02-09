@@ -36,8 +36,8 @@ model Users {
   groups                GroupOnUsers[]
   moderatorOfGroup      Group[]
   Attendance            AttendanceGroup[]
-  roleId                Int?
-  role                  Role?              @relation(fields: [roleId], references: [id])
+  roleId                Int
+  role                  Role               @relation(fields: [roleId], references: [id])
 }
 
 model WorkStation {
@@ -617,7 +617,6 @@ model Contratc {
 model Role {
   id         Int          @id @default(autoincrement())
   name       String       @unique
-  hierarchy  Int          @default(1)
   users      Users[]
   menuPoints MenuPoints[]
 }
@@ -643,7 +642,6 @@ enum MenuRol {
   MOD
   MEMBER
   VIEWER
-  USER
 }
 
 enum Menus {
