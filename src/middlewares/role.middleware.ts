@@ -45,30 +45,6 @@ class Role {
       }
       next();
     };
-
-  // public admin = this.InitiHandler([
-  //   'SUPER_ADMIN',
-  //   'ADMIN',
-  //   'ASSISTANT',
-  //   'ASSISTANT_ADMINISTRATIVE',
-  //   'AREA_MOD',
-  // ]);
-  // public mod = roleHandler([
-  //   'SUPER_ADMIN',
-  //   'ADMIN',
-  //   'ASSISTANT',
-  //   'SUPER_MOD',
-  //   'MOD',
-  // ]);
-  // public employee = roleHandler([
-  //   'SUPER_ADMIN',
-  //   'ADMIN',
-  //   'ASSISTANT',
-  //   'SUPER_MOD',
-  //   'MOD',
-  //   'EMPLOYEE',
-  //   'ASSISTANT_ADMINISTRATIVE',
-  // ]);
 }
 export default new Role();
 

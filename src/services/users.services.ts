@@ -4,6 +4,8 @@ import { enviarCorreoAgradecimiento } from '../utils/mailer';
 import { Users, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
 import RoleService from './role.service';
+import { MenuPoints } from '../models/menuPoints';
+const menuPoints = new MenuPoints();
 
 class UsersServices {
   static async getAll() {
@@ -23,10 +25,21 @@ class UsersServices {
       include: {
         profile: true,
         role: {
-          select: {
-            id: true,
-            name: true,
-            hierarchy: true,
+          include: {
+            menuPoints: {
+              select: {
+                id: true,
+                menuId: true,
+                typeRol: true,
+                subMenuPoints: {
+                  select: {
+                    id: true,
+                    menuId: true,
+                    typeRol: true,
+                  },
+                },
+              },
+            },
           },
         },
         equipment: {
@@ -36,32 +49,20 @@ class UsersServices {
         },
       },
     });
-    // const usersEmployes = await prisma.users.findMany({
-    //   // where: {
-    //   //   role: {
-    //   //     in: [
-    //   //       'ASSISTANT',
-    //   //       'ASSISTANT_ADMINISTRATIVE',
-    //   //       'SUPER_MOD',
-    //   //       'MOD',
-    //   //       'EMPLOYEE',
-    //   //     ],
-    //   //   },
-    //   // },
-    //   orderBy: { profile: { lastName: 'asc' } },
-    //   include: {
-    //     profile: true,
-    //     equipment: {
-    //       include: {
-    //         workStation: true,
-    //       },
-    //     },
-    //   },
-    // });
-    // console.log("entre")
+
     if (users.length == 0)
       throw new AppError('No se pudo encontrar el registro de usuarios', 404);
-    return users;
+
+    const userWithMenus = users.map(({ password, ...user }) =>
+      password && user.role
+        ? {
+            ...user,
+            role: menuPoints.getHeadersOptions(user.role),
+          }
+        : user
+    );
+
+    return userWithMenus;
   }
 
   static async find(id: Users['id']) {

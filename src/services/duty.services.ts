@@ -12,16 +12,15 @@ class DutyServices {
     });
     return groups;
   }
-  static async update(id: Duty['id'], { description, untilDate }: Duty) {
-    if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
-    const groups = await prisma.duty.update({
-      where: { id },
-      data: {
-        description,
-        untilDate,
-      },
-    });
-    return groups;
+  static async update(data: Duty[]) {
+    if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
+    for (const dutyData of data) {
+      await prisma.duty.update({
+        where: { id: dutyData.id },
+        data: { ...dutyData, untilDate: new Date(dutyData.untilDate) },
+      });
+    }
+    return 'ok';
   }
 }
 export default DutyServices;
