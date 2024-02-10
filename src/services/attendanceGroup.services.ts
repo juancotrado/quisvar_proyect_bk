@@ -7,7 +7,13 @@ import {
   prisma,
 } from '../utils/prisma.server';
 import { timerDay } from '../utils/tools';
-
+interface FilterOptions {
+  groupId?: number;
+  createdAt?: {
+    gte: Date;
+    lte: Date;
+  };
+}
 class AttendanceGroupService {
   static async getUsersGroup(groupId: Group['id']) {
     const users = await prisma.groupOnUsers.findMany({
@@ -213,6 +219,72 @@ class AttendanceGroupService {
       },
     });
     return groupList;
+  }
+  static async getHistory(
+    id?: GroupList['groupId'],
+    startDate?: string,
+    endDate?: string
+  ) {
+    // if (!id) throw new AppError('Oops!, Id no encontrado', 400);
+    let filterOptions: FilterOptions = {};
+    if (id) {
+      filterOptions.groupId = id;
+    }
+
+    if (startDate && endDate) {
+      filterOptions.createdAt = {
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      };
+    }
+    const groupListData = await prisma.groupList.findMany({
+      where: filterOptions,
+      select: {
+        id: true,
+        nombre: true,
+        groupId: true,
+        groups: {
+          select: {
+            name: true,
+            moderator: {
+              select: {
+                profile: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        duty: {
+          orderBy: {
+            id: 'asc',
+          },
+        },
+        title: true,
+        createdAt: true,
+        attendance: {
+          select: {
+            id: true,
+            description: true,
+            status: true,
+            user: {
+              select: {
+                profile: {
+                  select: {
+                    firstName: true,
+                    lastName: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return groupListData;
   }
   static async deleteList(id: GroupList['id']) {
     if (!id) throw new AppError(`Oops!, algo salio mal`, 400);

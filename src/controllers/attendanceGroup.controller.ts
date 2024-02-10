@@ -49,6 +49,20 @@ class AttendanceGroupController {
       next(error);
     }
   };
+  public getHistory: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { startDate, endDate } = req.query;
+      const query = await AttendanceGroupService.getHistory(
+        +id,
+        startDate as string,
+        endDate as string
+      );
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
   public deleteListAttendance: ControllerFunction = async (req, res, next) => {
     try {
       const { id } = req.params;
