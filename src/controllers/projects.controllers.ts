@@ -44,8 +44,10 @@ export const showProject = async (
 ) => {
   try {
     const { id } = req.params;
+    const userSession = res.locals.userInfo;
     const project_id = parseInt(id);
-    const query = await ProjectsServices.find(project_id);
+    const query = await ProjectsServices.find(project_id, +userSession.id);
+
     res.status(200).json(query);
   } catch (error) {
     next(error);
