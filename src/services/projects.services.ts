@@ -13,7 +13,7 @@ class ProjectsServices {
     return getListProjects;
   }
 
-  static async find(id: Projects['id']) {
+  static async find(id: Projects['id'], userId: number) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const findProject = await prisma.projects.findUnique({
       where: { id },
@@ -37,7 +37,10 @@ class ProjectsServices {
     });
     if (!findProject)
       throw new AppError('No se pudo encontrar los proyectos registrados', 404);
-    return findProject;
+    const hasAccessInStage = findProject.stages.some(
+      stage => stage.group?.moderator?.id === userId
+    );
+    return { ...findProject, hasAccessInStage, useSessionId: userId };
   }
 
   static async create({ name, typeSpecialityId, contractId }: projectPick) {
