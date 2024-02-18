@@ -15,7 +15,7 @@ class AttendanceGroupRoutes {
       AttendanceGroupControllers.getUsersGroup
     );
     //Filter
-    this.router.get('/filter/:groupId', AttendanceGroupControllers.getHistory);
+    this.router.get('/filter', AttendanceGroupControllers.getHistory);
     //Group List
     this.router.post('/list', AttendanceGroupControllers.createList);
     this.router.patch('/list/title/:id', AttendanceGroupControllers.editTitle);
