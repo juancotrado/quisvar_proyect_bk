@@ -19,15 +19,15 @@ import { uploads } from '../middlewares';
 const router = Router();
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
-router.use(_employee_role);
+// router.use(_employee_role);
 router.get('/', showUsers);
 router.get('/:id/tasks', showTaskByUser);
 router.get('/:id/subTasks', showSubTasksByUser);
 //MOD ROLE
-router.use(_mod_role);
+// router.use(_mod_role);
 router.get('/:id', showUser);
 //ADMIN ROLE
-router.use(_admin_role);
+// router.use(_admin_role);
 router.post(
   '/',
   // acceptFormData,

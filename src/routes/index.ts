@@ -14,7 +14,7 @@ export { default as sectorRouter } from './sector.routes';
 export { default as typeSpecialityRouter } from './typeSpecialities.routes';
 export { default as levelsRouter } from './levels.routes';
 export { default as listRouter } from './list.routes';
-export { default as mailRouter } from './mail.routes';
+export { default as MailRouter } from './mail.routes';
 export { default as licenseRouter } from './licenses.routes';
 export { default as companiesRouter } from './companies.routes';
 export { default as specialistRouter } from './specialist.routes';
