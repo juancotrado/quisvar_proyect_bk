@@ -38,7 +38,6 @@ export const getConsortiumById = async (
 ) => {
   try {
     const { id } = req.params;
-    console.log(id);
     const query = await ConsortiumServices.getConsortiumById(+id);
     res.status(200).json(query);
   } catch (error) {

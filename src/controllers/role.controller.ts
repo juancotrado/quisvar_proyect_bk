@@ -32,7 +32,6 @@ export class RoleController {
   public create: ControllerFunction = async (req, res, next) => {
     try {
       const body: RoleForMenuPick = req.body;
-      console.log(body);
       const query = await RoleService.create(body);
       res.status(201).json(query);
     } catch (error) {

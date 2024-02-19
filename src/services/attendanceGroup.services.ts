@@ -4,6 +4,7 @@ import {
   AttendanceGroup,
   Group,
   GroupList,
+  GroupOnUsers,
   prisma,
 } from '../utils/prisma.server';
 import { timerDay } from '../utils/tools';
@@ -180,6 +181,7 @@ class AttendanceGroupService {
         groups: {
           select: {
             name: true,
+            gNumber: true,
             moderator: {
               select: {
                 profile: {
@@ -246,6 +248,7 @@ class AttendanceGroupService {
         groups: {
           select: {
             name: true,
+            gNumber: true,
             moderator: {
               select: {
                 profile: {
@@ -336,6 +339,17 @@ class AttendanceGroupService {
     const attendance = await prisma.attendanceGroup.update({
       where: { id },
       data,
+    });
+    return attendance;
+  }
+  //Disabled Users
+  static async disabledGroup(userId: GroupOnUsers['userId']) {
+    if (!userId) throw new AppError(`Oops!, algo salio mal`, 400);
+    const attendance = await prisma.groupOnUsers.updateMany({
+      where: { userId },
+      data: {
+        active: false,
+      },
     });
     return attendance;
   }

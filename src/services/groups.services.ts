@@ -24,6 +24,7 @@ class GroupServices {
         id: true,
         name: true,
         modId: true,
+        gNumber: true,
         moderator: {
           select: {
             profile: {
@@ -52,7 +53,7 @@ class GroupServices {
         },
       },
       orderBy: {
-        createdAt: 'asc',
+        gNumber: 'asc',
       },
     });
     return groups;
@@ -65,6 +66,7 @@ class GroupServices {
         id: true,
         name: true,
         modId: true,
+        gNumber: true,
         moderator: {
           select: {
             profile: {

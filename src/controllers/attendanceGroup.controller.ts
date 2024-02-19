@@ -51,10 +51,9 @@ class AttendanceGroupController {
   };
   public getHistory: ControllerFunction = async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const { startDate, endDate } = req.query;
+      const { id, startDate, endDate } = req.query;
       const query = await AttendanceGroupService.getHistory(
-        +id,
+        +(id as string),
         startDate as string,
         endDate as string
       );

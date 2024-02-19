@@ -119,6 +119,7 @@ model TypeSpecialities {
 model Group {
   id        Int            @id @default(autoincrement())
   name      String
+  gNumber   Int?
   createdAt DateTime       @default(now())
   stage     Stages[]
   groups    GroupOnUsers[]

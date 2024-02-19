@@ -78,7 +78,6 @@ export const getLicensesEmployee = async (
 ) => {
   try {
     const id = req.params.id;
-    // console.log(id);
     const status = req.query.status as LicensesStatus;
     const query = await LicenseServices.getLicensesEmployee(Number(id), status);
     res.status(200).json(query);
