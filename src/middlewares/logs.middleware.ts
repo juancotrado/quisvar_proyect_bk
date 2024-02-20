@@ -7,7 +7,6 @@ class LogsMiddleware {
   static role: ControllerFunction = async (req, res, next) => {
     try {
       const { ip } = req;
-      console.log({ ip: req.ip, ips: req.ips });
       const { id: userId, profile: user }: UserType = res.locals.userInfo;
       const log = await prisma.logs.create({
         data: { ip, query: { userId, user } },

@@ -1,7 +1,11 @@
 import { PayMailServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
-import { ParametersPayMail, PickMail, PickMessageReply } from 'types/types';
+import {
+  ParametersPayMail,
+  PickPayMail,
+  PickPayMessageReply,
+} from 'types/types';
 import { existsSync, mkdirSync, renameSync } from 'fs';
 import { PayMessages } from '@prisma/client';
 import { ControllerFunction } from 'types/patterns';
@@ -53,7 +57,7 @@ class PayMailControllers {
       const userInfo: UserType = res.locals.userInfo;
       const senderId = userInfo.id;
       const files = this.requestFiles(req, `public/mail/${senderId}`);
-      const data = JSON.parse(body.data) as PickMessageReply;
+      const data = JSON.parse(body.data) as PickPayMessageReply;
       const query = await PayMailServices.createReply(
         { ...data, status, senderId },
         files
@@ -71,7 +75,7 @@ class PayMailControllers {
       const _messageId = parseInt(id);
       const files = this.requestFiles(req, `public/mail/${senderId}`, true);
       const { body } = req;
-      const data = JSON.parse(body.data) as PickMail;
+      const data = JSON.parse(body.data) as PickPayMail;
       const query = await PayMailServices.updateMessage(
         _messageId,
         { ...data, senderId },
@@ -90,7 +94,7 @@ class PayMailControllers {
       const files = this.requestFiles(req, `public/mail/${senderId}`, true);
       //--------------------------------------------------------------------------
       const { body } = req;
-      const data = JSON.parse(body.data) as PickMail;
+      const data = JSON.parse(body.data) as PickPayMail;
       const query = await PayMailServices.create({ ...data, senderId }, files);
       res.status(201).json(query);
     } catch (error) {

@@ -84,17 +84,7 @@ import {
   getListRange,
   deleteManyList,
 } from './list.controller';
-import {
-  archivedMessage,
-  createMessage,
-  createReplyMessage,
-  createVoucher,
-  declineVoucher,
-  doneMessage,
-  quantityFiles,
-  showMessages,
-  updateMessage,
-} from './mail.controllers';
+
 import {
   activeLicenses,
   createFreeForAll,
@@ -259,18 +249,6 @@ export {
   deleteManyList,
 };
 
-//Mail Controllers
-export {
-  showMessages,
-  createMessage,
-  quantityFiles,
-  createReplyMessage,
-  updateMessage,
-  archivedMessage,
-  doneMessage,
-  createVoucher,
-  declineVoucher,
-};
 //Licenses Controllers
 export {
   createLicense,

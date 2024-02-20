@@ -1,15 +1,5 @@
 import { Router } from 'express';
-import {
-  // createMessage,
-  quantityFiles,
-  updateMessage,
-  archivedMessage,
-  doneMessage,
-  createReplyMessage,
-  declineVoucher,
-  createVoucher,
-  MailControllers,
-} from '../controllers';
+import { MailControllers } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 
 import { uploads } from '../middlewares';

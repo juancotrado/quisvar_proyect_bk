@@ -3,8 +3,8 @@ import { prisma } from '../utils/prisma.server';
 import {
   FileMessagePick,
   ParametersPayMail,
-  PickMail,
-  PickMessageReply,
+  PickPayMail,
+  PickPayMessageReply,
 } from 'types/types';
 import Queries from '../utils/queries';
 import AppError from '../utils/appError';
@@ -113,7 +113,7 @@ class PayMailServices {
       senderId,
       receiverId,
       secondaryReceiver,
-    }: PickMail,
+    }: PickPayMail,
     files: FileMessagePick[]
   ) {
     const typeMail: PayMail['type'] = 'SENDER';
@@ -150,7 +150,7 @@ class PayMailServices {
       description,
       status,
       paymessageId,
-    }: PickMessageReply,
+    }: PickPayMessageReply,
     files: Pick<FileMessagePick, 'name' | 'path'>[]
   ) {
     if (!receiverId || !senderId)
