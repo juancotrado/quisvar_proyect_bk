@@ -166,3 +166,5 @@ class PayMailControllers {
 }
 
 export default new PayMailControllers();
+
+// secondaryReceiver: [{ userId: 1 }],

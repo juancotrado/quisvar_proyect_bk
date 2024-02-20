@@ -256,3 +256,5 @@ export interface UpperAddSubtask {
   days: number;
   description?: string;
 }
+
+export type CategoryMailType = 'GLOBAL' | 'DIRECT';

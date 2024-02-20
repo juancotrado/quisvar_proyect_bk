@@ -45,7 +45,7 @@ class PayMailServices {
 
   static async getMessage(id: PayMessages['id']) {
     if (!id) throw new AppError('Ops!, ID invalido', 400);
-    const getPayMessage = await prisma.payMessages.findUnique({
+    const getMessage = await prisma.payMessages.findUnique({
       where: { id },
       include: {
         users: {
@@ -78,11 +78,10 @@ class PayMailServices {
         },
       },
     });
-
-    if (!getPayMessage)
+    if (!getMessage)
       throw new AppError('No se pudo encontrar datos del mensaje', 404);
-    const userInit = getPayMessage.users.find(user => user.userInit);
-    return { ...getPayMessage, userInit };
+    const userInit = getMessage.users.find(user => user.userInit);
+    return { ...getMessage, userInit };
   }
 
   static async getMessagePreview(id: PayMessages['id']) {

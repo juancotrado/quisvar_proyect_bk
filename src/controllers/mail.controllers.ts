@@ -3,6 +3,7 @@ import { PayMailServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
 import {
+  CategoryMailType,
   ParametersMail,
   ParametersPayMail,
   PickMail,
@@ -13,28 +14,60 @@ import { PayMessages } from '@prisma/client';
 import { ControllerFunction } from 'types/patterns';
 import MailServices from '../services/mail.services';
 
-class MailControllers {
-  public showMesssages: ControllerFunction = async (req, res, next) => {
+export class MailControllers {
+  private attempt = `${new Date().getTime()}`;
+
+  public showMessages: ControllerFunction = async (req, res, next) => {
     try {
       const { skip, ...params } = req.query as ParametersMail;
+      const category = req.body.category as CategoryMailType;
       const { id: userId }: UserType = res.locals.userInfo;
       const newParams = { skip, ...params };
-      const query = await MailServices.getByUser(userId, 'GLOBAL', newParams);
+      const query = await MailServices.getByUser(userId, category, newParams);
       res.status(200).json(query);
     } catch (error) {
       next(error);
     }
   };
-}
 
-export class MailDirectControllers {
-  public showMesssages: ControllerFunction = async (req, res, next) => {
+  public showMessage: ControllerFunction = async (req, res, next) => {
     try {
-      const { skip, ...params } = req.query as ParametersMail;
-      const { id: userId }: UserType = res.locals.userInfo;
-      const newParams = { skip, ...params };
-      const query = await MailServices.getByUser(userId, 'DIRECT', newParams);
+      const { id: messageId } = req.params;
+      const query = await MailServices.getMessage(+messageId);
       res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public createMessage: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id: senderId }: UserType = res.locals.userInfo;
+      //--------------------------------------------------------------------------
+      const category = req.body.category as CategoryMailType;
+      if (!['GLOBAL', 'DIRECT'].includes(category))
+        throw new AppError('Ingresar Valores válidos en categoria', 400);
+
+      //--------------------------------------------------------------------------
+      const path = `public/mail/${senderId}`;
+      if (!existsSync(path)) mkdirSync(path, { recursive: true });
+      //--------------------------------------------------------------------------
+      if (!req.files)
+        throw new AppError('Oops!, no se pudo subir los archivos', 400);
+      const files = req.files as Express.Multer.File[];
+      const parseFiles = files.map(({ filename: name, ...file }) => {
+        renameSync(file.path, path + '/' + name);
+        return { name, path, attempt: this.attempt };
+      });
+      //--------------------------------------------------------------------------
+      const data = JSON.parse(req.body.data) as Omit<PickMail, 'id'>;
+      //--------------------------------------------------------------------------
+      const query = await MailServices.create(
+        { ...data, senderId },
+        category,
+        parseFiles
+      );
+      res.status(201).json(query);
     } catch (error) {
       next(error);
     }
@@ -49,27 +82,12 @@ export const showMessages = async (
   next: NextFunction
 ) => {
   try {
-    const { skip, ...params } = req.query as ParametersPayMail;
+    const { skip: sk, ...params } = req.query as ParametersPayMail;
     const { id: userId }: UserType = res.locals.userInfo;
-    const offset = parseInt(`${skip}`);
-    const _skip = !isNaN(offset) ? offset : undefined;
-    const newParams = { skip: _skip, ...params };
+    const offset = parseInt(`${sk}`);
+    const skip = !isNaN(offset) ? offset : undefined;
+    const newParams = { skip, ...params };
     const query = await PayMailServices.getByUser(userId, newParams);
-    res.status(200).json(query);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const showMessage = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const messageId = parseInt(id);
-    const query = await PayMailServices.getMessage(messageId);
     res.status(200).json(query);
   } catch (error) {
     next(error);

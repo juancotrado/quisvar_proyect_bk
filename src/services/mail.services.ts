@@ -65,28 +65,10 @@ class MailServices {
 
     if (!getMessage)
       throw new AppError('No se pudo encontrar datos del mensaje', 404);
-    const userInit = getMessage.users.find(user => user.userInit);
-    return { ...getMessage, userInit };
-  }
-
-  public async getMessagePreview(id: Messages['id']) {
-    if (!id) throw new AppError('Ops!, ID invalido', 400);
-    const getMessage = await prisma.messages.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        title: true,
-        status: true,
-        header: true,
-        description: true,
-        type: true,
-        createdAt: true,
-        files: { select: { id: true, name: true, path: true } },
-      },
-    });
-    if (!getMessage)
-      throw new AppError('No se pudo encontrar datos del mensaje', 404);
-    return getMessage;
+    const { users: usersMessage, ...message } = getMessage;
+    const initialSender = usersMessage.find(({ userInit }) => userInit);
+    const users = usersMessage.filter(({ userInit }) => !userInit);
+    return { ...message, initialSender, users };
   }
 
   public static async create(
@@ -98,7 +80,7 @@ class MailServices {
       senderId,
       receiverId,
       secondaryReceiver,
-    }: PickMail,
+    }: Omit<PickMail, 'id'>,
     category: Messages['category'],
     files: FileMessagePick[]
   ) {

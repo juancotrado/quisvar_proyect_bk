@@ -28,9 +28,8 @@ class PayMailRoutes implements InitialRouter {
   protected setUpRouter(): void {
     this.router.use(authenticateHandler);
     // this.router.use(role.employee);
-    this.router.use(
-      role.RoleHandler(['USER', 'MOD'], 'tramites', 'tramite-de-pago')
-    );
+    //EMPLOYEE ROLE
+    // router.use(role.RoleHandler('USER', 'tramites', 'tramite-de-pago'));
     this.router.get('/', showMessages);
     this.router.get('/:id', showMessage);
     this.router.get('/imbox/quantity', quantityFiles);
@@ -42,7 +41,7 @@ class PayMailRoutes implements InitialRouter {
       createVoucher
     );
     //MOD ROLE
-    this.router.use(role.RoleHandler(['MOD'], 'tramites', 'tramite-de-pago'));
+    // router.use(role.RoleHandler('MOD', 'tramites', 'tramite-de-pago'));
     this.router.patch('/archived/:id', archivedMessage);
     this.router.patch('/done/:id', doneMessage);
     this.router.delete('/voucher/:id', declineVoucher);

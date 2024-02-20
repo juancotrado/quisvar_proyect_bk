@@ -92,7 +92,6 @@ import {
   declineVoucher,
   doneMessage,
   quantityFiles,
-  showMessage,
   showMessages,
   updateMessage,
 } from './mail.controllers';
@@ -264,7 +263,6 @@ export {
 export {
   showMessages,
   createMessage,
-  showMessage,
   quantityFiles,
   createReplyMessage,
   updateMessage,
@@ -368,3 +366,4 @@ export { default as AttendanceGroupControllers } from './attendanceGroup.control
 export { default as DutyControllers } from './duty.controllers';
 export { default as SubtaskControllers } from './subtasks.controllers';
 export { default as LevelsControllers } from './levels.controllers';
+export { default as MailControllers } from './mail.controllers';

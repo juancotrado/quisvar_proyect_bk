@@ -482,19 +482,25 @@ export const setAdmin = async () => {
   });
   if (!findAdmin) {
     const password = await bcrypt.hash('admin', 10);
+    await prisma.role.create({ data: { name: 'admin' } });
     const createAdmin = await prisma.users.create({
       data: {
         email: `admin${new Date().getTime()}@admin.com`,
         password,
-        // role: 'SUPER_ADMIN',
         roleId: 1,
         status: true,
+        address: 'Jr. administrador N°123',
         profile: {
           create: {
             dni: '00000001',
             firstName: 'admin',
             lastName: 'admin',
             phone: '+51 000000001',
+            department: 'Puno',
+            province: 'Puno',
+            district: 'Puno',
+            degree: 'titulado',
+            job: 'Ingeniero',
           },
         },
       },

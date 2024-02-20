@@ -148,7 +148,7 @@ model GroupList {
   createdAt  DateTime          @default(now())
   groupId    Int
   groups     Group             @relation(fields: [groupId], references: [id])
-  attendance AttendanceGroup[] 
+  attendance AttendanceGroup[]
   duty       Duty[]
 }
 
@@ -638,6 +638,12 @@ model SubMenuPoints {
   menuId       Int
   menuPointsId Int?
   menuPoints   MenuPoints? @relation(fields: [menuPointsId], references: [id], onDelete: Cascade)
+}
+
+model Logs {
+  id    Int     @id @default(autoincrement())
+  ip    String?
+  query Json
 }
 
 enum MenuRol {
