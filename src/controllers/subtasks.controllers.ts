@@ -92,7 +92,27 @@ export const updateStatusSubTask = async (
       },
     });
   } catch (error) {
-    console.log(error);
+    next(error);
+  }
+};
+export const resetStatusSubTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id, stageId } = req.params;
+    const _subtask_id = parseInt(id);
+    const task = await SubTasksServices.resetStatus(_subtask_id);
+    const project = await StageServices.find(+stageId);
+    res.status(200).json({
+      task,
+      project: {
+        ...project,
+        stagesId: stageId,
+      },
+    });
+  } catch (error) {
     next(error);
   }
 };

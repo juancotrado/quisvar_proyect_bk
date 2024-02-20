@@ -18,6 +18,7 @@ import {
 import { validSubtaskByIdAndStatus } from '../middlewares/subtask.middleware';
 import {
   assignUserBySubtask,
+  resetStatusSubTask,
   updatePercentage,
 } from '../controllers/subtasks.controllers';
 
@@ -34,6 +35,7 @@ router.patch('/asigned/:id', assignedSubTask);
 // router.post('/upload/:id', upload.single('myFiles'), uploadFileSubTask);
 // router.delete('/deleteFile/:id/:filename', deleteFileSubTask);
 router.patch('/status/:id/:stageId', updateStatusSubTask);
+router.patch('/resetStatus/:id/:stageId', resetStatusSubTask);
 // router.patch('/pdf/:id', updateStatusSubTask);
 router.patch('/percentage/:id', updatePercentage);
 
