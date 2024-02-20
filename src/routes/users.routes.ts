@@ -14,7 +14,7 @@ import {
   _mod_role,
   _employee_role,
 } from '../middlewares/role.middleware';
-import { uploads } from '../middlewares';
+import { LogsMiddleware, uploads } from '../middlewares';
 
 const router = Router();
 router.use(authenticateHandler);
@@ -38,6 +38,6 @@ router.post(
   ]),
   createUser
 );
-router.patch('/:id', updateUser);
+router.patch('/:id', LogsMiddleware.role, updateUser);
 router.delete('/:id', deleteUser);
 export default router;
