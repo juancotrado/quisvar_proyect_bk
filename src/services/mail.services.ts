@@ -121,13 +121,16 @@ class MailServices {
   }
 
   public static async createReply(
+    id: number,
     {
       receiverId,
       senderId,
       status,
-      messageId: id,
       ...data
-    }: Omit<PickMessageReply, 'paymessageId' | 'createdAt' | 'id' | 'userId'>,
+    }: Omit<
+      PickMessageReply,
+      'messageId' | 'paymessageId' | 'createdAt' | 'id' | 'userId'
+    >,
     files: Pick<FileMessagePick, 'name' | 'path'>[]
   ) {
     if (!receiverId || !senderId)

@@ -71,8 +71,8 @@ export class MailControllers {
 
   public createReplyMessage: ControllerFunction = async (req, res, next) => {
     try {
-      const userInfo: UserType = res.locals.userInfo;
-      const senderId = userInfo.id;
+      const { id: messageId } = req.params;
+      const { id: senderId }: UserType = res.locals.userInfo;
       const { status } = req.query as ParametersMail;
       //--------------------------------------------------------------------------
       const path = `public/mail/${senderId}`;
@@ -89,6 +89,7 @@ export class MailControllers {
       const data = JSON.parse(req.body.data) as PickMessageReply;
       //--------------------------------------------------------------------------
       const query = await MailServices.createReply(
+        +messageId,
         { ...data, status, senderId },
         parseFiles
       );

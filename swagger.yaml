@@ -379,6 +379,109 @@ paths:
             application/json:
               example:
                 error: No se pudo encontrar el mensaje
+    put:
+      tags:
+        - mail
+      summary: edit mail
+      description: Editar trámites rechazados
+      parameters:
+        - $ref: '#/components/parameters/mailId'
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/mail_form_reply'
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite Existe
+        '404':
+          description: No se pudo encontrar el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo encontrar el mensaje
+  /mail/{id}/reply:
+    post:
+      tags:
+        - mail
+      summary: create mail reply
+      description: Crear trámites de respuesta
+      parameters:
+        - $ref: '#/components/parameters/mailId'
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/mail_form_reply'
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite Existe
+        '404':
+          description: No se pudo encontrar el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo encontrar el mensaje
+  /mail/{id}/archived:
+    patch:
+      tags:
+        - mail
+      summary: create mail reply
+      description: Crear trámites de respuesta
+      parameters:
+        - $ref: '#/components/parameters/mailId'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite Existe
+        '404':
+          description: No se pudo encontrar el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo encontrar el mensaje
+  /mail/{id}/done:
+    patch:
+      tags:
+        - mail
+      summary: create mail reply
+      description: Crear trámites de respuesta
+      parameters:
+        - $ref: '#/components/parameters/mailId'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite Existe
+        '404':
+          description: No se pudo encontrar el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo encontrar el mensaje
   /contract:
     get:
       tags:
@@ -1016,8 +1119,21 @@ components:
           example: [archivo_binario]
         data:
           type: string
-          example: 'data indexada'
+          example: '<p style="text-align: justify;">Por medio del presente documento me dirijo a usted con la finalidad de hacerle llegar un cordial saludo, y al mismo tiempo comunicarle lo siguiente:</p><p>asdasd</p>'
         category:
           type: string
           description: 'valores permitidos: <b>[GLOBAL, DIRECT]</b>'
           example: 'GLOBAL'
+    mail_form_reply:
+      required:
+        - data
+        - fileMail
+      type: object
+      properties:
+        fileMail:
+          type: string
+          format: binary
+          example: [archivo_binario]
+        data:
+          type: string
+          example: '<p style="text-align: justify;">Por medio del presente documento me dirijo a usted con la finalidad de hacerle llegar un cordial saludo, y al mismo tiempo comunicarle lo siguiente:</p><p>asdasd</p>'
