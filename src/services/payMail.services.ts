@@ -3,8 +3,8 @@ import { prisma } from '../utils/prisma.server';
 import {
   FileMessagePick,
   ParametersPayMail,
-  PickMail,
-  PickMessageReply,
+  PickPayMail,
+  PickPayMessageReply,
 } from 'types/types';
 import Queries from '../utils/queries';
 import AppError from '../utils/appError';
@@ -45,7 +45,7 @@ class PayMailServices {
 
   static async getMessage(id: PayMessages['id']) {
     if (!id) throw new AppError('Ops!, ID invalido', 400);
-    const getPayMessage = await prisma.payMessages.findUnique({
+    const getMessage = await prisma.payMessages.findUnique({
       where: { id },
       include: {
         users: {
@@ -78,11 +78,10 @@ class PayMailServices {
         },
       },
     });
-
-    if (!getPayMessage)
+    if (!getMessage)
       throw new AppError('No se pudo encontrar datos del mensaje', 404);
-    const userInit = getPayMessage.users.find(user => user.userInit);
-    return { ...getPayMessage, userInit };
+    const userInit = getMessage.users.find(user => user.userInit);
+    return { ...getMessage, userInit };
   }
 
   static async getMessagePreview(id: PayMessages['id']) {
@@ -114,7 +113,7 @@ class PayMailServices {
       senderId,
       receiverId,
       secondaryReceiver,
-    }: PickMail,
+    }: PickPayMail,
     files: FileMessagePick[]
   ) {
     const typeMail: PayMail['type'] = 'SENDER';
@@ -151,7 +150,7 @@ class PayMailServices {
       description,
       status,
       paymessageId,
-    }: PickMessageReply,
+    }: PickPayMessageReply,
     files: Pick<FileMessagePick, 'name' | 'path'>[]
   ) {
     if (!receiverId || !senderId)

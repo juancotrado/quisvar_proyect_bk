@@ -8,7 +8,7 @@ const roleHandler =
   (roles: any[]) => (req: Request, res: Response, next: NextFunction) => {
     const userInfo: UserType = res.locals.userInfo;
     // console.log(roles);
-    console.log('userInfo', JSON.stringify(userInfo, null, 2));
+    // console.log('userInfo', JSON.stringify(userInfo, null, 2));
     // const { role } = userInfo;
     // if (!roles.includes(role)) {
     //   throw new AppError(`${role} no tiene acceso a esta ruta`, 400);
@@ -18,7 +18,7 @@ const roleHandler =
 
 class Role {
   public RoleHandler =
-    (typeRol: MenuRole, menu: MenuAccess, subMenu?: string) =>
+    (typeRol: MenuRole[], menu: MenuAccess, subMenu?: string) =>
     (req: Request, res: Response, next: NextFunction) => {
       const userInfo: UserType = res.locals.userInfo;
       let hasAccess: boolean | undefined = false;
@@ -27,13 +27,15 @@ class Role {
         const findMenu = userInfo.role.menuPoints.find(
           menuPoint => menuPoint.route === menu
         );
-        hasAccess = findMenu?.menu?.some(
-          menuPoint =>
-            menuPoint.route === subMenu && menuPoint.typeRol === typeRol
-        );
+        hasAccess = findMenu?.menu?.some(menuPoint => {
+          return (
+            menuPoint.route === subMenu && typeRol.includes(menuPoint.typeRol)
+          );
+        });
       } else {
         hasAccess = userInfo.role.menuPoints.some(
-          menuPoint => menuPoint.route === menu && menuPoint.typeRol === typeRol
+          menuPoint =>
+            menuPoint.route === menu && typeRol.includes(menuPoint.typeRol)
         );
       }
 

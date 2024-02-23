@@ -119,6 +119,7 @@ model TypeSpecialities {
 model Group {
   id        Int            @id @default(autoincrement())
   name      String
+  gNumber   Int?
   createdAt DateTime       @default(now())
   stage     Stages[]
   groups    GroupOnUsers[]
@@ -637,6 +638,12 @@ model SubMenuPoints {
   menuId       Int
   menuPointsId Int?
   menuPoints   MenuPoints? @relation(fields: [menuPointsId], references: [id], onDelete: Cascade)
+}
+
+model Logs {
+  id    Int     @id @default(autoincrement())
+  ip    String?
+  query Json
 }
 
 enum MenuRol {

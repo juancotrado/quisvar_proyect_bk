@@ -14,16 +14,23 @@ class ContractServices {
   public static async showAll(
     startsWith?: string,
     companyId?: Companies['id'],
-    consortiumId?: Consortium['id']
+    consortiumId?: Consortium['id'],
+    date?: string
   ) {
     if (
       (companyId && isNaN(companyId)) ||
       (consortiumId && isNaN(consortiumId))
     )
       throw new AppError('Opps, id Invalida', 400);
+    const lteDate = (date && new Date(date)) || undefined;
     const showContract = await prisma.contratc.findMany({
-      where: { cui: { startsWith }, companyId, consortiumId },
-      orderBy: { createdAt: 'asc' },
+      where: {
+        cui: { startsWith },
+        createdAt: { lte: lteDate },
+        companyId,
+        consortiumId,
+      },
+      orderBy: { createdAt: 'asc', name: 'asc' },
       select: Queries.selectContract.select,
     });
     return showContract;
