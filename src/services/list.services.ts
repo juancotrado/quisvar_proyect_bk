@@ -115,7 +115,7 @@ class ListServices {
       //   status: true,
       // },
       where: { role: { hierarchy: { in: [1, 2] } } },
-      orderBy: { role: { hierarchy: 'asc' }, profile: { lastName: 'asc' } },
+      orderBy: { createdAt: 'asc' },
       select: {
         id: true,
         role: true,
