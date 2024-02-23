@@ -10,8 +10,6 @@ externalDocs:
 servers:
   - url: http://localhost:8081/api/v1
   - url: http://localhost:8082/api/v1
-#   # - url: https://dev.aqku.pe/api/v1
-#   # - url: https://api.aqku.pe/api/v1
 tags:
   - name: auth
     description: Authentication and security
@@ -83,8 +81,7 @@ paths:
                 type: object
                 example:
                   message: 'Error de servidor'
-      security:
-        - basicAuth: []
+
   /projects:
     post:
       tags:
@@ -744,34 +741,58 @@ paths:
           description: Detalles creado o actualizado exitosamente
         '400':
           description: Datos no válidos
-  /consortium:
+  /consortium/all:
     get:
       tags:
         - consortium
-      summary: Show Contracts
+      summary: Show Consortiums
       description: |-
-        Ver la lista de contratos por empresa
+        Ver la lista de consorcios
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: Operación exitosa
+          description: Lista de todos los consorcios
           content:
             application/json:
-              example:
-                message: Contrato Existe
+              schema:
+                $ref: '#/components/schemas/Consortium'
         '404':
-          description: No se pudo encontrar el contrato
+          description: No se encontraron consorcios
           content:
             application/json:
               example:
-                error: No se pudo encontrar el contrato
-    post:
+                error: No se pudo encontrar consorcios
+  /consortium/both:
+    get:
       tags:
-        - contract
-      summary: Create New Contract
+        - consortium
+      summary: Show consortiums and companies
       description: |-
-        Ingresar Los campos requeridos para crear un contrato
+        Ver la lista de consorcios y empresas
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de consorcion y empresas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Consortium-both'
+  /consortium/{id}:
+    patch:
+      tags:
+        - consortium
+      summary: Create New Contract
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del consorcio
+          schema:
+            type: integer
+      description: |-
+        Ingresar Los campos requeridos para actualizar datos de consorcio
       security:
         - bearerAuth: []
       requestBody:
@@ -779,14 +800,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Contract'
+              $ref: '#/components/schemas/Consortium-id-body'
       responses:
-        '200':
-          description: Token generated
+        '201':
+          description: Actualizar consorcio
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/JwtResponse'
+                $ref: '#/components/schemas/Consortium-id-res'
+        '400':
+          description: Datos no válidos
   /companies/img/{id}:
     patch:
       tags:
@@ -1137,3 +1160,111 @@ components:
         data:
           type: string
           example: '<p style="text-align: justify;">Por medio del presente documento me dirijo a usted con la finalidad de hacerle llegar un cordial saludo, y al mismo tiempo comunicarle lo siguiente:</p><p>asdasd</p>'
+    Consortium:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+          companies:
+            type: array
+            items: {}
+            example: []
+          name:
+            type: string
+            example: Dhyrium
+          manager:
+            type: string
+            example: Juan Gonzalo
+          img:
+            type: string
+            format: uri
+            example: 'https://media.tenor.com/Qb7l9m4NF2sAAAAe/te-la-creiste-we-xd-te-la-kreiste-we-xd.png'
+      example:
+        - id: 1
+          companies: []
+          name: Dhyrium
+          manager: Juan Gonzalo
+          img: 'https://media.tenor.com/Qb7l9m4NF2sAAAAe/te-la-creiste-we-xd-te-la-kreiste-we-xd.png'
+        - id: 2
+          companies: []
+          name: Another Consortium
+          manager: Maria Sanchez
+          img: 'https://example.com/another-image.png'
+    Consortium-both:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+          name:
+            type: string
+            example: Dhyrium
+          img:
+            type: string
+            format: uri
+            example: https://example.com/another-image.png
+          type:
+            type: string
+            example: consortiumId
+          newId:
+            type: string
+            example: consortiumId-1
+          uriImg:
+            type: string
+            format: uri
+            example: 'http://localhost:8081/images/img/consortium/another-image.png'
+      example:
+        - id: 1
+          name: Consorcio 1
+          img: https://example.com/another-image.png
+          type: consortiumId
+          newId: consortiumId-1
+          uriImg: 'http://localhost:8081/images/img/consortium/another-image.png'
+        - id: 2
+          name: Empresa 1
+          img: https://example.com/another-image.png
+          type: companyId
+          newId: companyId-1
+          uriImg: 'http://localhost:8081/images/img/consortium/another-image.png'
+    Consortium-id-body:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Consorcio 1
+        manager:
+          type: string
+          example: Juan Gonzalo
+      example:
+        name: Consorcio 1
+        manager: Juan Gonzalo
+    Consortium-id-res:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Consorcio 1
+        manager:
+          type: string
+          example: Juan Gonzalo
+        image:
+          type: string
+          format: uri
+          example: https://example.com/another-image.png
+        projectId:
+          type: integer
+          example: 1
+      example:
+        id: 1
+        name: Consorcio 1
+        manager: Juan Gonzalo
+        image: https://example.com/another-image.png
+        projectId: 1
