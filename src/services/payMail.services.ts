@@ -5,6 +5,7 @@ import {
   ParametersPayMail,
   PickPayMail,
   PickPayMessageReply,
+  ReceiverT,
 } from 'types/types';
 import Queries from '../utils/queries';
 import AppError from '../utils/appError';
@@ -149,77 +150,40 @@ class PayMailServices {
       header,
       description,
       status,
-      paymessageId,
+      paymessageId: id,
     }: PickPayMessageReply,
     files: Pick<FileMessagePick, 'name' | 'path'>[]
   ) {
     if (!receiverId || !senderId)
       throw new AppError('Ingrese Destinatario', 400);
+    const receiv: ReceiverT = { type: 'RECEIVER', role: 'MAIN', status: true };
+    await prisma.payMail.update({
+      where: { userId_paymessageId: { paymessageId: id, userId: senderId } },
+      data: { type: 'SENDER', status: false },
+    });
     if (status === 'RECHAZADO') {
-      await prisma.payMessages.update({
-        where: { id: paymessageId },
-        data: { status },
+      await prisma.payMail.updateMany({
+        where: { userInit: true },
+        data: { ...receiv },
       });
-      //------------------------------------------------------------------
-      await prisma.payMail.update({
-        where: { userId_paymessageId: { paymessageId, userId: senderId } },
-        data: { type: 'SENDER', status: false },
-      });
-      await prisma.payMail.update({
-        where: { userId_paymessageId: { paymessageId, userId: receiverId } },
-        data: { type: 'RECEIVER', status: true },
-      });
-      //------------------------------------------------------------------
-      const createReply = await prisma.messageHistory.create({
-        data: {
-          title,
-          header,
-          description,
-          user: { connect: { id: senderId } },
-          message: { connect: { id: paymessageId } },
-          files: { createMany: { data: files } },
+    } else {
+      await prisma.payMail.upsert({
+        where: {
+          userId_paymessageId: { paymessageId: id, userId: receiverId },
         },
+        update: { ...receiv },
+        create: { paymessageId: id, userId: receiverId, ...receiv },
       });
-      return createReply;
     }
     //------------------------------------------------------------------
-    if (status === 'PROCESO') {
-      await prisma.payMessages.update({
-        where: { id: paymessageId },
-        data: { status },
-      });
-    }
-    await prisma.payMail.upsert({
-      where: {
-        userId_paymessageId: {
-          paymessageId,
-          userId: receiverId,
-        },
-      },
-      update: {
-        type: 'RECEIVER',
-        role: 'MAIN',
-        status: true,
-      },
-      create: {
-        paymessageId,
-        userId: receiverId,
-        type: 'RECEIVER',
-        role: 'MAIN',
-        status: true,
-      },
-    });
-    await prisma.payMail.update({
-      where: { userId_paymessageId: { paymessageId, userId: senderId } },
-      data: { type: 'SENDER', status: false, role: 'MAIN' },
-    });
+    await prisma.payMessages.update({ where: { id }, data: { status } });
     const createForward = await prisma.messageHistory.create({
       data: {
         title,
         header,
         description,
         user: { connect: { id: senderId } },
-        message: { connect: { id: paymessageId } },
+        message: { connect: { id } },
         files: { createMany: { data: files } },
       },
     });
