@@ -114,7 +114,8 @@ class ListServices {
       //   role: { in: ['SUPER_ADMIN', 'ADMIN'] },
       //   status: true,
       // },
-      orderBy: { createdAt: 'asc' },
+      where: { role: { hierarchy: { in: [1, 2] } } },
+      orderBy: { role: { hierarchy: 'asc' }, profile: { lastName: 'asc' } },
       select: {
         id: true,
         role: true,
@@ -174,6 +175,7 @@ class ListServices {
       //   },
       //   status: true,
       // },
+      where: { role: { hierarchy: { notIn: [1, 2] } } },
       orderBy: { profile: { lastName: 'asc' } },
       select: {
         id: true,
