@@ -159,6 +159,33 @@ class SubTasksServices {
     return updateTask;
   }
 
+  public static async resetStatus(id: SubTasks['id']) {
+    const lastUser = await prisma.taskOnUsers.findFirst({
+      where: { subtaskId: id },
+      select: { userId: true },
+      orderBy: { assignedAt: 'desc' },
+    });
+    if (!lastUser) throw new AppError('No se pudo encontrar al usuario', 404);
+    const subtaskId_userId = { subtaskId: id, userId: lastUser.userId };
+    const patito = await prisma.subTasks.update({
+      where: { id },
+      data: {
+        status: 'PROCESS',
+        users: {
+          update: {
+            where: { subtaskId_userId },
+            data: {
+              status: true,
+              untilDate: new Date(),
+            },
+          },
+        },
+      },
+      include: Queries.includeSubtask,
+    });
+    return patito;
+  }
+
   public static async updateStatus(
     id: SubTasks['id'],
     { status, filesId }: SubTasks & { filesId?: number[] },

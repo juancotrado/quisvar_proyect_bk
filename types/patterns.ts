@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express';
 
 export abstract class SetUpRouter {
+  public abstract router: Router;
   protected abstract setUpRouter(): void;
 }
 

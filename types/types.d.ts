@@ -11,6 +11,7 @@ import {
   Supervisor,
   Users,
   PayMessages,
+  Mail,
 } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 
@@ -155,12 +156,18 @@ export interface ParametersMail {
   skip?: number;
   limit?: number;
   type?: Mail['type'];
-  // status?: boolean;
   typeMessage?: Messages['type'];
   status?: Messages['status'];
   assignedAt?: 'asc' | 'desc';
 }
-export interface PickMail extends PayMessages {
+export interface PickMail extends Messages {
+  senderId: Users['id'];
+  receiverId: Users['id'];
+  idMessageReply?: number;
+  idMessageResend?: number;
+  secondaryReceiver: { userId: number }[];
+}
+export interface PickPayMail extends PayMessages {
   senderId: Users['id'];
   receiverId: Users['id'];
   idMessageReply?: number;
@@ -168,6 +175,13 @@ export interface PickMail extends PayMessages {
   secondaryReceiver: { userId: number }[];
 }
 export interface PickMessageReply extends MessageHistory {
+  // type?: Mail['type'];
+  senderId: Users['id'];
+  receiverId: Users['id'];
+  status?: Messages['status'];
+  messageId: Messages['id'];
+}
+export interface PickPayMessageReply extends MessageHistory {
   // type?: Mail['type'];
   senderId: Users['id'];
   receiverId: Users['id'];
@@ -256,3 +270,7 @@ export interface UpperAddSubtask {
   days: number;
   description?: string;
 }
+
+export type CategoryMailType = 'GLOBAL' | 'DIRECT';
+
+export type ReceiverT = Pick<Mail, 'type' | 'role' | 'status'>;

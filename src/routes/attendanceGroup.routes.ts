@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateHandler, role, uploads } from '../middlewares';
+import { authenticateHandler, uploads } from '../middlewares';
 import { AttendanceGroupControllers } from '../controllers';
 class AttendanceGroupRoutes {
   public router: Router;
@@ -14,6 +14,8 @@ class AttendanceGroupRoutes {
       '/users/:groupId',
       AttendanceGroupControllers.getUsersGroup
     );
+    //Filter
+    this.router.get('/filter', AttendanceGroupControllers.getHistory);
     //Group List
     this.router.post('/list', AttendanceGroupControllers.createList);
     this.router.patch('/list/title/:id', AttendanceGroupControllers.editTitle);

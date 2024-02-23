@@ -223,13 +223,13 @@ export const TRAMITES_OPTIONS: SubMenu[] = [
   {
     id: 2,
     title: 'Trámite regulares',
-    route: 'tramite-regulare',
+    route: 'tramite-regular',
     access: ['MOD'],
   },
   {
     id: 3,
-    title: 'Proceso unilateral',
-    route: 'proceso-unilateral',
+    title: 'comunicados',
+    route: 'comunicado',
     access: ['MOD'],
   },
   { id: 4, title: 'Salidas', route: 'salidas', access: ['MOD', 'USER'] },

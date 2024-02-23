@@ -20,8 +20,6 @@ const authenticateHandler = async (
   res: Response,
   next: NextFunction
 ) => {
-  // const clientIP = req.ip;
-  // console.log(clientIP);
   const { authorization } = req.headers;
   const token = authorization?.split(' ')[1];
   try {
