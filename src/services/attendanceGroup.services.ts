@@ -135,6 +135,7 @@ class AttendanceGroupService {
       take: 1,
     });
     if (
+      lastList.length &&
       lastList[0].attendance.length === 0 &&
       startOfDay > lastList[0].createdAt
     ) {
