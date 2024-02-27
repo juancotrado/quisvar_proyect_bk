@@ -17,7 +17,7 @@ export class MailControllers {
   public showMessages: ControllerFunction = async (req, res, next) => {
     try {
       const { skip, ...params } = req.query as ParametersMail;
-      const category = req.body.category as CategoryMailType;
+      const category = req.query.category as CategoryMailType;
       const { id: userId }: UserType = res.locals.userInfo;
       const newParams = { skip, ...params };
       const query = await MailServices.getByUser(userId, category, newParams);
