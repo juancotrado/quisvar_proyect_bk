@@ -86,6 +86,7 @@ model Profiles {
   province     String?
   district     String?
   room         String?
+  gender       Gender   @default(F)
   userPc       String?
   usuario      String?
   userId       Int      @unique
@@ -759,4 +760,9 @@ enum TypeItem {
 enum MessageCategory {
   GLOBAL
   DIRECT
+}
+
+enum Gender {
+  M
+  F
 }
