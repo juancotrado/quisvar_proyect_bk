@@ -154,6 +154,7 @@ class UsersServices {
     phoneRef,
     description,
     roleId,
+    gender,
   }: userProfilePick) {
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -184,6 +185,7 @@ class UsersServices {
             userPc,
             lastNameRef,
             description,
+            gender,
           },
         },
       },
