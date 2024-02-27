@@ -30,7 +30,7 @@ class ContractServices {
         companyId,
         consortiumId,
       },
-      orderBy: { createdAt: 'asc', name: 'asc' },
+      orderBy: [{ createdAt: 'asc' }, { name: 'asc' }],
       select: Queries.selectContract.select,
     });
     return showContract;

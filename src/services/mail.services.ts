@@ -20,6 +20,7 @@ class MailServices {
     category: Messages['category'],
     { skip, type, status, typeMessage }: ParametersMail
   ) {
+    console.log({ category });
     const mail = await prisma.mail.findMany({
       where: {
         userId,
@@ -37,7 +38,7 @@ class MailServices {
       },
     });
     const total = await prisma.mail.count({
-      where: { userId, type, message: { status, type: typeMessage } },
+      where: { userId, type, message: { status, type: typeMessage, category } },
     });
     return { total, mail };
   }
