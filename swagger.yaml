@@ -334,8 +334,10 @@ paths:
     get:
       tags:
         - mail
-      summary: create mail
+      summary: show mail
       description: Ver tramites regulares y unilaterales
+      parameters:
+        - $ref: '#/components/parameters/mailCategory'
       security:
         - bearerAuth: []
       responses:
