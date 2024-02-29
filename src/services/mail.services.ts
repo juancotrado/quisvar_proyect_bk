@@ -33,7 +33,7 @@ class MailServices {
         messageId: true,
         status: true,
         type: true,
-        message: Queries.PayMail().selectMessage('MAIN', type),
+        message: Queries.PayMail().selectMessage('MAIN'),
       },
     });
     const total = await prisma.mail.count({
@@ -77,8 +77,8 @@ class MailServices {
       throw new AppError('No se pudo encontrar datos del mensaje', 404);
     const { users: usersMessage, ...message } = getMessage;
     const initialSender = usersMessage.find(({ userInit }) => userInit);
-    const users = usersMessage.filter(({ userInit }) => !userInit);
-    return { ...message, initialSender, users };
+    // const users = usersMessage.filter(({ userInit }) => !userInit);
+    return { ...message, initialSender, users: usersMessage };
   }
 
   public static async create(
