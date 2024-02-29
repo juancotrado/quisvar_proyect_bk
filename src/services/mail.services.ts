@@ -20,7 +20,6 @@ class MailServices {
     category: Messages['category'],
     { skip, type, status, typeMessage }: ParametersMail
   ) {
-    console.log({ category });
     const mail = await prisma.mail.findMany({
       where: {
         userId,
@@ -34,7 +33,7 @@ class MailServices {
         messageId: true,
         status: true,
         type: true,
-        message: Queries.PayMail().selectMessage('MAIN', type),
+        message: Queries.PayMail().selectMessage('MAIN'),
       },
     });
     const total = await prisma.mail.count({
@@ -78,8 +77,8 @@ class MailServices {
       throw new AppError('No se pudo encontrar datos del mensaje', 404);
     const { users: usersMessage, ...message } = getMessage;
     const initialSender = usersMessage.find(({ userInit }) => userInit);
-    const users = usersMessage.filter(({ userInit }) => !userInit);
-    return { ...message, initialSender, users };
+    // const users = usersMessage.filter(({ userInit }) => !userInit);
+    return { ...message, initialSender, users: usersMessage };
   }
 
   public static async create(
@@ -98,6 +97,28 @@ class MailServices {
     const typeMail: Mail['type'] = 'SENDER';
     const role: Mail['role'] = 'MAIN';
     const status = true;
+    if (category === 'GLOBAL') {
+      const createMessage = await prisma.messages.create({
+        data: {
+          title,
+          header,
+          description,
+          type,
+          category,
+          users: {
+            createMany: {
+              data: [
+                ...secondaryReceiver,
+                { userId: senderId, role, type: typeMail, userInit: true },
+              ],
+              skipDuplicates: true,
+            },
+          },
+          files: { createMany: { data: files } },
+        },
+      });
+      return createMessage;
+    }
     const createMessage = await prisma.messages.create({
       data: {
         title,

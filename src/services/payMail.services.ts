@@ -21,7 +21,7 @@ class PayMailServices {
     userId: Users['id'],
     { skip, type, status, typeMessage }: ParametersPayMail
   ) {
-    const typeMail = this.PickType(type);
+    // const typeMail = this.PickType(type);
     const mail = await prisma.payMail.findMany({
       where: {
         userId,
@@ -35,7 +35,7 @@ class PayMailServices {
         paymessageId: true,
         status: true,
         type: true,
-        paymessage: Queries.PayMail().selectMessage('MAIN', typeMail),
+        paymessage: Queries.PayMail().selectMessage('MAIN'),
       },
     });
     const total = await prisma.payMail.count({
@@ -183,7 +183,7 @@ class PayMailServices {
         header,
         description,
         user: { connect: { id: senderId } },
-        message: { connect: { id } },
+        paymessage: { connect: { id } },
         files: { createMany: { data: files } },
       },
     });
