@@ -183,7 +183,7 @@ class PayMailServices {
         header,
         description,
         user: { connect: { id: senderId } },
-        message: { connect: { id } },
+        paymessage: { connect: { id } },
         files: { createMany: { data: files } },
       },
     });

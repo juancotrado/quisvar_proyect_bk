@@ -20,7 +20,6 @@ class MailServices {
     category: Messages['category'],
     { skip, type, status, typeMessage }: ParametersMail
   ) {
-    console.log({ category });
     const mail = await prisma.mail.findMany({
       where: {
         userId,
@@ -98,6 +97,28 @@ class MailServices {
     const typeMail: Mail['type'] = 'SENDER';
     const role: Mail['role'] = 'MAIN';
     const status = true;
+    if (category === 'GLOBAL') {
+      const createMessage = await prisma.messages.create({
+        data: {
+          title,
+          header,
+          description,
+          type,
+          category,
+          users: {
+            createMany: {
+              data: [
+                ...secondaryReceiver,
+                { userId: senderId, role, type: typeMail, userInit: true },
+              ],
+              skipDuplicates: true,
+            },
+          },
+          files: { createMany: { data: files } },
+        },
+      });
+      return createMessage;
+    }
     const createMessage = await prisma.messages.create({
       data: {
         title,
