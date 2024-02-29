@@ -193,7 +193,6 @@ class PayMailQueries {
         title: true,
         createdAt: true,
         updatedAt: true,
-        category: true,
         users: {
           where: { type, role },
           select: {
