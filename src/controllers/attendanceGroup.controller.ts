@@ -112,5 +112,39 @@ class AttendanceGroupController {
       next(error);
     }
   };
+  //Disabled Users
+  public disabledUser: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      const query = await AttendanceGroupService.disabledGroup(+id, status);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+  //Attendance File
+  public updateFile: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { file } = req.files as FilesProps;
+      const query = await AttendanceGroupService.updateFile(
+        +id,
+        file[0].filename
+      );
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+  public deleteFile: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const query = await AttendanceGroupService.deleteFile(+id);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 export default new AttendanceGroupController();
