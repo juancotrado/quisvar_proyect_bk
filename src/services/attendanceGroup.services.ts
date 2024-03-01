@@ -178,6 +178,7 @@ class AttendanceGroupService {
         id: true,
         nombre: true,
         groupId: true,
+        file: true,
         groups: {
           select: {
             name: true,
