@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response, NextFunction } from 'express';
 import { authServices } from '../services';
 import AppError from '../utils/appError';
@@ -10,14 +9,15 @@ class AuthController {
   public static async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { body } = req;
-      const result = await authServices.auth(body);
-      const token = authServices.getToken(result);
-      const { password, status, ...data } = result;
-      if (status) return res.json({ ...data, token });
-      throw new AppError(
-        `Tu cuenta ha sido suspendida, hable con el admnistrador`,
-        400
-      );
+      const user = await authServices.auth(body);
+      const token = authServices.getToken(user.id);
+      const { status, ...data } = user;
+      if (!status)
+        throw new AppError(
+          `Tu cuenta ha sido suspendida, hable con el admnistrador`,
+          400
+        );
+      return res.json({ ...data, password: 'unknow', token });
     } catch (error) {
       next(error);
     }
@@ -40,23 +40,18 @@ class AuthController {
         userInfo.id,
         newpassword
       );
-      const token = authServices.getToken(result);
-      const { password: pd, status, ...data } = result;
+      const token = authServices.getToken(result.id);
       enviarCorreoAgradecimiento(
         email,
         `Tus datos de acceso son: \n DNI: ${dni} \n Contraseña: ${newpassword}`
       );
-      return res.json({ ...data, token });
+      return res.json({ ...result, password: 'unknow', token });
     } catch (error) {
       next(error);
     }
   }
 
-  public static async queryroute(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  public static async queryroute(req: Request, res: Response) {
     const query = new QueryServices();
     const data = await query.updateData();
     return res.json(data);
