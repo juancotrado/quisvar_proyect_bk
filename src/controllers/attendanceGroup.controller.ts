@@ -1,6 +1,7 @@
 import { ControllerFunction } from 'types/patterns';
 import { AttendanceGroupService } from '../services';
 import { FilesProps } from 'types/types';
+import AppError from '../utils/appError';
 
 class AttendanceGroupController {
   public getUsersGroup: ControllerFunction = async (req, res, next) => {
@@ -127,13 +128,19 @@ class AttendanceGroupController {
   public updateFile: ControllerFunction = async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { file } = req.files as FilesProps;
+      if (!req.file)
+        throw new AppError('Oops!, no se pudo subir el contrato', 400);
+      // const { file } = req.files as FilesProps;
+      // console.log(file)
+      // const pdf = file ?  file[0].filename : ''
+      // console.log(pdf)
       const query = await AttendanceGroupService.updateFile(
         +id,
-        file[0].filename
+        req.file.filename
       );
       res.status(200).json(query);
     } catch (error) {
+      console.log(error);
       next(error);
     }
   };

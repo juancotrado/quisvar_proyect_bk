@@ -266,20 +266,12 @@ class PayMailServices {
       data: { type: 'RECEIVER', role: 'SECONDARY', status: false },
     });
     //------------------------------------------------------------------
-    const getFirst = await prisma.payMail.findFirst({
-      where: { paymessageId: id },
-      orderBy: { assignedAt: 'asc' },
-    });
-    if (!getFirst) throw new AppError('error', 400);
-    //------------------------------------------------------------------
     await prisma.payMail.update({
       where: { userId_paymessageId: { paymessageId: id, userId: senderId } },
       data: { type: 'SENDER', role: 'MAIN' },
     });
-    await prisma.payMail.update({
-      where: {
-        userId_paymessageId: { paymessageId: id, userId: getFirst.userId },
-      },
+    await prisma.payMail.updateMany({
+      where: { userInit: true },
       data: { type: 'RECEIVER', role: 'MAIN' },
     });
     return done;
