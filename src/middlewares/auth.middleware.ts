@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import AppError from '../utils/appError';
 import { MenuRoles } from '../models/menuPoints';
+import { UsersServices } from '../services';
 
 interface RoleAuht {
   id: number;
@@ -13,7 +14,7 @@ interface RoleAuht {
 export type UserType = Users & { profile: Profiles } & { role: RoleAuht };
 
 config();
-const SECRET = process.env.SECRET;
+const SECRET = process.env.SECRET || 'helloWorld';
 
 const authenticateHandler = async (
   req: Request,
@@ -21,18 +22,25 @@ const authenticateHandler = async (
   next: NextFunction
 ) => {
   const { authorization } = req.headers;
-  const token = authorization?.split(' ')[1];
-  try {
-    if (SECRET && token) {
-      const decodedToken = jwt.verify(token, SECRET);
-      const userInfo = decodedToken as UserType;
-      res.locals.userInfo = userInfo;
-      return next();
-    }
-    throw new AppError(
-      'Usted no cuenta con un token, por favor inserta uno',
-      404
+  if (!authorization || !authorization.startsWith('Bearer'))
+    return next(
+      new AppError(
+        '¡Usted no se ha identificado! por favor inicie sesión para obtener acceso.',
+        401
+      )
     );
+  const token = authorization.split(' ')[1];
+  try {
+    const { id } = jwt.verify(token, SECRET) as {
+      id: number;
+    };
+    const user = await UsersServices.find(id);
+    if (!user?.status)
+      return next(
+        new AppError('El propietario de este token ya no está disponible.', 401)
+      );
+    res.locals.userInfo = user;
+    return next();
   } catch (error) {
     next(error);
   }

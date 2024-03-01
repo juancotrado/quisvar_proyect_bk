@@ -9,11 +9,7 @@ import {
   showSubTasksByUser,
 } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
-import {
-  _admin_role,
-  _mod_role,
-  _employee_role,
-} from '../middlewares/role.middleware';
+
 import { LogsMiddleware, uploads } from '../middlewares';
 
 const router = Router();
