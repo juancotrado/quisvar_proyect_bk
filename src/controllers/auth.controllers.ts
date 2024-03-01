@@ -9,7 +9,7 @@ import {
   sendLinkToRecoveryPassword,
 } from '../utils/mailer';
 import verificationUsersServices from '../services/verficationUser.services';
-const SECRET = process.env.SECRET || 'helloWorld';
+const JWT_RESET = process.env.JWT_RESET || 'JWT_RESET';
 
 class AuthController {
   public static async login(req: Request, res: Response, next: NextFunction) {
@@ -40,7 +40,8 @@ class AuthController {
       await verificationUsersServices.saveToken(token, user.id);
 
       const verficationLink = `${req.headers.referer}#/login/recuperar-contraseña/${token}`;
-      sendLinkToRecoveryPassword(user.email, verficationLink);
+      const fullName = user.profile?.firstName + ' ' + user.profile?.lastName;
+      sendLinkToRecoveryPassword(user.email, fullName, verficationLink);
       res.json({
         msg: 'Se envio un codigo para restablecer su contraseña a su correo',
       });
@@ -54,22 +55,33 @@ class AuthController {
     next: NextFunction
   ) {
     try {
-      console.log('asdasd');
-      const { newPassword } = req.body;
-      const resetToken = req.headers.ResetToken as string;
-      console.log({ resetToken, newPassword });
+      const { newPassword, verifyPassword } = req.body;
+      if (newPassword !== verifyPassword)
+        throw new AppError('Contraseñas con coinciden.', 400);
+      const resetToken = req.headers.reset as string;
       if (!resetToken || !newPassword)
-        return next(new AppError('Datos incorrectos.', 400));
-      const { id } = jwt.verify(resetToken, SECRET) as {
+        throw new AppError('Datos incorrectos.', 400);
+
+      const { id } = jwt.verify(resetToken, JWT_RESET) as {
         id: number;
       };
       const user = await UsersServices.findByTokenAndId(id, resetToken);
-      console.log(user);
       await authServices.updatePassword(user.id, newPassword);
       res.json({
         msg: 'Contraseña restablecida exitosamente.',
       });
     } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'jwt expired')
+          return next(
+            new AppError(
+              'El proceso expiro, vuelva a enviar otra solicitud de recuperacion.',
+              401
+            )
+          );
+        if (error.message === 'jwt malformed')
+          return next(new AppError('Algo salio mal.', 401));
+      }
       next(error);
     }
   }

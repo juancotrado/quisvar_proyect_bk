@@ -6,6 +6,7 @@ import AppError from '../utils/appError';
 
 dotenv.config();
 const secret = process.env.SECRET || 'patito juan';
+const JWT_RESET = process.env.JWT_RESET || 'JWT_RESET';
 
 export class authServices {
   static async auth({
@@ -48,7 +49,7 @@ export class authServices {
     }
   }
   static getTokenToResetPassword(id: number, dni: string) {
-    const token = jwt.sign({ id, dni }, secret, { expiresIn: '3m' });
+    const token = jwt.sign({ id, dni }, JWT_RESET, { expiresIn: '3m' });
     return token;
   }
 
