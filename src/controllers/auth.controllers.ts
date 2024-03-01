@@ -1,9 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
-import { authServices } from '../services';
+import { UsersServices, authServices } from '../services';
+import jwt from 'jsonwebtoken';
 import AppError from '../utils/appError';
 import { UserType } from '../middlewares/auth.middleware';
 import QueryServices from '../services/queries.services';
-import { enviarCorreoAgradecimiento } from '../utils/mailer';
+import {
+  enviarCorreoAgradecimiento,
+  sendLinkToRecoveryPassword,
+} from '../utils/mailer';
+import verificationUsersServices from '../services/verficationUser.services';
+const SECRET = process.env.SECRET || 'helloWorld';
 
 class AuthController {
   public static async login(req: Request, res: Response, next: NextFunction) {
@@ -18,6 +24,51 @@ class AuthController {
           400
         );
       return res.json({ ...data, password: 'unknow', token });
+    } catch (error) {
+      next(error);
+    }
+  }
+  public static async forgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { dni } = req.body;
+      const user = await UsersServices.findByDni(dni);
+      const token = authServices.getTokenToResetPassword(user.id, dni);
+      await verificationUsersServices.saveToken(token, user.id);
+
+      const verficationLink = `${req.headers.referer}#/login/recuperar-contraseña/${token}`;
+      sendLinkToRecoveryPassword(user.email, verficationLink);
+      res.json({
+        msg: 'Se envio un codigo para restablecer su contraseña a su correo',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  public static async newPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      console.log('asdasd');
+      const { newPassword } = req.body;
+      const resetToken = req.headers.ResetToken as string;
+      console.log({ resetToken, newPassword });
+      if (!resetToken || !newPassword)
+        return next(new AppError('Datos incorrectos.', 400));
+      const { id } = jwt.verify(resetToken, SECRET) as {
+        id: number;
+      };
+      const user = await UsersServices.findByTokenAndId(id, resetToken);
+      console.log(user);
+      await authServices.updatePassword(user.id, newPassword);
+      res.json({
+        msg: 'Contraseña restablecida exitosamente.',
+      });
     } catch (error) {
       next(error);
     }

@@ -38,6 +38,16 @@ model Users {
   Attendance            AttendanceGroup[]
   roleId                Int?
   role                  Role?              @relation(fields: [roleId], references: [id])
+  verificationUser      VerificationUser?
+}
+
+model VerificationUser {
+  id        Int       @id @default(autoincrement())
+  token     String?
+  code      String?
+  expiresAt DateTime?
+  user      Users     @relation(fields: [userId], references: [id])
+  userId    Int       @unique
 }
 
 model WorkStation {

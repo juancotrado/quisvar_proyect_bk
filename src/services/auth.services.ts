@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 import AppError from '../utils/appError';
 
 dotenv.config();
-const secret = process.env.SECRET;
+const secret = process.env.SECRET || 'patito juan';
 
 export class authServices {
   static async auth({
@@ -46,6 +46,10 @@ export class authServices {
       const token = jwt.sign({ id }, secret, { algorithm: 'HS512' });
       return token;
     }
+  }
+  static getTokenToResetPassword(id: number, dni: string) {
+    const token = jwt.sign({ id, dni }, secret, { expiresIn: '3m' });
+    return token;
   }
 
   static async updatePassword(id: Users['id'], password: string) {

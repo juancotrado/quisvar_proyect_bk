@@ -1,7 +1,7 @@
 import AppError from '../utils/appError';
 import { userProfilePick } from '../utils/format.server';
 import { enviarCorreoAgradecimiento } from '../utils/mailer';
-import { Users, prisma } from '../utils/prisma.server';
+import { Profiles, Users, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
 import RoleService from './role.service';
 import { MenuPoints } from '../models/menuPoints';
@@ -76,6 +76,33 @@ class UsersServices {
     if (!findUser) throw new AppError('No se pudo encontrar el usuario', 404);
     const role = await RoleService.findGeneral(findUser.roleId!);
     return { ...findUser, role };
+  }
+  static async findByDni(dni: Profiles['dni']) {
+    if (!dni) throw new AppError('Oops!,dni invalido', 409);
+    const findUser = await prisma.users.findFirst({
+      where: {
+        profile: {
+          dni,
+        },
+      },
+      include: {
+        profile: true,
+      },
+    });
+    if (!findUser) throw new AppError('No se pudo encontrar el usuario', 404);
+    return findUser;
+  }
+  static async findByTokenAndId(id: number, token: string) {
+    const findUser = await prisma.users.findFirst({
+      where: {
+        id,
+        verificationUser: {
+          token,
+        },
+      },
+    });
+    if (!findUser) throw new AppError('Algo salio mal', 404);
+    return findUser;
   }
 
   static async findListTask(id: Users['id']) {

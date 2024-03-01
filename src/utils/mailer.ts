@@ -32,5 +32,27 @@ const enviarCorreoAgradecimiento = (
     }
   });
 };
+const sendLinkToRecoveryPassword = (
+  to: string,
+  verficationLink: string
+): void => {
+  const mailOptions = {
+    from: '"Recuperar contraseña 👻" <coorporaciondhyriumsaa@gmail.com>',
+    to,
+    subject: 'Recuperar contraseña',
+    html: `
+    <b>Haz click al siguiente link, o pegalo en tu navegador para completa el proceso de recuperacion:</b>
+    <a href="${verficationLink}">${verficationLink}</a>
+    `,
+  };
 
-export { enviarCorreoAgradecimiento };
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error al enviar el correo :', error);
+    } else {
+      console.log('Correo de agradecimiento enviado con éxito:', info.response);
+    }
+  });
+};
+
+export { enviarCorreoAgradecimiento, sendLinkToRecoveryPassword };
