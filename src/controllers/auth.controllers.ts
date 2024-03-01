@@ -66,6 +66,7 @@ class AuthController {
         id: number;
       };
       const user = await UsersServices.findByTokenAndId(id, resetToken);
+      await verificationUsersServices.expireToken(user.id);
       await authServices.updatePassword(user.id, newPassword);
       res.json({
         msg: 'Contraseña restablecida exitosamente.',

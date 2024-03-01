@@ -14,5 +14,14 @@ class verificationUsersServices {
     });
     return verificationUser;
   }
+  static async expireToken(userId: number) {
+    const verificationUser = prisma.verificationUser.update({
+      where: { userId },
+      data: {
+        token: 'expired',
+      },
+    });
+    return verificationUser;
+  }
 }
 export default verificationUsersServices;
