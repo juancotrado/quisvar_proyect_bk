@@ -103,6 +103,7 @@ class Server {
     this.conectionCron();
     this.app.set('trust proxy', true);
     this.io = new WebSocketServer(this.httpServer, {
+      connectionStateRecovery: {},
       cors: {
         origin: '*',
       },
