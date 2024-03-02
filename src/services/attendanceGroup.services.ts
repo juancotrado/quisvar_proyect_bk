@@ -346,6 +346,22 @@ class AttendanceGroupService {
   //Disabled Users
   static async disabledGroup(userId: GroupOnUsers['userId'], status: boolean) {
     if (!userId) throw new AppError(`Oops!, algo salio mal`, 400);
+    const lead = await prisma.group.findFirst({
+      where: {
+        modId: userId,
+      },
+    });
+    console.log(lead);
+    if (lead && status === false) {
+      await prisma.group.updateMany({
+        where: {
+          modId: userId,
+        },
+        data: {
+          modId: null,
+        },
+      });
+    }
     const attendance = await prisma.groupOnUsers.updateMany({
       where: { userId },
       data: {

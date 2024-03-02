@@ -10,12 +10,17 @@ const menuPoints = new MenuPoints();
 class UsersServices {
   static async getAll() {
     const users = await prisma.users.findMany({
-      orderBy: [
-        {
-          role: {
-            hierarchy: 'asc',
-          },
+      where: {
+        role: {
+          hierarchy: { in: [1, 2] },
         },
+      },
+      orderBy: [
+        // {
+        //   role: {
+        //     hierarchy: ,
+        //   },
+        // },
         {
           profile: {
             lastName: 'asc',
@@ -49,11 +54,56 @@ class UsersServices {
         },
       },
     });
-
-    if (users.length == 0)
+    const employees = await prisma.users.findMany({
+      where: {
+        role: {
+          hierarchy: { gte: 3 },
+        },
+      },
+      orderBy: [
+        // {
+        //   role: {
+        //     hierarchy: 'asc',
+        //   },
+        // },
+        {
+          profile: {
+            lastName: 'asc',
+          },
+        },
+      ],
+      include: {
+        profile: true,
+        role: {
+          include: {
+            menuPoints: {
+              select: {
+                id: true,
+                menuId: true,
+                typeRol: true,
+                subMenuPoints: {
+                  select: {
+                    id: true,
+                    menuId: true,
+                    typeRol: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        equipment: {
+          include: {
+            workStation: true,
+          },
+        },
+      },
+    });
+    const merge = [...users, ...employees];
+    if (merge.length == 0)
       throw new AppError('No se pudo encontrar el registro de usuarios', 404);
 
-    const userWithMenus = users.map(({ password, ...user }) =>
+    const userWithMenus = merge.map(({ password, ...user }) =>
       password && user.role
         ? {
             ...user,
