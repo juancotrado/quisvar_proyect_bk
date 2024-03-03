@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { ContractServices, _contractPath } from '../services';
 import { existsSync, renameSync, rmSync } from 'fs';
 import AppError from '../utils/appError';
+import { ContractForm } from 'types/types';
 
 class ContractController {
   static INIT_VALUES_PHASE = {
@@ -19,6 +20,7 @@ class ContractController {
     try {
       const cui = req.query.cui as string;
       const date = req.query.date as string;
+      const type = req.query.type as ContractForm['type'];
       const company = req.query.companyId as string;
       const consortium = req.query.consortiumId as string;
       const compId = company ? parseInt(company) : undefined;
@@ -27,6 +29,7 @@ class ContractController {
         cui,
         compId,
         consortId,
+        type,
         date
       );
       res.status(200).json(result);

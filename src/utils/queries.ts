@@ -169,6 +169,7 @@ class Queries {
       name: true,
       projectId: true,
       projectName: true,
+      type: true,
       province: true,
       shortName: true,
       consortiumId: true,

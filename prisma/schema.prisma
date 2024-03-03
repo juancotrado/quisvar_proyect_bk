@@ -602,28 +602,28 @@ model FilesMessageHistory {
 }
 
 model Contratc {
-  id             Int      @id @default(autoincrement())
+  id             Int          @id @default(autoincrement())
   cui            String
   name           String
-  contractNumber String   @default("")
+  contractNumber String       @default("")
   projectName    String
   department     String
   province       String
   district       String
   shortName      String?
   difficulty     Int
-  createdAt      DateTime @default(now())
+  createdAt      DateTime     @default(now())
   indexContract  String
   details        String?
-
-  phases       String      @default("[]")
-  projectId    Int? //@unique
-  project      Projects?
+  type           ContractType @default(CONTRATO)
+  phases         String       @default("[]")
+  projectId      Int? //@unique
+  project        Projects?
   // project        Projects?   @relation(fields: [projectId], references: [id])
-  consortiumId Int?
-  companyId    Int?
-  consortium   Consortium? @relation(fields: [consortiumId], references: [id])
-  company      Companies?  @relation(fields: [companyId], references: [id])
+  consortiumId   Int?
+  companyId      Int?
+  consortium     Consortium?  @relation(fields: [consortiumId], references: [id])
+  company        Companies?   @relation(fields: [companyId], references: [id])
 }
 
 model Role {
@@ -775,4 +775,10 @@ enum MessageCategory {
 enum Gender {
   M
   F
+}
+
+enum ContractType {
+  CONTRATO
+  ORDEN_DE_SERVICIO
+  CONTRATACION_DIRECTA
 }
