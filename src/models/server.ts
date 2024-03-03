@@ -50,6 +50,7 @@ import { setAdmin } from '../utils/tools';
 import path from 'path';
 import { docs } from '../middlewares';
 import { env } from 'process';
+import ZipUtil from '../utils/zip.util';
 // import { exec } from 'child_process';
 
 dotenv.config();
@@ -142,6 +143,7 @@ class Server {
 
   conectionCron() {
     const time = new TimerCron('00 20 * * *');
+    // new ZipUtil();
     time.crontimer(() => {
       // exec('ls', (error, stdout, stderr) => {
       //   if (error) {

@@ -22,11 +22,25 @@ class ContractServices {
       (consortiumId && isNaN(consortiumId))
     )
       throw new AppError('Opps, id Invalida', 400);
-    const lteDate = (date && new Date(date)) || undefined;
+    if (date) {
+      const gmt_5 = 5 * 60 * 60 * 1000;
+      const gte = new Date(new Date(date).getTime() + gmt_5);
+      const lt = new Date(new Date(gte).setMonth(12));
+      const showContract = await prisma.contratc.findMany({
+        where: {
+          cui: { startsWith },
+          createdAt: { lt, gte },
+          companyId,
+          consortiumId,
+        },
+        orderBy: [{ createdAt: 'asc' }, { contractNumber: 'asc' }],
+        select: Queries.selectContract.select,
+      });
+      return showContract;
+    }
     const showContract = await prisma.contratc.findMany({
       where: {
         cui: { startsWith },
-        createdAt: { lte: lteDate },
         companyId,
         consortiumId,
       },

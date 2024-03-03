@@ -499,6 +499,12 @@ paths:
           # required: false
           schema:
             type: number
+        - name: date
+          in: query
+          description: fecha
+          # required: false
+          schema:
+            type: string
         - name: consortiumId
           in: query
           description: codigo de Consorcio
