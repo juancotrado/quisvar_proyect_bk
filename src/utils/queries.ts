@@ -200,6 +200,7 @@ class PayMailQueries {
             type: true,
             role: true,
             status: true,
+            userInit: true,
             user: Queries.selectProfileUser,
           },
         },

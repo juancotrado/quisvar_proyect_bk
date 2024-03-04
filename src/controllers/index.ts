@@ -345,3 +345,4 @@ export { default as DutyControllers } from './duty.controllers';
 export { default as SubtaskControllers } from './subtasks.controllers';
 export { default as LevelsControllers } from './levels.controllers';
 export { default as MailControllers } from './mail.controllers';
+export { default as BasicLevelsController } from './basiclevels.controller';

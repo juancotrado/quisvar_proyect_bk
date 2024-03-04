@@ -39,6 +39,7 @@ import {
   AttendanceGroupRoutes,
   DutyRoutes,
   roleRoutes,
+  BasiclevelsRoutes,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -77,6 +78,7 @@ class Server {
     typespecialities: `/${process.env.ROUTE}/typespecialities`,
     sector: `/${process.env.ROUTE}/sector`,
     levels: `/${process.env.ROUTE}/levels`,
+    basiclevels: `/${process.env.ROUTE}/basiclevels`,
     resource: `/${process.env.ROUTE}/resource`,
     list: `/${process.env.ROUTE}/list`,
     license: `/${process.env.ROUTE}/license`,
@@ -174,6 +176,7 @@ class Server {
     this.app.use(this.path.typespecialities, typeSpecialityRouter);
     this.app.use(this.path.sector, sectorRouter);
     this.app.use(this.path.levels, levelsRouter);
+    this.app.use(this.path.basiclevels, BasiclevelsRoutes);
     this.app.use(this.path.list, listRouter);
     this.app.use(this.path.license, licenseRouter);
     this.app.use(this.path.mail, MailRouter);
