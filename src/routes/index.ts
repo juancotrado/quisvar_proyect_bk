@@ -31,3 +31,4 @@ export { default as payMailRoutes } from './paymail.routes';
 export { default as AttendanceGroupRoutes } from './attendanceGroup.routes';
 export { default as DutyRoutes } from './duty.routes';
 export { default as roleRoutes } from './role.routes';
+export { default as BasiclevelsRoutes } from './basiclevels.routes';

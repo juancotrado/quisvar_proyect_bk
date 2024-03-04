@@ -14,7 +14,7 @@ export { default as SectorServices } from './sector.services';
 export { default as TypeSpecialitiesServices } from './typeSpecialities.services';
 export { default as LevelsServices } from './levels.services';
 export { default as ListServices } from './list.services';
-export { default as PayMailServices } from './paymail.services';
+export { default as PayMailServices } from './payMail.services';
 export { default as LicenseServices } from './licenses.services';
 export { default as CompaniesServices } from './companies.services';
 export { default as SpecialistServices } from './specialist.services';
@@ -29,6 +29,7 @@ export { default as ConsortiumServices } from './consortium.services';
 export { default as GroupServices } from './groups.services';
 export { default as AttendanceGroupService } from './attendanceGroup.services';
 export { default as DutyServices } from './duty.services';
+export { default as BasicLevelServices } from './basiclevels.services';
 
 export const rootPath = './uploads';
 export const indexPath = './index';

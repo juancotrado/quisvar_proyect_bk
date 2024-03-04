@@ -304,6 +304,33 @@ paths:
             application/json:
               example:
                 error: No se pudo duplicar la tarea
+  /basiclevels:
+    post:
+      tags:
+        - basiclevels
+      summary: create level
+      description: crear niveles
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Basiclevel-form'
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: No se pudo crear el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el mensaje
   /mail:
     post:
       tags:
@@ -1282,3 +1309,22 @@ components:
         manager: Juan Gonzalo
         image: https://example.com/another-image.png
         projectId: 1
+    Basiclevel-form:
+      type: object
+      properties:
+        rootId:
+          type: number
+          example: 1
+        stagesId:
+          type: number
+          example: 12
+        userId:
+          type: number
+          example: 21
+        name:
+          type: string
+          example: nuevo nivel en basicos
+        typeItem:
+          type: string
+          description: ingresar <b>[ABC,ROM,NUM]</b>
+          example: NUM
