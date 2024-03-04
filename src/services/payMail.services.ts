@@ -41,7 +41,7 @@ class PayMailServices {
     const parseList = mail.map(({ paymessage, ...data }) => {
       const userInit = paymessage.users.find(user => user.userInit);
       const _message = { ...paymessage, userInit };
-      return { ...data, message: _message };
+      return { ...data, paymessage: _message };
     });
     const total = await prisma.payMail.count({
       where: { userId, type, paymessage: { status, type: typeMessage } },
