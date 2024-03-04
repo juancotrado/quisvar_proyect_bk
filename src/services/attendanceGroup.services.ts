@@ -179,6 +179,7 @@ class AttendanceGroupService {
         id: true,
         nombre: true,
         groupId: true,
+        file: true,
         groups: {
           select: {
             name: true,
@@ -344,13 +345,53 @@ class AttendanceGroupService {
     return attendance;
   }
   //Disabled Users
-  static async disabledGroup(userId: GroupOnUsers['userId']) {
+  static async disabledGroup(userId: GroupOnUsers['userId'], status: boolean) {
     if (!userId) throw new AppError(`Oops!, algo salio mal`, 400);
+    const lead = await prisma.group.findFirst({
+      where: {
+        modId: userId,
+      },
+    });
+    console.log(lead);
+    if (lead && status === false) {
+      await prisma.group.updateMany({
+        where: {
+          modId: userId,
+        },
+        data: {
+          modId: null,
+        },
+      });
+    }
     const attendance = await prisma.groupOnUsers.updateMany({
       where: { userId },
       data: {
-        active: false,
+        active: status,
       },
+    });
+    return attendance;
+  }
+  //Attendance File
+  static async updateFile(id: GroupList['id'], file: string) {
+    if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
+    const attendance = await prisma.groupList.update({
+      where: { id },
+      data: { file },
+    });
+    return attendance;
+  }
+  static async deleteFile(id: GroupList['id']) {
+    if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
+    const res = await prisma.groupList.findUnique({
+      where: { id },
+      select: {
+        file: true,
+      },
+    });
+    if (res?.file) unlinkSync(`public/groups/daily/${res.file}`);
+    const attendance = await prisma.groupList.update({
+      where: { id },
+      data: { file: null },
     });
     return attendance;
   }

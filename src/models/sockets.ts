@@ -45,6 +45,9 @@ class Sockets {
       socket.on('client:call-notification', () => {
         this.io.emit('server:call-notification');
       });
+      socket.on('client:refresh-user', roleId => {
+        this.io.to(`role-${roleId}`).emit('server:refresh-user');
+      });
       socket.on('disconnect', () => {
         console.log('User disconected ==>', socket.id);
       });

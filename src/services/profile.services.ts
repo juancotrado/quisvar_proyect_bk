@@ -22,6 +22,7 @@ class ProfileServices {
       phoneRef,
       room,
       userPc,
+      gender,
     }: Profiles,
 
     { email, address, ruc, roleId }: userPickEdit
@@ -52,6 +53,7 @@ class ProfileServices {
             phoneRef,
             room,
             userPc,
+            gender,
           },
         },
       },

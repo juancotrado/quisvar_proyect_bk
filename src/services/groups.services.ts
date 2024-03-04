@@ -37,6 +37,11 @@ class GroupServices {
           },
         },
         groups: {
+          where: {
+            users: {
+              status: true,
+            },
+          },
           select: {
             users: {
               select: {
@@ -68,6 +73,9 @@ class GroupServices {
         modId: true,
         gNumber: true,
         moderator: {
+          where: {
+            status: true,
+          },
           select: {
             profile: {
               select: {
@@ -84,6 +92,11 @@ class GroupServices {
               profile: {
                 lastName: 'asc',
               },
+            },
+          },
+          where: {
+            users: {
+              status: true,
             },
           },
           select: {

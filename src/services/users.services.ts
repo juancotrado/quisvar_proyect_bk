@@ -1,7 +1,7 @@
 import AppError from '../utils/appError';
 import { userProfilePick } from '../utils/format.server';
 import { enviarCorreoAgradecimiento } from '../utils/mailer';
-import { Users, prisma } from '../utils/prisma.server';
+import { Profiles, Users, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
 import RoleService from './role.service';
 import { MenuPoints } from '../models/menuPoints';
@@ -10,12 +10,17 @@ const menuPoints = new MenuPoints();
 class UsersServices {
   static async getAll() {
     const users = await prisma.users.findMany({
-      orderBy: [
-        {
-          role: {
-            hierarchy: 'asc',
-          },
+      where: {
+        role: {
+          hierarchy: { in: [1, 2] },
         },
+      },
+      orderBy: [
+        // {
+        //   role: {
+        //     hierarchy: ,
+        //   },
+        // },
         {
           profile: {
             lastName: 'asc',
@@ -49,11 +54,56 @@ class UsersServices {
         },
       },
     });
-
-    if (users.length == 0)
+    const employees = await prisma.users.findMany({
+      where: {
+        role: {
+          hierarchy: { gte: 3 },
+        },
+      },
+      orderBy: [
+        // {
+        //   role: {
+        //     hierarchy: 'asc',
+        //   },
+        // },
+        {
+          profile: {
+            lastName: 'asc',
+          },
+        },
+      ],
+      include: {
+        profile: true,
+        role: {
+          include: {
+            menuPoints: {
+              select: {
+                id: true,
+                menuId: true,
+                typeRol: true,
+                subMenuPoints: {
+                  select: {
+                    id: true,
+                    menuId: true,
+                    typeRol: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        equipment: {
+          include: {
+            workStation: true,
+          },
+        },
+      },
+    });
+    const merge = [...users, ...employees];
+    if (merge.length == 0)
       throw new AppError('No se pudo encontrar el registro de usuarios', 404);
 
-    const userWithMenus = users.map(({ password, ...user }) =>
+    const userWithMenus = merge.map(({ password, ...user }) =>
       password && user.role
         ? {
             ...user,
@@ -76,6 +126,33 @@ class UsersServices {
     if (!findUser) throw new AppError('No se pudo encontrar el usuario', 404);
     const role = await RoleService.findGeneral(findUser.roleId!);
     return { ...findUser, role };
+  }
+  static async findByDni(dni: Profiles['dni']) {
+    if (!dni) throw new AppError('Oops!,dni invalido', 409);
+    const findUser = await prisma.users.findFirst({
+      where: {
+        profile: {
+          dni,
+        },
+      },
+      include: {
+        profile: true,
+      },
+    });
+    if (!findUser) throw new AppError('No se pudo encontrar el usuario', 404);
+    return findUser;
+  }
+  static async findByTokenAndId(id: number, token: string) {
+    const findUser = await prisma.users.findFirst({
+      where: {
+        id,
+        verificationUser: {
+          token,
+        },
+      },
+    });
+    if (!findUser) throw new AppError('Algo salio mal', 404);
+    return findUser;
   }
 
   static async findListTask(id: Users['id']) {
@@ -154,6 +231,7 @@ class UsersServices {
     phoneRef,
     description,
     roleId,
+    gender,
   }: userProfilePick) {
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -184,6 +262,7 @@ class UsersServices {
             userPc,
             lastNameRef,
             description,
+            gender,
           },
         },
       },

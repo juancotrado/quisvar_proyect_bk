@@ -2,12 +2,11 @@ import { Profiles, Users, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
-import { userHash } from '../utils/format.server';
 import AppError from '../utils/appError';
-import RoleService from './role.service';
 
 dotenv.config();
-const secret = process.env.SECRET;
+const secret = process.env.SECRET || 'patito juan';
+const JWT_RESET = process.env.JWT_RESET || 'JWT_RESET';
 
 export class authServices {
   static async auth({
@@ -35,16 +34,23 @@ export class authServices {
 
     if (!user) throw new AppError('Usuario inexistente', 404);
     const verifyPassword = await bcrypt.compare(password, user.password);
-    if (!verifyPassword) throw new AppError('contraseña incorrecta', 404);
-    const role = await RoleService.findGeneral(user.role!.id);
-    return { ...user, role };
+    if (!verifyPassword)
+      throw new AppError(
+        'Credenciales incorrectas. Verifique su usuario y contraseña.',
+        401
+      );
+    return user;
   }
 
-  static getToken(data: userHash) {
+  static getToken(id: number) {
     if (secret) {
-      const token = jwt.sign(data, secret, { algorithm: 'HS512' });
+      const token = jwt.sign({ id }, secret, { algorithm: 'HS512' });
       return token;
     }
+  }
+  static getTokenToResetPassword(id: number, dni: string) {
+    const token = jwt.sign({ id, dni }, JWT_RESET, { expiresIn: '3m' });
+    return token;
   }
 
   static async updatePassword(id: Users['id'], password: string) {

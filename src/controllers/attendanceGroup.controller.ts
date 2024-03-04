@@ -1,6 +1,7 @@
 import { ControllerFunction } from 'types/patterns';
 import { AttendanceGroupService } from '../services';
 import { FilesProps } from 'types/types';
+import AppError from '../utils/appError';
 
 class AttendanceGroupController {
   public getUsersGroup: ControllerFunction = async (req, res, next) => {
@@ -107,6 +108,46 @@ class AttendanceGroupController {
       const { id } = req.params;
       const { body } = req;
       const query = await AttendanceGroupService.update(+id, body);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+  //Disabled Users
+  public disabledUser: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      const query = await AttendanceGroupService.disabledGroup(+id, status);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+  //Attendance File
+  public updateFile: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      if (!req.file)
+        throw new AppError('Oops!, no se pudo subir el contrato', 400);
+      // const { file } = req.files as FilesProps;
+      // console.log(file)
+      // const pdf = file ?  file[0].filename : ''
+      // console.log(pdf)
+      const query = await AttendanceGroupService.updateFile(
+        +id,
+        req.file.filename
+      );
+      res.status(200).json(query);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+  public deleteFile: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const query = await AttendanceGroupService.deleteFile(+id);
       res.status(200).json(query);
     } catch (error) {
       next(error);

@@ -499,6 +499,18 @@ paths:
           # required: false
           schema:
             type: number
+        - name: date
+          in: query
+          description: fecha
+          # required: false
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: tipo de contrato usar <b>[ CONTRATO,ORDEN_DE_SERVICIO,CONTRATACION_DIRECTA]</b>
+          # required: false
+          schema:
+            type: string
         - name: consortiumId
           in: query
           description: codigo de Consorcio

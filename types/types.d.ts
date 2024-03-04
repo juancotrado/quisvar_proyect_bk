@@ -219,6 +219,7 @@ export interface usersCount {
 export type ContractForm = Pick<
   Contratc,
   | 'projectName'
+  | 'type'
   | 'name'
   | 'cui'
   | 'createdAt'

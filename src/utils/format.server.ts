@@ -48,6 +48,7 @@ export type userProfilePick = Pick<
   | 'room'
   | 'userPc'
   | 'roleId'
+  | 'gender'
 >;
 
 export type projectPick = Pick<

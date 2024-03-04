@@ -115,6 +115,8 @@ class ListServices {
       //   status: true,
       // },
       where: { role: { hierarchy: { in: [1, 2] } } },
+      // orderBy: { profile: { lastName: 'asc' } },
+
       orderBy: { createdAt: 'asc' },
       select: {
         id: true,
@@ -175,8 +177,17 @@ class ListServices {
       //   },
       //   status: true,
       // },
-      where: { role: { hierarchy: { notIn: [1, 2] } } },
-      orderBy: { profile: { lastName: 'asc' } },
+      where: {
+        role: { hierarchy: { gte: 3 } },
+      },
+      orderBy:
+        // {
+        //   role: {
+        //     hierarchy: 'asc',
+        //   },
+        // },
+        { profile: { lastName: 'asc' } },
+
       select: {
         id: true,
         role: true,
@@ -205,9 +216,9 @@ class ListServices {
               },
             },
           },
-          orderBy: {
-            assignedAt: 'asc',
-          },
+          // orderBy: {
+          //   assignedAt: 'asc',
+          // },
           select: {
             status: true,
             usersId: true,
@@ -223,6 +234,7 @@ class ListServices {
         },
       },
     });
+    console.log([...listAdmin, ...listEmploye]);
     return [...listAdmin, ...listEmploye];
   }
   static async deleteManyList() {

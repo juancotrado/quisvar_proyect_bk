@@ -37,6 +37,15 @@ class AttendanceGroupRoutes {
     //Attendance Group
     this.router.post('/relation', AttendanceGroupControllers.createAttendance);
     this.router.patch('/:id', AttendanceGroupControllers.updateAttendance);
+    //Disabled Users
+    this.router.patch('/disabled/:id', AttendanceGroupControllers.disabledUser);
+    //Attendance File
+    this.router.patch(
+      '/file/:id',
+      uploads.fileGroup.single('file'),
+      AttendanceGroupControllers.updateFile
+    );
+    this.router.delete('/file/:id', AttendanceGroupControllers.deleteFile);
   }
 }
 const { router } = new AttendanceGroupRoutes();

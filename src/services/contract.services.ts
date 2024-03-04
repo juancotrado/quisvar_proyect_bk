@@ -15,6 +15,7 @@ class ContractServices {
     startsWith?: string,
     companyId?: Companies['id'],
     consortiumId?: Consortium['id'],
+    type?: ContractForm['type'],
     date?: string
   ) {
     if (
@@ -22,15 +23,18 @@ class ContractServices {
       (consortiumId && isNaN(consortiumId))
     )
       throw new AppError('Opps, id Invalida', 400);
-    const lteDate = (date && new Date(date)) || undefined;
+    const gmt_5 = 5 * 60 * 60 * 1000;
+    const gte = date ? new Date(new Date(date).getTime() + gmt_5) : undefined;
+    const lt = gte ? new Date(new Date(gte).setMonth(12)) : undefined;
     const showContract = await prisma.contratc.findMany({
       where: {
         cui: { startsWith },
-        createdAt: { lte: lteDate },
+        createdAt: { lt, gte },
         companyId,
         consortiumId,
+        type,
       },
-      orderBy: [{ createdAt: 'asc' }, { name: 'asc' }],
+      orderBy: [{ createdAt: 'asc' }, { contractNumber: 'asc' }],
       select: Queries.selectContract.select,
     });
     return showContract;
@@ -85,6 +89,7 @@ class ContractServices {
     });
     return updateDetails;
   }
+
   public static async updatePhases(
     id: Contratc['id'],
     phases: Contratc['phases']
