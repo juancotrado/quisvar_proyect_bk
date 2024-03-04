@@ -38,10 +38,15 @@ class PayMailServices {
         paymessage: Queries.PayMail().selectMessage('MAIN'),
       },
     });
+    const parseList = mail.map(({ paymessage, ...data }) => {
+      const userInit = paymessage.users.find(user => user.userInit);
+      const _message = { ...paymessage, userInit };
+      return { ...data, message: _message };
+    });
     const total = await prisma.payMail.count({
       where: { userId, type, paymessage: { status, type: typeMessage } },
     });
-    return { total, mail };
+    return { total, mail: parseList };
   }
 
   static async getMessage(id: PayMessages['id']) {

@@ -44,7 +44,7 @@ class MailServices {
     const total = await prisma.mail.count({
       where: { userId, type, message: { status, type: typeMessage, category } },
     });
-    return { total, parseList };
+    return { total, mail: parseList };
   }
 
   public static async getMessage(id: Messages['id']) {
