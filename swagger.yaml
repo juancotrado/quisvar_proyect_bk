@@ -317,7 +317,48 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#components/schemas/Basiclevel-form'
+              $ref: '#/components/schemas/Basiclevel-form'
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: No se pudo crear el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el mensaje
+  /basiclevels/{id}:
+    get:
+      tags:
+        - basiclevels
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: No se pudo crear el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el mensaje
+    delete:
+      tags:
+        - basiclevels
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Operación exitosa
@@ -1314,7 +1355,7 @@ components:
       properties:
         rootId:
           type: number
-          example: 1
+          example: 0
         stagesId:
           type: number
           example: 12

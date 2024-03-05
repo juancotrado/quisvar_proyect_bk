@@ -8,6 +8,18 @@ class BasicLevelsController {
       const query = await BasicLevelServices.create(body);
       res.status(201).json(query);
     } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+
+  public static findByStage: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id: stageId } = req.params;
+      const query = await BasicLevelServices.find(+stageId);
+      res.status(200).json(query);
+    } catch (error) {
+      console.log(error);
       next(error);
     }
   };
@@ -18,6 +30,7 @@ class BasicLevelsController {
       const query = await BasicLevelServices.delete(+levelId);
       res.status(200).json(query);
     } catch (error) {
+      console.log(error);
       next(error);
     }
   };

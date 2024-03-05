@@ -256,7 +256,6 @@ model Levels {
 
 model BasicLevels {
   id           Int      @id @default(autoincrement())
-  item         String
   index        Int
   name         String
   level        Int      @default(0)
