@@ -352,9 +352,65 @@ paths:
             application/json:
               example:
                 error: No se pudo crear el mensaje
+    post:
+      tags:
+        - basiclevels
+      summary: Añadir niveles upper or lower
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+        - $ref: '#/components/parameters/typeUpperorLower'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpperOrLowerLevel'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: No se pudo crear el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el mensaje
+    put:
+      tags:
+        - basiclevels
+      summary: Actualizar nivel
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpperOrLowerLevel'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: No se pudo crear el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el mensaje
     delete:
       tags:
         - basiclevels
+      summary: Eliminar nivel
       parameters:
         - $ref: '#/components/parameters/levelId'
       security:
