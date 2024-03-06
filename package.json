@@ -44,6 +44,7 @@
     "mv": "^2.1.1",
     "node-cron": "^3.0.2",
     "nodemailer": "^6.9.7",
+    "pdf-lib": "^1.17.1",
     "pdfkit": "^0.13.0",
     "socket.io": "^4.6.1",
     "swagger-jsdoc": "^6.2.8",

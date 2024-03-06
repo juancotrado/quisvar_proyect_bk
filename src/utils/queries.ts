@@ -162,6 +162,7 @@ class Queries {
     select: {
       createdAt: true,
       cui: true,
+      amount: true,
       department: true,
       difficulty: true,
       district: true,
