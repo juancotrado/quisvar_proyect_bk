@@ -1129,6 +1129,7 @@ components:
         - district
         - indexContract
         - shortName
+        - amount
         # - companyId
         # - consortiumId
         - difficulty
@@ -1146,6 +1147,9 @@ components:
         department:
           type: string
           example: 'Puno'
+        amount:
+          type: number
+          example: 123.2
         province:
           type: string
           example: 'Puno'
