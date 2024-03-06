@@ -237,6 +237,7 @@ export type ContractForm = Pick<
   | 'type'
   | 'name'
   | 'cui'
+  | 'amount'
   | 'createdAt'
   | 'indexContract'
   | 'department'

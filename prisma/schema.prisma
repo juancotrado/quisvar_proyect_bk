@@ -651,6 +651,7 @@ model Contratc {
   details        String?
   type           ContractType @default(CONTRATO)
   phases         String       @default("[]")
+  amount         Float        @default(0)
   projectId      Int? //@unique
   project        Projects?
   // project        Projects?   @relation(fields: [projectId], references: [id])
