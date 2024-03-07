@@ -168,6 +168,7 @@ class Queries {
       district: true,
       id: true,
       name: true,
+      indexContract: true,
       projectId: true,
       projectName: true,
       type: true,

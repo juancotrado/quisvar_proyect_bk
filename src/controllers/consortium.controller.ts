@@ -108,7 +108,6 @@ export const getBoth = async (
 ) => {
   try {
     const query = await ConsortiumServices.getBoth();
-    console.log(query);
     res.status(200).json(query);
   } catch (error) {
     console.log(error);
