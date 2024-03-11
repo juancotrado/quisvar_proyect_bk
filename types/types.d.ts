@@ -13,6 +13,8 @@ import {
   PayMessages,
   Mail,
   BasicLevels,
+  BasicTasks,
+  BasicFiles,
 } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 
@@ -119,17 +121,28 @@ export interface DuplicateLevel {
 export interface GetFilterLevels extends Levels {
   subTasks?: SubTaskFilter[];
 }
-export interface GetFilterBasicLevels
-  extends Pick<
-    BasicLevels,
-    'id' | 'index' | 'typeItem' | 'name' | 'rootId' | 'level' | 'rootLevel'
-  > {
-  // subTasks?: SubTaskFilter[];
+export interface GetFilterBasicLevels extends BasicLevels {
+  subTasks?: BasicTasks[];
+}
+export interface GetFolderBasicLevels extends BasicLevels {
+  subTasks?: BasicTaskFolder[];
+}
+
+export interface BasicTaskFolder extends BasicTasks {
+  files?: BasicFiles[];
 }
 
 export interface FolderLevels {
   id: number;
   index: number;
+}
+
+export interface BasicFilesForm {
+  dir: string;
+  type: BasicFiles['type'];
+  subTasksId: number;
+  name: string;
+  userId: number | null;
 }
 
 export type TypeIdsList = number | TypeIdsList[];
@@ -138,6 +151,24 @@ export interface GetDuplicateLevels extends Levels {
   next?: GetDuplicateLevels[];
 }
 export interface SubTaskFilter extends SubTasks {
+  users: {
+    percentage: number;
+    userId: number;
+    user: {
+      id: number;
+      profile: {
+        firstName: string;
+        lastName: string;
+        dni: string;
+        phone: string | null;
+        degree: string | null;
+        description: string | null;
+      } | null;
+    };
+  }[];
+}
+
+export interface BasicTaskFilter extends BasicTasks {
   users: {
     percentage: number;
     userId: number;
@@ -291,3 +322,22 @@ export interface UpperAddSubtask {
 export type CategoryMailType = 'GLOBAL' | 'DIRECT';
 
 export type ReceiverT = Pick<Mail, 'type' | 'role' | 'status'>;
+
+export interface MergePDFBasicFiles {
+  status?: BasicTasks['status'];
+  typeFile?: 'all' | 'pdf' | 'no_pdf';
+}
+
+export interface FolderBasicLevelList {
+  id: number;
+  index: number;
+  path: string;
+  subtasks: {
+    id: number;
+    index: number;
+    name: string;
+    path: string;
+    files: { id: number; oldPath: string; newPath: string }[];
+  }[];
+  next: FolderBasicLevelList[];
+}

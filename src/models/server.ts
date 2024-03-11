@@ -40,6 +40,8 @@ import {
   DutyRoutes,
   roleRoutes,
   BasiclevelsRoutes,
+  BasicTasksRoutes,
+  PDFGenerateRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -68,6 +70,7 @@ class Server {
     specialities: `/${process.env.ROUTE}/specialities`,
     projects: `/${process.env.ROUTE}/projects`,
     subtasks: `/${process.env.ROUTE}/subtasks`,
+    basictasks: `/${process.env.ROUTE}/basictasks`,
     files: `/${process.env.ROUTE}/files`,
     reports: `/${process.env.ROUTE}/reports`,
     feedbacks: `/${process.env.ROUTE}/feedbacks`,
@@ -97,6 +100,7 @@ class Server {
     attendanceGroup: `/${process.env.ROUTE}/attendanceGroup`,
     duty: `/${process.env.ROUTE}/duty`,
     role: `/${process.env.ROUTE}/role`,
+    generatepdf: `/${process.env.ROUTE}/generate-pdf`,
   };
 
   constructor() {
@@ -144,7 +148,7 @@ class Server {
 
   conectionCron() {
     const time = new TimerCron('00 20 * * *');
-    // new ZipUtil();
+    // new ZipUtil()
     time.crontimer(() => {
       // exec('ls', (error, stdout, stderr) => {
       //   if (error) {
@@ -166,6 +170,7 @@ class Server {
     this.app.use(this.path.projects, projectRouter);
     this.app.use(this.path.specialities, speacilitiesRouter);
     this.app.use(this.path.subtasks, subTaskRouter);
+    this.app.use(this.path.basictasks, BasicTasksRoutes);
     this.app.use(this.path.files, filesRouter);
     this.app.use(this.path.reports, reportsRouter);
     this.app.use(this.path.feedbacks, feedbacksRouter);
@@ -194,6 +199,7 @@ class Server {
     this.app.use(this.path.attendanceGroup, AttendanceGroupRoutes);
     this.app.use(this.path.duty, DutyRoutes);
     this.app.use(this.path.role, roleRoutes);
+    this.app.use(this.path.generatepdf, PDFGenerateRouter);
     this.app.use(docs);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       res.locals.pageNotFound = this.rootDir + '/404_page/index.html';
