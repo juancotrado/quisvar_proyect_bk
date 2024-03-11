@@ -29,5 +29,22 @@ class PDFGenerateController {
       next(error);
     }
   };
+
+  public pagesInCover: ControllerFunction = async (req, res, next) => {
+    try {
+      if (!req.file) throw new AppError('archivo inexistente', 500);
+      const { buffer, originalname } = req.file as Express.Multer.File;
+      const options = this.headers(originalname);
+      // outputPath: 'compress_cp/file_with_logo.pdf',
+      const newFile = await GenerateFiles.cover(buffer, { brand: 'dhyrium' });
+      const fileTemp = tmp.fileSync({ postfix: '.pdf' });
+      writeFileSync(fileTemp.name, newFile);
+      res.download(fileTemp.name, `convert_${originalname}`, options, error => {
+        if (!error) fileTemp.removeCallback();
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 export default PDFGenerateController;
