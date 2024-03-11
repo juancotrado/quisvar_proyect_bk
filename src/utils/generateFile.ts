@@ -1,15 +1,7 @@
 import { createWriteStream, readFileSync, writeFileSync } from 'fs';
 import PDFDocumentKit from 'pdfkit';
 import AppError from './appError';
-import {
-  PDFDocument,
-  PDFFont,
-  PDFPage,
-  PageSizes,
-  StandardFonts,
-  drawImage,
-  rgb,
-} from 'pdf-lib';
+import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from 'pdf-lib';
 import { configurationSealPDF } from 'types/types';
 import path from 'path';
 class GenerateFiles {
