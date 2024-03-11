@@ -56,7 +56,6 @@ class GenerateFiles {
     );
     const footer = brand && (await pdfDoc.embedPng(readFileSync(pathFooter)));
     const header = brand && (await pdfDoc.embedPng(readFileSync(pathHeader)));
-    console.log(footer, header);
     for (let i = 0; i < numberPages; i++) {
       const page = pdfDoc.getPage(i);
       page.drawImage(image, {
