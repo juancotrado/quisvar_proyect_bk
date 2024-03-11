@@ -352,7 +352,6 @@ class AttendanceGroupService {
         modId: userId,
       },
     });
-    console.log(lead);
     if (lead && status === false) {
       await prisma.group.updateMany({
         where: {

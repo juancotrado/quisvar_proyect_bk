@@ -164,14 +164,28 @@ model GroupList {
 }
 
 model Duty {
-  id          Int       @id @default(autoincrement())
-  description String?
-  fullName    String
-  startDate   DateTime  @default(now())
-  untilDate   DateTime
-  listId      Int
-  createdAt   DateTime  @default(now())
-  groupList   GroupList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  id        Int           @id @default(autoincrement())
+  CUI       String
+  project   String
+  asitec    String?
+  feedback  String?
+  members   DutyMembers[]
+  listId    Int
+  createdAt DateTime      @default(now())
+  groupList GroupList     @relation(fields: [listId], references: [id], onDelete: Cascade)
+}
+
+model DutyMembers {
+  id            Int       @id @default(autoincrement())
+  position      String?
+  fullName      String
+  progress      String?
+  lastMeeting   DateTime?
+  futureMeeting DateTime?
+  status        String
+  request       String?
+  dutyId        Int
+  duty          Duty      @relation(fields: [dutyId], references: [id], onDelete: Cascade)
 }
 
 model AttendanceGroup {
@@ -256,7 +270,6 @@ model Levels {
 
 model BasicLevels {
   id           Int      @id @default(autoincrement())
-  item         String
   index        Int
   name         String
   level        Int      @default(0)
@@ -638,6 +651,7 @@ model Contratc {
   details        String?
   type           ContractType @default(CONTRATO)
   phases         String       @default("[]")
+  amount         Float        @default(0)
   projectId      Int? //@unique
   project        Projects?
   // project        Projects?   @relation(fields: [projectId], references: [id])

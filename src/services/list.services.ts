@@ -234,7 +234,6 @@ class ListServices {
         },
       },
     });
-    console.log([...listAdmin, ...listEmploye]);
     return [...listAdmin, ...listEmploye];
   }
   static async deleteManyList() {

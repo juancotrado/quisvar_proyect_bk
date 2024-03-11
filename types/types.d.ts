@@ -12,6 +12,7 @@ import {
   Users,
   PayMessages,
   Mail,
+  BasicLevels,
 } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 
@@ -118,6 +119,20 @@ export interface DuplicateLevel {
 export interface GetFilterLevels extends Levels {
   subTasks?: SubTaskFilter[];
 }
+export interface GetFilterBasicLevels
+  extends Pick<
+    BasicLevels,
+    'id' | 'index' | 'typeItem' | 'name' | 'rootId' | 'level' | 'rootLevel'
+  > {
+  // subTasks?: SubTaskFilter[];
+}
+
+export interface FolderLevels {
+  id: number;
+  index: number;
+}
+
+export type TypeIdsList = number | TypeIdsList[];
 export interface GetDuplicateLevels extends Levels {
   subTasks?: SubTaskFiles[];
   next?: GetDuplicateLevels[];
@@ -222,6 +237,7 @@ export type ContractForm = Pick<
   | 'type'
   | 'name'
   | 'cui'
+  | 'amount'
   | 'createdAt'
   | 'indexContract'
   | 'department'

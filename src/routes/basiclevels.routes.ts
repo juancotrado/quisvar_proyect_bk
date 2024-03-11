@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { BasicLevelsController } from '../controllers';
-const { create } = BasicLevelsController;
+const {
+  create,
+  findByStage,
+  update,
+  upperOrLower,
+  delete: deleteStage,
+} = BasicLevelsController;
 
 class BasicLevelsRouter {
   public router: Router;
@@ -11,7 +17,10 @@ class BasicLevelsRouter {
 
   private setUpRoutes() {
     this.router.post('/', create);
-    this.router.delete('/', create);
+    this.router.post('/:id', upperOrLower);
+    this.router.get('/:id', findByStage);
+    this.router.put('/:id', update);
+    this.router.delete('/:id', deleteStage);
   }
 }
 const { router } = new BasicLevelsRouter();

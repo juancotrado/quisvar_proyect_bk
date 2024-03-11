@@ -66,8 +66,7 @@ class LevelsServices {
     let rootId, stagesId;
     rootId = id;
     stagesId = stageId;
-    if (name.includes('projects'))
-      throw new AppError('Error palabra reservada', 404);
+
     if (type === 'ID') {
       const getId = await prisma.levels.findUnique({ where: { id } });
       if (!getId) throw new AppError('No se pudo encontrar el índice', 404);
