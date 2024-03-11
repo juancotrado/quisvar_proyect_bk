@@ -1,7 +1,7 @@
 import { ProjectDir } from 'types/types';
 import { _dirPath, _materialPath, _reviewPath } from '.';
 import AppError from '../utils/appError';
-import { Files, prisma } from '../utils/prisma.server';
+import { BasicFiles, Files, prisma } from '../utils/prisma.server';
 
 class StageInfo {
   static async findProject(id: number) {
@@ -72,6 +72,7 @@ class PathServices {
     const path = await StageInfo.getValues(id);
     return projectPath + '/' + path;
   }
+
   static async subTask(id: number, type: Files['type']) {
     const { levels_Id, Levels } = await StageInfo.findSubtask(id);
     const { stages } = Levels;
@@ -81,6 +82,18 @@ class PathServices {
     }
     const rootPath = await PathServices.stage(stages.id, type);
     return rootPath;
+  }
+
+  static readonly basicPath = 'uploads/basics';
+  static async basicTask(id: number, type: BasicFiles['type']) {
+    const task = await prisma.basicTasks.findUnique({
+      where: { id },
+      select: { Levels: { select: { stagesId: true } } },
+    });
+    if (!task) throw new AppError('Opps,tarea invalida', 404);
+    const rootPath = this.basicPath + '/' + type;
+    const relativePath = rootPath + '/' + task.Levels.stagesId;
+    return relativePath;
   }
 }
 export default PathServices;

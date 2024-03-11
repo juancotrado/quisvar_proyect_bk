@@ -86,6 +86,43 @@ class Queries {
       },
     },
   };
+
+  static includeBasictask = {
+    Levels: {
+      select: {
+        userId: true,
+        stages: {
+          select: {
+            group: {
+              select: {
+                id: true,
+                name: true,
+                groups: {
+                  select: { users: Queries.selectProfileUserForStage },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    // feedBacks: {
+    //   include: {
+    //     users: { include: { user: this.selectProfileUser } },
+    //     files: true,
+    //   },
+    // },
+    files: true,
+    // users: {
+    //   select: {
+    //     percentage: true,
+    //     assignedAt: true,
+    //     untilDate: true,
+    //     status: true,
+    //     user: this.selectProfileUser,
+    //   },
+    // },
+  };
   static selectSpecialist = {
     select: {
       career: true,

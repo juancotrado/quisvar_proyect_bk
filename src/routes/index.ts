@@ -32,3 +32,5 @@ export { default as AttendanceGroupRoutes } from './attendanceGroup.routes';
 export { default as DutyRoutes } from './duty.routes';
 export { default as roleRoutes } from './role.routes';
 export { default as BasiclevelsRoutes } from './basiclevels.routes';
+export { default as BasicTasksRoutes } from './basictask.routes';
+export { default as PDFGenerateRouter } from './pdfgenerate.routes';

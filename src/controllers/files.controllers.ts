@@ -1,16 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
 import {
+  BasicTasksServices,
   FilesServices,
   PathServices,
   SubTasksServices,
   UsersServices,
 } from '../services';
-import { Files } from '@prisma/client';
+import { BasicFiles, Files } from '@prisma/client';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
 import { unlinkSync } from 'fs';
 import { TypeFileUser } from 'types/types';
 import { convertToUtf8 } from '../utils/tools';
+import { ControllerFunction } from 'types/patterns';
 export const uploadFile = async (
   req: Request,
   res: Response,
@@ -99,6 +101,7 @@ export const deleteUserFile = async (
     next(error);
   }
 };
+
 export const uploadFiles = async (
   req: Request,
   res: Response,
@@ -126,6 +129,29 @@ export const uploadFiles = async (
     next(error);
   }
 };
+
+export const uploadBasicFiles: ControllerFunction = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const subTasksId = +id;
+    const type = req.query.status as BasicFiles['type'];
+    const userInfo: UserType = res.locals.userInfo;
+    if (!req.files) return;
+    const newFiles = req.files as Express.Multer.File[];
+    const dir = await PathServices.basicTask(subTasksId, type);
+    const data = newFiles.map(({ filename: name }) => {
+      const values = { dir, type, subTasksId, name };
+      return { userId: userInfo.id || null, ...values };
+    });
+    await FilesServices.createManyBasicFiles(data, +subTasksId);
+    const query = await BasicTasksServices.find(+subTasksId);
+    res.status(201).json(query);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
 export const deleteFile = async (
   req: Request,
   res: Response,
