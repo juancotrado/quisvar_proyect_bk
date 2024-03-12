@@ -20,8 +20,8 @@ class MailRoutes {
     this.setUpRouter();
   }
   protected setUpRouter(): void {
-    this.router.get('/imbox/quantity', quantityFiles);
     this.router.use(authenticateHandler);
+    this.router.get('/imbox/quantity', quantityFiles);
     this.router.get('/', showMessages);
     this.router.get('/:id', showMessage);
     this.router.post('/', uploads.fileMail.array('fileMail'), createMessage);
