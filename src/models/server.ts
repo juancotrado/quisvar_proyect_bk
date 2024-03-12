@@ -53,6 +53,7 @@ import { setAdmin } from '../utils/tools';
 import path from 'path';
 import { docs } from '../middlewares';
 import { env } from 'process';
+// import GenerateFiles from '../utils/generateFile';
 // import { exec } from 'child_process';
 
 dotenv.config();
@@ -148,6 +149,19 @@ class Server {
 
   conectionCron() {
     const time = new TimerCron('00 20 * * *');
+    // GenerateFiles.coverFirma(
+    //   'compress_cp/servicio.pdf',
+    //   'compress_cp/servicio_firma.pdf',
+    //   {
+    //     pos: 10,
+    //     title: 'Gerencia General',
+    //     numberPage: 123,
+    //     to: 'Diego Adolfo Romani Cotohuanca Puerquisimo Diego ',
+    //     date: '2024/11/12',
+    //     observation:
+    //       'Se encontraron nuevas irregularidades en el documento presentado sin folio',
+    //   }
+    // );
     // new ZipUtil()
     time.crontimer(() => {
       // exec('ls', (error, stdout, stderr) => {

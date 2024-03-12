@@ -3,7 +3,7 @@ import { PDFGenerateController } from '../controllers';
 import tmp from 'tmp';
 import { uploads } from '../middlewares';
 
-const { pagesInPage } = new PDFGenerateController();
+const { pagesInPage, pagesInCover } = new PDFGenerateController();
 class PDFGenerateRouter {
   public router: Router;
   constructor() {
@@ -15,6 +15,7 @@ class PDFGenerateRouter {
     tmp.setGracefulCleanup();
     this.router.use(uploads.PDF_Files.single('file'));
     this.router.post('/two-pages', pagesInPage);
+    this.router.post('/cover', pagesInCover);
   }
 }
 

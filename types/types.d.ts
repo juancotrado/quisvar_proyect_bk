@@ -341,3 +341,13 @@ export interface FolderBasicLevelList {
   }[];
   next: FolderBasicLevelList[];
 }
+
+export interface configurationSealPDF {
+  x: number;
+  y: number;
+  title?: string;
+  numberPage: number;
+  to: string;
+  date: string;
+  observation?: string;
+}

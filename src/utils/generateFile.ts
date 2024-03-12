@@ -1,9 +1,11 @@
 import { createWriteStream, readFileSync, writeFileSync } from 'fs';
 import PDFDocumentKit from 'pdfkit';
 import AppError from './appError';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from 'pdf-lib';
+import { configurationSealPDF } from 'types/types';
+import path from 'path';
 class GenerateFiles {
-  static cover(text: string, outputPath: string, imagePath: string) {
+  static cover2(text: string, outputPath: string, imagePath: string) {
     const margin = 10;
     const doc = new PDFDocumentKit({ margin });
     //--------------------------------------------------------------------------
@@ -21,6 +23,60 @@ class GenerateFiles {
     stream.on('error', () => {
       throw new AppError('Error al crear archivo pdf', 500);
     });
+  }
+
+  static async cover(
+    filePath: string | Buffer,
+    {
+      imagePath,
+      outputPath,
+      brand,
+    }: { imagePath?: string; brand?: string; outputPath?: string }
+  ) {
+    const pdfBytes: Buffer =
+      typeof filePath !== 'string' ? filePath : readFileSync(filePath);
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+    const numberPages = pdfDoc.getPageCount();
+    // const newPdfGenerate = await PDFDocument.create();
+    // const newPage = newPdfGenerate.addPage(PageSizes.A4);
+    const pathBrand = path.join('resource', `${brand}`, `${brand}_logo.png`);
+    const pathHeader = path.join('resource', `${brand}`, `${brand}_header.png`);
+    const pathFooter = path.join('resource', `${brand}`, `${brand}_footer.png`);
+
+    const image = await pdfDoc.embedPng(
+      readFileSync(imagePath ? imagePath : pathBrand)
+    );
+    const footer = brand && (await pdfDoc.embedPng(readFileSync(pathFooter)));
+    const header = brand && (await pdfDoc.embedPng(readFileSync(pathHeader)));
+    for (let i = 0; i < numberPages; i++) {
+      const page = pdfDoc.getPage(i);
+      page.drawImage(image, {
+        x: page.getWidth() / 4,
+        y: page.getHeight() / 3,
+        width: page.getWidth() / 2,
+        height: page.getHeight() / 3,
+        opacity: 0.2,
+      });
+      if (header && footer) {
+        page.drawImage(header, {
+          x: 0,
+          y: page.getHeight() - 80,
+          width: page.getWidth(),
+          height: 80,
+        });
+        page.drawImage(footer, {
+          x: 0,
+          y: -10,
+          width: page.getWidth(),
+          height: 100,
+        });
+      }
+    }
+    //------------------------------------------------------------
+    const pdfWithBytes = await pdfDoc.save();
+    if (outputPath && outputPath.length > 0)
+      writeFileSync(outputPath, pdfWithBytes);
+    return pdfWithBytes;
   }
 
   static async coverTwoPage(filePath: string | Buffer, outputPath?: string) {
@@ -52,14 +108,39 @@ class GenerateFiles {
   static async coverFirma(
     filePath: string,
     outputPath: string,
-    imagePath: string
+    { pos, ...data }: Omit<configurationSealPDF, 'x' | 'y'> & { pos: number } // imagePath: string
   ) {
     const pdfBytes = readFileSync(filePath);
     const pdfDoc = await PDFDocument.load(pdfBytes);
     const numberPages = pdfDoc.getPageCount();
-    const image = await pdfDoc.embedJpg(readFileSync(imagePath));
+    // const image = await pdfDoc.embedJpg(readFileSync(imagePath));
+    const font = await pdfDoc.embedFont(StandardFonts.CourierBold);
     const page = pdfDoc.getPage(numberPages - 1);
-    page.drawImage(image, { x: 100, y: 100, width: 100, height: 100 });
+    const sealdWidth = page.getWidth() / 3;
+    const generateCoordsX = [10, sealdWidth + 5, sealdWidth * 2];
+    const generateCoordsY = new Array(6).fill(10).map((v, i) => v + 135 * i);
+    //-------------------------------------------------------------------------
+    const getCoords = (value: number) => {
+      const coordX = value % 3 !== 0 ? (value % 3) - 1 : 2;
+      const coordY = value % 3 !== 0 ? Math.floor(value / 3) : value / 3 - 1;
+      if (value <= 0 || value > 18) return { x: 10, y: 10 };
+      return { x: generateCoordsX[coordX], y: generateCoordsY[coordY] };
+    };
+    //-------------------------------------------------------------------------
+    const position = getCoords(pos);
+    // maxlength_obs = 88
+    // maxlength_title = 16
+    // maxlength_to = 50
+    GenerateFiles.drawSeil(page, font, {
+      x: position.x,
+      y: position.y,
+      date: data.date,
+      numberPage: data.numberPage,
+      to: data.to,
+      observation: data.observation,
+      title: data.title,
+    });
+
     const modifiedPdfBytes = await pdfDoc.save();
     writeFileSync(outputPath, modifiedPdfBytes);
   }
@@ -81,6 +162,76 @@ class GenerateFiles {
     );
     const mergedBytes = await mergedDoc.save();
     writeFileSync(outputPath, mergedBytes);
+  }
+
+  static async drawSeil(
+    page: PDFPage,
+    font: PDFFont,
+    { x, y, date, to, observation, numberPage, title }: configurationSealPDF
+  ) {
+    const lineHeight = 15;
+    page.drawRectangle({
+      x,
+      y,
+      width: page.getWidth() / 3 - 10,
+      height: 120,
+      borderWidth: 2,
+      borderColor: rgb(0, 0, 0.7),
+      borderOpacity: 0.9,
+      opacity: 0.6,
+      color: rgb(0.98, 0.98, 0.98),
+    });
+    page.drawRectangle({
+      x: x + 5,
+      y: y + 5,
+      width: page.getWidth() / 3 - 20,
+      height: 120 - 10,
+      borderWidth: 1,
+      borderColor: rgb(0, 0, 0.7),
+      borderDashArray: [3, 4],
+      opacity: 0,
+    });
+    page.setFontSize(10.5);
+    page.setFont(font);
+    page.setFontColor(rgb(0, 0, 0.7));
+    page.drawText(`PROVEIDO ${title?.toUpperCase()}`, {
+      x: x + 15,
+      y: y + 50 + lineHeight * 3 + 8,
+    });
+    page.drawText(`CORPORACIÓN DHYRIUM S.A.C`, {
+      x: x + 15,
+      y: y + 50 + lineHeight * 3 - 2,
+    });
+    page.setFontSize(9.5);
+    page.drawText(`Fecha:${date}`, {
+      x: x + 15,
+      y: y + 50 + lineHeight * 2,
+    });
+    page.drawText(`N°:${numberPage.toString().padStart(4, '0')}`, {
+      x: x + 130,
+      y: y + 50 + lineHeight * 2,
+    });
+    page.drawText(`Para:${to}`, {
+      x: x + 15,
+      y: y + 50 + lineHeight,
+      lineHeight: 12,
+      maxWidth: page.getWidth() / 3 - 30,
+    });
+    const responsiveHeightFromTo =
+      to.length > 24 ? y + 50 - lineHeight + 5 : y + 50 - lineHeight + 15;
+    page.setFontSize(10);
+    page.drawText('Observaciones:', {
+      x: x + 15,
+      y: responsiveHeightFromTo,
+      lineHeight: 10,
+    });
+    page.setFontSize(8);
+    page.drawText(`${observation}`, {
+      x: x + 15,
+      y: responsiveHeightFromTo - 10,
+      maxWidth: page.getWidth() / 3 - 22,
+      lineHeight: 10,
+    });
   }
 }
 
