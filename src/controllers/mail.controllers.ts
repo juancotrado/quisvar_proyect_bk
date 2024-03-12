@@ -152,7 +152,7 @@ export class MailControllers {
   public quantityFiles: ControllerFunction = async (req, res, next) => {
     try {
       const { id }: UserType = res.locals.userInfo;
-      const query = await PayMailServices.quantityFiles(id);
+      const query = await MailServices.quantityFiles(id);
       res.status(200).json(query);
     } catch (error) {
       next(error);

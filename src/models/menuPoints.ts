@@ -232,7 +232,7 @@ export const TRAMITES_OPTIONS: SubMenu[] = [
     id: 3,
     title: 'comunicados',
     route: 'comunicado',
-    access: ['MOD'],
+    access: ['MOD', 'USER'],
   },
   { id: 4, title: 'Salidas', route: 'salidas', access: ['MOD', 'USER'] },
 ];

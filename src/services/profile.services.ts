@@ -24,7 +24,6 @@ class ProfileServices {
       userPc,
       gender,
     }: Profiles,
-
     { email, address, ruc, roleId }: userPickEdit
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
