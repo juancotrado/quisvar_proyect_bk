@@ -1,15 +1,7 @@
 import { createWriteStream, readFileSync, writeFileSync } from 'fs';
 import PDFDocumentKit from 'pdfkit';
 import AppError from './appError';
-import {
-  PDFDocument,
-  PDFFont,
-  PDFPage,
-  PageSizes,
-  StandardFonts,
-  drawImage,
-  rgb,
-} from 'pdf-lib';
+import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from 'pdf-lib';
 import { configurationSealPDF } from 'types/types';
 import path from 'path';
 class GenerateFiles {
@@ -56,7 +48,6 @@ class GenerateFiles {
     );
     const footer = brand && (await pdfDoc.embedPng(readFileSync(pathFooter)));
     const header = brand && (await pdfDoc.embedPng(readFileSync(pathHeader)));
-    console.log(footer, header);
     for (let i = 0; i < numberPages; i++) {
       const page = pdfDoc.getPage(i);
       page.drawImage(image, {
