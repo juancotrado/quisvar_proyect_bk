@@ -269,22 +269,22 @@ model Levels {
 }
 
 model BasicLevels {
-  id           Int      @id @default(autoincrement())
+  id           Int          @id @default(autoincrement())
   index        Int
   name         String
-  level        Int      @default(0)
+  level        Int          @default(0)
   rootLevel    Int
-  typeItem     TypeItem @default(NUM)
-  rootTypeItem TypeItem @default(NUM)
-  isProject    Boolean  @default(false)
-  isArea       Boolean  @default(false)
-  isInclude    Boolean  @default(false)
+  typeItem     TypeItem     @default(NUM)
+  rootTypeItem TypeItem     @default(NUM)
+  isProject    Boolean      @default(false)
+  isArea       Boolean      @default(false)
+  isInclude    Boolean      @default(false)
   stagesId     Int
   userId       Int?
   rootId       Int
-  // subTasks     SubTasks[]
+  subTasks     BasicTasks[]
   // user         Users?     @relation(fields: [userId], references: [id])
-  stages       Stages   @relation(fields: [stagesId], references: [id], onDelete: Cascade)
+  stages       Stages       @relation(fields: [stagesId], references: [id], onDelete: Cascade)
 }
 
 model TaskOnUsers {
@@ -322,6 +322,22 @@ model SubTasks {
   users       TaskOnUsers[]
 }
 
+model BasicTasks {
+  id        Int          @id @default(autoincrement())
+  status    TaskRole     @default(UNRESOLVED)
+  name      String
+  index     Int
+  typeItem  TypeItem     @default(NUM)
+  days      Float
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  levels_Id Int
+  files     BasicFiles[]
+  Levels    BasicLevels  @relation(fields: [levels_Id], references: [id], onDelete: Cascade)
+  // feedBacks   Feedback[]
+  // users       TaskOnUsers[]
+}
+
 model Feedback {
   id         Int                @id @default(autoincrement())
   comment    String?
@@ -357,6 +373,19 @@ model Files {
   assignedAt DateTime  @default(now())
   feedback   Feedback? @relation(fields: [feedbackId], references: [id])
   subTasks   SubTasks  @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
+}
+
+model BasicFiles {
+  id         Int        @id @default(autoincrement())
+  name       String
+  userId     Int?
+  dir        String?
+  type       FileTypes
+  subTasksId Int
+  feedbackId Int?
+  assignedAt DateTime   @default(now())
+  // feedback   Feedback? @relation(fields: [feedbackId], references: [id])
+  subTasks   BasicTasks @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
 }
 
 model PersonBussiness {
@@ -771,6 +800,7 @@ enum MessageType {
   ACUERDO
   OFICIO
   COORDINACION
+  MEMORANDUM_GLOBAL
 }
 
 enum MessageRole {

@@ -1,32 +1,58 @@
-import { BasicLevels } from '@prisma/client';
+import { BasicFiles, BasicLevels, BasicTasks } from '@prisma/client';
 import lodash from 'lodash';
 import { numberToConvert } from '../utils/tools';
 import {
   DuplicateLevel,
+  FolderBasicLevelList,
   FolderLevels,
   GetFilterBasicLevels,
+  GetFolderBasicLevels,
+  MergePDFBasicFiles,
+  ObjectNumber,
   TypeIdsList,
 } from 'types/types';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-import { existsSync, mkdirSync } from 'fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  rmdirSync,
+  statSync,
+  unlinkSync,
+} from 'fs';
+import GenerateFiles from '../utils/generateFile';
 
 class BasicLevelServices {
-  static async find(id: BasicLevels['id']) {
+  static async find(id: BasicLevels['id'], status?: BasicTasks['status']) {
+    // const list = await this.mergePDFs(id, { status, typeFile: 'pdf' });
     const getBasicList = await prisma.basicLevels.findMany({
       where: { stagesId: id },
       orderBy: { index: 'asc' },
-      select: {
-        id: true,
-        index: true,
-        typeItem: true,
-        name: true,
-        rootId: true,
-        level: true,
-        rootLevel: true,
+      include: {
+        subTasks: {
+          where: { status },
+          include: {
+            files: true,
+          },
+          orderBy: { index: 'asc' },
+        },
       },
     });
-    const list = this.findList(getBasicList, 0, 0, '');
+    // const list = this.folderlist(getBasicList, 0, 0, '',"compress_cp/test");
+    const list = this.folderlist(
+      getBasicList,
+      {
+        _item: '',
+        _path: 'compress_cp/test',
+        _rootId: 0,
+        _rootLevel: 0,
+      },
+      true
+    );
     return list;
   }
 
@@ -135,45 +161,100 @@ class BasicLevelServices {
     );
     const list = array.filter(value => !findList.includes(value));
     if (!findList.length) return [];
-    const newList = findList.map(({ ...value }) => {
+    const newList = findList.map(({ subTasks, ...value }) => {
       const findItem = numberToConvert(value.index, value.typeItem);
       const item = _item + (_item ? '.' : '') + findItem;
+      let data;
+      if (subTasks && subTasks.length) {
+        const subtasks = subTasks.map(({ index, typeItem, ...value }) => {
+          const findItem = numberToConvert(index, typeItem);
+          const newItem = item + (item ? '.' : '') + findItem;
+          return { item: newItem, index, typeItem, ...value };
+        });
+        data = { subTasks: subtasks };
+      }
       const nextLevel: typeof findList = this.findList(
         list,
         value.id,
         value.level,
         item
       );
-      if (!nextLevel.length) return { ...value, item };
-      return { ...value, item, nextLevel };
+      if (!nextLevel.length) return { ...value, item, ...data };
+      return { ...value, item, ...data, nextLevel };
     });
     return newList;
     // const nextLevel = this.findList(list,)
   }
 
   static folderlist(
-    array: GetFilterBasicLevels[],
-    _rootId: number,
-    _rootLevel: number,
-    _item: string,
-    _path: string
+    array: GetFolderBasicLevels[],
+    {
+      _rootId,
+      _rootLevel,
+      _item,
+      _path,
+    }: { _rootId: number; _rootLevel: number; _item: string; _path: string },
+    createfiles: boolean = false
   ) {
     const findList = array.filter(
       ({ rootId, rootLevel }) => rootId === _rootId && rootLevel === _rootLevel
     );
     const list = array.filter(value => !findList.includes(value));
     if (!findList.length) return [];
-    const newList = findList.map(({ id, index, level, typeItem, name }) => {
-      const findItem = numberToConvert(index, typeItem);
-      const item = _item + (_item ? '.' : '') + findItem;
-      const newPath = item + '.' + name;
-      const path = _path + '/' + newPath;
-      if (!existsSync(path)) mkdirSync(path, { recursive: true });
-      const next: FolderLevels[] = this.folderlist(list, id, level, item, path);
-      const data = { id, index, path };
-      if (!next.length) return data;
-      return { ...data, next };
-    });
+    const newList = findList.map(
+      ({ id, index, level, typeItem, name, subTasks }) => {
+        const findItem = numberToConvert(index, typeItem);
+        const item = _item + (_item ? '.' : '') + findItem;
+        const newPath = item + '.' + name;
+        const path = _path + '/' + newPath;
+        if (createfiles && !existsSync(path))
+          mkdirSync(path, { recursive: true });
+        const subtasks = subTasks?.map(
+          ({ index, name, typeItem, id, files: _files }) => {
+            const findItem = numberToConvert(index, typeItem);
+            const newItem = item + (item ? '.' : '') + findItem;
+            const newName = newItem + '.' + name;
+            const _path = path + '/' + newName;
+            //------------------------- Count files per task ------------------------------------------
+            const countExt =
+              _files?.reduce((acc: ObjectNumber, value) => {
+                const ext = value.name.split('.').at(-1) || '';
+                acc[ext] = (acc[ext] || 0) + 1;
+                return acc;
+              }, {}) || {};
+            //-------------------------------------------------------------------
+            const files =
+              _files?.map(({ dir, name: nameFile, id, type }) => {
+                const oldPath = dir + '/' + nameFile;
+                if (type === 'UPLOADS') {
+                  const ext = nameFile.split('.').at(-1) || '';
+                  countExt[ext] -= 1;
+                  const pivot = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
+                  const newFileName = newName + pivot + '.' + ext;
+                  const newPath = path + '/' + newFileName;
+                  return { id, oldPath, newPath };
+                }
+                const newPath = path + '/' + nameFile;
+                return { id, oldPath, newPath };
+              }) || [];
+            if (createfiles)
+              files.forEach(({ newPath, oldPath }) =>
+                copyFileSync(oldPath, newPath)
+              );
+            return { id, index, name: newName, path: _path, files };
+          }
+        );
+        const next: FolderLevels[] = this.folderlist(list, {
+          _rootId: id,
+          _rootLevel: level,
+          _item: item,
+          _path: path,
+        });
+        const data = { id, index, path, subtasks };
+        if (!next.length) return data;
+        return { ...data, next };
+      }
+    );
     return newList;
   }
 
@@ -189,6 +270,74 @@ class BasicLevelServices {
       })
     );
     return updateListPerLevel;
+  }
+
+  // static valueBasic: FolderBasicLevelList[] = JSON.parse(
+  //   readFileSync('compress_cp/values_basic.json', 'utf-8')
+  // );
+
+  static async mergePDFs(
+    id: BasicLevels['id'],
+    { status, typeFile = 'all' }: MergePDFBasicFiles
+  ) {
+    const filterFiles = (typeFile: MergePDFBasicFiles['typeFile']) => {
+      const type = { type: 'UPLOADS' as BasicFiles['type'] };
+      if (typeFile === 'no_pdf')
+        return { ...type, NOT: { name: { endsWith: '.pdf' } } };
+      if (typeFile === 'pdf') return { ...type, name: { endsWith: '.pdf' } };
+      return {};
+    };
+    const getBasicList = await prisma.basicLevels.findMany({
+      where: { stagesId: id },
+      orderBy: { index: 'asc' },
+      include: {
+        subTasks: {
+          where: { status },
+          include: { files: { where: filterFiles(typeFile) } },
+          orderBy: { index: 'asc' },
+        },
+      },
+    });
+    const list = this.folderlist(getBasicList, {
+      _rootId: 0,
+      _rootLevel: 0,
+      _item: '',
+      _path: 'compress_cp/basic',
+    });
+
+    const parseFiles = list.map(file => file as FolderBasicLevelList);
+    if (typeFile === 'pdf') {
+      mkdirSync('compress_cp/filemerge', { recursive: true });
+      await this.parsingPathMerge(parseFiles);
+      const patito2 = readdirSync('compress_cp/filemerge');
+      const patito3 = patito2.map(value => 'compress_cp/filemerge/' + value);
+      console.log(patito3);
+      await GenerateFiles.merge(patito3, 'compress_cp/mergetask.pdf');
+      // const sizeMerge = statSync('compress_cp/mergetask.pdf').size;
+      // console.log(sizeMerge);
+      setTimeout(() => {
+        rmSync('compress_cp/filemerge', { recursive: true });
+      }, 4000);
+    }
+
+    return this.listFilter;
+  }
+
+  static listFilter: { name: string; files: string[] }[] = [];
+
+  static async parsingPathMerge(list: FolderBasicLevelList[]) {
+    list?.forEach(async ({ subtasks, next }) => {
+      if (subtasks && subtasks.length) {
+        subtasks.forEach(async value => {
+          const files = value.files.map(({ oldPath }) => oldPath);
+          const outputPath = 'compress_cp/filemerge/' + value.name + '.pdf';
+          if (files.length) {
+            await GenerateFiles.merge(files, outputPath);
+          }
+        });
+      }
+      await this.parsingPathMerge(next);
+    });
   }
 
   static async listByDelete(rootId: BasicLevels['rootId']) {

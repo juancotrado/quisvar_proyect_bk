@@ -1,5 +1,7 @@
+import { BasicFilesForm } from 'types/types';
 import AppError from '../utils/appError';
 import {
+  BasicFiles,
   FileTypes,
   Files,
   GeneralFiles,
@@ -39,6 +41,17 @@ class FilesServices {
     });
     return newFile;
   }
+
+  static async createManyBasicFiles(
+    data: BasicFilesForm[],
+    subTasksId: SubTasks['id']
+  ) {
+    if (!subTasksId)
+      throw new AppError(`no se pudo encontrar la subtarea`, 404);
+    const newFile = await prisma.basicFiles.createMany({ data });
+    return newFile;
+  }
+
   static async create(
     subTasksId: Files['subTasksId'],
     filename: string,
@@ -56,6 +69,21 @@ class FilesServices {
         subTasksId,
         name: filename,
       },
+    });
+    return newFile;
+  }
+
+  static async createBasicFiles(
+    subTasksId: BasicFiles['subTasksId'],
+    filename: string,
+    type: BasicFiles['type']
+  ) {
+    const basicTask = await prisma.basicTasks.findUnique({
+      where: { id: subTasksId },
+    });
+    if (!basicTask) throw new AppError(`no se pudo encontrar la tarea`, 404);
+    const newFile = await prisma.basicFiles.create({
+      data: { dir: '', type, subTasksId, name: filename },
     });
     return newFile;
   }

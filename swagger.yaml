@@ -428,6 +428,99 @@ paths:
             application/json:
               example:
                 error: No se pudo crear el mensaje
+  /basictasks:
+    post:
+      tags:
+        - basictasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpperOrLowerBasic'
+      responses:
+        '201':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Operación exitosa
+        '404':
+          description: No se pudo crear la tarea
+          content:
+            application/json:
+              example:
+                error: No se pudo crear la tarea
+  /basictasks/{id}:
+    get:
+      tags:
+        - basictasks
+      parameters:
+        - $ref: '#/components/parameters/subtaskId'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: No se pudo crear el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el mensaje
+  /files/basics/{id}:
+    post:
+      tags:
+        - basictasks
+      summary: Add new files on basics
+      parameters:
+        - $ref: '#/components/parameters/subtaskId'
+        - $ref: '#/components/parameters/typeFileTask'
+      description: |-
+        Ingresar Los campos requeridos para añadir un archivo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Basic_File'
+      responses:
+        '201':
+          description: Contrato creado exitosamente
+        '400':
+          description: Datos no válidos
+    delete:
+      tags:
+        - basictasks
+      summary: Add new files
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del contrato
+          schema:
+            type: integer
+        - name: filename
+          in: query
+          description: Nombre del archivo
+          required: true
+          schema:
+            type: string
+      description: |-
+        Ingresar Los campos requeridos para añadir un archivo
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Contrato creado exitosamente
+        '400':
+          description: Datos no válidos
   /mail:
     post:
       tags:
@@ -477,7 +570,6 @@ paths:
             application/json:
               example:
                 error: No se pudo crear el mensaje
-
   /mail/{id}:
     get:
       tags:
@@ -1064,6 +1156,13 @@ components:
       required: true
       schema:
         type: integer
+    typeFileTask:
+      name: status
+      in: query
+      description: 'Usar <b>[MODEL,REVIEW,UPLOADS,EDITABLES]</b>'
+      example: MODEL
+      schema:
+        type: string
     levelId:
       name: id
       in: path
@@ -1188,6 +1287,16 @@ components:
         fileName:
           type: string
           example: 'nombre_del_archivo'
+    Basic_File:
+      required:
+        - files
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
     CompanyImage:
       required:
         - img
@@ -1252,6 +1361,25 @@ components:
         description:
           type: string
           example: 'Lorem ipsum'
+    CreateUpperOrLowerBasic:
+      required:
+        - name
+        - days
+        - stageId
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'nueva_tarea_creada'
+        days:
+          type: integer
+          example: 2
+        stageId:
+          type: integer
+          example: 29
+        levels_Id:
+          type: integer
+          example: 10
     CreateUpperOrLowerLevel:
       required:
         - name

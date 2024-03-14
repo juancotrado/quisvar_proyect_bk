@@ -7,6 +7,7 @@ import {
   deleteFilesGeneral,
   deleteUserFile,
   showFilesGeneral,
+  uploadBasicFiles,
   uploadFilesGeneral,
   uploadUserFile,
 } from '../controllers/files.controllers';
@@ -34,6 +35,11 @@ router.get('/generalFiles', showFilesGeneral);
 router.delete('/generalFiles/:id', deleteFilesGeneral);
 router.post('/upload/:id', uploads.upload.single('file'), uploadFile);
 router.post('/uploads/:id', uploads.upload.array('files'), uploadFiles);
+router.post(
+  '/basics/:id/',
+  uploads.basicFiles.array('files'),
+  uploadBasicFiles
+);
 router.delete('/remove/:id', deleteFile);
 //ADMIN ROLE
 router.use(_admin_role);

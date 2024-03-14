@@ -35,6 +35,40 @@ class StorageConfig {
     });
   }
 
+  public setUpTask(name?: string) {
+    return multer.diskStorage({
+      destination: async function (req, file, callback) {
+        try {
+          const { id: subtaskId } = req.params;
+          const status = req.query.status as Files['type'];
+          const path = await PathServices.basicTask(+subtaskId, status);
+          if (!existsSync(path)) mkdirSync(path, { recursive: true });
+          callback(null, path);
+        } catch (error) {
+          callback(new AppError(`No se pudo encontrar la ruta`, 404), '');
+        }
+      },
+      filename: async (req, { originalname }, callback) => {
+        const ext = originalname.split('.').at(-1) || '';
+        const uniqueSuffix = Date.now();
+        try {
+          if (this.ExtNotAllowed.includes(ext) || originalname.includes('$$'))
+            throw new Error();
+          const { id: subtaskId } = req.params;
+          const parseFileName =
+            subtaskId + '_' + uniqueSuffix + '$$' + originalname;
+          const fileName = name ? name : convertToUtf8(parseFileName);
+          callback(null, fileName);
+        } catch (error) {
+          callback(
+            new AppError(`Oops! , envie archivos con extension válida`, 404),
+            ''
+          );
+        }
+      },
+    });
+  }
+
   public setUpPDF(path: string, name?: string) {
     return multer.diskStorage({
       destination: function (req, file, cb) {
@@ -228,6 +262,16 @@ class Stogares extends StorageConfig {
 
   public fileSpecialist: multer.Multer = multer({
     storage: storageFileSpecialist,
+  });
+
+  public basicFiles: multer.Multer = multer({
+    storage: this.setUpTask(),
+  });
+  public PDF_Files: multer.Multer = multer({
+    storage: multer.memoryStorage(),
+  });
+  public singImg: multer.Multer = multer({
+    storage: this.setUp('public/signs'),
   });
 }
 
