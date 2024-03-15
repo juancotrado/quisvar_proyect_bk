@@ -270,6 +270,9 @@ class Stogares extends StorageConfig {
   public PDF_Files: multer.Multer = multer({
     storage: multer.memoryStorage(),
   });
+  public singImg: multer.Multer = multer({
+    storage: this.setUp('public/signs'),
+  });
 }
 
 // export const acceptFormData = multer().any();

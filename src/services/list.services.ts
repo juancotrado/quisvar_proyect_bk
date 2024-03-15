@@ -179,6 +179,7 @@ class ListServices {
       // },
       where: {
         role: { hierarchy: { gte: 3 } },
+        id: { notIn: [4, 5, 3] },
       },
       orderBy:
         // {
