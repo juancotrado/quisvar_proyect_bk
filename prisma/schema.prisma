@@ -176,16 +176,16 @@ model Duty {
 }
 
 model DutyMembers {
-  id            Int       @id @default(autoincrement())
+  id            Int     @id @default(autoincrement())
   position      String?
   fullName      String
   progress      String?
-  lastMeeting   DateTime?
-  futureMeeting DateTime?
+  lastMeeting   String?
+  futureMeeting String?
   status        String
   request       String?
   dutyId        Int
-  duty          Duty      @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+  duty          Duty    @relation(fields: [dutyId], references: [id], onDelete: Cascade)
 }
 
 model AttendanceGroup {
