@@ -172,9 +172,13 @@ class ContractController {
     next: NextFunction
   ) {
     try {
-      const { id } = req.params;
+      const { id, isIndependent } = req.params;
       const { phases } = req.body;
-      const result = await ContractServices.updatePhases(+id, phases);
+      const result = await ContractServices.updatePhases(
+        +id,
+        phases,
+        isIndependent
+      );
       res.status(201).json(result);
     } catch (error) {
       next(error);
