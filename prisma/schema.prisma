@@ -676,6 +676,7 @@ model Contratc {
   shortName      String?
   difficulty     Int
   createdAt      DateTime     @default(now())
+  isIndependent  Boolean      @default(false)
   indexContract  String
   details        String?
   type           ContractType @default(CONTRATO)
