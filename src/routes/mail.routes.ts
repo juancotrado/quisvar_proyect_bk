@@ -21,6 +21,7 @@ class MailRoutes {
   }
   protected setUpRouter(): void {
     this.router.use(authenticateHandler);
+    this.router.get('/imbox/quantity', quantityFiles);
     this.router.use(
       role.RoleHandler(['MOD', 'USER'], 'tramites', 'comunicado')
     );

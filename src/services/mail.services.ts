@@ -260,12 +260,19 @@ class MailServices {
       by: ['type'],
       _count: { type: true },
       where: {
+        type: { not: 'MEMORANDUM_GLOBAL' },
         users: {
           some: { userId },
         },
       },
     });
-    return quantity;
+    const global = await prisma.messages.groupBy({
+      by: ['type'],
+      _count: { type: true },
+      where: { type: 'MEMORANDUM_GLOBAL' },
+    });
+    const total = [...quantity, ...global];
+    return total;
   }
 }
 export default MailServices;
