@@ -15,6 +15,7 @@ import {
   BasicLevels,
   BasicTasks,
   BasicFiles,
+  Office,
 } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 
@@ -193,6 +194,7 @@ export interface ParametersPayMail {
   skip?: number;
   limit?: number;
   type?: PayMail['type'];
+  officeId?: PayMessages['officeId'];
   // status?: boolean;
   typeMessage?: PayMessages['type'];
   status?: PayMessages['status'];
@@ -216,9 +218,16 @@ export interface PickMail extends Messages {
 export interface PickPayMail extends PayMessages {
   senderId: Users['id'];
   receiverId: Users['id'];
+  officeId: Office['id'];
   idMessageReply?: number;
   idMessageResend?: number;
   secondaryReceiver: { userId: number }[];
+}
+
+export interface ReceiverTypePick {
+  userId: number;
+  role: PayMail['role'];
+  status: PayMail['status'];
 }
 export interface PickMessageReply extends MessageHistory {
   // type?: Mail['type'];

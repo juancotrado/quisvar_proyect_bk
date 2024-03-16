@@ -42,17 +42,17 @@ class BasicLevelServices {
         },
       },
     });
-    // const list = this.folderlist(getBasicList, 0, 0, '',"compress_cp/test");
-    const list = this.folderlist(
-      getBasicList,
-      {
-        _item: '',
-        _path: 'compress_cp/test',
-        _rootId: 0,
-        _rootLevel: 0,
-      },
-      true
-    );
+    const list = this.findList(getBasicList, 0, 0, '');
+    // const list = this.folderlist(
+    //   getBasicList,
+    //   {
+    //     _item: '',
+    //     _path: 'compress_cp/test',
+    //     _rootId: 0,
+    //     _rootLevel: 0,
+    //   },
+    //   true
+    // );
     return list;
   }
 

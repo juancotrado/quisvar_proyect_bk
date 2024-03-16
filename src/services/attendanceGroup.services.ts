@@ -59,7 +59,6 @@ class AttendanceGroupService {
     const transformedData = [
       {
         id: mod?.moderator?.id,
-        description: '',
         status: 'PUNTUAL',
         user: {
           profile: {
@@ -70,7 +69,6 @@ class AttendanceGroupService {
       },
       ...users.map(user => ({
         id: user.users.id,
-        description: '',
         status: 'PUNTUAL',
         user: {
           profile: {
@@ -88,7 +86,6 @@ class AttendanceGroupService {
       where: { groupListId: id },
       select: {
         userId: true,
-        description: true,
         status: true,
         user: {
           select: {
@@ -108,7 +105,6 @@ class AttendanceGroupService {
       firstName: integrante.user.profile?.firstName,
       lastName: integrante.user.profile?.lastName,
       status: integrante.status,
-      description: integrante.description,
     }));
 
     return integrantesArray;
@@ -198,6 +194,13 @@ class AttendanceGroupService {
         duty: {
           orderBy: {
             id: 'asc',
+          },
+          include: {
+            members: {
+              orderBy: {
+                id: 'asc',
+              },
+            },
           },
         },
         title: true,
