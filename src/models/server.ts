@@ -38,6 +38,7 @@ import {
   payMailRoutes,
   AttendanceGroupRoutes,
   DutyRoutes,
+  DutyMembersRoutes,
   roleRoutes,
   BasiclevelsRoutes,
   BasicTasksRoutes,
@@ -100,6 +101,7 @@ class Server {
     groups: `/${process.env.ROUTE}/groups`,
     attendanceGroup: `/${process.env.ROUTE}/attendanceGroup`,
     duty: `/${process.env.ROUTE}/duty`,
+    dutyMembers: `/${process.env.ROUTE}/dutyMembers`,
     role: `/${process.env.ROUTE}/role`,
     generatepdf: `/${process.env.ROUTE}/generate-pdf`,
   };
@@ -212,6 +214,7 @@ class Server {
     this.app.use(this.path.groups, groupsRoutes);
     this.app.use(this.path.attendanceGroup, AttendanceGroupRoutes);
     this.app.use(this.path.duty, DutyRoutes);
+    this.app.use(this.path.dutyMembers, DutyMembersRoutes);
     this.app.use(this.path.role, roleRoutes);
     this.app.use(this.path.generatepdf, PDFGenerateRouter);
     this.app.use(docs);

@@ -29,6 +29,7 @@ export { default as ConsortiumServices } from './consortium.services';
 export { default as GroupServices } from './groups.services';
 export { default as AttendanceGroupService } from './attendanceGroup.services';
 export { default as DutyServices } from './duty.services';
+export { default as DutyMembersServices } from './dutyMembers.services';
 export { default as BasicLevelServices } from './basiclevels.services';
 export { default as BasicTasksServices } from './basictask.services';
 

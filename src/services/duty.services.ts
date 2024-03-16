@@ -5,8 +5,8 @@ interface DutyMember {
   position?: string;
   fullName: string;
   progress?: string;
-  lastMeeting?: Date;
-  futureMeeting?: Date;
+  lastMeeting?: string;
+  futureMeeting?: string;
   status: string;
   request?: string;
 }
@@ -35,17 +35,13 @@ class DutyServices {
     });
     await prisma.dutyMembers.createMany({
       data: members.map(memberData => ({
-        position: memberData.position,
+        position: memberData.position ?? '',
         fullName: memberData.fullName,
-        progress: memberData.progress,
-        lastMeeting: memberData.lastMeeting
-          ? new Date(memberData.lastMeeting)
-          : null,
-        futureMeeting: memberData.futureMeeting
-          ? new Date(memberData.futureMeeting)
-          : null,
-        status: memberData.status,
-        request: memberData.request,
+        progress: memberData.progress ?? '',
+        lastMeeting: memberData.lastMeeting ?? '',
+        futureMeeting: memberData.futureMeeting ?? '',
+        status: memberData.status ?? '',
+        request: memberData.request ?? '',
         dutyId: duty.id,
       })),
     });
@@ -54,7 +50,7 @@ class DutyServices {
   static async update(id: Duty['id'], data: Data) {
     if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
     const { CUI, project, asitec, feedback, listId, members } = data;
-    const duty = await prisma.duty.update({
+    await prisma.duty.update({
       where: { id },
       data: {
         CUI,
@@ -67,30 +63,58 @@ class DutyServices {
         members: true,
       },
     });
-    await prisma.dutyMembers.updateMany({
-      data: members.map(memberData => ({
-        where: { id: memberData.id },
-        data: {
-          position: memberData.position,
-          fullName: memberData.fullName,
-          progress: memberData.progress,
-          lastMeeting: memberData.lastMeeting
-            ? new Date(memberData.lastMeeting)
-            : null,
-          futureMeeting: memberData.futureMeeting
-            ? new Date(memberData.futureMeeting)
-            : null,
-          status: memberData.status,
-          request: memberData.request,
+    members.forEach(async member => {
+      await prisma.dutyMembers.update({
+        where: {
+          id: member.id,
         },
-      })),
+        data: {
+          position: member.position ?? '',
+          fullName: member.fullName,
+          progress: member.progress ?? '',
+          lastMeeting: member.lastMeeting ?? '',
+          futureMeeting: member.futureMeeting ?? '',
+          status: member.status ?? '',
+          request: member.request ?? '',
+        },
+      });
     });
-    return duty;
+    // await prisma.dutyMembers.updateMany({
+    //   data: members.map(memberData => ({
+    //     where: { id: memberData.id },
+    //     data: {
+    //       position: memberData.position,
+    //       fullName: memberData.fullName,
+    //       progress: memberData.progress,
+    //       lastMeeting: memberData.lastMeeting,
+    //       futureMeeting: memberData.futureMeeting,
+    //       status: memberData.status,
+    //       request: memberData.request,
+    //     },
+    //   })),
+    // });
+    return 'ok';
   }
   static async delete(id: Duty['id']) {
     if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
     await prisma.duty.delete({ where: { id } });
     return 'ok';
   }
+  //Duty projects
+  static async getProjects() {
+    // if (!cui) throw new AppError(`Oops!, algo salio mal`, 400);
+    const projects = await prisma.contratc.findMany({
+      select: { id: true, cui: true, projectName: true },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+    return projects;
+  }
+  // static async getProject(cui: Contratc['cui']) {
+  //   if (!cui) throw new AppError(`Oops!, algo salio mal`, 400);
+  //   await prisma.contratc.findFirst({ where: { cui } });
+  //   return 'ok';
+  // }
 }
 export default DutyServices;
