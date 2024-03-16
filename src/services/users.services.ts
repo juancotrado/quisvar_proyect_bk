@@ -121,6 +121,7 @@ class UsersServices {
       where: { id },
       include: {
         profile: true,
+        office: { select: { id: true, name: true } },
       },
     });
     if (!findUser) throw new AppError('No se pudo encontrar el usuario', 404);
