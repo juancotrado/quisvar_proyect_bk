@@ -10,3 +10,4 @@ import { default as uploads } from './upload.middleware';
 export { default as authenticateHandler } from './auth.middleware';
 export { default as role } from './role.middleware';
 export { default as LogsMiddleware } from './logs.middleware';
+export { default as PdfGenerateMiddleware } from './pdfGenerate.middleware';

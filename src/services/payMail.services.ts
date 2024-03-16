@@ -6,6 +6,7 @@ import {
   PickPayMail,
   PickPayMessageReply,
   ReceiverT,
+  ReceiverTypePick,
 } from 'types/types';
 import Queries from '../utils/queries';
 import AppError from '../utils/appError';
@@ -117,6 +118,7 @@ class PayMailServices {
       type,
       header,
       senderId,
+      officeId,
       receiverId,
       secondaryReceiver,
     }: PickPayMail,
@@ -125,18 +127,22 @@ class PayMailServices {
     const typeMail: PayMail['type'] = 'SENDER';
     const role: PayMail['role'] = 'MAIN';
     const status: PayMail['status'] = true;
+    const receiverList: ReceiverTypePick[] = officeId
+      ? [{ userId: receiverId, role, status }]
+      : [];
     const createPayMessage = await prisma.payMessages.create({
       data: {
         title,
         header,
         description,
         type,
+        officeId,
         users: {
           createMany: {
             data: [
               ...secondaryReceiver,
+              ...receiverList,
               { userId: senderId, role, type: typeMail, userInit: true },
-              { userId: receiverId, role, status },
             ],
             skipDuplicates: true,
           },

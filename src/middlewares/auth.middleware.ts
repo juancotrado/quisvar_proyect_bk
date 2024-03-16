@@ -1,4 +1,4 @@
-import { Profiles, Users } from '@prisma/client';
+import { Office, Profiles, Users } from '@prisma/client';
 import { config } from 'dotenv';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
@@ -11,7 +11,9 @@ interface RoleAuht {
   name: string;
   menuPoints: MenuRoles[];
 }
-export type UserType = Users & { profile: Profiles } & { role: RoleAuht };
+export type UserType = Users & { profile: Profiles } & { role: RoleAuht } & {
+  office: Office;
+};
 
 config();
 const SECRET = process.env.SECRET || 'helloWorld';
