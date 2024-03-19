@@ -1,9 +1,13 @@
 import { Router } from 'express';
 import { PDFGenerateController } from '../controllers';
 import tmp from 'tmp';
-import { PdfGenerateMiddleware, uploads } from '../middlewares';
+import {
+  PdfGenerateMiddleware,
+  authenticateHandler,
+  uploads,
+} from '../middlewares';
 
-const { crypt, decrypt } = new PDFGenerateController();
+const { crypt, decrypt, removeSign } = new PDFGenerateController();
 const { verifyToken } = new PdfGenerateMiddleware();
 
 class EncryptRouter {
@@ -13,12 +17,14 @@ class EncryptRouter {
     this.setUpRoutes();
   }
 
-  private setUpRoutes() {
+  private setUpRoutes(): void {
     tmp.setGracefulCleanup();
     this.router.use(verifyToken);
-    this.router.get('/:id', decrypt);
+    this.router.get('/:dni', decrypt);
+    this.router.use(authenticateHandler);
     this.router.use(uploads.singImg.single('file'));
     this.router.post('/', crypt);
+    this.router.delete('/', removeSign);
   }
 }
 
