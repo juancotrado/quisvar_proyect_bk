@@ -39,6 +39,7 @@ model Users {
   roleId                Int?
   role                  Role?              @relation(fields: [roleId], references: [id])
   verificationUser      VerificationUser?
+  office                Office[]           @relation("OfficeToUsers")
 }
 
 model VerificationUser {
@@ -48,6 +49,14 @@ model VerificationUser {
   expiresAt DateTime?
   user      Users     @relation(fields: [userId], references: [id])
   userId    Int       @unique
+}
+
+model Office {
+  id        Int           @id @default(autoincrement())
+  name      String
+  user      Users[]       @relation("OfficeToUsers")
+  paymesage PayMessages[]
+  message   Messages[]
 }
 
 model WorkStation {
@@ -176,16 +185,16 @@ model Duty {
 }
 
 model DutyMembers {
-  id            Int       @id @default(autoincrement())
+  id            Int     @id @default(autoincrement())
   position      String?
   fullName      String
   progress      String?
-  lastMeeting   DateTime?
-  futureMeeting DateTime?
+  lastMeeting   String?
+  futureMeeting String?
   status        String
   request       String?
   dutyId        Int
-  duty          Duty      @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+  duty          Duty    @relation(fields: [dutyId], references: [id], onDelete: Cascade)
 }
 
 model AttendanceGroup {
@@ -581,9 +590,10 @@ model PayMail {
 }
 
 model PayMessages {
-  id             Int              @id @default(autoincrement())
-  title          String
-  header         String           @default("")
+  id     Int    @id @default(autoincrement())
+  title  String
+  header String @default("")
+
   paymentPdfData String           @default("")
   description    String
   filesPay       Payment[]
@@ -594,6 +604,8 @@ model PayMessages {
   history        MessageHistory[]
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
+  office         Office?          @relation(fields: [officeId], references: [id])
+  officeId       Int?
 }
 
 model Messages {
@@ -609,6 +621,8 @@ model Messages {
   history     MessageHistory[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
+  officeId    Int?
+  office      Office?          @relation(fields: [officeId], references: [id])
 }
 
 model MessageHistory {
@@ -676,6 +690,7 @@ model Contratc {
   shortName      String?
   difficulty     Int
   createdAt      DateTime     @default(now())
+  isIndependent  Boolean      @default(false)
   indexContract  String
   details        String?
   type           ContractType @default(CONTRATO)

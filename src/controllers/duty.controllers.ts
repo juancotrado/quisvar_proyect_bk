@@ -31,5 +31,14 @@ class DutyControllers {
       next(error);
     }
   };
+  //Duty projects
+  public getProjects: ControllerFunction = async (req, res, next) => {
+    try {
+      const query = await DutyServices.getProjects();
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 export default new DutyControllers();
