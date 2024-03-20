@@ -91,9 +91,19 @@ class RoleService {
   }
 
   static async create({ name, menuPoints }: RoleForMenuPick) {
+    const roleHierarchy = await prisma.role.findFirst({
+      select: {
+        hierarchy: true,
+      },
+      orderBy: {
+        hierarchy: 'desc',
+      },
+    });
+    const maxHierarchy = roleHierarchy?.hierarchy || 0;
     const role = await prisma.role.create({
       data: {
         name,
+        hierarchy: maxHierarchy + 1,
       },
     });
 
