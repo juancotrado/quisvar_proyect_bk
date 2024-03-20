@@ -54,7 +54,6 @@ class PDFGenerateController {
     try {
       if (!req.file) throw new AppError('archivo inexistente', 500);
       const { path: filePath, destination } = req.file as Express.Multer.File;
-      console.log(req.file.originalname, req.file.filename);
       const { IV, SECRET_CODE } = res.locals as Record<string, string>;
       const { profile }: UserType = res.locals.userInfo;
       const extension = extname(filePath);
@@ -107,6 +106,8 @@ class PDFGenerateController {
           // writeFileSync(`public/signs/${originalname}`, dataDeciper);
         });
       });
+      // const imageStream = bufferImage.toString('base64');
+      // res.send(imageStream);
       const imageStream = Readable.from(bufferImage);
       res.set('Content-Type', 'image/png');
       res.set('Content-Disposition', `filename="image.png"`);
