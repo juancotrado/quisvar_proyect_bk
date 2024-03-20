@@ -35,7 +35,6 @@ export class RoleController {
       const query = await RoleService.create(body);
       res.status(201).json(query);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   };
