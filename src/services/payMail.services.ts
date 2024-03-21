@@ -223,6 +223,16 @@ class PayMailServices {
         where: { userId_paymessageId: { paymessageId: id, userId: senderId } },
         data: { type: 'SENDER', status: false },
       });
+      const getOffice = await prisma.payMessages.findUnique({
+        where: { id },
+        select: { officeId: true },
+      });
+      if (getOffice && getOffice.officeId) {
+        await prisma.payMessages.update({
+          where: { id },
+          data: { officeId: null, beforeOfficeId: getOffice.officeId },
+        });
+      }
     }
     await prisma.payMessages.update({ where: { id }, data: { status } });
     const createForward = await prisma.messageHistory.create({

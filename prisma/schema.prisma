@@ -615,7 +615,7 @@ model PayMessages {
   updatedAt      DateTime         @updatedAt
   office         Office?          @relation(fields: [officeId], references: [id])
   officeId       Int?
-  beforeOfficeId Int              @default(0)
+  beforeOfficeId Int?              @default(0)
 }
 
 model Messages {
