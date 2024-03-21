@@ -285,7 +285,7 @@ export type ContractForm = Pick<
   | 'province'
   | 'district'
   | 'difficulty'
-  | 'shortName'
+  | 'projectShortName'
   | 'companyId'
   | 'consortiumId'
 >;

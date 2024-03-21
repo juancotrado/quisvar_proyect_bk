@@ -192,7 +192,7 @@ class Queries {
       projectId: true,
       projectName: true,
       province: true,
-      shortName: true,
+      projectShortName: true,
     },
   };
   static selectContract = {
@@ -210,7 +210,7 @@ class Queries {
       projectName: true,
       type: true,
       province: true,
-      shortName: true,
+      projectShortName: true,
       consortiumId: true,
       companyId: true,
       contractNumber: true,
