@@ -239,6 +239,7 @@ export interface PickMessageReply extends MessageHistory {
 export interface PickPayMessageReply extends MessageHistory {
   // type?: Mail['type'];
   senderId: Users['id'];
+  officeId?: PayMessages['officeId'];
   receiverId: Users['id'];
   status?: PayMessages['status'];
   paymessageId: PayMessages['id'];

@@ -603,7 +603,6 @@ model PayMessages {
   id     Int    @id @default(autoincrement())
   title  String
   header String @default("")
-
   paymentPdfData String           @default("")
   description    String
   filesPay       Payment[]
@@ -616,6 +615,7 @@ model PayMessages {
   updatedAt      DateTime         @updatedAt
   office         Office?          @relation(fields: [officeId], references: [id])
   officeId       Int?
+  beforeOfficeId Int              @default(0)
 }
 
 model Messages {
