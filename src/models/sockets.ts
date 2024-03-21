@@ -48,6 +48,12 @@ class Sockets {
       socket.on('client:refresh-user', roleId => {
         this.io.to(`role-${roleId}`).emit('server:refresh-user');
       });
+      socket.on('client:action-button', () => {
+        this.io.emit('server:action-button');
+      });
+      socket.on('client:action-button', () => {
+        this.io.emit('server:license-update');
+      });
       socket.on('disconnect', () => {
         console.log('User disconected ==>', socket.id);
       });

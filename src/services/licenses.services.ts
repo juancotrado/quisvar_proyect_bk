@@ -141,21 +141,47 @@ class LicenseServices {
     return { licenses, mainData };
   }
 
-  static async getLicensesByStatus(status: Licenses['status']) {
-    const licenses = await prisma.licenses.findMany({
+  static async getLicensesByStatus(
+    status: Licenses['status'],
+    page?: number,
+    pageSize?: number
+  ) {
+    const _page = page || 1;
+    const _pageSize = pageSize || 20;
+    const skip = (_page - 1) * _pageSize;
+    const count = await prisma.licenses.count({
       where: status ? { status } : {},
       orderBy: {
         createdAt: 'desc',
       },
     });
-    return licenses;
+    const licenses = await prisma.licenses.findMany({
+      where: status ? { status } : {},
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: _pageSize,
+      skip: skip,
+    });
+    return { licenses, count };
   }
 
   static async getLicensesEmployee(
     usersId: Licenses['usersId'],
-    status?: Licenses['status']
+    status?: Licenses['status'],
+    page?: number,
+    pageSize?: number
   ) {
     await this.deleteExpiredLicenses();
+    const _page = page || 1;
+    const _pageSize = pageSize || 20;
+    const skip = (_page - 1) * _pageSize;
+    const count = await prisma.licenses.count({
+      where: {
+        usersId,
+        ...(status ? { status } : {}),
+      },
+    });
     const licenses = await prisma.licenses.findMany({
       where: {
         usersId,
@@ -164,8 +190,10 @@ class LicenseServices {
       orderBy: {
         createdAt: 'desc',
       },
+      take: _pageSize,
+      skip: skip,
     });
-    return licenses;
+    return { licenses, count };
   }
 
   static async getLicensesFee(
