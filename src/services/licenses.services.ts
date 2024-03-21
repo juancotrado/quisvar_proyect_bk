@@ -82,17 +82,36 @@ class LicenseServices {
     }: Licenses
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const GMT = 60 * 60 * 1000;
+    const _startDate = new Date(startDate).getTime();
+    const _untilDate = new Date(untilDate).getTime();
+    const startOfDay = new Date(_startDate - GMT * 5);
+    const endOfDay = new Date(_untilDate - GMT * 5);
     const updateList = await prisma.licenses.update({
       where: { id },
       data: {
         reason,
-        startDate,
-        untilDate,
+        startDate: startOfDay,
+        untilDate: endOfDay,
         usersId,
         feedback,
         status,
         checkout,
         fine,
+      },
+    });
+    return updateList;
+  }
+  static async updateApprove(
+    id: Licenses['id'],
+    { feedback, status }: Licenses
+  ) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const updateList = await prisma.licenses.update({
+      where: { id },
+      data: {
+        feedback,
+        status,
       },
     });
     return updateList;

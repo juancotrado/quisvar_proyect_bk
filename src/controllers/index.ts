@@ -87,6 +87,7 @@ import {
 
 import {
   activeLicenses,
+  approveLicense,
   createFreeForAll,
   createLicense,
   deleteLicense,
@@ -251,6 +252,7 @@ export {
 
 //Licenses Controllers
 export {
+  approveLicense,
   createLicense,
   createFreeForAll,
   updateLicense,
