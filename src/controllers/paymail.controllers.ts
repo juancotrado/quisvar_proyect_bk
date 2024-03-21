@@ -14,12 +14,12 @@ import { Request } from 'express';
 class PayMailControllers {
   public showMessages: ControllerFunction = async (req, res, next) => {
     try {
-      const { skip, ...params } = req.query as ParametersPayMail;
+      const { skip: _skip, ...params } = req.query as ParametersPayMail;
       const userInfo: UserType = res.locals.userInfo;
       const userId = userInfo.id;
-      const offset = parseInt(`${skip}`);
-      const _skip = !isNaN(offset) ? offset : undefined;
-      const newParams = { skip: _skip, ...params };
+      const offset = parseInt(`${_skip}`);
+      const skip = !isNaN(offset) ? offset : undefined;
+      const newParams = { skip, ...params };
       const query = await PayMailServices.getByUser(userId, newParams);
       res.status(200).json(query);
     } catch (error) {

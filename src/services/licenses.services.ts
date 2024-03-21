@@ -102,6 +102,20 @@ class LicenseServices {
     });
     return updateList;
   }
+  static async updateApprove(
+    id: Licenses['id'],
+    { feedback, status }: Licenses
+  ) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const updateList = await prisma.licenses.update({
+      where: { id },
+      data: {
+        feedback,
+        status,
+      },
+    });
+    return updateList;
+  }
 
   static async getLicenceById() {
     const licenses = await prisma.licenses.groupBy({

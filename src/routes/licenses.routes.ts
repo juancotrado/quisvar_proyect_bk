@@ -4,6 +4,7 @@ import {
   createLicense,
   createFreeForAll,
   updateLicense,
+  approveLicense,
   getLicenseById,
   getLicensesByStatus,
   getLicensesEmployee,
@@ -24,6 +25,7 @@ router.get('/fee/:id', getLicensesFee);
 router.post('/', createLicense);
 router.post('/free', createFreeForAll);
 router.patch('/:id', updateLicense);
+router.patch('/approve/:id', approveLicense);
 router.get('/active', activeLicenses);
 router.delete('/:id', deleteLicense);
 //ADMIN ROLE
