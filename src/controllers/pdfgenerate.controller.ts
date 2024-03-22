@@ -90,6 +90,7 @@ class PDFGenerateController {
       if (!IV || !SECRET_CODE)
         throw new AppError('error en claves secretas', 500);
       const { dni: id } = req.params;
+      const type = req.query.type as '64' | 'BLOB' | undefined;
       const key = crypto.scryptSync(SECRET_CODE, 'GfG', 24);
       const iv = Buffer.from(IV, 'hex');
       const pathDeciper = path.join('public/signs', id + '.png' + '.key');
@@ -106,12 +107,15 @@ class PDFGenerateController {
           // writeFileSync(`public/signs/${originalname}`, dataDeciper);
         });
       });
-      // const imageStream = bufferImage.toString('base64');
-      // res.send(imageStream);
-      const imageStream = Readable.from(bufferImage);
-      res.set('Content-Type', 'image/png');
-      res.set('Content-Disposition', `filename="image.png"`);
-      imageStream.pipe(res);
+      if (type === '64') {
+        const imageStream = bufferImage.toString('base64');
+        res.send(imageStream);
+      } else {
+        const imageStream = Readable.from(bufferImage);
+        res.set('Content-Type', 'image/png');
+        res.set('Content-Disposition', `filename="image.png"`);
+        imageStream.pipe(res);
+      }
     } catch (error) {
       next(error);
     }
