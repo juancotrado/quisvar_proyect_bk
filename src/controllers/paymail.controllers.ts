@@ -44,7 +44,11 @@ class PayMailControllers {
       throw new AppError('Oops!, no se pudo subir los archivos', 400);
     const files = Request.files as Express.Multer.File[];
     if (!existsSync(path)) mkdirSync(path, { recursive: true });
-    return files.map(({ filename: name, ...file }) => {
+    return files.map(({ filename: name, fieldname, ...file }) => {
+      if (fieldname === 'mainProcedure') {
+        renameSync(file.path, path + '/' + 'mp_' + name);
+        return { name: 'mp_' + name, path, attempt };
+      }
       renameSync(file.path, path + '/' + name);
       return { name, path, attempt };
     });
