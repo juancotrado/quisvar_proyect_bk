@@ -23,6 +23,7 @@ class ContractRoutes {
     this.router.patch('/:id', ContractController.updateContract);
     this.router.put('/:id/index', ContractController.updateIndex);
     this.router.put('/:id/details', ContractController.updateDetails);
+    this.router.put('/:id/observations', ContractController.updateObservations);
     this.router.put(
       '/:id/phases/:isIndependent',
       ContractController.updatePhases

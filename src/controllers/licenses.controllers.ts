@@ -42,6 +42,20 @@ export const updateLicense = async (
     next(error);
   }
 };
+export const approveLicense = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const body = req.body;
+    const { id } = req.params;
+    const query = await LicenseServices.updateApprove(Number(id), body);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 export const getLicenseById = async (
   req: Request,
   res: Response,
@@ -64,8 +78,12 @@ export const getLicensesByStatus = async (
 ) => {
   try {
     // const id = req.params.id;
-    const status = req.query.status as LicensesStatus;
-    const query = await LicenseServices.getLicensesByStatus(status);
+    const { page, pageSize, status } = req.query;
+    const query = await LicenseServices.getLicensesByStatus(
+      status as LicensesStatus,
+      +(page as string),
+      +(pageSize as string)
+    );
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -77,9 +95,14 @@ export const getLicensesEmployee = async (
   next: NextFunction
 ) => {
   try {
-    const id = req.params.id;
-    const status = req.query.status as LicensesStatus;
-    const query = await LicenseServices.getLicensesEmployee(Number(id), status);
+    const { id } = req.params;
+    const { page, pageSize, status } = req.query;
+    const query = await LicenseServices.getLicensesEmployee(
+      Number(id),
+      status as LicensesStatus,
+      +(page as string),
+      +(pageSize as string)
+    );
     res.status(200).json(query);
   } catch (error) {
     next(error);

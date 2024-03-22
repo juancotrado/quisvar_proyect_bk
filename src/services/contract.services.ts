@@ -42,7 +42,13 @@ class ContractServices {
 
   public static async show(id: Contratc['id']) {
     if (!id) throw new AppError('Opps, id Invalida', 400);
-    const showContract = await prisma.contratc.findUnique({ where: { id } });
+    const showContract = await prisma.contratc.findUnique({
+      where: { id },
+      include: {
+        consortium: true,
+        company: true,
+      },
+    });
     if (!showContract)
       throw new AppError('No existe información del contrato', 404);
     return showContract;
@@ -61,11 +67,28 @@ class ContractServices {
     data: Omit<ContractForm, 'companyId' | 'consortiumId'>
   ) {
     if (!id) throw new AppError('Opps, id Invalida', 400);
-    const createContract = await prisma.contratc.update({
+    const contract = await prisma.contratc.update({
       where: { id },
       data,
+      include: {
+        project: {
+          select: {
+            id: true,
+          },
+        },
+      },
     });
-    return createContract;
+    if (contract.project?.id) {
+      await prisma.projects.update({
+        where: {
+          id: contract.project?.id,
+        },
+        data: {
+          name: data.projectShortName,
+        },
+      });
+    }
+    return contract;
   }
 
   public static async delete(id: Contratc['id']) {
@@ -88,6 +111,17 @@ class ContractServices {
       data: { details },
     });
     return updateDetails;
+  }
+  public static async updateObservations(
+    id: Contratc['id'],
+    observations: string
+  ) {
+    if (!id) throw new AppError('Opps, id Invalida', 400);
+    const updateObservations = await prisma.contratc.update({
+      where: { id },
+      data: { observations },
+    });
+    return updateObservations;
   }
 
   public static async updatePhases(

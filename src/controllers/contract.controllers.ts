@@ -165,6 +165,23 @@ class ContractController {
       next(error);
     }
   }
+  public static async updateObservations(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params;
+      const { observations } = req.body;
+      const result = await ContractServices.updateObservations(
+        +id,
+        observations
+      );
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 
   public static async updatePhases(
     req: Request,

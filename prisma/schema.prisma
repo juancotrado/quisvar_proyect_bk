@@ -39,7 +39,7 @@ model Users {
   roleId                Int?
   role                  Role?              @relation(fields: [roleId], references: [id])
   verificationUser      VerificationUser?
-  office                Office[]           @relation("OfficeToUsers")
+  offices               UserToOffice[]
 }
 
 model VerificationUser {
@@ -52,11 +52,21 @@ model VerificationUser {
 }
 
 model Office {
-  id        Int           @id @default(autoincrement())
+  id        Int            @id @default(autoincrement())
   name      String
-  user      Users[]       @relation("OfficeToUsers")
   paymesage PayMessages[]
   message   Messages[]
+  users     UserToOffice[]
+}
+
+model UserToOffice {
+  usersId         Int
+  officeId        Int
+  isOfficeManager Boolean @default(false)
+  user            Users   @relation(fields: [usersId], references: [id], onDelete: Cascade)
+  office          Office  @relation(fields: [officeId], references: [id], onDelete: Cascade)
+
+  @@id([usersId, officeId])
 }
 
 model WorkStation {
@@ -593,7 +603,6 @@ model PayMessages {
   id     Int    @id @default(autoincrement())
   title  String
   header String @default("")
-
   paymentPdfData String           @default("")
   description    String
   filesPay       Payment[]
@@ -606,6 +615,7 @@ model PayMessages {
   updatedAt      DateTime         @updatedAt
   office         Office?          @relation(fields: [officeId], references: [id])
   officeId       Int?
+  beforeOfficeId Int?              @default(0)
 }
 
 model Messages {
@@ -679,30 +689,30 @@ model FilesMessageHistory {
 }
 
 model Contratc {
-  id             Int          @id @default(autoincrement())
-  cui            String
-  name           String
-  contractNumber String       @default("")
-  projectName    String
-  department     String
-  province       String
-  district       String
-  shortName      String?
-  difficulty     Int
-  createdAt      DateTime     @default(now())
-  isIndependent  Boolean      @default(false)
-  indexContract  String
-  details        String?
-  type           ContractType @default(CONTRATO)
-  phases         String       @default("[]")
-  amount         Float        @default(0)
-  projectId      Int? //@unique
-  project        Projects?
-  // project        Projects?   @relation(fields: [projectId], references: [id])
-  consortiumId   Int?
-  companyId      Int?
-  consortium     Consortium?  @relation(fields: [consortiumId], references: [id])
-  company        Companies?   @relation(fields: [companyId], references: [id])
+  id               Int          @id @default(autoincrement())
+  cui              String
+  name             String
+  contractNumber   String       @default("")
+  observations   String       @default("")
+  projectName      String
+  department       String
+  province         String
+  district         String
+  projectShortName String?
+  difficulty       Int
+  createdAt        DateTime?    @default(now())
+  isIndependent    Boolean      @default(false)
+  indexContract    String
+  details          String?
+  type             ContractType @default(CONTRATO)
+  phases           String       @default("[]")
+  amount           Float        @default(0)
+  projectId        Int? //@unique
+  project          Projects?
+  consortiumId     Int?
+  companyId        Int?
+  consortium       Consortium?  @relation(fields: [consortiumId], references: [id])
+  company          Companies?   @relation(fields: [companyId], references: [id])
 }
 
 model Role {

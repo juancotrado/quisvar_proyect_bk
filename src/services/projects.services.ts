@@ -63,6 +63,14 @@ class ProjectsServices {
       where: { id },
       data: { ...data, contractId },
     });
+    await prisma.contratc.update({
+      where: {
+        id: updateProject.contractId,
+      },
+      data: {
+        projectShortName: data.name,
+      },
+    });
     return updateProject;
   }
 

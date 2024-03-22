@@ -48,6 +48,37 @@ const authenticateHandler = async (
   }
 };
 
+export const authenticateHandlerByToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const authorization = ('Bearer ' + req.query.token) as string;
+  console.log(authorization);
+  if (!authorization || !authorization.startsWith('Bearer'))
+    return next(
+      new AppError(
+        '¡Usted no se ha identificado! por favor inicie sesión para obtener acceso.',
+        401
+      )
+    );
+  const token = authorization.split(' ')[1];
+  try {
+    const { id } = jwt.verify(token, SECRET) as {
+      id: number;
+    };
+    const user = await UsersServices.find(id);
+    if (!user?.status)
+      return next(
+        new AppError('El propietario de este token ya no está disponible.', 401)
+      );
+    res.locals.userInfo = user;
+    return next();
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const verifySecretEnv = async (
   req: Request,
   res: Response,

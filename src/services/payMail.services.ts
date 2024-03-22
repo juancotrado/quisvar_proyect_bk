@@ -127,9 +127,22 @@ class PayMailServices {
     const typeMail: PayMail['type'] = 'SENDER';
     const role: PayMail['role'] = 'MAIN';
     const status: PayMail['status'] = true;
+    // const getUserOffice = await prisma.office.findUnique({
+    //   where: { id: officeId },
+    //   select: {
+    //     users: {
+    //       where: { isOfficeManager: true },
+    //       select: { usersId: true },
+    //       take: 1,
+    //     },
+    //   },
+    // });
+    // const userOffice: ReceiverTypePick[] = getUserOffice
+    //   ? [{ userId: getUserOffice.users[0].usersId, role, status }]
+    //   : [];
     const receiverList: ReceiverTypePick[] = officeId
-      ? [{ userId: receiverId, role, status }]
-      : [];
+      ? []
+      : [{ userId: receiverId, role, status }];
     const createPayMessage = await prisma.payMessages.create({
       data: {
         title,
@@ -161,32 +174,66 @@ class PayMailServices {
       header,
       description,
       status,
+      officeId,
       paymessageId: id,
     }: PickPayMessageReply,
     files: Pick<FileMessagePick, 'name' | 'path'>[]
   ) {
-    if (!receiverId || !senderId)
-      throw new AppError('Ingrese Destinatario', 400);
     const receiv: ReceiverT = { type: 'RECEIVER', role: 'MAIN', status: true };
-    await prisma.payMail.update({
-      where: { userId_paymessageId: { paymessageId: id, userId: senderId } },
-      data: { type: 'SENDER', status: false },
-    });
-    if (status === 'RECHAZADO') {
-      await prisma.payMail.updateMany({
-        where: { userInit: true },
-        data: { ...receiv },
+    if (officeId) {
+      const getOffice = await prisma.payMessages.findUnique({
+        where: { id },
+        select: { office: true },
+      });
+      if (!getOffice || !getOffice.office)
+        throw new AppError('Error al encontrar oficina', 400);
+      await prisma.payMessages.update({
+        where: { id },
+        data: { officeId, beforeOfficeId: getOffice.office.id },
       });
     } else {
-      await prisma.payMail.upsert({
-        where: {
-          userId_paymessageId: { paymessageId: id, userId: receiverId },
-        },
-        update: { ...receiv },
-        create: { paymessageId: id, userId: receiverId, ...receiv },
+      if (!receiverId || !senderId)
+        throw new AppError('Ingrese Destinatario', 400);
+      if (status === 'RECHAZADO') {
+        // const findReceiverId = await prisma.payMessages.findUnique({
+        //   where: { id },
+        //   select: { users: { where: { type: 'SENDER', role: 'MAIN' } } },
+        // });
+        // await prisma.payMail.updateMany({
+        //   where: { userInit: true },
+        //   data: { ...receiv },
+        // });
+        await prisma.payMail.update({
+          where: {
+            userId_paymessageId: { paymessageId: id, userId: receiverId },
+          },
+          data: { ...receiv },
+        });
+      } else {
+        await prisma.payMail.upsert({
+          where: {
+            userId_paymessageId: { paymessageId: id, userId: receiverId },
+          },
+          update: { ...receiv },
+          create: { paymessageId: id, userId: receiverId, ...receiv },
+        });
+      }
+      //------------------------------------------------------------------
+      await prisma.payMail.update({
+        where: { userId_paymessageId: { paymessageId: id, userId: senderId } },
+        data: { type: 'SENDER', status: false },
       });
+      const getOffice = await prisma.payMessages.findUnique({
+        where: { id },
+        select: { officeId: true },
+      });
+      if (getOffice && getOffice.officeId) {
+        await prisma.payMessages.update({
+          where: { id },
+          data: { officeId: null, beforeOfficeId: getOffice.officeId },
+        });
+      }
     }
-    //------------------------------------------------------------------
     await prisma.payMessages.update({ where: { id }, data: { status } });
     const createForward = await prisma.messageHistory.create({
       data: {

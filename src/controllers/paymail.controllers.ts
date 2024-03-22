@@ -14,12 +14,12 @@ import { Request } from 'express';
 class PayMailControllers {
   public showMessages: ControllerFunction = async (req, res, next) => {
     try {
-      const { skip, ...params } = req.query as ParametersPayMail;
+      const { skip: _skip, ...params } = req.query as ParametersPayMail;
       const userInfo: UserType = res.locals.userInfo;
       const userId = userInfo.id;
-      const offset = parseInt(`${skip}`);
-      const _skip = !isNaN(offset) ? offset : undefined;
-      const newParams = { skip: _skip, ...params };
+      const offset = parseInt(`${_skip}`);
+      const skip = !isNaN(offset) ? offset : undefined;
+      const newParams = { skip, ...params };
       const query = await PayMailServices.getByUser(userId, newParams);
       res.status(200).json(query);
     } catch (error) {
@@ -44,7 +44,11 @@ class PayMailControllers {
       throw new AppError('Oops!, no se pudo subir los archivos', 400);
     const files = Request.files as Express.Multer.File[];
     if (!existsSync(path)) mkdirSync(path, { recursive: true });
-    return files.map(({ filename: name, ...file }) => {
+    return files.map(({ filename: name, fieldname, ...file }) => {
+      if (fieldname === 'mainProcedure') {
+        renameSync(file.path, path + '/' + 'mp_' + name);
+        return { name: 'mp_' + name, path, attempt };
+      }
       renameSync(file.path, path + '/' + name);
       return { name, path, attempt };
     });
