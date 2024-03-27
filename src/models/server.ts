@@ -150,7 +150,8 @@ class Server {
       this.app.use(morgan('dev'));
     }
   }
-
+  //ms-word:ofe|u|http://localhost:8081/file-user/cv%20%2015-03-2024.docx
+  // ms-word:ofe|u|http://localhost:8081/api-docs/file-user/cv%20%2015-03-2024.docx
   conectionCron() {
     const time = new TimerCron('00 20 * * *');
     // GenerateFiles.coverFirma(

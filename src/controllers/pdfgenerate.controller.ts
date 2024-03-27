@@ -19,13 +19,24 @@ class PDFGenerateController {
 
   public pagesInPage: ControllerFunction = async (req, res, next) => {
     try {
-      if (!req.file) throw new AppError('archivo inexistente', 500);
-      const { buffer, originalname } = req.file as Express.Multer.File;
-      const options = this.headers(originalname);
-      const newFile = await GenerateFiles.coverTwoPage(buffer);
+      const url = req.query.url as string;
+      let originalName: string;
+      let Buffer: Buffer | string;
+      if (url) {
+        const name = req.query.fileName as string;
+        Buffer = url;
+        originalName = name || '';
+      } else {
+        if (!req.file) throw new AppError('archivo inexistente', 500);
+        const { buffer, originalname } = req.file as Express.Multer.File;
+        Buffer = buffer;
+        originalName = originalname;
+      }
+      const newFile = await GenerateFiles.coverTwoPage(Buffer);
       const fileTemp = tmp.fileSync({ postfix: '.pdf' });
+      const options = this.headers(originalName);
       writeFileSync(fileTemp.name, newFile);
-      res.download(fileTemp.name, `convert_${originalname}`, options, error => {
+      res.download(fileTemp.name, `convert_${originalName}`, options, error => {
         if (!error) fileTemp.removeCallback();
       });
     } catch (error) {
@@ -90,6 +101,7 @@ class PDFGenerateController {
       if (!IV || !SECRET_CODE)
         throw new AppError('error en claves secretas', 500);
       const { dni: id } = req.params;
+      const type = req.query.type as '64' | 'BLOB' | undefined;
       const key = crypto.scryptSync(SECRET_CODE, 'GfG', 24);
       const iv = Buffer.from(IV, 'hex');
       const pathDeciper = path.join('public/signs', id + '.png' + '.key');
@@ -106,12 +118,15 @@ class PDFGenerateController {
           // writeFileSync(`public/signs/${originalname}`, dataDeciper);
         });
       });
-      // const imageStream = bufferImage.toString('base64');
-      // res.send(imageStream);
-      const imageStream = Readable.from(bufferImage);
-      res.set('Content-Type', 'image/png');
-      res.set('Content-Disposition', `filename="image.png"`);
-      imageStream.pipe(res);
+      if (type === '64') {
+        const imageStream = bufferImage.toString('base64');
+        res.send(imageStream);
+      } else {
+        const imageStream = Readable.from(bufferImage);
+        res.set('Content-Type', 'image/png');
+        res.set('Content-Disposition', `filename="image.png"`);
+        imageStream.pipe(res);
+      }
     } catch (error) {
       next(error);
     }
