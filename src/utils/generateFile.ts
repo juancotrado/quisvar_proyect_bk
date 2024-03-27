@@ -162,6 +162,7 @@ class GenerateFiles {
     );
     const mergedBytes = await mergedDoc.save();
     writeFileSync(outputPath, mergedBytes);
+    return outputPath;
   }
 
   static async drawSeil(

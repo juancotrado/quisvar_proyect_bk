@@ -247,6 +247,10 @@ export interface PickPayMessageReply extends MessageHistory {
 export type FileMessagePick = Pick<FilesMessage, 'name' | 'path'> & {
   attempt?: string;
 };
+
+export interface VerifyTokenT {
+  id: number;
+}
 export type UpdateLevelBlock = Levels & {
   subTasks: {
     id: number;

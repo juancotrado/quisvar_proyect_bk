@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import AppError from '../utils/appError';
 import { MenuRoles } from '../models/menuPoints';
 import { UsersServices } from '../services';
+import { VerifyTokenT } from 'types/types';
 
 interface RoleAuht {
   id: number;
@@ -54,24 +55,12 @@ export const authenticateHandlerByToken = async (
   next: NextFunction
 ) => {
   const authorization = ('Bearer ' + req.query.token) as string;
-  console.log(authorization);
   if (!authorization || !authorization.startsWith('Bearer'))
-    return next(
-      new AppError(
-        '¡Usted no se ha identificado! por favor inicie sesión para obtener acceso.',
-        401
-      )
-    );
+    return next(new AppError('¡Error al obtener acceso.', 401));
   const token = authorization.split(' ')[1];
   try {
-    const { id } = jwt.verify(token, SECRET) as {
-      id: number;
-    };
+    const { id } = jwt.verify(token, SECRET) as VerifyTokenT;
     const user = await UsersServices.find(id);
-    if (!user?.status)
-      return next(
-        new AppError('El propietario de este token ya no está disponible.', 401)
-      );
     res.locals.userInfo = user;
     return next();
   } catch (error) {
