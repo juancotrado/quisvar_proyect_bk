@@ -36,7 +36,7 @@ class PayMailRoutes implements InitialRouter {
     this.router.post(
       '/',
       uploads.fileMail.fields([
-        { name: 'mainProcedure' },
+        { name: 'mainProcedure', maxCount: 1 },
         { name: 'fileMail' },
       ]),
       createMessage
@@ -61,7 +61,10 @@ class PayMailRoutes implements InitialRouter {
     this.router.delete('/voucher/:id', declineVoucher);
     this.router.post(
       '/reply',
-      uploads.fileMail.array('fileMail'),
+      uploads.fileMail.fields([
+        { name: 'mainProcedure' },
+        { name: 'fileMail' },
+      ]),
       createReplyMessage
     );
   }
