@@ -56,6 +56,20 @@ export const approveLicense = async (
     next(error);
   }
 };
+export const updateCheckOut = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const body = req.body;
+    const { id } = req.params;
+    const query = await LicenseServices.updateCheckOut(Number(id), body);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 export const getLicenseById = async (
   req: Request,
   res: Response,
