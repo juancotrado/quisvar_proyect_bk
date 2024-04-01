@@ -35,7 +35,7 @@ model Users {
   equipment             Equipment?
   groups                GroupOnUsers[]
   moderatorOfGroup      Group[]
-  Attendance            AttendanceGroup[]
+  // Attendance            AttendanceGroup[]
   roleId                Int?
   role                  Role?              @relation(fields: [roleId], references: [id])
   verificationUser      VerificationUser?
@@ -171,23 +171,23 @@ model GroupOnUsers {
 }
 
 model GroupList {
-  id         Int               @id @default(autoincrement())
-  file       String?
-  nombre     String?
-  title      String?
-  createdAt  DateTime          @default(now())
-  groupId    Int
-  groups     Group             @relation(fields: [groupId], references: [id])
-  attendance AttendanceGroup[]
-  duty       Duty[]
+  id        Int      @id @default(autoincrement())
+  file      String?
+  nombre    String?
+  createdAt DateTime @default(now())
+  groupId   Int
+  groups    Group    @relation(fields: [groupId], references: [id])
+  // attendance AttendanceGroup[]
+  duty      Duty[]
 }
 
 model Duty {
   id        Int           @id @default(autoincrement())
   CUI       String
   project   String
-  asitec    String?
-  feedback  String?
+  shortName String
+  titleMeeting String?
+  dutyGroup String?
   members   DutyMembers[]
   listId    Int
   createdAt DateTime      @default(now())
@@ -195,29 +195,23 @@ model Duty {
 }
 
 model DutyMembers {
-  id            Int     @id @default(autoincrement())
-  position      String?
-  fullName      String
-  progress      String?
-  lastMeeting   String?
-  futureMeeting String?
-  status        String
-  request       String?
-  dutyId        Int
-  duty          Duty    @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+  id         Int         @id @default(autoincrement())
+  position   String?
+  fullName   String
+  task       DutyTasks[]
+  feedBack   String?
+  dailyDuty  String?
+  attendance ListDetails @default(PUNTUAL)
+  dutyId     Int
+  duty       Duty        @relation(fields: [dutyId], references: [id], onDelete: Cascade)
 }
 
-model AttendanceGroup {
-  id          Int         @id @default(autoincrement())
-  userId      Int
-  groupListId Int
-  description String?
-  punish      String?
-  status      ListDetails
-  createdAt   DateTime    @default(now())
-  group       GroupList   @relation(fields: [groupListId], references: [id])
-  user        Users       @relation(fields: [userId], references: [id])
-  // GroupOnUser GroupOnUsers @relation(fields: [userId, groupId], references: [userId, groupId])
+model DutyTasks {
+  id           Int         @id @default(autoincrement())
+  name         String?
+  percentage   Int?
+  dutyMemberId Int
+  member       DutyMembers @relation(fields: [dutyMemberId], references: [id], onDelete: Cascade)
 }
 
 model Projects {
@@ -600,9 +594,9 @@ model PayMail {
 }
 
 model PayMessages {
-  id     Int    @id @default(autoincrement())
-  title  String
-  header String @default("")
+  id             Int              @id @default(autoincrement())
+  title          String
+  header         String           @default("")
   paymentPdfData String           @default("")
   description    String
   filesPay       Payment[]
@@ -615,7 +609,7 @@ model PayMessages {
   updatedAt      DateTime         @updatedAt
   office         Office?          @relation(fields: [officeId], references: [id])
   officeId       Int?
-  beforeOfficeId Int?              @default(0)
+  beforeOfficeId Int?             @default(0)
 }
 
 model Messages {
@@ -693,7 +687,7 @@ model Contratc {
   cui              String
   name             String
   contractNumber   String       @default("")
-  observations   String       @default("")
+  observations     String       @default("")
   projectName      String
   department       String
   province         String
