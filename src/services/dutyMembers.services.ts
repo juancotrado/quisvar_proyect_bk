@@ -6,7 +6,13 @@ class DutyMembersServices {
   static async create(id: DutyMembers['dutyId']) {
     if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
     const member = await prisma.dutyMembers.create({
-      data: { fullName: '', status: 'NO APTO', dutyId: id },
+      data: {
+        position: '',
+        fullName: '',
+        feedBack: '',
+        dailyDuty: '',
+        dutyId: id,
+      },
     });
     return member;
   }

@@ -96,6 +96,7 @@ import {
   getLicensesByStatus,
   getLicensesEmployee,
   getLicensesFee,
+  updateCheckOut,
   updateLicense,
 } from './licenses.controllers';
 import CompanyController, {
@@ -256,6 +257,7 @@ export {
   createLicense,
   createFreeForAll,
   updateLicense,
+  updateCheckOut,
   getLicenseById,
   getLicensesByStatus,
   getLicensesEmployee,

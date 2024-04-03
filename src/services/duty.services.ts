@@ -14,6 +14,9 @@ interface DutyMember {
 interface Data {
   CUI: string;
   project: string;
+  shortName: string;
+  titleMeeting?: string;
+  dutyGroup?: string;
   asitec?: string;
   feedback?: string;
   listId: number;
@@ -22,15 +25,14 @@ interface Data {
 
 class DutyServices {
   static async create(data: Data) {
-    const { CUI, project, asitec, feedback, listId, members } = data;
+    const { CUI, project, listId, shortName, members } = data;
     if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
     const duty = await prisma.duty.create({
       data: {
         CUI,
         project,
-        asitec,
-        feedback,
         listId,
+        shortName,
       },
     });
     await prisma.dutyMembers.createMany({
@@ -49,14 +51,12 @@ class DutyServices {
   }
   static async update(id: Duty['id'], data: Data) {
     if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
-    const { CUI, project, asitec, feedback, listId, members } = data;
+    const { CUI, project, listId, members } = data;
     await prisma.duty.update({
       where: { id },
       data: {
         CUI,
         project,
-        asitec,
-        feedback,
         listId,
       },
       include: {
@@ -71,11 +71,6 @@ class DutyServices {
         data: {
           position: member.position ?? '',
           fullName: member.fullName,
-          progress: member.progress ?? '',
-          lastMeeting: member.lastMeeting ?? '',
-          futureMeeting: member.futureMeeting ?? '',
-          status: member.status ?? '',
-          request: member.request ?? '',
         },
       });
     });
