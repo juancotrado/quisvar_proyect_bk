@@ -54,6 +54,7 @@ model VerificationUser {
 model Office {
   id        Int            @id @default(autoincrement())
   name      String
+  quantity  Int            @default(0)
   paymesage PayMessages[]
   message   Messages[]
   users     UserToOffice[]
@@ -599,7 +600,7 @@ model PayMessages {
   title          String
   header         String           @default("")
   paymentPdfData String           @default("")
-  description    String
+  description    String?
   filesPay       Payment[]
   status         PayMessageStatus @default(PROCESO)
   type           MessageType      @default(INFORME)
@@ -611,6 +612,7 @@ model PayMessages {
   office         Office?          @relation(fields: [officeId], references: [id])
   officeId       Int?
   beforeOfficeId Int?             @default(0)
+  positionSeal   Int              @default(1)
 }
 
 model Messages {
@@ -618,7 +620,7 @@ model Messages {
   title       String
   category    MessageCategory
   header      String
-  description String
+  description String?
   status      MessageStatus    @default(PENDIENTE)
   type        MessageType      @default(INFORME)
   files       FilesMessage[]
@@ -634,9 +636,9 @@ model MessageHistory {
   id           Int                   @id @default(autoincrement())
   title        String
   header       String                @default("")
-  description  String
-  userId       Int
-  user         Users                 @relation(fields: [userId], references: [id])
+  description  String?
+  userId       Int?
+  user         Users?                @relation(fields: [userId], references: [id])
   files        FilesMessageHistory[]
   paymessage   PayMessages?          @relation(fields: [paymessageId], references: [id])
   paymessageId Int?
