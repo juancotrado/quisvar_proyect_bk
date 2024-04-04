@@ -353,3 +353,4 @@ export { default as MailControllers } from './mail.controllers';
 export { default as BasicLevelsController } from './basiclevels.controller';
 export { default as BasicTaskControllers } from './basictask.controllers';
 export { default as PDFGenerateController } from './pdfgenerate.controller';
+export { default as OfficeControllers } from './office.controllers';
