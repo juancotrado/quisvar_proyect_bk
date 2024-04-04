@@ -10,6 +10,7 @@ import {
 } from 'types/types';
 import Queries from '../utils/queries';
 import AppError from '../utils/appError';
+import GenerateFiles from '../utils/generateFile';
 
 class PayMailServices {
   public static PickType(type?: PayMail['type']): PayMail['type'] | undefined {
@@ -172,7 +173,6 @@ class PayMailServices {
       receiverId,
       senderId,
       header,
-      description,
       status,
       officeId,
       paymessageId: id,
@@ -239,8 +239,87 @@ class PayMailServices {
       data: {
         title,
         header,
-        description,
+        description: '',
         user: { connect: { id: senderId } },
+        paymessage: { connect: { id } },
+        files: { createMany: { data: files } },
+      },
+    });
+    return createForward;
+  }
+
+  static async updateDataWithSeal(
+    {
+      title,
+      header,
+      officeId,
+      paymessageId: id,
+      ...data
+    }: PickPayMessageReply & {
+      officeId: number;
+      observations?: string;
+      numberPage?: number;
+    },
+    files: Pick<FileMessagePick, 'name' | 'path'>[]
+  ) {
+    const getOffice = await prisma.payMessages.findUnique({
+      where: { id },
+      select: {
+        office: true,
+        positionSeal: true,
+        files: {
+          where: { name: { startsWith: 'mp' } },
+          orderBy: { attempt: 'desc' },
+          take: 1,
+        },
+      },
+    });
+    if (!getOffice || !getOffice.office)
+      throw new AppError('Error al encontrar oficina', 400);
+    const quantitySeal = data.numberPage
+      ? data.numberPage
+      : getOffice.office.quantity + 1;
+    const positionSeal = getOffice.positionSeal;
+    //-------------------------------------------------------------------
+    const officeS = await prisma.office.findUnique({
+      where: { id: officeId },
+      select: { name: true },
+    });
+    if (!officeS) throw new AppError('Error al encontrar oficina destino', 400);
+    //-------------------------------------------------------------------
+    await prisma.payMessages.update({
+      where: { id },
+      data: {
+        officeId,
+        beforeOfficeId: getOffice.office.id,
+        positionSeal: positionSeal + 1,
+      },
+    });
+    //-------------------------------------------------------------------
+    await prisma.office.update({
+      where: { id: getOffice.office.id },
+      data: { quantity: quantitySeal },
+    });
+    //-------------------------------------------------------------------
+    const { name, path } = getOffice.files[0];
+    const destinityFile = path + '/' + name;
+    // const destinityFile2 = path + '/' + 'parchado.pdf';
+    const dateSeal = new Date().toISOString().split('T')[0];
+    const parseDateSeal = dateSeal.split('-').reverse().join('-');
+
+    await GenerateFiles.coverFirma(destinityFile, destinityFile, {
+      date: parseDateSeal,
+      pos: positionSeal,
+      to: officeS.name,
+      observation: data.observations,
+      title: getOffice.office.name,
+      numberPage: data.numberPage ? data.numberPage : quantitySeal,
+    });
+
+    const createForward = await prisma.messageHistory.create({
+      data: {
+        title,
+        header,
         paymessage: { connect: { id } },
         files: { createMany: { data: files } },
       },
