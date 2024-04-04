@@ -38,7 +38,7 @@ class StageServices {
           select: {
             id: true,
             name: true,
-            moderator: Queries.selectProfileUserForStage,
+            // moderator: Queries.selectProfileUserForStage,
             groups: { select: { users: Queries.selectProfileUserForStage } },
           },
         },
@@ -176,16 +176,7 @@ class StageServices {
       select: {
         group: {
           select: {
-            moderator: {
-              select: {
-                profile: {
-                  select: {
-                    lastName: true,
-                    firstName: true,
-                  },
-                },
-              },
-            },
+            id: true,
           },
         },
         project: {
@@ -204,15 +195,23 @@ class StageServices {
         },
       },
     });
-
+    const mod = await prisma.groupOnUsers.findMany({
+      where: {
+        groupId: findStage?.group?.id,
+        mod: true,
+      },
+      select: {
+        users: Queries.selectProfileUserForStage,
+      },
+    });
     if (!findStage)
       throw new AppError('No se pudo encontrar el informe .', 404);
-    const { group, project } = findStage;
+    const { project } = findStage;
     const { createdAt, cui, department, district, projectName, province } =
       project.contract;
     let moderatorName = 'Aun no asignado';
-    if (group?.moderator?.profile) {
-      const { firstName, lastName } = group.moderator.profile;
+    if (mod[0].users.profile) {
+      const { firstName, lastName } = mod[0].users.profile;
       moderatorName = `${firstName} ${lastName}`;
     }
 

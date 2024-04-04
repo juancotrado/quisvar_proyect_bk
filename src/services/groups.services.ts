@@ -8,34 +8,23 @@ class GroupServices {
     const groups = await prisma.group.create({ data });
     return groups;
   }
-  static async deleteMod(id: Group['id']) {
-    if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
-    const groups = await prisma.group.update({
-      where: { id },
-      data: {
-        modId: null,
-      },
-    });
-    return groups;
-  }
+  // static async deleteMod(id: Group['id']) {
+  //   if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
+  //   const groups = await prisma.group.update({
+  //     where: { id },
+  //     data: {
+  //       modId: null,
+  //     },
+  //   });
+  //   return groups;
+  // }
   static async getAll() {
     const groups = await prisma.group.findMany({
       select: {
         id: true,
         name: true,
-        modId: true,
+        // modId: true,
         gNumber: true,
-        moderator: {
-          select: {
-            profile: {
-              select: {
-                firstName: true,
-                lastName: true,
-                userPc: true,
-              },
-            },
-          },
-        },
         groups: {
           where: {
             users: {
@@ -70,22 +59,8 @@ class GroupServices {
       select: {
         id: true,
         name: true,
-        modId: true,
         gNumber: true,
-        moderator: {
-          where: {
-            status: true,
-          },
-          select: {
-            profile: {
-              select: {
-                firstName: true,
-                lastName: true,
-                userPc: true,
-              },
-            },
-          },
-        },
+
         groups: {
           orderBy: {
             users: {
@@ -121,13 +96,13 @@ class GroupServices {
   }
   static async update(
     id: Group['id'],
-    name: Group['name'],
-    modId?: Group['modId']
+    name: Group['name']
+    // modId?: Group['modId']
   ) {
     if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
     const groups = await prisma.group.update({
       where: { id },
-      data: { name, modId },
+      data: { name },
     });
     return groups;
   }

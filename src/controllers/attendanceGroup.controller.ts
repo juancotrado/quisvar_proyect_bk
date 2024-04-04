@@ -40,16 +40,16 @@ class AttendanceGroupController {
   //     next(error);
   //   }
   // };
-  // public getList: ControllerFunction = async (req, res, next) => {
-  //   try {
-  //     const { id } = req.params;
-  //     const { date } = req.query;
-  //     const query = await AttendanceGroupService.getList(date as string, +id);
-  //     res.status(200).json(query);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
+  public getList: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { date } = req.query;
+      const query = await AttendanceGroupService.getList(date as string, +id);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
   // public getHistory: ControllerFunction = async (req, res, next) => {
   //   try {
   //     const { id, startDate, endDate } = req.query;
