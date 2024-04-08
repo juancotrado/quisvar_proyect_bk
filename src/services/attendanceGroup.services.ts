@@ -2,6 +2,7 @@ import { unlinkSync } from 'fs';
 import AppError from '../utils/appError';
 import { Group, GroupList, GroupOnUsers, prisma } from '../utils/prisma.server';
 import { timerDay } from '../utils/tools';
+import { findProjects } from '../controllers';
 
 class AttendanceGroupService {
   static async getUsersGroup(groupId: Group['id']) {
@@ -29,6 +30,61 @@ class AttendanceGroupService {
       },
     });
     return users;
+  }
+  static async createList(data: GroupList, id: number, date: string) {
+    if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
+    const { nombre, groupId } = data;
+    const today = new Date();
+    today.setDate(today.getDate());
+    today.setHours(0, 0, 0, 0);
+    const _today = today.getTime();
+    const startOfDay = new Date(_today);
+    const lastList = await prisma.groupList.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        duty: {
+          select: {
+            members: true,
+          },
+        },
+        createdAt: true,
+      },
+      take: 1,
+    });
+    if (
+      lastList.length > 0 &&
+      lastList[0].duty[0].members.length === 0 &&
+      startOfDay > lastList[0].createdAt
+    ) {
+      await this.deleteList(lastList[0].id);
+    }
+
+    // if (lastList[0].attendance.length === 0)
+    //   throw new AppError(`Oops!, Al parecer hay una lista en curso`, 400);
+    await prisma.groupList.create({
+      data: {
+        nombre,
+        groupId,
+      },
+    });
+    const list = await this.getList(date, id);
+    return list;
+  }
+  static async deleteList(id: GroupList['id']) {
+    if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
+    const hasGroup = await prisma.groupList.findFirst({
+      where: { id },
+      select: {
+        duty: true,
+      },
+    });
+    if (hasGroup && hasGroup?.duty.length > 0)
+      throw new AppError(`No puede borrar una lista con datos`, 400);
+    const groupList = await prisma.groupList.delete({ where: { id } });
+    return groupList;
   }
   static async getList(date: string, groupId: GroupList['groupId']) {
     if (!date) throw new AppError(`Oops!, algo salio mal`, 400);
@@ -59,12 +115,11 @@ class AttendanceGroupService {
           orderBy: {
             id: 'asc',
           },
-          include: {
-            members: {
-              orderBy: {
-                id: 'asc',
-              },
-            },
+          select: {
+            id: true,
+            CUI: true,
+            project: true,
+            shortName: true,
           },
         },
         createdAt: true,

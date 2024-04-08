@@ -1,6 +1,26 @@
 import AppError from '../utils/appError';
-import { Group, GroupOnUsers, prisma } from '../utils/prisma.server';
+import { Group, GroupList, GroupOnUsers, prisma } from '../utils/prisma.server';
+interface Project {
+  id: number;
+  name: string;
+  district: string;
+}
 
+interface ProjectGroup {
+  project: {
+    stages: {
+      project: {
+        contract: Project;
+      }[];
+    };
+  };
+}
+
+interface ResumeItem {
+  id: number;
+  name: string;
+  district: string;
+}
 class GroupServices {
   // GROUPS
   static async create(data: Group) {
@@ -173,6 +193,56 @@ class GroupServices {
     });
 
     return deletedGroupOnUsers;
+  }
+  static async findProjects(groupId: GroupOnUsers['groupId']) {
+    if (!groupId) throw new AppError(`Oops!, algo salió mal`, 400);
+
+    const projects = await prisma.groupList.findFirst({
+      where: {
+        groupId: groupId,
+      },
+      select: {
+        groups: {
+          include: {
+            stage: {
+              select: {
+                project: {
+                  select: {
+                    stages: {
+                      select: {
+                        project: {
+                          include: {
+                            contract: {
+                              select: {
+                                id: true,
+                                district: true,
+                                name: true,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    const resume = projects?.groups.stage.map(project => {
+      return {
+        id: project.project.stages[0].project.contract.id,
+        name: project.project.stages[0].project.contract.name,
+        district: project.project.stages[0].project.contract.district,
+      };
+    });
+    // const result: ResumeItem[] | undefined = resume?.filter((item, index, self) =>
+    //   index === self.findIndex(obj => obj.id === item.id)
+    // );
+    // console.log(result)
+    return resume;
   }
 }
 export default GroupServices;

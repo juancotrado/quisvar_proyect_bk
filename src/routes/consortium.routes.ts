@@ -11,6 +11,7 @@ import {
   getConsortiumById,
   updateById,
   updateImg,
+  updatePercentaje,
 } from '../controllers';
 import { _admin_role } from '../middlewares/role.middleware';
 import { uploads } from '../middlewares';
@@ -28,6 +29,7 @@ router.get('/all', getAllConsortium);
 router.get('/both', getBoth);
 router.get('/:id', getConsortiumById);
 router.patch('/:id', updateById);
+router.patch('/relation/percentaje/:consortiumId/:companyId', updatePercentaje);
 router.delete('/:id', deleteById);
 //CONSORTIUM IMG
 router.patch(

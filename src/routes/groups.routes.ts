@@ -9,6 +9,7 @@ import {
   createRelation,
   updateRelation,
   deleteRelation,
+  findProjects,
   // deleteMod,
 } from '../controllers';
 import { _admin_role } from '../middlewares/role.middleware';
@@ -26,4 +27,6 @@ router.delete('/:id', deleteGroup);
 router.post('/relation/:userId/:groupId', createRelation);
 router.patch('/relation/:userId/:groupId', updateRelation);
 router.delete('/relation/:userId/:groupId', deleteRelation);
+
+router.get('/projects/:groupId', findProjects);
 export default router;

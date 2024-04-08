@@ -463,6 +463,7 @@ model Companies {
 model ConsortiumOnCompanies {
   consortiumId Int
   companiesId  Int
+  percentaje   Int?       @default(0)
   consortium   Consortium @relation(fields: [consortiumId], references: [id])
   companies    Companies  @relation(fields: [companiesId], references: [id])
 

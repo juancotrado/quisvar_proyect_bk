@@ -121,3 +121,16 @@ export const deleteRelation = async (
     next(error);
   }
 };
+export const findProjects = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { groupId } = req.params;
+    const query = await GroupServices.findProjects(+groupId);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};

@@ -17,13 +17,13 @@ class AttendanceGroupRoutes {
     //Filter
     // this.router.get('/filter', AttendanceGroupControllers.getHistory);
     //Group List
-    // this.router.post('/list', AttendanceGroupControllers.createList);
+    this.router.post('/list', AttendanceGroupControllers.createList);
     // this.router.patch('/list/title/:id', AttendanceGroupControllers.editTitle);
     this.router.get('/list/:id', AttendanceGroupControllers.getList);
-    // this.router.delete(
-    //   '/list/:id',
-    //   AttendanceGroupControllers.deleteListAttendance
-    // );
+    this.router.delete(
+      '/list/:id',
+      AttendanceGroupControllers.deleteListAttendance
+    );
     //Group List File
     this.router.patch(
       '/list/file/:id',
