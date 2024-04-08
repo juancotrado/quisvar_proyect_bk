@@ -1,26 +1,5 @@
 import AppError from '../utils/appError';
-import { Group, GroupList, GroupOnUsers, prisma } from '../utils/prisma.server';
-interface Project {
-  id: number;
-  name: string;
-  district: string;
-}
-
-interface ProjectGroup {
-  project: {
-    stages: {
-      project: {
-        contract: Project;
-      }[];
-    };
-  };
-}
-
-interface ResumeItem {
-  id: number;
-  name: string;
-  district: string;
-}
+import { Group, GroupOnUsers, prisma } from '../utils/prisma.server';
 class GroupServices {
   // GROUPS
   static async create(data: Group) {
