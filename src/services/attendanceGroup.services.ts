@@ -2,7 +2,7 @@ import { unlinkSync } from 'fs';
 import AppError from '../utils/appError';
 import { Group, GroupList, GroupOnUsers, prisma } from '../utils/prisma.server';
 import { timerDay } from '../utils/tools';
-import { findProjects } from '../controllers';
+// import { findProjects } from '../controllers';
 
 class AttendanceGroupService {
   static async getUsersGroup(groupId: Group['id']) {
