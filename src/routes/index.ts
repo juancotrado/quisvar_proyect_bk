@@ -37,3 +37,4 @@ export { default as BasicTasksRoutes } from './basictask.routes';
 export { default as PDFGenerateRouter } from './pdfgenerate.routes';
 export { default as EncryptRouter } from './encrypt.routes';
 export { default as ProfessionRouter } from './profession.routes';
+export { default as OfficeRouter } from './office.routes';

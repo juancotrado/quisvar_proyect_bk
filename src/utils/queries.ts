@@ -1,4 +1,5 @@
 import { Mail } from '@prisma/client';
+import { ProfileByRoleType } from 'types/types';
 
 class Queries {
   static selectProfileUser = {
@@ -219,6 +220,40 @@ class Queries {
   };
   static PayMail(): PayMailQueries {
     return new PayMailQueries();
+  }
+
+  static selectProfileByRole({
+    subMenuId: id,
+    menuId,
+    typeRol,
+  }: ProfileByRoleType) {
+    return {
+      select: {
+        id: true,
+        ruc: true,
+        address: true,
+        profile: {
+          select: {
+            firstName: true,
+            lastName: true,
+            dni: true,
+            phone: true,
+            degree: true,
+            description: true,
+            job: true,
+          },
+        },
+        role: {
+          select: {
+            menuPoints: {
+              select: {
+                subMenuPoints: { where: { id, typeRol, menuId } },
+              },
+            },
+          },
+        },
+      },
+    };
   }
 }
 

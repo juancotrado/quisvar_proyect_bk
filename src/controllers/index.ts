@@ -167,7 +167,7 @@ import {
   createRelation,
   updateRelation,
   deleteRelation,
-  deleteMod,
+  // deleteMod,
 } from './groups.controller';
 // User Controllers
 export {
@@ -337,7 +337,7 @@ export {
   createRelation,
   updateRelation,
   deleteRelation,
-  deleteMod,
+  // deleteMod,
 };
 
 export { default as ContractController } from './contract.controllers';
@@ -353,3 +353,4 @@ export { default as MailControllers } from './mail.controllers';
 export { default as BasicLevelsController } from './basiclevels.controller';
 export { default as BasicTaskControllers } from './basictask.controllers';
 export { default as PDFGenerateController } from './pdfgenerate.controller';
+export { default as OfficeControllers } from './office.controllers';

@@ -1,9 +1,32 @@
+import { ProfileByRoleType } from 'types/types';
 import { Office, prisma, UserToOffice } from '../utils/prisma.server';
+import Queries from '../utils/queries';
 
 class OfficeServices {
-  public static async getAll() {
+  public static async getAll(
+    userId: number,
+    { typeRol, menuId, subMenuId: id }: ProfileByRoleType
+  ) {
+    console.log({ typeRol, menuId, id });
     const getListOffice = await prisma.office.findMany({
-      include: { users: { where: { isOfficeManager: true } } },
+      include: {
+        users: {
+          where: {
+            user: {
+              id: { notIn: [userId] },
+              role: {
+                menuPoints: {
+                  every: { subMenuPoints: { every: { typeRol, menuId, id } } },
+                },
+              },
+            },
+          },
+          select: {
+            user: Queries.selectProfileUser,
+            isOfficeManager: true,
+          },
+        },
+      },
     });
     return getListOffice;
   }

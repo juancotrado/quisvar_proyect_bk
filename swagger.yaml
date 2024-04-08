@@ -1135,6 +1135,45 @@ paths:
             application/json:
               example:
                 error: No se pudo encontrar el reporte
+  /office:
+    get:
+      tags:
+        - office
+      summary: Show users By office
+      parameters:
+        - name: menuId
+          in: query
+          description: Id de Menu
+          schema:
+            type: string
+        - name: subMenuId
+          in: query
+          description: Id de SubMenu
+          schema:
+            type: string
+        - name: typeRol
+          in: query
+          description: Puede Usar <b>["MEMBER","USER","MOD","VIEWER"]</b>
+          # required: false
+          schema:
+            type: number
+      description: |-
+        Ver la lista de contratos por empresa
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Contrato Existe
+        '404':
+          description: No se pudo encontrar el contrato
+          content:
+            application/json:
+              example:
+                error: No se pudo encontrar el contrato
 components:
   securitySchemes:
     bearerAuth:

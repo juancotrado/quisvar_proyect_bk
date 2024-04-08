@@ -34,7 +34,7 @@ model Users {
   feedbacks             UsersOnFeedbacks[]
   equipment             Equipment?
   groups                GroupOnUsers[]
-  moderatorOfGroup      Group[]
+  // moderatorOfGroup      Group[]
   // Attendance            AttendanceGroup[]
   roleId                Int?
   role                  Role?              @relation(fields: [roleId], references: [id])
@@ -155,8 +155,8 @@ model Group {
   stage     Stages[]
   groups    GroupOnUsers[]
   active    Boolean        @default(true)
-  modId     Int?
-  moderator Users?         @relation(fields: [modId], references: [id])
+  // modId     Int?
+  // moderator Users?         @relation(fields: [modId], references: [id])
   GroupList GroupList[]
 }
 
@@ -164,6 +164,7 @@ model GroupOnUsers {
   userId  Int
   groupId Int
   active  Boolean @default(true)
+  mod     Boolean @default(false)
   // Attendance AttendanceGroup[]
   users   Users   @relation(fields: [userId], references: [id])
   groups  Group   @relation(fields: [groupId], references: [id])
