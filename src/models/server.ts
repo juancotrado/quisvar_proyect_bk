@@ -44,6 +44,8 @@ import {
   BasicTasksRoutes,
   PDFGenerateRouter,
   EncryptRouter,
+  ProfessionRouter,
+  OfficeRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -104,8 +106,10 @@ class Server {
     duty: `/${process.env.ROUTE}/duty`,
     dutyMembers: `/${process.env.ROUTE}/dutyMembers`,
     role: `/${process.env.ROUTE}/role`,
+    office: `/${process.env.ROUTE}/office`,
     generatepdf: `/${process.env.ROUTE}/generate-pdf`,
     encrypt: `/${process.env.ROUTE}/encrypt`,
+    profession: `/${process.env.ROUTE}/profession`,
   };
 
   constructor() {
@@ -220,8 +224,10 @@ class Server {
     this.app.use(this.path.duty, DutyRoutes);
     this.app.use(this.path.dutyMembers, DutyMembersRoutes);
     this.app.use(this.path.role, roleRoutes);
+    this.app.use(this.path.office, OfficeRouter);
     this.app.use(this.path.generatepdf, PDFGenerateRouter);
     this.app.use(this.path.encrypt, EncryptRouter);
+    this.app.use(this.path.profession, ProfessionRouter);
     this.app.use(docs);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       res.locals.pageNotFound = this.rootDir + '/404_page/index.html';

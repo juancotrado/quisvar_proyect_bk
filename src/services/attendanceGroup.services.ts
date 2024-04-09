@@ -1,6 +1,8 @@
 import { unlinkSync } from 'fs';
 import AppError from '../utils/appError';
 import { Group, GroupList, GroupOnUsers, prisma } from '../utils/prisma.server';
+import { timerDay } from '../utils/tools';
+// import { findProjects } from '../controllers';
 
 class AttendanceGroupService {
   static async getUsersGroup(groupId: Group['id']) {
@@ -27,46 +29,105 @@ class AttendanceGroupService {
         },
       },
     });
-    const mod = await prisma.group.findFirst({
-      where: { id: groupId },
+    return users;
+  }
+  static async createList(data: GroupList, id: number, date: string) {
+    if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
+    const { nombre, groupId } = data;
+    const today = new Date();
+    today.setDate(today.getDate());
+    today.setHours(0, 0, 0, 0);
+    const _today = today.getTime();
+    const startOfDay = new Date(_today);
+    const lastList = await prisma.groupList.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
       select: {
-        moderator: {
+        id: true,
+        duty: {
           select: {
-            id: true,
-            profile: {
-              select: {
-                firstName: true,
-                lastName: true,
-              },
-            },
+            members: true,
           },
         },
+        createdAt: true,
+      },
+      take: 1,
+    });
+    if (
+      lastList.length > 0 &&
+      lastList[0].duty[0].members.length === 0 &&
+      startOfDay > lastList[0].createdAt
+    ) {
+      await this.deleteList(lastList[0].id);
+    }
+
+    // if (lastList[0].attendance.length === 0)
+    //   throw new AppError(`Oops!, Al parecer hay una lista en curso`, 400);
+    await prisma.groupList.create({
+      data: {
+        nombre,
+        groupId,
       },
     });
-    const transformedData = [
-      {
-        id: mod?.moderator?.id,
-        status: 'PUNTUAL',
-        user: {
-          profile: {
-            firstName: mod?.moderator?.profile?.firstName,
-            lastName: mod?.moderator?.profile?.lastName,
-          },
+    const list = await this.getList(date, id);
+    return list;
+  }
+  static async deleteList(id: GroupList['id']) {
+    if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
+    const hasGroup = await prisma.groupList.findFirst({
+      where: { id },
+      select: {
+        duty: true,
+      },
+    });
+    if (hasGroup && hasGroup?.duty.length > 0)
+      throw new AppError(`No puede borrar una lista con datos`, 400);
+    const groupList = await prisma.groupList.delete({ where: { id } });
+    return groupList;
+  }
+  static async getList(date: string, groupId: GroupList['groupId']) {
+    if (!date) throw new AppError(`Oops!, algo salio mal`, 400);
+    const { startOfDay, endOfDay } = timerDay(date);
+    const groupList = await prisma.groupList.findMany({
+      where: {
+        groupId,
+        createdAt: {
+          gte: startOfDay,
+          lte: endOfDay,
         },
       },
-      ...users.map(user => ({
-        id: user.users.id,
-        status: 'PUNTUAL',
-        user: {
-          profile: {
-            firstName: user.users.profile?.firstName,
-            lastName: user.users.profile?.lastName,
+      orderBy: {
+        createdAt: 'asc',
+      },
+      select: {
+        id: true,
+        nombre: true,
+        groupId: true,
+        file: true,
+        groups: {
+          select: {
+            name: true,
+            gNumber: true,
           },
         },
-      })),
-    ];
-    return transformedData;
+        duty: {
+          orderBy: {
+            id: 'asc',
+          },
+          select: {
+            id: true,
+            CUI: true,
+            project: true,
+            shortName: true,
+          },
+        },
+        createdAt: true,
+      },
+    });
+    return groupList;
   }
+
   //Group List File
   static async updateListFile(file: GroupList['file'], id: GroupList['id']) {
     if (!file || !id) throw new AppError(`Oops!, algo salio mal`, 400);
@@ -96,21 +157,6 @@ class AttendanceGroupService {
   //Disabled Users
   static async disabledGroup(userId: GroupOnUsers['userId'], status: boolean) {
     if (!userId) throw new AppError(`Oops!, algo salio mal`, 400);
-    const lead = await prisma.group.findFirst({
-      where: {
-        modId: userId,
-      },
-    });
-    if (lead && status === false) {
-      await prisma.group.updateMany({
-        where: {
-          modId: userId,
-        },
-        data: {
-          modId: null,
-        },
-      });
-    }
     const attendance = await prisma.groupOnUsers.updateMany({
       where: { userId },
       data: {

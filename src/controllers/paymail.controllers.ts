@@ -74,6 +74,32 @@ class PayMailControllers {
     }
   };
 
+  public createSeal: ControllerFunction = async (req, res, next) => {
+    try {
+      const { status } = req.query as ParametersPayMail;
+      const { body } = req;
+      const { id: senderId }: UserType = res.locals.userInfo;
+      // const data = JSON.parse(body.data) as PickPayMessageReply;
+      const data = body as PickPayMessageReply & {
+        observations?: string;
+        numberPage?: number;
+        officeId: number;
+      };
+      const result = await PayMailServices.updateDataWithSeal(
+        {
+          ...data,
+          status,
+          senderId,
+        },
+        []
+      );
+      res.json(result);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+
   public updateMessage: ControllerFunction = async (req, res, next) => {
     try {
       const { id: senderId }: UserType = res.locals.userInfo;

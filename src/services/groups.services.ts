@@ -1,6 +1,5 @@
 import AppError from '../utils/appError';
 import { Group, GroupOnUsers, prisma } from '../utils/prisma.server';
-
 class GroupServices {
   // GROUPS
   static async create(data: Group) {
@@ -8,34 +7,23 @@ class GroupServices {
     const groups = await prisma.group.create({ data });
     return groups;
   }
-  static async deleteMod(id: Group['id']) {
-    if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
-    const groups = await prisma.group.update({
-      where: { id },
-      data: {
-        modId: null,
-      },
-    });
-    return groups;
-  }
+  // static async deleteMod(id: Group['id']) {
+  //   if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
+  //   const groups = await prisma.group.update({
+  //     where: { id },
+  //     data: {
+  //       modId: null,
+  //     },
+  //   });
+  //   return groups;
+  // }
   static async getAll() {
     const groups = await prisma.group.findMany({
       select: {
         id: true,
         name: true,
-        modId: true,
+        // modId: true,
         gNumber: true,
-        moderator: {
-          select: {
-            profile: {
-              select: {
-                firstName: true,
-                lastName: true,
-                userPc: true,
-              },
-            },
-          },
-        },
         groups: {
           where: {
             users: {
@@ -70,22 +58,8 @@ class GroupServices {
       select: {
         id: true,
         name: true,
-        modId: true,
         gNumber: true,
-        moderator: {
-          where: {
-            status: true,
-          },
-          select: {
-            profile: {
-              select: {
-                firstName: true,
-                lastName: true,
-                userPc: true,
-              },
-            },
-          },
-        },
+
         groups: {
           orderBy: {
             users: {
@@ -121,13 +95,13 @@ class GroupServices {
   }
   static async update(
     id: Group['id'],
-    name: Group['name'],
-    modId?: Group['modId']
+    name: Group['name']
+    // modId?: Group['modId']
   ) {
     if (!id) throw new AppError(`Oops!, algo salio mal`, 400);
     const groups = await prisma.group.update({
       where: { id },
-      data: { name, modId },
+      data: { name },
     });
     return groups;
   }
@@ -198,6 +172,56 @@ class GroupServices {
     });
 
     return deletedGroupOnUsers;
+  }
+  static async findProjects(groupId: GroupOnUsers['groupId']) {
+    if (!groupId) throw new AppError(`Oops!, algo salió mal`, 400);
+
+    const projects = await prisma.groupList.findFirst({
+      where: {
+        groupId: groupId,
+      },
+      select: {
+        groups: {
+          include: {
+            stage: {
+              select: {
+                project: {
+                  select: {
+                    stages: {
+                      select: {
+                        project: {
+                          include: {
+                            contract: {
+                              select: {
+                                id: true,
+                                district: true,
+                                name: true,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    const resume = projects?.groups.stage.map(project => {
+      return {
+        id: project.project.stages[0].project.contract.id,
+        name: project.project.stages[0].project.contract.name,
+        district: project.project.stages[0].project.contract.district,
+      };
+    });
+    // const result: ResumeItem[] | undefined = resume?.filter((item, index, self) =>
+    //   index === self.findIndex(obj => obj.id === item.id)
+    // );
+    // console.log(result)
+    return resume;
   }
 }
 export default GroupServices;

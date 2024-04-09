@@ -11,6 +11,7 @@ const {
   createReplyMessage,
   createVoucher,
   declineVoucher,
+  createSeal,
   doneMessage,
   quantityFiles,
   updateMessage,
@@ -66,6 +67,11 @@ class PayMailRoutes implements InitialRouter {
         { name: 'fileMail' },
       ]),
       createReplyMessage
+    );
+    this.router.post(
+      '/reply-seal',
+      uploads.fileMail.fields([{ name: 'fileMail' }]),
+      createSeal
     );
   }
 }

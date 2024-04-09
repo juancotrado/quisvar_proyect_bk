@@ -14,21 +14,21 @@ class AttendanceGroupController {
     }
   };
   //Group List
-  // public createList: ControllerFunction = async (req, res, next) => {
-  //   try {
-  //     const { body } = req;
-  //     const { id, date } = req.query;
-  //     const query = await AttendanceGroupService.createList(
-  //       body,
-  //       Number(id),
-  //       date as string
-  //     );
-  //     res.status(200).json(query);
-  //   } catch (error) {
-  //     console.log(error);
-  //     next(error);
-  //   }
-  // };
+  public createList: ControllerFunction = async (req, res, next) => {
+    try {
+      const { body } = req;
+      const { id, date } = req.query;
+      const query = await AttendanceGroupService.createList(
+        body,
+        Number(id),
+        date as string
+      );
+      res.status(200).json(query);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
   // public editTitle: ControllerFunction = async (req, res, next) => {
   //   try {
   //     const { id } = req.params;
@@ -40,16 +40,16 @@ class AttendanceGroupController {
   //     next(error);
   //   }
   // };
-  // public getList: ControllerFunction = async (req, res, next) => {
-  //   try {
-  //     const { id } = req.params;
-  //     const { date } = req.query;
-  //     const query = await AttendanceGroupService.getList(date as string, +id);
-  //     res.status(200).json(query);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
+  public getList: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { date } = req.query;
+      const query = await AttendanceGroupService.getList(date as string, +id);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
   // public getHistory: ControllerFunction = async (req, res, next) => {
   //   try {
   //     const { id, startDate, endDate } = req.query;
@@ -63,15 +63,15 @@ class AttendanceGroupController {
   //     next(error);
   //   }
   // };
-  // public deleteListAttendance: ControllerFunction = async (req, res, next) => {
-  //   try {
-  //     const { id } = req.params;
-  //     const query = await AttendanceGroupService.deleteList(+id);
-  //     res.status(200).json(query);
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
+  public deleteListAttendance: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const query = await AttendanceGroupService.deleteList(+id);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
   //Group List File
   public updateListFile: ControllerFunction = async (req, res, next) => {
     try {

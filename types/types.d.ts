@@ -16,6 +16,7 @@ import {
   BasicTasks,
   BasicFiles,
   Office,
+  SubMenuPoints,
 } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 
@@ -364,4 +365,10 @@ export interface configurationSealPDF {
   to: string;
   date: string;
   observation?: string;
+}
+
+export interface ProfileByRoleType {
+  subMenuId?: number;
+  typeRol?: SubMenuPoints['typeRol'];
+  menuId?: number;
 }

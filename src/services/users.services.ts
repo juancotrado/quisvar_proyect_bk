@@ -5,6 +5,7 @@ import { Profiles, Users, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
 import RoleService from './role.service';
 import { MenuPoints } from '../models/menuPoints';
+import professionServices from './profession.services';
 const menuPoints = new MenuPoints();
 
 class UsersServices {
@@ -106,13 +107,13 @@ class UsersServices {
     const userWithMenus = merge.map(({ password, ...user }) =>
       password && user.role
         ? {
-            ...user,
-            role: menuPoints.getHeadersOptions(user.role),
-          }
+          ...user,
+          role: menuPoints.getHeadersOptions(user.role),
+        }
         : user
     );
-
-    return userWithMenus;
+    const userWithProfession = professionServices.userWithProfession(userWithMenus)
+    return userWithProfession;
   }
 
   static async find(id: Users['id']) {

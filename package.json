@@ -53,6 +53,7 @@
     "tmp": "^0.2.3",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.1",
+    "uuidv4": "^6.2.13",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {

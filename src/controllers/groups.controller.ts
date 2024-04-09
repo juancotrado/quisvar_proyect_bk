@@ -15,19 +15,19 @@ export const createGroup = async (
     next(error);
   }
 };
-export const deleteMod = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const query = await GroupServices.deleteMod(+id);
-    res.status(200).json(query);
-  } catch (error) {
-    next(error);
-  }
-};
+// export const deleteMod = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const { id } = req.params;
+//     const query = await GroupServices.deleteMod(+id);
+//     res.status(200).json(query);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 export const getAll = async (
   req: Request,
   res: Response,
@@ -60,8 +60,8 @@ export const updateGroup = async (
 ) => {
   try {
     const { id } = req.params;
-    const { name, modId } = req.body;
-    const query = await GroupServices.update(+id, name, modId);
+    const { name } = req.body;
+    const query = await GroupServices.update(+id, name);
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -116,6 +116,19 @@ export const deleteRelation = async (
   try {
     const { userId, groupId } = req.params;
     const query = await GroupServices.deleteRelation(+userId, +groupId);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const findProjects = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { groupId } = req.params;
+    const query = await GroupServices.findProjects(+groupId);
     res.status(200).json(query);
   } catch (error) {
     next(error);

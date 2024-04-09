@@ -41,6 +41,25 @@ export const getConsortiumById = async (
     const query = await ConsortiumServices.getConsortiumById(+id);
     res.status(200).json(query);
   } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+export const updatePercentaje = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { consortiumId, companyId } = req.params;
+    const { percentaje } = req.body;
+    const query = await ConsortiumServices.updatePercentaje(
+      +consortiumId,
+      +companyId,
+      percentaje
+    );
+    res.status(201).json(query);
+  } catch (error) {
     next(error);
   }
 };

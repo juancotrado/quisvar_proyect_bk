@@ -1,6 +1,11 @@
 import { unlinkSync } from 'fs';
 import AppError from '../utils/appError';
-import { Companies, Consortium, prisma } from '../utils/prisma.server';
+import {
+  Companies,
+  Consortium,
+  ConsortiumOnCompanies,
+  prisma,
+} from '../utils/prisma.server';
 import { URL_HOST } from '../utils/tools';
 
 class ConsortiumServices {
@@ -26,25 +31,46 @@ class ConsortiumServices {
   }
   static async getConsortiumById(id: Consortium['id']) {
     if (!id) throw new AppError(`Oops!, id no encontrado`, 400);
-    const consortiums = await prisma.consortium.findFirst({
-      where: { id },
+    const consortiums = await prisma.consortiumOnCompanies.findFirst({
+      where: { consortiumId: id },
       select: {
-        id: true,
-        manager: true,
-        companies: {
+        consortium: {
           select: {
+            id: true,
+            name: true,
+            manager: true,
+            img: true,
             companies: {
               select: {
-                id: true,
-                name: true,
-                img: true,
+                companies: {
+                  select: {
+                    id: true,
+                    name: true,
+                    img: true,
+                  },
+                },
+                percentaje: true,
               },
             },
           },
         },
-        name: true,
-        img: true,
       },
+    });
+    return { ...consortiums?.consortium };
+  }
+
+  static async updatePercentaje(
+    consortiumId: Consortium['id'],
+    companiesId: Companies['id'],
+    percentaje: ConsortiumOnCompanies['percentaje']
+  ) {
+    if (!consortiumId || !companiesId)
+      throw new AppError(`Oops!, id no encontrado`, 400);
+    const consortiums = await prisma.consortiumOnCompanies.update({
+      where: {
+        consortiumId_companiesId: { consortiumId, companiesId },
+      },
+      data: { percentaje },
     });
     return consortiums;
   }
