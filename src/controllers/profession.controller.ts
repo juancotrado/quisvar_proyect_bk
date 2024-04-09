@@ -4,7 +4,7 @@ import ProfessionService from '../services/profession.services';
 export class ProfessionController {
   getAll: ControllerFunction = async (_req, res, next) => {
     try {
-      const result = ProfessionService.getAll();
+      const result = ProfessionService.professions;
       res.status(200).json(result);
     } catch (error) {
       next(error);

@@ -1,61 +1,197 @@
 [
-  { "value": "1", "label": "Ingeniería Agronómica", "abrv": "Ing" },
-  { "value": "2", "label": "Ingeniería Agroindustrial", "abrv": "Ing" },
-  { "value": "3", "label": "Ingeniería Agrícola", "abrv": "Ing" },
-  {
-    "value": "4",
-    "label": "Ingeniería Topográfica y Agrimensura",
-    "abrv": "Ing"
-  },
-  { "value": "5", "label": "Ingeniería Civil", "abrv": "Ing" },
-  { "value": "6", "label": "Arquitectura y Urbanismo", "abrv": "Arq" },
-  { "value": "7", "label": "Ingeniería Económica", "abrv": "Ing" },
-  {
-    "value": "8",
-    "label": "Ingeniería Estadística e Informática",
-    "abrv": "Ing"
-  },
-  { "value": "9", "label": "Ingeniería Geológica", "abrv": "Ing" },
-  { "value": "10", "label": "Ingeniería Metalúrgica", "abrv": "Ing" },
-  { "value": "11", "label": "Ingeniería Electrónica", "abrv": "Ing" },
-  { "value": "12", "label": "Ingeniería Mecánica Eléctrica", "abrv": "Ing" },
-  { "value": "13", "label": "Ingeniería de Sistemas", "abrv": "Ing" },
-  { "value": "14", "label": "Ingenieria de Minas", "abrv": "Ing" },
-  { "value": "15", "label": "Ingeniería Química", "abrv": "Ing" },
-  { "value": "16", "label": "Ingeniería Sanitaria y Ambiental", "abrv": "Ing" },
-  { "value": "17", "label": "Ciencias Biológicas", "abrv": "Lic" },
-  { "value": "18", "label": "Ciencias Biológicas: Pesquería", "abrv": "Lic" },
-  {
-    "value": "19",
-    "label": "Ciencias Biológicas: Microbiología",
-    "abrv": "Lic"
-  },
-  { "value": "21", "label": "Nutrición Humana", "abrv": "Lic" },
-  { "value": "22", "label": "Odontología", "abrv": "Lic" },
-  { "value": "23", "label": "Enfermería", "abrv": "Lic" },
-  { "value": "24", "label": "Medicina Humana", "abrv": "Lic" },
-  { "value": "25", "label": "Medicina Veterinaria y Zootecnia", "abrv": "Lic" },
-  { "value": "26", "label": "Ciencias Contables", "abrv": "Lic" },
-  { "value": "27", "label": "Administración", "abrv": "Lic" },
-  {
-    "value": "28",
-    "label": "Gestión Pública y Desarrollo Social",
-    "abrv": "Lic"
-  },
-  { "value": "29", "label": "Física", "abrv": "Lic" },
-  { "value": "30", "label": "Inicial", "abrv": "Lic" },
-  { "value": "31", "label": "Primaria", "abrv": "Lic" },
-  { "value": "32", "label": "Secundaria", "abrv": "Lic" },
-  { "value": "33", "label": "Derecho", "abrv": "Lic" },
-  { "value": "34", "label": "Antropología", "abrv": "Lic" },
-  { "value": "35", "label": "Arte", "abrv": "Lic" },
-  {
-    "value": "36",
-    "label": "Ciencias de la Comunicación Social",
-    "abrv": "Lic"
-  },
-  { "value": "37", "label": "Sociología", "abrv": "Lic" },
-  { "value": "38", "label": "Turismo", "abrv": "Lic" },
-  { "value": "39", "label": "Trabajo Social", "abrv": "Lic" },
-  { "value": "40", "label": "Técnico en Topografía y Geodesia", "abrv": "Tec" }
+   {
+      "value": "2",
+      "label": "Ingeniería Agroindustrial",
+      "abrv": "Ing"
+   },
+   {
+      "value": "3",
+      "label": "Ingeniería Agrícola",
+      "abrv": "Ing"
+   },
+   {
+      "value": "4",
+      "label": "Ingeniería Topográfica y Agrimensura",
+      "abrv": "Ing"
+   },
+   {
+      "value": "5",
+      "label": "Ingeniería Civil",
+      "abrv": "Ing"
+   },
+   {
+      "value": "6",
+      "label": "Arquitectura y Urbanismo",
+      "abrv": "Arq"
+   },
+   {
+      "value": "7",
+      "label": "Ingeniería Económica",
+      "abrv": "Ing"
+   },
+   {
+      "value": "8",
+      "label": "Ingeniería Estadística e Informática",
+      "abrv": "Ing"
+   },
+   {
+      "value": "9",
+      "label": "Ingeniería Geológica",
+      "abrv": "Ing"
+   },
+   {
+      "value": "10",
+      "label": "Ingeniería Metalúrgica",
+      "abrv": "Ing"
+   },
+   {
+      "value": "11",
+      "label": "Ingeniería Electrónica",
+      "abrv": "Ing"
+   },
+   {
+      "value": "12",
+      "label": "Ingeniería Mecánica Eléctrica",
+      "abrv": "Ing"
+   },
+   {
+      "value": "13",
+      "label": "Ingeniería de Sistemas",
+      "abrv": "Ing"
+   },
+   {
+      "value": "14",
+      "label": "Ingenieria de Minas",
+      "abrv": "Ing"
+   },
+   {
+      "value": "15",
+      "label": "Ingeniería Química",
+      "abrv": "Ing"
+   },
+   {
+      "value": "16",
+      "label": "Ingeniería Sanitaria y Ambiental",
+      "abrv": "Ing"
+   },
+   {
+      "value": "17",
+      "label": "Ciencias Biológicas",
+      "abrv": "Lic"
+   },
+   {
+      "value": "18",
+      "label": "Ciencias Biológicas: Pesquería",
+      "abrv": "Lic"
+   },
+   {
+      "value": "19",
+      "label": "Ciencias Biológicas: Microbiología",
+      "abrv": "Lic"
+   },
+   {
+      "value": "21",
+      "label": "Nutrición Humana",
+      "abrv": "Lic"
+   },
+   {
+      "value": "22",
+      "label": "Odontología",
+      "abrv": "Lic"
+   },
+   {
+      "value": "23",
+      "label": "Enfermería",
+      "abrv": "Lic"
+   },
+   {
+      "value": "24",
+      "label": "Medicina Humana",
+      "abrv": "Lic"
+   },
+   {
+      "value": "25",
+      "label": "Medicina Veterinaria y Zootecnia",
+      "abrv": "Lic"
+   },
+   {
+      "value": "26",
+      "label": "Ciencias Contables",
+      "abrv": "Lic"
+   },
+   {
+      "value": "27",
+      "label": "Administración",
+      "abrv": "Lic"
+   },
+   {
+      "value": "28",
+      "label": "Gestión Pública y Desarrollo Social",
+      "abrv": "Lic"
+   },
+   {
+      "value": "29",
+      "label": "Física",
+      "abrv": "Lic"
+   },
+   {
+      "value": "30",
+      "label": "Inicial",
+      "abrv": "Lic"
+   },
+   {
+      "value": "31",
+      "label": "Primaria",
+      "abrv": "Lic"
+   },
+   {
+      "value": "32",
+      "label": "Secundaria",
+      "abrv": "Lic"
+   },
+   {
+      "value": "33",
+      "label": "Derecho",
+      "abrv": "Lic"
+   },
+   {
+      "value": "34",
+      "label": "Antropología",
+      "abrv": "Lic"
+   },
+   {
+      "value": "35",
+      "label": "Arte",
+      "abrv": "Lic"
+   },
+   {
+      "value": "36",
+      "label": "Ciencias de la Comunicación Social",
+      "abrv": "Lic"
+   },
+   {
+      "value": "37",
+      "label": "Sociología",
+      "abrv": "Lic"
+   },
+   {
+      "value": "38",
+      "label": "Turismo",
+      "abrv": "Lic"
+   },
+   {
+      "value": "39",
+      "label": "Trabajo Social",
+      "abrv": "Lic"
+   },
+   {
+      "value": "40",
+      "label": "Técnico en Topografía y Geodesia",
+      "abrv": "Tec"
+   },
+   {
+      "value": "aed91611-a90b-445d-8421-75186404baa5",
+      "abrv": "Lic",
+      "label": "Ingeniera de la vida "
+   }
 ]

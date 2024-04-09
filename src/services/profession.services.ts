@@ -1,46 +1,58 @@
 import { Profession } from 'types/profession';
-import fs from 'fs';
+import { writeFileSync, readFileSync } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
 class ProfessionService {
-  private professions: Profession[];
 
-  constructor() {
-    const json_profession = fs.readFileSync('json/professions.json', 'utf-8');
-    this.professions = JSON.parse(json_profession);
+  get professions(): Profession[] {
+    const json_profession = readFileSync('json/professions.json', 'utf-8');
+    const professions = JSON.parse(json_profession);
+    return professions;
   }
 
-  getAll() {
-    return this.professions;
+  find(id: string) {
+    const findProfession = this.professions.find(({ value }) => value === id)
+    return findProfession
   }
 
+  userWithProfession(users: { [key: string]: any }[]) {
+    const newUsers = users.map(user => {
+      const findProfession = this.find(user.profile.job)
+      const profile = { ...user.profile, job: findProfession || { label: 'unknow', value: 'unknow' } }
+      return { ...user, profile }
+    })
+    return newUsers
+  }
   create({ abrv, label }: Profession) {
     const newProfession = {
       value: uuidv4(),
       abrv,
       label,
     };
-    this.professions.push(newProfession);
-    const json_profession = JSON.stringify(this.professions);
-    fs.writeFileSync('json/professions.json', json_profession, 'utf-8');
+    const professions = this.professions
+    professions.push(newProfession);
+    const json_profession = JSON.stringify(professions, null, 3);
+    writeFileSync('json/professions.json', json_profession, 'utf-8');
     return newProfession;
   }
 
   delete(id: string) {
-    const filterProfession = this.professions.filter(
+    const professions = this.professions
+    const filterProfession = professions.filter(
       ({ value }) => value !== id
     );
     const json_profession = JSON.stringify(filterProfession);
-    fs.writeFileSync('json/professions.json', json_profession, 'utf-8');
+    writeFileSync('json/professions.json', json_profession, 'utf-8');
     return this.professions;
   }
 
   update({ abrv, label, value }: Profession) {
-    const updateProfession = this.professions.map(profession =>
+    const professions = this.professions
+    const updateProfession = professions.map(profession =>
       profession.value === value ? { ...profession, abrv, label } : profession
     );
-    const json_profession = JSON.stringify(updateProfession);
-    fs.writeFileSync('json/professions.json', json_profession, 'utf-8');
+    const json_profession = JSON.stringify(updateProfession, null, 3);
+    writeFileSync('json/professions.json', json_profession, 'utf-8');
     return updateProfession;
   }
 }
