@@ -5,15 +5,21 @@ import Queries from '../utils/queries';
 class OfficeServices {
   public static async getAll(
     userId: number,
-    { typeRol, menuId, subMenuId: id }: ProfileByRoleType
+    {
+      typeRol,
+      menuId,
+      subMenuId: id,
+      includeSelf,
+    }: ProfileByRoleType & { includeSelf: boolean }
   ) {
-    console.log({ typeRol, menuId, id });
+    const notIn = includeSelf ? [userId] : [];
     const getListOffice = await prisma.office.findMany({
       include: {
         users: {
           where: {
             user: {
-              id: { notIn: [userId] },
+              id: { notIn },
+              status: true,
               role: {
                 menuPoints: {
                   every: { subMenuPoints: { every: { typeRol, menuId, id } } },
