@@ -7,9 +7,18 @@ class OfficeControllers {
   public static showAll: ControllerFunction = async (req, res, next) => {
     try {
       const { id: userId }: UserType = res.locals.userInfo;
-      const { menuId, subMenuId, typeRol } = req.query as ProfileByRoleType;
-      const includeSelf = req.query.includeUser ? false : true;
-      const queries = { menuId, subMenuId, typeRol, includeSelf };
+      const { menuId, subMenuId, typeRol, subTypeRol } = req.query as Omit<
+        ProfileByRoleType,
+        'includeSelf'
+      >;
+      const includeSelf = req.query.includeUser === 'true';
+      const queries: ProfileByRoleType = {
+        menuId: menuId ? +menuId : undefined,
+        subMenuId: subMenuId ? +subMenuId : undefined,
+        typeRol,
+        subTypeRol,
+        includeSelf,
+      };
       const result = await OfficeServices.getAll(userId, queries);
       res.json(result).status(200);
     } catch (error) {

@@ -5,12 +5,7 @@ import Queries from '../utils/queries';
 class OfficeServices {
   public static async getAll(
     userId: number,
-    {
-      typeRol,
-      menuId,
-      subMenuId: id,
-      includeSelf,
-    }: ProfileByRoleType & { includeSelf: boolean }
+    { typeRol, menuId, subMenuId, subTypeRol, includeSelf }: ProfileByRoleType
   ) {
     const notIn = includeSelf ? [userId] : [];
     const getListOffice = await prisma.office.findMany({
@@ -22,13 +17,30 @@ class OfficeServices {
               status: true,
               role: {
                 menuPoints: {
-                  every: { subMenuPoints: { every: { typeRol, menuId, id } } },
+                  some: {
+                    menuId,
+                    typeRol,
+                    subMenuPoints: subMenuId
+                      ? { some: { menuId: subMenuId, typeRol: subTypeRol } }
+                      : {},
+                  },
                 },
               },
             },
           },
           select: {
             user: Queries.selectProfileUser,
+            // user: {
+            //   select: {
+            //     id: true,
+            //     role: {
+            //       select: {
+            //         name: true,
+            //         menuPoints: { select: { subMenuPoints: true } },
+            //       },
+            //     },
+            //   },
+            // },
             isOfficeManager: true,
           },
         },
