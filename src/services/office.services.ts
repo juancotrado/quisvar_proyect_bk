@@ -10,27 +10,6 @@ class OfficeServices {
     const notIn = includeSelf ? [userId] : [];
     const getListOffice = await prisma.office.findMany({
       include: {
-        _count: {
-          select: {
-            users: {
-              where: {
-                user: {
-                  role: {
-                    menuPoints: {
-                      some: {
-                        menuId,
-                        typeRol,
-                        subMenuPoints: subMenuId
-                          ? { some: { menuId: subMenuId, typeRol: subTypeRol } }
-                          : {},
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
         users: {
           where: {
             user: {
@@ -56,7 +35,20 @@ class OfficeServices {
         },
       },
     });
-    return getListOffice;
+    const parseOffice = getListOffice.map(({ users, ...data }) => {
+      const manager = users.find(user => user.isOfficeManager)?.user;
+      const parseUsers = users.map(({ user, ...value }) => {
+        const newUser = { ...user, office: data.name };
+        return { ...value, user: newUser };
+      });
+      return {
+        ...data,
+        _count: { users: parseUsers.length },
+        manager,
+        users: parseUsers,
+      };
+    });
+    return parseOffice;
   }
 
   public static async create({ name }: Office) {
