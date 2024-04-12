@@ -52,7 +52,7 @@ class PayMailRoutes implements InitialRouter {
     );
     this.router.patch(
       '/voucher/:id',
-      uploads.fileVoucher.array('fileMail'),
+      uploads.fileVoucher.fields([{ name: 'fileMail' }]),
       createVoucher
     );
     //MOD ROLE
