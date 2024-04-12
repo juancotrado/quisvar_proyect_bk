@@ -1145,18 +1145,29 @@ paths:
           in: query
           description: Id de Menu
           schema:
-            type: string
+            type: number
         - name: subMenuId
           in: query
           description: Id de SubMenu
           schema:
-            type: string
+            type: number
+        - name: includeUser
+          in: query
+          description: Añadir mismo usuario
+          schema:
+            type: boolean
         - name: typeRol
           in: query
           description: Puede Usar <b>["MEMBER","USER","MOD","VIEWER"]</b>
           # required: false
           schema:
-            type: number
+            type: string
+        - name: subTypeRol
+          in: query
+          description: Puede Usar <b>["MEMBER","USER","MOD","VIEWER"]</b>
+          # required: false
+          schema:
+            type: string
       description: |-
         Ver la lista de contratos por empresa
       security:

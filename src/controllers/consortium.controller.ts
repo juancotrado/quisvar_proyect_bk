@@ -51,15 +51,15 @@ export const updatePercentaje = async (
   next: NextFunction
 ) => {
   try {
-    const { consortiumId, companyId } = req.params;
-    const { percentaje } = req.body;
+    const { consortiumId } = req.params;
+    const data = req.body;
     const query = await ConsortiumServices.updatePercentaje(
       +consortiumId,
-      +companyId,
-      percentaje
+      data
     );
     res.status(201).json(query);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };

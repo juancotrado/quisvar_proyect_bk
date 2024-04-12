@@ -1,22 +1,30 @@
 import { ProfileByRoleType } from 'types/types';
 import { Office, prisma, UserToOffice } from '../utils/prisma.server';
 import Queries from '../utils/queries';
+import professionServices from './profession.services';
 
 class OfficeServices {
   public static async getAll(
     userId: number,
-    { typeRol, menuId, subMenuId: id }: ProfileByRoleType
+    { typeRol, menuId, subMenuId, subTypeRol, includeSelf }: ProfileByRoleType
   ) {
-    console.log({ typeRol, menuId, id });
+    const notIn = includeSelf ? [userId] : [];
     const getListOffice = await prisma.office.findMany({
       include: {
         users: {
           where: {
             user: {
-              id: { notIn: [userId] },
+              id: { notIn },
+              status: true,
               role: {
                 menuPoints: {
-                  every: { subMenuPoints: { every: { typeRol, menuId, id } } },
+                  some: {
+                    menuId,
+                    typeRol,
+                    subMenuPoints: subMenuId
+                      ? { some: { menuId: subMenuId, typeRol: subTypeRol } }
+                      : {},
+                  },
                 },
               },
             },
@@ -28,7 +36,24 @@ class OfficeServices {
         },
       },
     });
-    return getListOffice;
+    const parseOffice = getListOffice.map(({ users, ...data }) => {
+      const manager = users.find(user => user.isOfficeManager)?.user;
+      const job = professionServices.find(manager?.profile?.job || '');
+      const newManager = { ...manager, profile: { ...manager?.profile, job } };
+      const parseUsers = users.map(({ user, ...value }) => {
+        const job = professionServices.find(user.profile?.job || '');
+        const _user = { ...user, profile: { ...user.profile, job } };
+        const newUser = { ..._user, office: data.name };
+        return { ...value, user: newUser };
+      });
+      return {
+        ...data,
+        _count: { users: parseUsers.length },
+        manager: newManager,
+        users: parseUsers,
+      };
+    });
+    return parseOffice;
   }
 
   public static async create({ name }: Office) {

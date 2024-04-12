@@ -29,7 +29,7 @@ router.get('/all', getAllConsortium);
 router.get('/both', getBoth);
 router.get('/:id', getConsortiumById);
 router.patch('/:id', updateById);
-router.patch('/relation/percentaje/:consortiumId/:companyId', updatePercentaje);
+router.patch('/relation/all/:consortiumId', updatePercentaje);
 router.delete('/:id', deleteById);
 //CONSORTIUM IMG
 router.patch(
