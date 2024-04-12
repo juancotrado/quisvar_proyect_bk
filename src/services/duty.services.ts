@@ -5,7 +5,9 @@ class DutyServices {
   static async create(data: Duty) {
     if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
     const duty = await prisma.duty.create({
-      data,
+      data: {
+        ...data,
+      },
     });
     return duty;
   }
