@@ -16,6 +16,8 @@ import {
   BasicTasks,
   BasicFiles,
   Office,
+  SubMenuPoints,
+  MenuPoints,
 } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 
@@ -247,6 +249,10 @@ export interface PickPayMessageReply extends MessageHistory {
 export type FileMessagePick = Pick<FilesMessage, 'name' | 'path'> & {
   attempt?: string;
 };
+
+export interface VerifyTokenT {
+  id: number;
+}
 export type UpdateLevelBlock = Levels & {
   subTasks: {
     id: number;
@@ -360,4 +366,12 @@ export interface configurationSealPDF {
   to: string;
   date: string;
   observation?: string;
+}
+
+export interface ProfileByRoleType {
+  subMenuId?: number;
+  typeRol?: MenuPoints['typeRol'];
+  subTypeRol?: SubMenuPoints['typeRol'];
+  menuId?: number;
+  includeSelf: boolean;
 }

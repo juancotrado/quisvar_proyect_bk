@@ -27,7 +27,8 @@ class ProjectsServices {
               select: {
                 id: true,
                 name: true,
-                moderator: Queries.selectProfileUserForStage,
+
+                // moderator: Queries.selectProfileUserForStage,
               },
             },
           },
@@ -37,10 +38,10 @@ class ProjectsServices {
     });
     if (!findProject)
       throw new AppError('No se pudo encontrar los proyectos registrados', 404);
-    const hasAccessInStage = findProject.stages.some(
-      stage => stage.group?.moderator?.id === userId
-    );
-    return { ...findProject, hasAccessInStage, useSessionId: userId };
+    // const hasAccessInStage = findProject.stages.some(
+    //   stage => stage.group?.moderator?.id === userId
+    // );
+    return { ...findProject, hasAccessInStage: false, useSessionId: userId }; // arregla castillo
   }
 
   static async create({ name, typeSpecialityId, contractId }: projectPick) {

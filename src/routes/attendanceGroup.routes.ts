@@ -15,10 +15,10 @@ class AttendanceGroupRoutes {
       AttendanceGroupControllers.getUsersGroup
     );
     //Filter
-    this.router.get('/filter', AttendanceGroupControllers.getHistory);
+    // this.router.get('/filter', AttendanceGroupControllers.getHistory);
     //Group List
     this.router.post('/list', AttendanceGroupControllers.createList);
-    this.router.patch('/list/title/:id', AttendanceGroupControllers.editTitle);
+    // this.router.patch('/list/title/:id', AttendanceGroupControllers.editTitle);
     this.router.get('/list/:id', AttendanceGroupControllers.getList);
     this.router.delete(
       '/list/:id',
@@ -35,8 +35,8 @@ class AttendanceGroupRoutes {
       AttendanceGroupControllers.deleteListFile
     );
     //Attendance Group
-    this.router.post('/relation', AttendanceGroupControllers.createAttendance);
-    this.router.patch('/:id', AttendanceGroupControllers.updateAttendance);
+    // this.router.post('/relation', AttendanceGroupControllers.createAttendance);
+    // this.router.patch('/:id', AttendanceGroupControllers.updateAttendance);
     //Disabled Users
     this.router.patch('/disabled/:id', AttendanceGroupControllers.disabledUser);
     //Attendance File

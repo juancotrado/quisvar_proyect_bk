@@ -5,6 +5,7 @@ import { Profiles, Users, prisma } from '../utils/prisma.server';
 import bcrypt from 'bcryptjs';
 import RoleService from './role.service';
 import { MenuPoints } from '../models/menuPoints';
+import professionServices from './profession.services';
 const menuPoints = new MenuPoints();
 
 class UsersServices {
@@ -111,8 +112,9 @@ class UsersServices {
           }
         : user
     );
-
-    return userWithMenus;
+    const userWithProfession =
+      professionServices.userWithProfession(userWithMenus);
+    return userWithProfession;
   }
 
   static async find(id: Users['id']) {
@@ -129,6 +131,17 @@ class UsersServices {
     const role = await RoleService.findGeneral(findUser.roleId!);
     return { ...findUser, role };
   }
+
+  static async findForSign(id: Users['id']) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const findUser = await prisma.users.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+    if (!findUser) throw new AppError('No se pudo encontrar el usuario', 404);
+    return findUser;
+  }
+
   static async findByDni(dni: Profiles['dni']) {
     if (!dni) throw new AppError('Oops!,dni invalido', 409);
     const findUser = await prisma.users.findFirst({

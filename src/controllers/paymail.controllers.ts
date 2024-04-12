@@ -42,16 +42,18 @@ class PayMailControllers {
     const attempt = att ? `${new Date().getTime()}` : undefined;
     if (!Request.files)
       throw new AppError('Oops!, no se pudo subir los archivos', 400);
-    const files = Request.files as Express.Multer.File[];
+    const { mainProcedure: main_file, fileMail: files } =
+      Request.files as Record<string, Express.Multer.File[]>;
     if (!existsSync(path)) mkdirSync(path, { recursive: true });
-    return files.map(({ filename: name, fieldname, ...file }) => {
-      if (fieldname === 'mainProcedure') {
-        renameSync(file.path, path + '/' + 'mp_' + name);
-        return { name: 'mp_' + name, path, attempt };
-      }
+    const mainFiles = main_file.map(({ filename: name, ...file }) => {
+      renameSync(file.path, path + '/' + 'mp_' + name);
+      return { name: 'mp_' + name, path, attempt };
+    });
+    const otherFiles = files?.map(({ filename: name, ...file }) => {
       renameSync(file.path, path + '/' + name);
       return { name, path, attempt };
     });
+    return [...mainFiles, ...(otherFiles ?? [])];
   }
 
   public createReplyMessage: ControllerFunction = async (req, res, next) => {
@@ -68,6 +70,32 @@ class PayMailControllers {
       );
       res.status(201).json(query);
     } catch (error) {
+      next(error);
+    }
+  };
+
+  public createSeal: ControllerFunction = async (req, res, next) => {
+    try {
+      const { status } = req.query as ParametersPayMail;
+      const { body } = req;
+      const { id: senderId }: UserType = res.locals.userInfo;
+      // const data = JSON.parse(body.data) as PickPayMessageReply;
+      const data = body as PickPayMessageReply & {
+        observations?: string;
+        numberPage?: number;
+        officeId: number;
+      };
+      const result = await PayMailServices.updateDataWithSeal(
+        {
+          ...data,
+          status,
+          senderId,
+        },
+        []
+      );
+      res.json(result);
+    } catch (error) {
+      console.log(error);
       next(error);
     }
   };

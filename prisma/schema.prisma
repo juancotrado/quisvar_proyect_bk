@@ -34,8 +34,8 @@ model Users {
   feedbacks             UsersOnFeedbacks[]
   equipment             Equipment?
   groups                GroupOnUsers[]
-  moderatorOfGroup      Group[]
-  Attendance            AttendanceGroup[]
+  // moderatorOfGroup      Group[]
+  // Attendance            AttendanceGroup[]
   roleId                Int?
   role                  Role?              @relation(fields: [roleId], references: [id])
   verificationUser      VerificationUser?
@@ -54,6 +54,7 @@ model VerificationUser {
 model Office {
   id        Int            @id @default(autoincrement())
   name      String
+  quantity  Int            @default(0)
   paymesage PayMessages[]
   message   Messages[]
   users     UserToOffice[]
@@ -154,8 +155,8 @@ model Group {
   stage     Stages[]
   groups    GroupOnUsers[]
   active    Boolean        @default(true)
-  modId     Int?
-  moderator Users?         @relation(fields: [modId], references: [id])
+  // modId     Int?
+  // moderator Users?         @relation(fields: [modId], references: [id])
   GroupList GroupList[]
 }
 
@@ -163,6 +164,7 @@ model GroupOnUsers {
   userId  Int
   groupId Int
   active  Boolean @default(true)
+  mod     Boolean @default(false)
   // Attendance AttendanceGroup[]
   users   Users   @relation(fields: [userId], references: [id])
   groups  Group   @relation(fields: [groupId], references: [id])
@@ -171,53 +173,47 @@ model GroupOnUsers {
 }
 
 model GroupList {
-  id         Int               @id @default(autoincrement())
-  file       String?
-  nombre     String?
-  title      String?
-  createdAt  DateTime          @default(now())
-  groupId    Int
-  groups     Group             @relation(fields: [groupId], references: [id])
-  attendance AttendanceGroup[]
-  duty       Duty[]
+  id        Int      @id @default(autoincrement())
+  file      String?
+  nombre    String?
+  createdAt DateTime @default(now())
+  groupId   Int
+  groups    Group    @relation(fields: [groupId], references: [id])
+  // attendance AttendanceGroup[]
+  duty      Duty[]
 }
 
 model Duty {
-  id        Int           @id @default(autoincrement())
-  CUI       String
-  project   String
-  asitec    String?
-  feedback  String?
-  members   DutyMembers[]
-  listId    Int
-  createdAt DateTime      @default(now())
-  groupList GroupList     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  id           Int           @id @default(autoincrement())
+  CUI          String
+  project      String
+  shortName    String
+  titleMeeting String?
+  dutyGroup    String?
+  members      DutyMembers[]
+  listId       Int
+  createdAt    DateTime      @default(now())
+  groupList    GroupList     @relation(fields: [listId], references: [id], onDelete: Cascade)
 }
 
 model DutyMembers {
-  id            Int     @id @default(autoincrement())
-  position      String?
-  fullName      String
-  progress      String?
-  lastMeeting   String?
-  futureMeeting String?
-  status        String
-  request       String?
-  dutyId        Int
-  duty          Duty    @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+  id         Int         @id @default(autoincrement())
+  position   String?
+  fullName   String
+  task       DutyTasks[]
+  feedBack   String?
+  dailyDuty  String?
+  attendance ListDetails @default(PUNTUAL)
+  dutyId     Int
+  duty       Duty        @relation(fields: [dutyId], references: [id], onDelete: Cascade)
 }
 
-model AttendanceGroup {
-  id          Int         @id @default(autoincrement())
-  userId      Int
-  groupListId Int
-  description String?
-  punish      String?
-  status      ListDetails
-  createdAt   DateTime    @default(now())
-  group       GroupList   @relation(fields: [groupListId], references: [id])
-  user        Users       @relation(fields: [userId], references: [id])
-  // GroupOnUser GroupOnUsers @relation(fields: [userId, groupId], references: [userId, groupId])
+model DutyTasks {
+  id           Int         @id @default(autoincrement())
+  name         String?
+  percentage   Int?
+  dutyMemberId Int
+  member       DutyMembers @relation(fields: [dutyMemberId], references: [id], onDelete: Cascade)
 }
 
 model Projects {
@@ -467,6 +463,7 @@ model Companies {
 model ConsortiumOnCompanies {
   consortiumId Int
   companiesId  Int
+  percentaje   Int?       @default(0)
   consortium   Consortium @relation(fields: [consortiumId], references: [id])
   companies    Companies  @relation(fields: [companiesId], references: [id])
 
@@ -600,11 +597,11 @@ model PayMail {
 }
 
 model PayMessages {
-  id     Int    @id @default(autoincrement())
-  title  String
-  header String @default("")
+  id             Int              @id @default(autoincrement())
+  title          String
+  header         String           @default("")
   paymentPdfData String           @default("")
-  description    String
+  description    String?
   filesPay       Payment[]
   status         PayMessageStatus @default(PROCESO)
   type           MessageType      @default(INFORME)
@@ -615,7 +612,8 @@ model PayMessages {
   updatedAt      DateTime         @updatedAt
   office         Office?          @relation(fields: [officeId], references: [id])
   officeId       Int?
-  beforeOfficeId Int?              @default(0)
+  beforeOfficeId Int?             @default(0)
+  positionSeal   Int              @default(1)
 }
 
 model Messages {
@@ -623,7 +621,7 @@ model Messages {
   title       String
   category    MessageCategory
   header      String
-  description String
+  description String?
   status      MessageStatus    @default(PENDIENTE)
   type        MessageType      @default(INFORME)
   files       FilesMessage[]
@@ -639,9 +637,9 @@ model MessageHistory {
   id           Int                   @id @default(autoincrement())
   title        String
   header       String                @default("")
-  description  String
-  userId       Int
-  user         Users                 @relation(fields: [userId], references: [id])
+  description  String?
+  userId       Int?
+  user         Users?                @relation(fields: [userId], references: [id])
   files        FilesMessageHistory[]
   paymessage   PayMessages?          @relation(fields: [paymessageId], references: [id])
   paymessageId Int?
@@ -693,7 +691,7 @@ model Contratc {
   cui              String
   name             String
   contractNumber   String       @default("")
-  observations   String       @default("")
+  observations     String       @default("")
   projectName      String
   department       String
   province         String

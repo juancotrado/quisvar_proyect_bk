@@ -44,6 +44,8 @@ import {
   BasicTasksRoutes,
   PDFGenerateRouter,
   EncryptRouter,
+  ProfessionRouter,
+  OfficeRouter,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -104,8 +106,10 @@ class Server {
     duty: `/${process.env.ROUTE}/duty`,
     dutyMembers: `/${process.env.ROUTE}/dutyMembers`,
     role: `/${process.env.ROUTE}/role`,
+    office: `/${process.env.ROUTE}/office`,
     generatepdf: `/${process.env.ROUTE}/generate-pdf`,
     encrypt: `/${process.env.ROUTE}/encrypt`,
+    profession: `/${process.env.ROUTE}/profession`,
   };
 
   constructor() {
@@ -135,6 +139,7 @@ class Server {
     this.app.use('/general', express.static('public/general'));
     this.app.use('/reports', express.static('public/reports'));
     this.app.use('/images', express.static('public'));
+    this.app.use('/public', express.static('public'));
 
     this.app.use(express.json());
     this.morganConfiguration();
@@ -150,7 +155,8 @@ class Server {
       this.app.use(morgan('dev'));
     }
   }
-
+  //ms-word:ofe|u|http://localhost:8081/file-user/cv%20%2015-03-2024.docx
+  // ms-word:ofe|u|http://localhost:8081/api-docs/file-user/cv%20%2015-03-2024.docx
   conectionCron() {
     const time = new TimerCron('00 20 * * *');
     // GenerateFiles.coverFirma(
@@ -218,8 +224,10 @@ class Server {
     this.app.use(this.path.duty, DutyRoutes);
     this.app.use(this.path.dutyMembers, DutyMembersRoutes);
     this.app.use(this.path.role, roleRoutes);
+    this.app.use(this.path.office, OfficeRouter);
     this.app.use(this.path.generatepdf, PDFGenerateRouter);
     this.app.use(this.path.encrypt, EncryptRouter);
+    this.app.use(this.path.profession, ProfessionRouter);
     this.app.use(docs);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       res.locals.pageNotFound = this.rootDir + '/404_page/index.html';

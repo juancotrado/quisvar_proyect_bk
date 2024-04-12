@@ -68,36 +68,19 @@ class LicenseServices {
     return newLicence;
   }
 
-  static async update(
-    id: Licenses['id'],
-    {
-      reason,
-      startDate,
-      untilDate,
-      usersId,
-      feedback,
-      status,
-      checkout,
-      fine,
-    }: Licenses
-  ) {
+  static async update(id: Licenses['id'], data: Licenses) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const GMT = 60 * 60 * 1000;
-    const _startDate = new Date(startDate).getTime();
-    const _untilDate = new Date(untilDate).getTime();
+    const _startDate = new Date(data.startDate).getTime();
+    const _untilDate = new Date(data.untilDate).getTime();
     const startOfDay = new Date(_startDate - GMT * 5);
     const endOfDay = new Date(_untilDate - GMT * 5);
     const updateList = await prisma.licenses.update({
       where: { id },
       data: {
-        reason,
+        ...data,
         startDate: startOfDay,
         untilDate: endOfDay,
-        usersId,
-        feedback,
-        status,
-        checkout,
-        fine,
       },
     });
     return updateList;
@@ -111,6 +94,21 @@ class LicenseServices {
       where: { id },
       data: {
         feedback,
+        status,
+      },
+    });
+    return updateList;
+  }
+  static async updateCheckOut(
+    id: Licenses['id'],
+    { checkout, fine, status }: Licenses
+  ) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const updateList = await prisma.licenses.update({
+      where: { id },
+      data: {
+        checkout,
+        fine,
         status,
       },
     });

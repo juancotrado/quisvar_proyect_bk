@@ -19,13 +19,24 @@ class PDFGenerateController {
 
   public pagesInPage: ControllerFunction = async (req, res, next) => {
     try {
-      if (!req.file) throw new AppError('archivo inexistente', 500);
-      const { buffer, originalname } = req.file as Express.Multer.File;
-      const options = this.headers(originalname);
-      const newFile = await GenerateFiles.coverTwoPage(buffer);
+      const url = req.query.url as string;
+      let originalName: string;
+      let Buffer: Buffer | string;
+      if (url) {
+        const name = req.query.fileName as string;
+        Buffer = url;
+        originalName = name || '';
+      } else {
+        if (!req.file) throw new AppError('archivo inexistente', 500);
+        const { buffer, originalname } = req.file as Express.Multer.File;
+        Buffer = buffer;
+        originalName = originalname;
+      }
+      const newFile = await GenerateFiles.coverTwoPage(Buffer);
       const fileTemp = tmp.fileSync({ postfix: '.pdf' });
+      const options = this.headers(originalName);
       writeFileSync(fileTemp.name, newFile);
-      res.download(fileTemp.name, `convert_${originalname}`, options, error => {
+      res.download(fileTemp.name, `convert_${originalName}`, options, error => {
         if (!error) fileTemp.removeCallback();
       });
     } catch (error) {

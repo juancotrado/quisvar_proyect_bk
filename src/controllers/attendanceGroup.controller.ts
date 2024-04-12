@@ -29,17 +29,17 @@ class AttendanceGroupController {
       next(error);
     }
   };
-  public editTitle: ControllerFunction = async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const { title } = req.body;
-      const query = await AttendanceGroupService.editTitle(+id, title);
-      res.status(200).json(query);
-    } catch (error) {
-      console.log(error);
-      next(error);
-    }
-  };
+  // public editTitle: ControllerFunction = async (req, res, next) => {
+  //   try {
+  //     const { id } = req.params;
+  //     const { title } = req.body;
+  //     const query = await AttendanceGroupService.editTitle(+id, title);
+  //     res.status(200).json(query);
+  //   } catch (error) {
+  //     console.log(error);
+  //     next(error);
+  //   }
+  // };
   public getList: ControllerFunction = async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -50,19 +50,19 @@ class AttendanceGroupController {
       next(error);
     }
   };
-  public getHistory: ControllerFunction = async (req, res, next) => {
-    try {
-      const { id, startDate, endDate } = req.query;
-      const query = await AttendanceGroupService.getHistory(
-        +(id as string),
-        startDate as string,
-        endDate as string
-      );
-      res.status(200).json(query);
-    } catch (error) {
-      next(error);
-    }
-  };
+  // public getHistory: ControllerFunction = async (req, res, next) => {
+  //   try {
+  //     const { id, startDate, endDate } = req.query;
+  //     const query = await AttendanceGroupService.getHistory(
+  //       +(id as string),
+  //       startDate as string,
+  //       endDate as string
+  //     );
+  //     res.status(200).json(query);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
   public deleteListAttendance: ControllerFunction = async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -94,25 +94,25 @@ class AttendanceGroupController {
     }
   };
   //Attendance Group
-  public createAttendance: ControllerFunction = async (req, res, next) => {
-    try {
-      const { body } = req;
-      const query = await AttendanceGroupService.create(body);
-      res.status(201).json(query);
-    } catch (error) {
-      next(error);
-    }
-  };
-  public updateAttendance: ControllerFunction = async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const { body } = req;
-      const query = await AttendanceGroupService.update(+id, body);
-      res.status(200).json(query);
-    } catch (error) {
-      next(error);
-    }
-  };
+  // public createAttendance: ControllerFunction = async (req, res, next) => {
+  //   try {
+  //     const { body } = req;
+  //     const query = await AttendanceGroupService.create(body);
+  //     res.status(201).json(query);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
+  // public updateAttendance: ControllerFunction = async (req, res, next) => {
+  //   try {
+  //     const { id } = req.params;
+  //     const { body } = req;
+  //     const query = await AttendanceGroupService.update(+id, body);
+  //     res.status(200).json(query);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
   //Disabled Users
   public disabledUser: ControllerFunction = async (req, res, next) => {
     try {

@@ -12,6 +12,7 @@ import {
   deleteLicense,
   activeLicenses,
   getLicensesFee,
+  updateCheckOut,
 } from '../controllers';
 import { _admin_role, _employee_role } from '../middlewares/role.middleware';
 // import { role } from '../middlewares';
@@ -26,6 +27,7 @@ router.post('/', createLicense);
 router.post('/free', createFreeForAll);
 router.patch('/:id', updateLicense);
 router.patch('/approve/:id', approveLicense);
+router.patch('/checkout/:id', updateCheckOut);
 router.get('/active', activeLicenses);
 router.delete('/:id', deleteLicense);
 //ADMIN ROLE

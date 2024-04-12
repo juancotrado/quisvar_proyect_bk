@@ -32,6 +32,7 @@ export { default as DutyServices } from './duty.services';
 export { default as DutyMembersServices } from './dutyMembers.services';
 export { default as BasicLevelServices } from './basiclevels.services';
 export { default as BasicTasksServices } from './basictask.services';
+export { default as OfficeServices } from './office.services';
 
 export const rootPath = './uploads';
 export const indexPath = './index';

@@ -1,8 +1,16 @@
 import { unlinkSync } from 'fs';
 import AppError from '../utils/appError';
-import { Companies, Consortium, prisma } from '../utils/prisma.server';
+import {
+  Companies,
+  Consortium,
+  // ConsortiumOnCompanies,
+  prisma,
+} from '../utils/prisma.server';
 import { URL_HOST } from '../utils/tools';
-
+type DataProps = {
+  id: number;
+  percentage: number;
+};
 class ConsortiumServices {
   static async create(data: Consortium) {
     if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
@@ -26,27 +34,58 @@ class ConsortiumServices {
   }
   static async getConsortiumById(id: Consortium['id']) {
     if (!id) throw new AppError(`Oops!, id no encontrado`, 400);
-    const consortiums = await prisma.consortium.findFirst({
-      where: { id },
+    const consortiums = await prisma.consortiumOnCompanies.findFirst({
+      where: { consortiumId: id },
       select: {
-        id: true,
-        manager: true,
-        companies: {
+        consortium: {
           select: {
+            id: true,
+            name: true,
+            manager: true,
+            img: true,
             companies: {
               select: {
-                id: true,
-                name: true,
-                img: true,
+                companies: {
+                  select: {
+                    id: true,
+                    name: true,
+                    img: true,
+                  },
+                },
+                percentaje: true,
+              },
+              orderBy: {
+                companies: {
+                  name: 'asc',
+                },
               },
             },
           },
         },
-        name: true,
-        img: true,
       },
     });
-    return consortiums;
+    return { ...consortiums?.consortium };
+  }
+
+  static async updatePercentaje(
+    consortiumId: Consortium['id'],
+    data: DataProps[]
+  ) {
+    if (!consortiumId) throw new AppError(`Oops!, id no encontrado`, 400);
+    if (data.length === 0)
+      throw new AppError(`Oops!, Al parecer no hay nada que actualizar`, 400);
+    data.map(async ({ id, percentage }) => {
+      return await prisma.consortiumOnCompanies.update({
+        where: {
+          consortiumId_companiesId: {
+            consortiumId,
+            companiesId: id,
+          },
+        },
+        data: { percentaje: percentage },
+      });
+    });
+    return 'Datos actualizados';
   }
   static async updateById(id: Consortium['id'], { name, manager }: Consortium) {
     if (!id) throw new AppError(`Oops!, id no encontrado`, 400);
