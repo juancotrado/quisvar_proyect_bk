@@ -193,14 +193,13 @@ class PayMailServices {
           },
         })
       : null;
-    if (getOffice?.id === officeId)
-      throw new AppError('No puedes mandar a la misma oficina', 500);
     //---------------------------------------------------------------------------
     const getSender = await prisma.payMessages.findUnique({
       where: { id },
       select: {
         office: {
           select: {
+            id: true,
             users: {
               where: { isOfficeManager: true },
               select: { usersId: true },
@@ -210,6 +209,9 @@ class PayMailServices {
         },
       },
     });
+
+    if (getSender?.office?.id === officeId)
+      throw new AppError('No puedes mandar a la misma oficina', 500);
     //---------------------------------------------------------------------------
     const newReceiver = getOffice ? getOffice.users[0].usersId : receiverId;
     const newSender = getSender?.office
