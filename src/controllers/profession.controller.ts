@@ -34,8 +34,13 @@ export class ProfessionController {
   update: ControllerFunction = async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { abrv, label } = req.body;
-      const result = ProfessionService.update({ abrv, label, value: id });
+      const { abrv, label, amount } = req.body;
+      const result = ProfessionService.update({
+        abrv,
+        label,
+        value: id,
+        amount,
+      });
       res.status(200).json(result);
     } catch (error) {
       next(error);
