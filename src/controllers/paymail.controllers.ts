@@ -45,10 +45,11 @@ class PayMailControllers {
     const { mainProcedure: main_file, fileMail: files } =
       Request.files as Record<string, Express.Multer.File[]>;
     if (!existsSync(path)) mkdirSync(path, { recursive: true });
-    const mainFiles = main_file.map(({ filename: name, ...file }) => {
-      renameSync(file.path, path + '/' + 'mp_' + name);
-      return { name: 'mp_' + name, path, attempt };
-    });
+    const mainFiles =
+      main_file?.map(({ filename: name, ...file }) => {
+        renameSync(file.path, path + '/' + 'mp_' + name);
+        return { name: 'mp_' + name, path, attempt };
+      }) ?? [];
     const otherFiles = files?.map(({ filename: name, ...file }) => {
       renameSync(file.path, path + '/' + name);
       return { name, path, attempt };
