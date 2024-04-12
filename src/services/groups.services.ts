@@ -173,55 +173,26 @@ class GroupServices {
 
     return deletedGroupOnUsers;
   }
-  static async findProjects(groupId: GroupOnUsers['groupId']) {
-    if (!groupId) throw new AppError(`Oops!, algo salió mal`, 400);
-
-    const projects = await prisma.groupList.findFirst({
+  static async findProjects(id: Group['id']) {
+    if (!id) throw new AppError(`Oops!, algo salió mal`, 400);
+    const projects = await prisma.contratc.findMany({
       where: {
-        groupId: groupId,
-      },
-      select: {
-        groups: {
-          include: {
-            stage: {
-              select: {
-                project: {
-                  select: {
-                    stages: {
-                      select: {
-                        project: {
-                          include: {
-                            contract: {
-                              select: {
-                                id: true,
-                                district: true,
-                                name: true,
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
+        project: {
+          stages: {
+            every: {
+              groupId: id,
             },
           },
         },
       },
+      select: {
+        id: true,
+        name: true,
+        district: true,
+        cui: true,
+      },
     });
-    const resume = projects?.groups.stage.map(project => {
-      return {
-        id: project.project.stages[0].project.contract.id,
-        name: project.project.stages[0].project.contract.name,
-        district: project.project.stages[0].project.contract.district,
-      };
-    });
-    // const result: ResumeItem[] | undefined = resume?.filter((item, index, self) =>
-    //   index === self.findIndex(obj => obj.id === item.id)
-    // );
-    // console.log(result)
-    return resume;
+    return projects;
   }
 }
 export default GroupServices;

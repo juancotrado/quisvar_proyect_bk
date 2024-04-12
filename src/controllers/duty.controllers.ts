@@ -9,6 +9,7 @@ class DutyControllers {
       const query = await DutyServices.create(body);
       res.status(200).json(query);
     } catch (error) {
+      console.log(error);
       next(error);
     }
   };

@@ -197,15 +197,17 @@ model Duty {
 }
 
 model DutyMembers {
-  id         Int         @id @default(autoincrement())
-  position   String?
-  fullName   String
-  task       DutyTasks[]
-  feedBack   String?
-  dailyDuty  String?
-  attendance ListDetails @default(PUNTUAL)
-  dutyId     Int
-  duty       Duty        @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+  id            Int         @id @default(autoincrement())
+  position      String?
+  fullName      String
+  task          DutyTasks[]
+  feedBack      String?
+  feedBackDate  DateTime?
+  dailyDuty     String?
+  dailyDutyDate DateTime?
+  attendance    ListDetails @default(PUNTUAL)
+  dutyId        Int
+  duty          Duty        @relation(fields: [dutyId], references: [id], onDelete: Cascade)
 }
 
 model DutyTasks {
