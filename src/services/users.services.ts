@@ -6,6 +6,8 @@ import bcrypt from 'bcryptjs';
 import RoleService from './role.service';
 import { MenuPoints } from '../models/menuPoints';
 import professionServices from './profession.services';
+import { ProfileByRoleType } from 'types/types';
+import Queries from '../utils/queries';
 const menuPoints = new MenuPoints();
 
 class UsersServices {
@@ -107,12 +109,13 @@ class UsersServices {
     const userWithMenus = merge.map(({ password, ...user }) =>
       password && user.role
         ? {
-          ...user,
-          role: menuPoints.getHeadersOptions(user.role),
-        }
+            ...user,
+            role: menuPoints.getHeadersOptions(user.role),
+          }
         : user
     );
-    const userWithProfession = professionServices.userWithProfession(userWithMenus)
+    const userWithProfession =
+      professionServices.userWithProfession(userWithMenus);
     return userWithProfession;
   }
 
@@ -173,11 +176,85 @@ class UsersServices {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     return;
   }
+
+  static async findLisTaskByUser(userId: Users['id']) {
+    if (!userId) throw new AppError('Oops!,ID invalido', 400);
+    const taskList = await prisma.taskOnUsers.findMany({
+      where: { userId, subtask: { status: { in: ['PROCESS', 'INREVIEW'] } } },
+      orderBy: { subtaskId: 'desc' },
+      select: {
+        subtask: {
+          include: {
+            Levels: {
+              select: {
+                id: true,
+                name: true,
+                stages: {
+                  select: {
+                    id: true,
+                    name: true,
+                    project: {
+                      select: {
+                        id: true,
+                        name: true,
+                        contract: {
+                          select: {
+                            id: true,
+                            district: true,
+                            name: true,
+                            projectName: true,
+                            projectShortName: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return taskList;
+  }
+
+  static async getUserMenuPoints(
+    userId: number,
+    { typeRol, menuId, subMenuId, subTypeRol, includeSelf }: ProfileByRoleType
+  ) {
+    const notIn = includeSelf ? [userId] : [];
+    const getListUser = await prisma.role.findMany({
+      where: {
+        users: { some: { id: { notIn } } },
+        menuPoints: {
+          some: {
+            menuId,
+            typeRol,
+            subMenuPoints: subMenuId
+              ? { some: { menuId: subMenuId, typeRol: subTypeRol } }
+              : {},
+          },
+        },
+      },
+      select: { users: Queries.selectProfileUser },
+    });
+    const parseList = getListUser.map(({ users }) => {
+      const parseUsers = users.map(user => {
+        const job = professionServices.find(user.profile?.job || '');
+        const _user = { ...user, profile: { ...user.profile, job } };
+        return _user;
+      });
+      return parseUsers;
+    });
+    return parseList.flat().sort();
+  }
+
   static async findListSubTask(userId: Users['id'], projectId: number) {
     if (!userId) throw new AppError('Oops!,ID invalido', 400);
     if (!projectId) {
       const subTaskGeneral = await prisma.taskOnUsers.findMany({
-        where: { userId },
+        where: { userId, subtask: { status: { in: ['PROCESS', 'INREVIEW'] } } },
         orderBy: { subtaskId: 'desc' },
         select: {
           subtask: {

@@ -3,7 +3,8 @@ import { UsersServices } from '../services';
 import { userProfilePick } from '../utils/format.server';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
-import { FilesProps } from 'types/types';
+import { FilesProps, ProfileByRoleType } from 'types/types';
+import { ControllerFunction } from 'types/patterns';
 
 export const showUsers = async (
   req: Request,
@@ -47,6 +48,48 @@ export const showTaskByUser = async (
     next(error);
   }
 };
+
+export const showTaskByUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userInfo: UserType = res.locals.userInfo;
+    const { id } = userInfo;
+    const query = await UsersServices.findListTask(id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const showAllByMenuPoints: ControllerFunction = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    const { id: userId }: UserType = res.locals.userInfo;
+    const { menuId, subMenuId, typeRol, subTypeRol } = req.query as Omit<
+      ProfileByRoleType,
+      'includeSelf'
+    >;
+    const includeSelf = req.query.includeUser === 'true';
+    const queries: ProfileByRoleType = {
+      menuId: menuId ? +menuId : undefined,
+      subMenuId: subMenuId ? +subMenuId : undefined,
+      typeRol,
+      subTypeRol,
+      includeSelf,
+    };
+    const result = await UsersServices.getUserMenuPoints(userId, queries);
+    res.json(result).status(200);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const showSubTasksByUser = async (
   req: Request,
   res: Response,
