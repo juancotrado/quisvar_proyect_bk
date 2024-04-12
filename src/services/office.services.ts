@@ -8,7 +8,7 @@ class OfficeServices {
     userId: number,
     { typeRol, menuId, subMenuId, subTypeRol, includeSelf }: ProfileByRoleType
   ) {
-    const notIn = includeSelf ? [userId] : [];
+    const notIn = includeSelf ? [] : [userId];
     const getListOffice = await prisma.office.findMany({
       include: {
         users: {

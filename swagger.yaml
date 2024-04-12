@@ -81,7 +81,56 @@ paths:
                 type: object
                 example:
                   message: 'Error de servidor'
-
+  /users/menupoints:
+    get:
+      tags:
+        - user
+      summary: Show users By office
+      parameters:
+        - name: menuId
+          in: query
+          description: Id de Menu
+          schema:
+            type: number
+        - name: subMenuId
+          in: query
+          description: Id de SubMenu
+          schema:
+            type: number
+        - name: includeUser
+          in: query
+          description: Añadir mismo usuario
+          schema:
+            type: boolean
+        - name: typeRol
+          in: query
+          description: Puede Usar <b>["MEMBER","USER","MOD","VIEWER"]</b>
+          # required: false
+          schema:
+            type: string
+        - name: subTypeRol
+          in: query
+          description: Puede Usar <b>["MEMBER","USER","MOD","VIEWER"]</b>
+          # required: false
+          schema:
+            type: string
+      description: |-
+        Ver la lista de contratos por empresa
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Contrato Existe
+        '404':
+          description: No se pudo encontrar el contrato
+          content:
+            application/json:
+              example:
+                error: No se pudo encontrar el contrato
   /projects:
     post:
       tags:

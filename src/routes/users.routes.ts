@@ -11,12 +11,14 @@ import {
 import authenticateHandler from '../middlewares/auth.middleware';
 
 import { LogsMiddleware, uploads } from '../middlewares';
+import { showAllByMenuPoints } from '../controllers/users.controllers';
 
 const router = Router();
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
 // router.use(_employee_role);
 router.get('/', showUsers);
+router.get('/menupoints', showAllByMenuPoints);
 router.get('/:id/tasks', showTaskByUser);
 router.get('/:id/subTasks', showSubTasksByUser);
 //MOD ROLE
