@@ -45,18 +45,14 @@ class AttendanceGroupService {
       },
       select: {
         id: true,
-        duty: {
-          select: {
-            members: true,
-          },
-        },
+        duty: true,
         createdAt: true,
       },
       take: 1,
     });
     if (
       lastList.length > 0 &&
-      lastList[0].duty[0].members.length === 0 &&
+      lastList[0].duty.length === 0 &&
       startOfDay > lastList[0].createdAt
     ) {
       await this.deleteList(lastList[0].id);
@@ -115,11 +111,8 @@ class AttendanceGroupService {
           orderBy: {
             id: 'asc',
           },
-          select: {
-            id: true,
-            CUI: true,
-            project: true,
-            shortName: true,
+          include: {
+            members: true,
           },
         },
         createdAt: true,
