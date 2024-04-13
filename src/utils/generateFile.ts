@@ -195,15 +195,19 @@ class GenerateFiles {
     page.setFontSize(9.5);
     page.setFont(font);
     page.setFontColor(rgb(0, 0, 0.7));
-    page.drawText(`PROVEIDO ${title?.toUpperCase()}`, {
-      x: x + 15,
-      y: y + 50 + lineHeight * 3 + 8,
-      maxWidth: page.getWidth() / 3 - 40,
-    });
-    page.drawText(`CORPORACIÓN DHYRIUM S.A.C`, {
-      x: x + 15,
-      y: y + 50 + lineHeight * 3 - 2,
-    });
+    page.drawText(
+      `PROVEIDO ${title?.toUpperCase()} CORPORACIÓN DHYRIUM S.A.C`,
+      {
+        x: x + 15,
+        y: y + 50 + lineHeight * 3 + 8,
+        lineHeight: 10,
+        maxWidth: page.getWidth() / 3 - 30,
+      }
+    );
+    // page.drawText(`CORPORACIÓN DHYRIUM S.A.C`, {
+    //   x: x + 15,
+    //   y: y + 50 + lineHeight * 3 - 2,
+    // });
     page.setFontSize(9.5);
     page.drawText(`Fecha:${date}`, {
       x: x + 15,

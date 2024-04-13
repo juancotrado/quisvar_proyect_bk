@@ -85,6 +85,7 @@ class PayMailServices {
             user: Queries.selectProfileUser,
           },
         },
+        office: { select: { id: true, name: true, quantity: true } },
       },
     });
     if (!getMessage)
