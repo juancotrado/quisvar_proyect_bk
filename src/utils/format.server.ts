@@ -49,7 +49,7 @@ export type userProfilePick = Pick<
   | 'userPc'
   | 'roleId'
   | 'gender'
->;
+> & { officeIds: number[] };
 
 export type projectPick = Pick<
   Projects,

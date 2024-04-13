@@ -11,16 +11,48 @@ class OfficeControllers {
         ProfileByRoleType,
         'includeSelf'
       >;
-      const includeSelf = req.query.includeUser === 'true';
+      const includeSelf = req.query.includeSelf === 'true';
+      const includeUsers = req.query.includeUsers === 'true';
       const queries: ProfileByRoleType = {
-        menuId: menuId ? +menuId : undefined,
-        subMenuId: subMenuId ? +subMenuId : undefined,
+        menuId: menuId && +menuId,
+        subMenuId: subMenuId && +subMenuId,
         typeRol,
         subTypeRol,
         includeSelf,
       };
-      const result = await OfficeServices.getAll(userId, queries);
+      const result = await OfficeServices.getAll(userId, includeUsers, queries);
       res.json(result).status(200);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public static create: ControllerFunction = async (req, res, next) => {
+    try {
+      const { body } = req;
+      const query = await OfficeServices.create(body);
+      res.status(201).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public static update: ControllerFunction = async (req, res, next) => {
+    try {
+      const { body } = req;
+      const { id: officeId } = req.params;
+      const query = await OfficeServices.update(+officeId, body);
+      res.status(201).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public static remove: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id: officeId } = req.params;
+      const query = await OfficeServices.delete(+officeId);
+      res.status(204).json(query);
     } catch (error) {
       next(error);
     }

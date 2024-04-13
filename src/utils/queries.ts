@@ -255,6 +255,25 @@ class Queries {
       },
     };
   }
+
+  static includeRole = {
+    include: {
+      menuPoints: {
+        select: {
+          id: true,
+          menuId: true,
+          typeRol: true,
+          subMenuPoints: {
+            select: {
+              id: true,
+              menuId: true,
+              typeRol: true,
+            },
+          },
+        },
+      },
+    },
+  };
 }
 
 class PayMailQueries {

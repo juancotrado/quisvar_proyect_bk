@@ -13,17 +13,12 @@ const menuPoints = new MenuPoints();
 class UsersServices {
   static async getAll() {
     const users = await prisma.users.findMany({
-      where: {
-        role: {
-          hierarchy: { in: [1, 2] },
-        },
-      },
+      // where: {
+      //   role: {
+      //     hierarchy: { in: [1, 2] },
+      //   },
+      // },
       orderBy: [
-        // {
-        //   role: {
-        //     hierarchy: ,
-        //   },
-        // },
         {
           profile: {
             lastName: 'asc',
@@ -32,22 +27,11 @@ class UsersServices {
       ],
       include: {
         profile: true,
-        role: {
-          include: {
-            menuPoints: {
-              select: {
-                id: true,
-                menuId: true,
-                typeRol: true,
-                subMenuPoints: {
-                  select: {
-                    id: true,
-                    menuId: true,
-                    typeRol: true,
-                  },
-                },
-              },
-            },
+        role: Queries.includeRole,
+        offices: {
+          select: {
+            isOfficeManager: true,
+            office: { select: { id: true, name: true } },
           },
         },
         equipment: {
@@ -57,55 +41,13 @@ class UsersServices {
         },
       },
     });
-    const employees = await prisma.users.findMany({
-      where: {
-        role: {
-          hierarchy: { gte: 3 },
-        },
-      },
-      orderBy: [
-        // {
-        //   role: {
-        //     hierarchy: 'asc',
-        //   },
-        // },
-        {
-          profile: {
-            lastName: 'asc',
-          },
-        },
-      ],
-      include: {
-        profile: true,
-        role: {
-          include: {
-            menuPoints: {
-              select: {
-                id: true,
-                menuId: true,
-                typeRol: true,
-                subMenuPoints: {
-                  select: {
-                    id: true,
-                    menuId: true,
-                    typeRol: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-        equipment: {
-          include: {
-            workStation: true,
-          },
-        },
-      },
-    });
-    const merge = [...users, ...employees];
+    const _users = users.filter(({ role }) =>
+      [1, 2].includes(role?.hierarchy || 0)
+    );
+    const employees = users.filter(({ role }) => role?.hierarchy || 0 >= 3);
+    const merge = [..._users, ...employees];
     if (merge.length == 0)
       throw new AppError('No se pudo encontrar el registro de usuarios', 404);
-
     const userWithMenus = merge.map(({ password, ...user }) =>
       password && user.role
         ? {
@@ -125,8 +67,9 @@ class UsersServices {
       where: { id },
       include: {
         profile: true,
-        offices: { select: { officeId: true } },
-        // office: { select: { id: true, name: true } },
+        offices: {
+          select: { officeId: true, office: { select: { name: true } } },
+        },
       },
     });
     if (!findUser) throw new AppError('No se pudo encontrar el usuario', 404);
@@ -323,9 +266,10 @@ class UsersServices {
     description,
     roleId,
     gender,
+    officeIds,
   }: userProfilePick) {
     const passwordHash = await bcrypt.hash(password, 10);
-
+    const officeData = officeIds.map(officeId => ({ officeId }));
     const newUser = await prisma.users.create({
       data: {
         email,
@@ -335,6 +279,9 @@ class UsersServices {
         address,
         declaration,
         roleId: +roleId!,
+        offices: {
+          createMany: { data: officeData, skipDuplicates: true },
+        },
         profile: {
           create: {
             firstName,
