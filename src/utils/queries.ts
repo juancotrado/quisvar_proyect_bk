@@ -268,6 +268,8 @@ class PayMailQueries {
         title: true,
         createdAt: true,
         updatedAt: true,
+        onHolding: true,
+        onHoldingDate: true,
         users: {
           where: { type, role },
           select: {

@@ -49,11 +49,13 @@ class PDFGenerateController {
   public pagesInSeal: ControllerFunction = async (req, res, next) => {
     try {
       const { body } = req;
-      const data = JSON.parse(body.data) as PickSealMessage;
+      const { id } = req.params;
+      const data = JSON.parse(body.data) as Omit<
+        PickSealMessage,
+        'paymessageId'
+      >;
       //----------------------------------------------------------------
-      const findMessage = await PayMailServices.getMessageShort(
-        data.paymessageId
-      );
+      const findMessage = await PayMailServices.getMessageShort(+id);
       //----------------------------------------------------------------
       const { name, path } = findMessage.files[0];
       const destinityFile = path + '/' + name;

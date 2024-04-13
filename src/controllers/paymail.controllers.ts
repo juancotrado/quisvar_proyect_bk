@@ -28,6 +28,20 @@ class PayMailControllers {
     }
   };
 
+  public showHoldingMessages: ControllerFunction = async (req, res, next) => {
+    try {
+      const { skip: _skip, ...params } = req.query as ParametersPayMail;
+      const offset = parseInt(`${_skip}`);
+      const skip = !isNaN(offset) ? offset : undefined;
+      const onHolding = req.query.onHolding === 'true';
+      const newParams = { skip, ...params, onHolding };
+      const query = await PayMailServices.onHolding(newParams);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public showMessage: ControllerFunction = async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -103,6 +117,16 @@ class PayMailControllers {
         { ...data, senderId },
         files
       );
+      res.status(201).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public updateHoldingStage: ControllerFunction = async (req, res, next) => {
+    try {
+      const ids: number[] = req.body.ids;
+      const query = await PayMailServices.changeHoldingStatus(ids);
       res.status(201).json(query);
     } catch (error) {
       next(error);

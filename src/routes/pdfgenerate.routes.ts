@@ -16,7 +16,7 @@ class PDFGenerateRouter {
     this.router.use(uploads.PDF_Files.single('file'));
     this.router.post('/two-pages', pagesInPage);
     this.router.post('/cover', pagesInCover);
-    this.router.post('/seal-paymessage', pagesInSeal);
+    this.router.post('/seal-paymessage/:id', pagesInSeal);
   }
 }
 

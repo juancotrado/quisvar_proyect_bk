@@ -201,6 +201,7 @@ export interface ParametersPayMail {
   typeMessage?: PayMessages['type'];
   status?: PayMessages['status'];
   assignedAt?: 'asc' | 'desc';
+  onHolding?: boolean;
 }
 export interface ParametersMail {
   skip?: number;

@@ -20,16 +20,40 @@ class PayMailServices {
     return undefined;
   }
 
+  public static async onHolding({
+    skip,
+    officeId,
+    onHolding,
+  }: ParametersPayMail) {
+    const mailList = await prisma.payMessages.findMany({
+      where: { officeId, onHolding },
+      skip,
+      take: 30,
+      orderBy: { updatedAt: 'desc' },
+      ...Queries.PayMail().selectMessage('MAIN'),
+    });
+    return mailList;
+  }
+
+  public static async changeHoldingStatus(ids: number[]) {
+    const now = new Date();
+    const mailListUpdate = await prisma.payMessages.updateMany({
+      where: { id: { in: ids } },
+      data: { onHolding: true, onHoldingDate: now },
+    });
+    return mailListUpdate;
+  }
+
   public static async getByUser(
     userId: Users['id'],
-    { skip, type, status, typeMessage }: ParametersPayMail
+    { skip, type, status, typeMessage, officeId }: ParametersPayMail
   ) {
     // const typeMail = this.PickType(type);
     const mail = await prisma.payMail.findMany({
       where: {
         userId,
         type,
-        paymessage: { type: typeMessage, status },
+        paymessage: { type: typeMessage, status, onHolding: true, officeId },
       },
       orderBy: { paymessage: { updatedAt: 'desc' } },
       skip,
@@ -51,6 +75,7 @@ class PayMailServices {
     });
     return { total, mail: parseList };
   }
+
   static async getMessageShort(id: PayMessages['id']) {
     if (!id) throw new AppError('Ops!, ID invalido', 400);
     const getMessage = await prisma.payMessages.findUnique({
@@ -514,6 +539,7 @@ class PayMailServices {
     });
     return quantity;
   }
+
   static async createVoucher(
     id: PayMessages['id'],
     { senderId }: { senderId: number },
