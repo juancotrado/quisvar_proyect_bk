@@ -5,6 +5,7 @@ import {
   ParametersPayMail,
   PickPayMail,
   PickPayMessageReply,
+  PickSealMessage,
 } from 'types/types';
 import { existsSync, mkdirSync, renameSync } from 'fs';
 import { PayMessages } from '@prisma/client';
@@ -45,10 +46,11 @@ class PayMailControllers {
     const { mainProcedure: main_file, fileMail: files } =
       Request.files as Record<string, Express.Multer.File[]>;
     if (!existsSync(path)) mkdirSync(path, { recursive: true });
-    const mainFiles = main_file.map(({ filename: name, ...file }) => {
-      renameSync(file.path, path + '/' + 'mp_' + name);
-      return { name: 'mp_' + name, path, attempt };
-    });
+    const mainFiles =
+      main_file?.map(({ filename: name, ...file }) => {
+        renameSync(file.path, path + '/' + 'mp_' + name);
+        return { name: 'mp_' + name, path, attempt };
+      }) ?? [];
     const otherFiles = files?.map(({ filename: name, ...file }) => {
       renameSync(file.path, path + '/' + name);
       return { name, path, attempt };
@@ -76,26 +78,14 @@ class PayMailControllers {
 
   public createSeal: ControllerFunction = async (req, res, next) => {
     try {
-      const { status } = req.query as ParametersPayMail;
       const { body } = req;
       const { id: senderId }: UserType = res.locals.userInfo;
-      // const data = JSON.parse(body.data) as PickPayMessageReply;
-      const data = body as PickPayMessageReply & {
-        observations?: string;
-        numberPage?: number;
-        officeId: number;
-      };
-      const result = await PayMailServices.updateDataWithSeal(
-        {
-          ...data,
-          status,
-          senderId,
-        },
-        []
-      );
+      const data = JSON.parse(body.data) as PickSealMessage;
+      // const data = body as PickSealMessage;
+      const files = this.requestFiles(req, `public/mail/${senderId}`);
+      const result = await PayMailServices.updateDataWithSeal(data, files);
       res.json(result);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   };

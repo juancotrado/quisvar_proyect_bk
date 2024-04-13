@@ -246,6 +246,17 @@ export interface PickPayMessageReply extends MessageHistory {
   status?: PayMessages['status'];
   paymessageId: PayMessages['id'];
 }
+
+export interface PickSealMessage {
+  title: string;
+  header: string;
+  officeId: number;
+  paymessageId: number;
+  observations?: string;
+  title: string;
+  numberPage?: number;
+  to: string;
+}
 export type FileMessagePick = Pick<FilesMessage, 'name' | 'path'> & {
   attempt?: string;
 };
