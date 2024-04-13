@@ -80,8 +80,8 @@ class PayMailControllers {
     try {
       const { body } = req;
       const { id: senderId }: UserType = res.locals.userInfo;
-      // const data = JSON.parse(body.data) as PickPayMessageReply;
-      const data = body as PickSealMessage;
+      const data = JSON.parse(body.data) as PickSealMessage;
+      // const data = body as PickSealMessage;
       const files = this.requestFiles(req, `public/mail/${senderId}`);
       const result = await PayMailServices.updateDataWithSeal(data, files);
       res.json(result);
