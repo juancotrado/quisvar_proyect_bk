@@ -5,6 +5,7 @@ import {
   ParametersPayMail,
   PickPayMail,
   PickPayMessageReply,
+  PickSealMessage,
 } from 'types/types';
 import { existsSync, mkdirSync, renameSync } from 'fs';
 import { PayMessages } from '@prisma/client';
@@ -77,26 +78,14 @@ class PayMailControllers {
 
   public createSeal: ControllerFunction = async (req, res, next) => {
     try {
-      const { status } = req.query as ParametersPayMail;
       const { body } = req;
       const { id: senderId }: UserType = res.locals.userInfo;
       // const data = JSON.parse(body.data) as PickPayMessageReply;
-      const data = body as PickPayMessageReply & {
-        observations?: string;
-        numberPage?: number;
-        officeId: number;
-      };
-      const result = await PayMailServices.updateDataWithSeal(
-        {
-          ...data,
-          status,
-          senderId,
-        },
-        []
-      );
+      const data = body as PickSealMessage;
+      const files = this.requestFiles(req, `public/mail/${senderId}`);
+      const result = await PayMailServices.updateDataWithSeal(data, files);
       res.json(result);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   };
