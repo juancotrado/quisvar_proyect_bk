@@ -192,12 +192,13 @@ class GenerateFiles {
       borderDashArray: [3, 4],
       opacity: 0,
     });
-    page.setFontSize(10.5);
+    page.setFontSize(9.5);
     page.setFont(font);
     page.setFontColor(rgb(0, 0, 0.7));
     page.drawText(`PROVEIDO ${title?.toUpperCase()}`, {
       x: x + 15,
       y: y + 50 + lineHeight * 3 + 8,
+      maxWidth: page.getWidth() / 3 - 40,
     });
     page.drawText(`CORPORACIÓN DHYRIUM S.A.C`, {
       x: x + 15,

@@ -299,6 +299,7 @@ class PayMailServices {
           select: {
             id: true,
             quantity: true,
+            name: true,
             users: {
               where: { isOfficeManager: true },
               select: { usersId: true },
@@ -322,7 +323,7 @@ class PayMailServices {
     if (!newReceiver || !newSender)
       throw new AppError('Ingrese Destinatario', 400);
     const quantitySeal = numberPage
-      ? numberPage
+      ? +numberPage
       : getSender.office?.quantity + 1;
     const positionSeal = getSender.positionSeal;
     //---------------------------------------------------------------------------
@@ -360,7 +361,7 @@ class PayMailServices {
       pos: positionSeal,
       to: to,
       observation: observations,
-      title: getOffice.name,
+      title: getSender.office.name,
       numberPage: numberPage ? numberPage : quantitySeal,
     });
     //-------------------------------------------------------------------
