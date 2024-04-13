@@ -261,6 +261,13 @@ export type FileMessagePick = Pick<FilesMessage, 'name' | 'path'> & {
   attempt?: string;
 };
 
+export interface SealInterface {
+  numberPage: number;
+  pos: number;
+  to: string;
+  observation?: string;
+  title: string;
+}
 export interface VerifyTokenT {
   id: number;
 }

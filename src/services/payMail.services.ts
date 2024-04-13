@@ -51,6 +51,24 @@ class PayMailServices {
     });
     return { total, mail: parseList };
   }
+  static async getMessageShort(id: PayMessages['id']) {
+    if (!id) throw new AppError('Ops!, ID invalido', 400);
+    const getMessage = await prisma.payMessages.findUnique({
+      where: { id },
+      include: {
+        office: {
+          select: { name: true, quantity: true },
+        },
+        files: {
+          where: { name: { startsWith: 'mp' } },
+          orderBy: { attempt: 'desc' },
+          take: 1,
+        },
+      },
+    });
+    if (!getMessage) throw new AppError('Ops!, ID invalido', 400);
+    return getMessage;
+  }
 
   static async getMessage(id: PayMessages['id']) {
     if (!id) throw new AppError('Ops!, ID invalido', 400);
