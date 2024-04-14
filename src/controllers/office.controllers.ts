@@ -12,7 +12,8 @@ class OfficeControllers {
         'includeSelf'
       >;
       const includeSelf = req.query.includeSelf === 'true';
-      const includeUsers = req.query.includeUsers === 'true';
+      const { includeUsers } = req.query;
+      const includeUser = !includeUsers || includeUsers === 'true';
       const queries: ProfileByRoleType = {
         menuId: menuId && +menuId,
         subMenuId: subMenuId && +subMenuId,
@@ -20,7 +21,7 @@ class OfficeControllers {
         subTypeRol,
         includeSelf,
       };
-      const result = await OfficeServices.getAll(userId, includeUsers, queries);
+      const result = await OfficeServices.getAll(userId, includeUser, queries);
       res.json(result).status(200);
     } catch (error) {
       next(error);

@@ -595,34 +595,22 @@ paths:
             application/json:
               example:
                 error: No se pudo crear el mensaje
-    # put:
-    #   tags:
-    #     - paymail
-    #   summary: edit mail
-    #   description: Editar trámites rechazados
-    #   parameters:
-    #     - $ref: '#/components/parameters/mailId'
-    #   security:
-    #     - bearerAuth: []
-    #   requestBody:
-    #     required: true
-    #     content:
-    #       multipart/form-data:
-    #         schema:
-    #           $ref: '#/components/schemas/mail_form_reply'
-    #   responses:
-    #     '200':
-    #       description: Operación exitosa
-    #       content:
-    #         application/json:
-    #           example:
-    #             message: Trámite Existe
-    #     '404':
-    #       description: No se pudo encontrar el mensaje
-    #       content:
-    #         application/json:
-    #           example:
-    #             error: No se pudo encontrar el mensaje
+    put:
+      tags:
+        - paymail
+      summary: edit mail
+      description: Aceptar trámites
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/onHolding-paymail-form'
+      responses:
+        '200':
+          description: Operación exitosa
   /mail:
     post:
       tags:
@@ -1808,3 +1796,9 @@ components:
         name:
           type: string
           example: 'GERENCIA DE GERENCIAS'
+    onHolding-paymail-form:
+      type: object
+      properties:
+        ids:
+          type: array
+          example: [1, 2, 3]

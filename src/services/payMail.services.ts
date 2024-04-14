@@ -53,7 +53,7 @@ class PayMailServices {
       where: {
         userId,
         type,
-        paymessage: { type: typeMessage, status, onHolding: true, officeId },
+        paymessage: { type: typeMessage, status, officeId },
       },
       orderBy: { paymessage: { updatedAt: 'desc' } },
       skip,
@@ -62,14 +62,17 @@ class PayMailServices {
         paymessageId: true,
         status: true,
         type: true,
+        userInit: true,
         paymessage: Queries.PayMail().selectMessage('MAIN'),
       },
     });
+    // const patito = mail.map(data => {data.})
     const parseList = mail.map(({ paymessage, ...data }) => {
       const userInit = paymessage.users.find(user => user.userInit);
       const _message = { ...paymessage, userInit };
       return { ...data, paymessage: _message };
     });
+
     const total = await prisma.payMail.count({
       where: { userId, type, paymessage: { status, type: typeMessage } },
     });
