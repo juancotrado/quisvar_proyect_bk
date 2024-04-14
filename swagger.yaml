@@ -570,6 +570,59 @@ paths:
           description: Contrato creado exitosamente
         '400':
           description: Datos no válidos
+  /paymail/holding:
+    get:
+      tags:
+        - paymail
+      summary: show mail
+      description: Ver tramites en mesa de partes
+      parameters:
+        - $ref: '#/components/parameters/onHolding'
+        - $ref: '#/components/parameters/officeIdQuery'
+        - $ref: '#/components/parameters/skip'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: No se pudo crear el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el mensaje
+    # put:
+    #   tags:
+    #     - paymail
+    #   summary: edit mail
+    #   description: Editar trámites rechazados
+    #   parameters:
+    #     - $ref: '#/components/parameters/mailId'
+    #   security:
+    #     - bearerAuth: []
+    #   requestBody:
+    #     required: true
+    #     content:
+    #       multipart/form-data:
+    #         schema:
+    #           $ref: '#/components/schemas/mail_form_reply'
+    #   responses:
+    #     '200':
+    #       description: Operación exitosa
+    #       content:
+    #         application/json:
+    #           example:
+    #             message: Trámite Existe
+    #     '404':
+    #       description: No se pudo encontrar el mensaje
+    #       content:
+    #         application/json:
+    #           example:
+    #             error: No se pudo encontrar el mensaje
   /mail:
     post:
       tags:
@@ -1200,23 +1253,10 @@ paths:
           description: Id de SubMenu
           schema:
             type: number
-        - name: includeUser
-          in: query
-          description: Añadir mismo usuario
-          schema:
-            type: boolean
-        - name: typeRol
-          in: query
-          description: Puede Usar <b>["MEMBER","USER","MOD","VIEWER"]</b>
-          # required: false
-          schema:
-            type: string
-        - name: subTypeRol
-          in: query
-          description: Puede Usar <b>["MEMBER","USER","MOD","VIEWER"]</b>
-          # required: false
-          schema:
-            type: string
+        - $ref: '#/components/parameters/includeSelf'
+        - $ref: '#/components/parameters/includeUsers'
+        - $ref: '#/components/parameters/typeRol'
+        - $ref: '#/components/parameters/subTypeRol'
       description: |-
         Ver la lista de contratos por empresa
       security:
@@ -1234,6 +1274,62 @@ paths:
             application/json:
               example:
                 error: No se pudo encontrar el contrato
+    post:
+      tags:
+        - office
+      summary: create office
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Office-form'
+      responses:
+        '201':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Operación exitosa
+  /office/{id}:
+    put:
+      tags:
+        - office
+      summary: update office
+      parameters:
+        - $ref: '#/components/parameters/officeId'
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Office-form'
+      responses:
+        '201':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Operación exitosa
+    delete:
+      tags:
+        - office
+      summary: delete office
+      parameters:
+        - $ref: '#/components/parameters/officeId'
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Operación exitosa
 components:
   securitySchemes:
     bearerAuth:
@@ -1252,6 +1348,13 @@ components:
       name: id
       in: path
       description: Ingresar id de tarea
+      required: true
+      schema:
+        type: integer
+    officeId:
+      name: id
+      in: path
+      description: Ingresar id de la oficina
       required: true
       schema:
         type: integer
@@ -1287,6 +1390,49 @@ components:
       name: category
       in: query
       description: Usar las siguientes variables <b>[GLOBAL, DIRECT]</b>
+      schema:
+        type: string
+    onHolding:
+      name: onHolding
+      in: query
+      description: tramites que estan en mesa de partes
+      schema:
+        type: boolean
+    officeIdQuery:
+      name: officeId
+      in: query
+      description: tramites filtrados por oficina
+      schema:
+        type: number
+    skip:
+      name: skip
+      in: query
+      description: saltos de registros
+      schema:
+        type: number
+    includeSelf:
+      name: includeSelf
+      in: query
+      description: Añadir mismo usuario
+      schema:
+        type: boolean
+    includeUsers:
+      name: includeUsers
+      in: query
+      description: Añadir usuarios, por defectro esta en true
+      schema:
+        type: boolean
+        example: true
+    typeRol:
+      name: typeRol
+      in: query
+      description: Puede Usar <b>["MEMBER","USER","MOD","VIEWER"]</b>
+      schema:
+        type: string
+    subTypeRol:
+      name: subTypeRol
+      in: query
+      description: Puede Usar <b>["MEMBER","USER","MOD","VIEWER"]</b>
       schema:
         type: string
   schemas:
@@ -1656,3 +1802,9 @@ components:
           type: string
           description: ingresar <b>[ABC,ROM,NUM]</b>
           example: NUM
+    Office-form:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'GERENCIA DE GERENCIAS'

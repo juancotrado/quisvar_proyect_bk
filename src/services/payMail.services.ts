@@ -5,6 +5,7 @@ import {
   ParametersPayMail,
   PickPayMail,
   PickPayMessageReply,
+  PickSealMessage,
   ReceiverT,
   ReceiverTypePick,
 } from 'types/types';
@@ -19,16 +20,40 @@ class PayMailServices {
     return undefined;
   }
 
+  public static async onHolding({
+    skip,
+    officeId,
+    onHolding,
+  }: ParametersPayMail) {
+    const mailList = await prisma.payMessages.findMany({
+      where: { officeId, onHolding },
+      skip,
+      take: 30,
+      orderBy: { updatedAt: 'desc' },
+      ...Queries.PayMail().selectMessage('MAIN'),
+    });
+    return mailList;
+  }
+
+  public static async changeHoldingStatus(ids: number[]) {
+    const now = new Date();
+    const mailListUpdate = await prisma.payMessages.updateMany({
+      where: { id: { in: ids } },
+      data: { onHolding: true, onHoldingDate: now },
+    });
+    return mailListUpdate;
+  }
+
   public static async getByUser(
     userId: Users['id'],
-    { skip, type, status, typeMessage }: ParametersPayMail
+    { skip, type, status, typeMessage, officeId }: ParametersPayMail
   ) {
     // const typeMail = this.PickType(type);
     const mail = await prisma.payMail.findMany({
       where: {
         userId,
         type,
-        paymessage: { type: typeMessage, status },
+        paymessage: { type: typeMessage, status, onHolding: true, officeId },
       },
       orderBy: { paymessage: { updatedAt: 'desc' } },
       skip,
@@ -49,6 +74,25 @@ class PayMailServices {
       where: { userId, type, paymessage: { status, type: typeMessage } },
     });
     return { total, mail: parseList };
+  }
+
+  static async getMessageShort(id: PayMessages['id']) {
+    if (!id) throw new AppError('Ops!, ID invalido', 400);
+    const getMessage = await prisma.payMessages.findUnique({
+      where: { id },
+      include: {
+        office: {
+          select: { name: true, quantity: true },
+        },
+        files: {
+          where: { name: { startsWith: 'mp' } },
+          orderBy: { attempt: 'desc' },
+          take: 1,
+        },
+      },
+    });
+    if (!getMessage) throw new AppError('Ops!, ID invalido', 400);
+    return getMessage;
   }
 
   static async getMessage(id: PayMessages['id']) {
@@ -84,6 +128,7 @@ class PayMailServices {
             user: Queries.selectProfileUser,
           },
         },
+        office: { select: { id: true, name: true, quantity: true } },
       },
     });
     if (!getMessage)
@@ -241,7 +286,7 @@ class PayMailServices {
     }
     //------------------------------------------------------------------
     await prisma.payMail.update({
-      where: { userId_paymessageId: { paymessageId: id, userId: senderId } },
+      where: { userId_paymessageId: { paymessageId: id, userId: newSender } },
       data: { type: 'SENDER', status: false },
     });
     await prisma.payMessages.update({ where: { id }, data: { status } });
@@ -263,68 +308,107 @@ class PayMailServices {
       header,
       officeId,
       paymessageId: id,
-      ...data
-    }: PickPayMessageReply & {
-      officeId: number;
-      observations?: string;
-      numberPage?: number;
-    },
+      numberPage,
+      observations,
+      to,
+    }: // ...data
+    PickSealMessage,
     files: Pick<FileMessagePick, 'name' | 'path'>[]
   ) {
-    const getOffice = await prisma.payMessages.findUnique({
+    const receiv: ReceiverT = { type: 'RECEIVER', role: 'MAIN', status: true };
+    //-------------------------- Set New Office ---------------------------------
+    const getOffice = await prisma.office.findUnique({
+      where: { id: officeId },
+      select: {
+        name: true,
+        users: {
+          where: { isOfficeManager: true },
+          select: { usersId: true },
+          take: 1,
+        },
+      },
+    });
+    //---------------------------------------------------------------------------
+    const getSender = await prisma.payMessages.findUnique({
       where: { id },
       select: {
-        office: true,
+        id: true,
         positionSeal: true,
         files: {
           where: { name: { startsWith: 'mp' } },
           orderBy: { attempt: 'desc' },
           take: 1,
         },
+        office: {
+          select: {
+            id: true,
+            quantity: true,
+            name: true,
+            users: {
+              where: { isOfficeManager: true },
+              select: { usersId: true },
+              take: 1,
+            },
+          },
+        },
       },
     });
-    if (!getOffice || !getOffice.office)
-      throw new AppError('Error al encontrar oficina', 400);
-    const quantitySeal = data.numberPage
-      ? data.numberPage
-      : getOffice.office.quantity + 1;
-    const positionSeal = getOffice.positionSeal;
-    //-------------------------------------------------------------------
-    const officeS = await prisma.office.findUnique({
-      where: { id: officeId },
-      select: { name: true },
+    //---------------------------------------------------------------------------
+    if (!getSender || !getSender.office)
+      throw new AppError('Error, no existe oficina oficina', 500);
+    if (!getOffice || !getOffice.users)
+      throw new AppError('Error, no existe oficina oficina', 500);
+    if (getSender.office?.id === officeId)
+      throw new AppError('No puedes mandar a la misma oficina', 500);
+    //---------------------------------------------------------------------------
+    const newReceiver = getOffice.users[0].usersId;
+    const newSender = getSender.office.users[0].usersId;
+    //---------------------------------------------------------------------------
+    if (!newReceiver || !newSender)
+      throw new AppError('Ingrese Destinatario', 400);
+    const quantitySeal = numberPage
+      ? +numberPage
+      : getSender.office?.quantity + 1;
+    const positionSeal = getSender.positionSeal;
+    //---------------------------------------------------------------------------
+    await prisma.payMail.upsert({
+      where: {
+        userId_paymessageId: { paymessageId: id, userId: newReceiver },
+      },
+      update: { ...receiv },
+      create: { paymessageId: id, userId: newReceiver, ...receiv },
     });
-    if (!officeS) throw new AppError('Error al encontrar oficina destino', 400);
+    await prisma.payMail.update({
+      where: { userId_paymessageId: { paymessageId: id, userId: newSender } },
+      data: { type: 'SENDER', status: false },
+    });
     //-------------------------------------------------------------------
     await prisma.payMessages.update({
-      where: { id },
+      where: { id: getSender.id },
       data: {
         officeId,
-        beforeOfficeId: getOffice.office.id,
         positionSeal: positionSeal + 1,
       },
     });
-    //-------------------------------------------------------------------
     await prisma.office.update({
-      where: { id: getOffice.office.id },
+      where: { id: getSender.office.id },
       data: { quantity: quantitySeal },
     });
     //-------------------------------------------------------------------
-    const { name, path } = getOffice.files[0];
+    const { name, path } = getSender.files[0];
     const destinityFile = path + '/' + name;
-    // const destinityFile2 = path + '/' + 'parchado.pdf';
     const dateSeal = new Date().toISOString().split('T')[0];
     const parseDateSeal = dateSeal.split('-').reverse().join('-');
-
+    //-------------------------------------------------------------------
     await GenerateFiles.coverFirma(destinityFile, destinityFile, {
       date: parseDateSeal,
       pos: positionSeal,
-      to: officeS.name,
-      observation: data.observations,
-      title: getOffice.office.name,
-      numberPage: data.numberPage ? data.numberPage : quantitySeal,
+      to: to,
+      observation: observations,
+      title: getSender.office.name,
+      numberPage: numberPage ? numberPage : quantitySeal,
     });
-
+    //-------------------------------------------------------------------
     const createForward = await prisma.messageHistory.create({
       data: {
         title,
@@ -455,6 +539,7 @@ class PayMailServices {
     });
     return quantity;
   }
+
   static async createVoucher(
     id: PayMessages['id'],
     { senderId }: { senderId: number },

@@ -23,10 +23,12 @@ class ProfileServices {
       room,
       userPc,
       gender,
-    }: Profiles,
+      officeIds,
+    }: Profiles & { officeIds: number[] },
     { email, address, ruc, roleId }: userPickEdit
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const officeData = officeIds.map(officeId => ({ officeId }));
     const updateUser = await prisma.users.update({
       where: { id },
       data: {
@@ -54,6 +56,10 @@ class ProfileServices {
             userPc,
             gender,
           },
+        },
+        offices: {
+          deleteMany: { usersId: id },
+          createMany: { data: officeData, skipDuplicates: true },
         },
       },
     });

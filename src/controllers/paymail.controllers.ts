@@ -5,6 +5,7 @@ import {
   ParametersPayMail,
   PickPayMail,
   PickPayMessageReply,
+  PickSealMessage,
 } from 'types/types';
 import { existsSync, mkdirSync, renameSync } from 'fs';
 import { PayMessages } from '@prisma/client';
@@ -21,6 +22,20 @@ class PayMailControllers {
       const skip = !isNaN(offset) ? offset : undefined;
       const newParams = { skip, ...params };
       const query = await PayMailServices.getByUser(userId, newParams);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public showHoldingMessages: ControllerFunction = async (req, res, next) => {
+    try {
+      const { skip: _skip, ...params } = req.query as ParametersPayMail;
+      const offset = parseInt(`${_skip}`);
+      const skip = !isNaN(offset) ? offset : undefined;
+      const onHolding = req.query.onHolding === 'true';
+      const newParams = { skip, ...params, onHolding };
+      const query = await PayMailServices.onHolding(newParams);
       res.status(200).json(query);
     } catch (error) {
       next(error);
@@ -77,26 +92,14 @@ class PayMailControllers {
 
   public createSeal: ControllerFunction = async (req, res, next) => {
     try {
-      const { status } = req.query as ParametersPayMail;
       const { body } = req;
       const { id: senderId }: UserType = res.locals.userInfo;
-      // const data = JSON.parse(body.data) as PickPayMessageReply;
-      const data = body as PickPayMessageReply & {
-        observations?: string;
-        numberPage?: number;
-        officeId: number;
-      };
-      const result = await PayMailServices.updateDataWithSeal(
-        {
-          ...data,
-          status,
-          senderId,
-        },
-        []
-      );
+      const data = JSON.parse(body.data) as PickSealMessage;
+      // const data = body as PickSealMessage;
+      const files = this.requestFiles(req, `public/mail/${senderId}`);
+      const result = await PayMailServices.updateDataWithSeal(data, files);
       res.json(result);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   };
@@ -114,6 +117,16 @@ class PayMailControllers {
         { ...data, senderId },
         files
       );
+      res.status(201).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public updateHoldingStage: ControllerFunction = async (req, res, next) => {
+    try {
+      const ids: number[] = req.body.ids;
+      const query = await PayMailServices.changeHoldingStatus(ids);
       res.status(201).json(query);
     } catch (error) {
       next(error);

@@ -201,6 +201,7 @@ export interface ParametersPayMail {
   typeMessage?: PayMessages['type'];
   status?: PayMessages['status'];
   assignedAt?: 'asc' | 'desc';
+  onHolding?: boolean;
 }
 export interface ParametersMail {
   skip?: number;
@@ -246,10 +247,28 @@ export interface PickPayMessageReply extends MessageHistory {
   status?: PayMessages['status'];
   paymessageId: PayMessages['id'];
 }
+
+export interface PickSealMessage {
+  title: string;
+  header: string;
+  officeId: number;
+  paymessageId: number;
+  observations?: string;
+  title: string;
+  numberPage?: number;
+  to: string;
+}
 export type FileMessagePick = Pick<FilesMessage, 'name' | 'path'> & {
   attempt?: string;
 };
 
+export interface SealInterface {
+  numberPage: number;
+  pos: number;
+  to: string;
+  observation?: string;
+  title: string;
+}
 export interface VerifyTokenT {
   id: number;
 }

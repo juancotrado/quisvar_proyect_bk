@@ -6,9 +6,14 @@ import professionServices from './profession.services';
 class OfficeServices {
   public static async getAll(
     userId: number,
+    includeUser: boolean = true,
     { typeRol, menuId, subMenuId, subTypeRol, includeSelf }: ProfileByRoleType
   ) {
     const notIn = includeSelf ? [] : [userId];
+    if (!includeUser)
+      return await prisma.office.findMany({
+        include: { _count: { select: { users: true } } },
+      });
     const getListOffice = await prisma.office.findMany({
       include: {
         users: {
@@ -36,6 +41,7 @@ class OfficeServices {
         },
       },
     });
+
     const parseOffice = getListOffice.map(({ users, ...data }) => {
       const manager = users.find(user => user.isOfficeManager)?.user;
       const job = professionServices.find(manager?.profile?.job || '');
@@ -46,6 +52,11 @@ class OfficeServices {
         const newUser = { ..._user, office: data.name };
         return { ...value, user: newUser };
       });
+      // if (!includeUser)
+      //   return {
+      //     ...data,
+      //     _count: { users: parseUsers.length },
+      //   };
       return {
         ...data,
         _count: { users: parseUsers.length },
@@ -67,6 +78,13 @@ class OfficeServices {
       data: { name },
     });
     return updateOffice;
+  }
+
+  public static async delete(id: Office['id']) {
+    const deleteOffice = await prisma.office.delete({
+      where: { id },
+    });
+    return deleteOffice;
   }
 
   public static async addUser(

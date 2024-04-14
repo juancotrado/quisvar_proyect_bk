@@ -15,6 +15,8 @@ const {
   doneMessage,
   quantityFiles,
   updateMessage,
+  showHoldingMessages,
+  updateHoldingStage,
 } = PayMailControllers;
 
 class PayMailRoutes implements InitialRouter {
@@ -32,6 +34,7 @@ class PayMailRoutes implements InitialRouter {
     //EMPLOYEE ROLE
     // router.use(role.RoleHandler('USER', 'tramites', 'tramite-de-pago'));
     this.router.get('/', showMessages);
+    this.router.get('/holding', showHoldingMessages);
     this.router.get('/:id', showMessage);
     this.router.get('/imbox/quantity', quantityFiles);
     this.router.post(
@@ -42,6 +45,7 @@ class PayMailRoutes implements InitialRouter {
       ]),
       createMessage
     );
+    this.router.put('/holding', updateHoldingStage);
     this.router.put(
       '/:id',
       uploads.fileMail.fields([

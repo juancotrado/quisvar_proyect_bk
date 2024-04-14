@@ -106,11 +106,12 @@ class GenerateFiles {
   }
 
   static async coverFirma(
-    filePath: string,
-    outputPath: string,
+    filePath: string | Buffer,
+    outputPath: string | undefined,
     { pos, ...data }: Omit<configurationSealPDF, 'x' | 'y'> & { pos: number } // imagePath: string
   ) {
-    const pdfBytes = readFileSync(filePath);
+    const pdfBytes: Buffer =
+      typeof filePath !== 'string' ? filePath : readFileSync(filePath);
     const pdfDoc = await PDFDocument.load(pdfBytes);
     const numberPages = pdfDoc.getPageCount();
     // const image = await pdfDoc.embedJpg(readFileSync(imagePath));
@@ -142,7 +143,9 @@ class GenerateFiles {
     });
 
     const modifiedPdfBytes = await pdfDoc.save();
-    writeFileSync(outputPath, modifiedPdfBytes);
+    if (outputPath && outputPath.length > 0)
+      writeFileSync(outputPath, modifiedPdfBytes);
+    return modifiedPdfBytes;
   }
 
   static async merge(pdfPaths: string[], outputPath: string) {
@@ -192,17 +195,22 @@ class GenerateFiles {
       borderDashArray: [3, 4],
       opacity: 0,
     });
-    page.setFontSize(10.5);
+    page.setFontSize(9.5);
     page.setFont(font);
     page.setFontColor(rgb(0, 0, 0.7));
-    page.drawText(`PROVEIDO ${title?.toUpperCase()}`, {
-      x: x + 15,
-      y: y + 50 + lineHeight * 3 + 8,
-    });
-    page.drawText(`CORPORACIÓN DHYRIUM S.A.C`, {
-      x: x + 15,
-      y: y + 50 + lineHeight * 3 - 2,
-    });
+    page.drawText(
+      `PROVEIDO ${title?.toUpperCase()} CORPORACIÓN DHYRIUM S.A.C`,
+      {
+        x: x + 15,
+        y: y + 50 + lineHeight * 3 + 8,
+        lineHeight: 10,
+        maxWidth: page.getWidth() / 3 - 20,
+      }
+    );
+    // page.drawText(`CORPORACIÓN DHYRIUM S.A.C`, {
+    //   x: x + 15,
+    //   y: y + 50 + lineHeight * 3 - 2,
+    // });
     page.setFontSize(9.5);
     page.drawText(`Fecha:${date}`, {
       x: x + 15,

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticateHandler } from '../middlewares';
 import { OfficeControllers } from '../controllers';
-const { showAll } = OfficeControllers;
+const { showAll, create, remove, update } = OfficeControllers;
 class PDFGenerateRouter {
   public router: Router;
   constructor() {
@@ -12,6 +12,9 @@ class PDFGenerateRouter {
   private setUpRoutes() {
     this.router.use(authenticateHandler);
     this.router.get('/', showAll);
+    this.router.post('/', create);
+    this.router.put('/:id', update);
+    this.router.delete('/:id', remove);
   }
 }
 

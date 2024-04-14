@@ -2,5 +2,5 @@
   "execMap": {
     "ts": "ts-node"
   },
-   "ignore": ["json/professions.json"] 
+  "ignore": ["json/professions.json"]
 }
