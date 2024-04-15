@@ -3,6 +3,7 @@ import { MailControllers } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 
 import { role, uploads } from '../middlewares';
+import { verifyAccessMail } from '../middlewares/mail.middleware';
 const {
   createMessage,
   showMessage,
@@ -22,12 +23,10 @@ class MailRoutes {
   protected setUpRouter(): void {
     this.router.use(authenticateHandler);
     this.router.get('/imbox/quantity', quantityFiles);
-    this.router.use(
-      role.RoleHandler(['MOD', 'USER'], 'tramites', 'comunicado')
-    );
+    this.router.use(verifyAccessMail(['USER', 'MOD']));
     this.router.get('/', showMessages);
     this.router.get('/:id', showMessage);
-    this.router.use(role.RoleHandler(['MOD'], 'tramites', 'comunicado'));
+    this.router.use(verifyAccessMail(['MOD']));
     this.router.get('/imbox/quantity', quantityFiles);
     this.router.post('/', uploads.fileMail.array('fileMail'), createMessage);
     this.router.put('/:id', uploads.fileMail.array('fileMail'), updateMessage);
