@@ -41,6 +41,7 @@ class OfficeServices {
           },
         },
       },
+      orderBy: { name: 'asc' },
     });
 
     const parseOffice = getListOffice.map(({ users, ...data }) => {

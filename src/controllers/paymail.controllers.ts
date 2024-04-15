@@ -97,7 +97,11 @@ class PayMailControllers {
       const data = JSON.parse(body.data) as PickSealMessage;
       // const data = body as PickSealMessage;
       const files = this.requestFiles(req, `public/mail/${senderId}`);
-      const result = await PayMailServices.updateDataWithSeal(data, files);
+      const result = await PayMailServices.updateDataWithSeal(
+        data,
+        files,
+        senderId
+      );
       res.json(result);
     } catch (error) {
       next(error);

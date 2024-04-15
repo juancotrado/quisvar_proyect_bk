@@ -314,7 +314,6 @@ class PayMailServices {
   static async updateDataWithSeal(
     {
       title,
-      header,
       officeId,
       paymessageId: id,
       numberPage,
@@ -322,7 +321,8 @@ class PayMailServices {
       to,
     }: // ...data
     PickSealMessage,
-    files: Pick<FileMessagePick, 'name' | 'path'>[]
+    files: Pick<FileMessagePick, 'name' | 'path'>[],
+    senderId: number
   ) {
     const receiv: ReceiverT = { type: 'RECEIVER', role: 'MAIN', status: true };
     //-------------------------- Set New Office ---------------------------------
@@ -420,8 +420,9 @@ class PayMailServices {
     //-------------------------------------------------------------------
     const createForward = await prisma.messageHistory.create({
       data: {
-        title,
-        header,
+        title: title,
+        header: '(proveido)/' + getSender.office.name,
+        user: { connect: { id: senderId } },
         paymessage: { connect: { id } },
         files: { createMany: { data: files } },
       },
