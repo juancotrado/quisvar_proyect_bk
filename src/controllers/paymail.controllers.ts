@@ -33,7 +33,7 @@ class PayMailControllers {
       const { skip: _skip, ...params } = req.query as ParametersPayMail;
       const offset = parseInt(`${_skip}`);
       const skip = !isNaN(offset) ? offset : undefined;
-      const onHolding = req.query.onHolding === 'true';
+      const onHolding = !req.query.onHolding || req.query.onHolding === 'true';
       const newParams = { skip, ...params, onHolding };
       const query = await PayMailServices.onHolding(newParams);
       res.status(200).json(query);

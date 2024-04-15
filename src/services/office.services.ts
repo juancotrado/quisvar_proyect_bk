@@ -2,6 +2,7 @@ import { ProfileByRoleType } from 'types/types';
 import { Office, prisma, UserToOffice } from '../utils/prisma.server';
 import Queries from '../utils/queries';
 import professionServices from './profession.services';
+import AppError from '../utils/appError';
 
 class OfficeServices {
   public static async getAll(
@@ -73,6 +74,8 @@ class OfficeServices {
   }
 
   public static async update(id: Office['id'], { name }: Office) {
+    if (!id) throw new AppError('Opps, ID incorrecto', 400);
+    if (id === 1) throw new AppError('Error, oficina reservada', 400);
     const updateOffice = await prisma.office.update({
       where: { id },
       data: { name },
@@ -81,6 +84,8 @@ class OfficeServices {
   }
 
   public static async delete(id: Office['id']) {
+    if (!id) throw new AppError('Opps, ID incorrecto', 400);
+    if (id === 1) throw new AppError('Error, oficina reservada', 400);
     const deleteOffice = await prisma.office.delete({
       where: { id },
     });

@@ -615,7 +615,7 @@ model PayMessages {
   office         Office?          @relation(fields: [officeId], references: [id])
   officeId       Int?
   positionSeal   Int              @default(1)
-  onHolding      Boolean          @default(false)
+  onHolding      Boolean          @default(true)
   onHoldingDate  DateTime?
 }
 
