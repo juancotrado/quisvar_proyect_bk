@@ -103,8 +103,11 @@ class UsersServices {
       },
     });
     if (!findUser) throw new AppError('No se pudo encontrar el usuario', 404);
+    const isAccessReception = !!findUser.offices.find(
+      ({ officeId }) => officeId === 1
+    );
     const role = await RoleService.findGeneral(findUser.roleId!);
-    return { ...findUser, role };
+    return { ...findUser, isAccessReception, role };
   }
 
   static async findForSign(id: Users['id']) {
