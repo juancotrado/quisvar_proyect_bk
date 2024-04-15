@@ -49,11 +49,18 @@ class PayMailServices {
     { skip, type, status, typeMessage, officeId }: ParametersPayMail
   ) {
     // const typeMail = this.PickType(type);
+    const onHolding = type === 'SENDER' ? undefined : false;
     const mail = await prisma.payMail.findMany({
       where: {
         userId,
         type,
-        paymessage: { type: typeMessage, status, officeId },
+        userInit: true,
+        paymessage: {
+          type: typeMessage,
+          status,
+          officeId,
+          onHolding,
+        },
       },
       orderBy: { paymessage: { updatedAt: 'desc' } },
       skip,
