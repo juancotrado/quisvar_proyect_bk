@@ -117,14 +117,15 @@ export const createUser = async (
       throw new AppError('Oops!, no se pudo subir los archivos', 400);
     const { fileUserCv, fileUserDeclaration } = req.files as FilesProps;
     const body: userProfilePick = req.body;
+    const officeIds = JSON.parse(req.body.officeIds);
     const query = await UsersServices.create({
       ...body,
+      officeIds,
       cv: fileUserCv[0].filename,
       declaration: fileUserDeclaration[0].filename,
     });
     res.status(201).json(query);
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
