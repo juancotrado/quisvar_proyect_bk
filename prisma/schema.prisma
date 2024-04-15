@@ -620,20 +620,22 @@ model PayMessages {
 }
 
 model Messages {
-  id          Int              @id @default(autoincrement())
-  title       String
-  category    MessageCategory
-  header      String
-  description String?
-  status      MessageStatus    @default(PENDIENTE)
-  type        MessageType      @default(INFORME)
-  files       FilesMessage[]
-  users       Mail[]
-  history     MessageHistory[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  officeId    Int?
-  office      Office?          @relation(fields: [officeId], references: [id])
+  id            Int              @id @default(autoincrement())
+  title         String
+  category      MessageCategory
+  header        String
+  description   String?
+  status        MessageStatus    @default(PENDIENTE)
+  type          MessageType      @default(INFORME)
+  files         FilesMessage[]
+  users         Mail[]
+  history       MessageHistory[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  officeId      Int?
+  office        Office?          @relation(fields: [officeId], references: [id])
+  onHolding     Boolean          @default(true)
+  onHoldingDate DateTime?
 }
 
 model MessageHistory {
