@@ -39,7 +39,7 @@ class PayMailServices {
     const now = new Date();
     const mailListUpdate = await prisma.payMessages.updateMany({
       where: { id: { in: ids } },
-      data: { onHolding: true, onHoldingDate: now },
+      data: { onHolding: false, onHoldingDate: now },
     });
     return mailListUpdate;
   }
