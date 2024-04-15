@@ -54,7 +54,6 @@ class PayMailServices {
       where: {
         userId,
         type,
-        userInit: true,
         paymessage: {
           type: typeMessage,
           status,
