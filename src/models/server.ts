@@ -46,6 +46,7 @@ import {
   EncryptRouter,
   ProfessionRouter,
   OfficeRouter,
+  ListSpecialtiesRoutes,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -110,6 +111,7 @@ class Server {
     generatepdf: `/${process.env.ROUTE}/generate-pdf`,
     encrypt: `/${process.env.ROUTE}/encrypt`,
     profession: `/${process.env.ROUTE}/profession`,
+    listSpecialties: `/${process.env.ROUTE}/listSpecialties`,
   };
 
   constructor() {
@@ -228,6 +230,7 @@ class Server {
     this.app.use(this.path.generatepdf, PDFGenerateRouter);
     this.app.use(this.path.encrypt, EncryptRouter);
     this.app.use(this.path.profession, ProfessionRouter);
+    this.app.use(this.path.listSpecialties, ListSpecialtiesRoutes);
     this.app.use(docs);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       res.locals.pageNotFound = this.rootDir + '/404_page/index.html';

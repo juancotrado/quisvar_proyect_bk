@@ -490,6 +490,11 @@ model AreaSpecialtyNameList {
   specialist        Specialists     @relation(fields: [specialistId], references: [id], onDelete: Cascade)
 }
 
+model ListSpecialties {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+}
+
 model Specialists {
   id        Int                          @id @default(autoincrement())
   dni       String                       @unique @db.VarChar(8)

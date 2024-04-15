@@ -38,3 +38,4 @@ export { default as PDFGenerateRouter } from './pdfgenerate.routes';
 export { default as EncryptRouter } from './encrypt.routes';
 export { default as ProfessionRouter } from './profession.routes';
 export { default as OfficeRouter } from './office.routes';
+export { default as ListSpecialtiesRoutes } from './ListSpecialties.routes';
