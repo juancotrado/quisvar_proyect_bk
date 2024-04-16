@@ -5,8 +5,9 @@ import { DutyServices } from '../services';
 class DutyControllers {
   public createDuty: ControllerFunction = async (req, res, next) => {
     try {
+      const { groupId, projectId } = req.params;
       const { body } = req;
-      const query = await DutyServices.create(body);
+      const query = await DutyServices.create(body, +groupId, +projectId);
       res.status(200).json(query);
     } catch (error) {
       console.log(error);

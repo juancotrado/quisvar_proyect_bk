@@ -53,6 +53,19 @@ export const getById = async (
     next(error);
   }
 };
+export const getUserTask = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id, contractId } = req.params;
+    const query = await GroupServices.getUserTask(+id, +contractId);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 export const updateGroup = async (
   req: Request,
   res: Response,

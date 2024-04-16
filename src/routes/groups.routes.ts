@@ -10,6 +10,7 @@ import {
   updateRelation,
   deleteRelation,
   findProjects,
+  getUserTask,
   // deleteMod,
 } from '../controllers';
 import { _admin_role } from '../middlewares/role.middleware';
@@ -21,6 +22,7 @@ router.get('/all', getAll);
 router.use(_admin_role);
 router.post('/', createGroup);
 router.get('/:id', getById);
+router.get('/task/:id/:contractId', getUserTask);
 router.patch('/:id', updateGroup);
 // router.delete('/mod/:id', deleteMod);
 router.delete('/:id', deleteGroup);

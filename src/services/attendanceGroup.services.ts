@@ -112,7 +112,11 @@ class AttendanceGroupService {
             id: 'asc',
           },
           include: {
-            members: true,
+            members: {
+              include: {
+                task: true,
+              },
+            },
           },
         },
         createdAt: true,

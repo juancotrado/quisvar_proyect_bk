@@ -11,7 +11,7 @@ class DutyRoutes {
     this.router.use(authenticateHandler);
 
     this.router.use(role.RoleHandler(['MOD'], 'grupos'));
-    this.router.post('/', DutyControllers.createDuty);
+    this.router.post('/:groupId/:projectId', DutyControllers.createDuty);
     this.router.patch('/items/:id', DutyControllers.updateDuty);
     this.router.delete('/:id', DutyControllers.deleteDuty);
     //Duty projects

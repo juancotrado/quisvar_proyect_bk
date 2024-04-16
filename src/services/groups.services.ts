@@ -1,5 +1,5 @@
 import AppError from '../utils/appError';
-import { Group, GroupOnUsers, prisma } from '../utils/prisma.server';
+import { Contratc, Group, GroupOnUsers, prisma } from '../utils/prisma.server';
 class GroupServices {
   // GROUPS
   static async create(data: Group) {
@@ -93,6 +93,69 @@ class GroupServices {
       },
     });
     return groups;
+  }
+  static async getUserTask(id: Group['id'], contractId: Contratc['id']) {
+    if (!id || !contractId) throw new AppError(`Oops!, algo salio mal`, 400);
+    const members = await prisma.groupOnUsers.findMany({
+      where: {
+        groupId: id,
+      },
+      select: {
+        userId: true,
+        users: {
+          select: {
+            profile: {
+              select: {
+                id: true,
+                job: true,
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    const subtasksByUser = [];
+    for (const { userId, users } of members) {
+      const userSubtasks = await prisma.taskOnUsers.findMany({
+        where: {
+          userId: userId,
+          subtask: {
+            Levels: {
+              stages: {
+                project: {
+                  contractId,
+                },
+              },
+            },
+          },
+        },
+        select: {
+          subtask: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          percentage: true,
+        },
+      });
+      subtasksByUser.push({ user: { ...users }, subtasks: userSubtasks });
+    }
+    const data = subtasksByUser.map(item => {
+      return {
+        user: item.user.profile,
+        subtasks: item.subtasks.map(subtask => {
+          return {
+            id: subtask.subtask.id,
+            name: subtask.subtask.name,
+            percentage: subtask.percentage,
+          };
+        }),
+      };
+    });
+    return data;
   }
   static async update(
     id: Group['id'],
