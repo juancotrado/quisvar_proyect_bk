@@ -288,6 +288,33 @@ class PayMailQueries {
         createdAt: true,
         updatedAt: true,
         onHolding: true,
+        historyOfficesIds: true,
+        onHoldingDate: true,
+        users: {
+          where: { type, role },
+          select: {
+            type: true,
+            role: true,
+            status: true,
+            userInit: true,
+            user: Queries.selectProfileUser,
+          },
+        },
+      },
+    };
+  }
+
+  public selectMessageByMail(role: Mail['role'], type?: Mail['type']) {
+    return {
+      select: {
+        id: true,
+        header: true,
+        status: true,
+        type: true,
+        title: true,
+        createdAt: true,
+        updatedAt: true,
+        onHolding: true,
         onHoldingDate: true,
         users: {
           where: { type, role },

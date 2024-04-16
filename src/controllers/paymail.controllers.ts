@@ -17,13 +17,13 @@ class PayMailControllers {
     try {
       const { skip: _skip, ...params } = req.query as ParametersPayMail;
       const userInfo: UserType = res.locals.userInfo;
-      const userId = userInfo.id;
       const offset = parseInt(`${_skip}`);
       const skip = !isNaN(offset) ? offset : undefined;
       const newParams = { skip, ...params };
-      const query = await PayMailServices.getByUser(userId, newParams);
+      const query = await PayMailServices.getByUser(userInfo, newParams);
       res.status(200).json(query);
     } catch (error) {
+      console.log(error);
       next(error);
     }
   };
@@ -46,7 +46,8 @@ class PayMailControllers {
     try {
       const { id } = req.params;
       const messageId = parseInt(id);
-      const query = await PayMailServices.getMessage(messageId);
+      const userInfo: UserType = res.locals.userInfo;
+      const query = await PayMailServices.getMessage(messageId, userInfo);
       res.status(200).json(query);
     } catch (error) {
       next(error);

@@ -604,24 +604,25 @@ model PayMail {
 }
 
 model PayMessages {
-  id             Int              @id @default(autoincrement())
-  title          String
-  header         String           @default("")
-  paymentPdfData String           @default("")
-  description    String?
-  filesPay       Payment[]
-  status         PayMessageStatus @default(PROCESO)
-  type           MessageType      @default(INFORME)
-  files          FilesMessage[]
-  users          PayMail[]
-  history        MessageHistory[]
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  office         Office?          @relation(fields: [officeId], references: [id])
-  officeId       Int?
-  positionSeal   Int              @default(1)
-  onHolding      Boolean          @default(true)
-  onHoldingDate  DateTime?
+  id                Int              @id @default(autoincrement())
+  title             String
+  header            String           @default("")
+  paymentPdfData    String           @default("")
+  description       String?
+  filesPay          Payment[]
+  status            PayMessageStatus @default(PROCESO)
+  type              MessageType      @default(INFORME)
+  files             FilesMessage[]
+  users             PayMail[]
+  history           MessageHistory[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  office            Office?          @relation(fields: [officeId], references: [id])
+  officeId          Int?
+  historyOfficesIds Int[]
+  positionSeal      Int              @default(1)
+  onHolding         Boolean          @default(true)
+  onHoldingDate     DateTime?
 }
 
 model Messages {
