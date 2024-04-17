@@ -184,16 +184,17 @@ model GroupList {
 }
 
 model Duty {
-  id           Int           @id @default(autoincrement())
-  CUI          String
-  project      String
-  shortName    String?
-  titleMeeting String?
-  dutyGroup    String?
-  members      DutyMembers[]
-  listId       Int
-  createdAt    DateTime      @default(now())
-  groupList    GroupList     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  id            Int           @id @default(autoincrement())
+  CUI           String
+  project       String
+  shortName     String?
+  titleMeeting  String?
+  dutyGroup     String?
+  dutyGroupDate DateTime?
+  members       DutyMembers[]
+  listId        Int
+  createdAt     DateTime      @default(now())
+  groupList     GroupList     @relation(fields: [listId], references: [id], onDelete: Cascade)
 }
 
 model DutyMembers {
