@@ -203,9 +203,9 @@ model DutyMembers {
   fullName      String
   task          DutyTasks[]
   feedBack      String?
-  feedBackDate  DateTime?
+  feedBackDate  String?
   dailyDuty     String?
-  dailyDutyDate DateTime?
+  dailyDutyDate String?
   attendance    ListDetails @default(PUNTUAL)
   dutyId        Int
   duty          Duty        @relation(fields: [dutyId], references: [id], onDelete: Cascade)
