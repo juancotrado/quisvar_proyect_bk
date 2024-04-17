@@ -11,7 +11,7 @@ class ProfessionService {
 
   find(id: string) {
     const findProfession = this.professions.find(({ value }) => value === id);
-    return findProfession;
+    return findProfession || { label: 'unknow', value: 'unknow', amount: 0 };
   }
 
   userWithProfession(users: { [key: string]: any }[]) {
@@ -19,7 +19,7 @@ class ProfessionService {
       const findProfession = this.find(user.profile.job);
       const profile = {
         ...user.profile,
-        job: findProfession || { label: 'unknow', value: 'unknow', amount: 0 },
+        job: findProfession,
       };
       return { ...user, profile };
     });

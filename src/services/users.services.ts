@@ -8,6 +8,7 @@ import { MenuPoints } from '../models/menuPoints';
 import professionServices from './profession.services';
 import { ProfileByRoleType } from 'types/types';
 import Queries from '../utils/queries';
+
 const menuPoints = new MenuPoints();
 
 class UsersServices {
@@ -106,8 +107,17 @@ class UsersServices {
     const isAccessReception = !!findUser.offices.find(
       ({ officeId }) => officeId === 1
     );
+
     const role = await RoleService.findGeneral(findUser.roleId!);
-    return { ...findUser, isAccessReception, role };
+    return {
+      ...findUser,
+      isAccessReception,
+      role,
+      profile: {
+        ...findUser.profile,
+        job: professionServices.find(findUser.profile?.job || ''),
+      },
+    };
   }
 
   static async findForSign(id: Users['id']) {
