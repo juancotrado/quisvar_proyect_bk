@@ -190,7 +190,7 @@ model Duty {
   shortName     String?
   titleMeeting  String?
   dutyGroup     String?
-  dutyGroupDate DateTime?
+  dutyGroupDate String?
   members       DutyMembers[]
   listId        Int
   createdAt     DateTime      @default(now())
