@@ -11,6 +11,7 @@ import { existsSync, mkdirSync, renameSync } from 'fs';
 import { PayMessages } from '@prisma/client';
 import { ControllerFunction } from 'types/patterns';
 import { Request } from 'express';
+import { isQueryNumber } from '../utils/tools';
 
 class PayMailControllers {
   public showMessages: ControllerFunction = async (req, res, next) => {
@@ -52,10 +53,15 @@ class PayMailControllers {
 
   public showMessage: ControllerFunction = async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const messageId = parseInt(id);
+      const { id: messageId } = req.params;
+      const { officeId: office } = req.query;
+      const officeId = isQueryNumber(office as string);
       const userInfo: UserType = res.locals.userInfo;
-      const query = await PayMailServices.getMessage(messageId, userInfo);
+      const query = await PayMailServices.getMessage(
+        +messageId,
+        userInfo,
+        officeId
+      );
       res.status(200).json(query);
     } catch (error) {
       next(error);

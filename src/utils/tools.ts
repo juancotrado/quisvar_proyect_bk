@@ -578,3 +578,10 @@ export const removeUnwantedCharacters = (str: string) => {
   const result = str.replace(regex, '');
   return result;
 };
+
+export const isQueryNumber = (value: string | undefined | null) => {
+  const regex = /^\d+$/;
+  if (!value) return undefined;
+  if (!regex.test(value)) return 0;
+  return +value;
+};

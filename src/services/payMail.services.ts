@@ -133,8 +133,13 @@ class PayMailServices {
     return getMessage;
   }
 
-  static async getMessage(id: PayMessages['id'], dataUser: UserType) {
+  static async getMessage(
+    id: PayMessages['id'],
+    dataUser: UserType,
+    officeId?: number
+  ) {
     if (!id) throw new AppError('Ops!, ID invalido', 400);
+    if (officeId === 0) throw new AppError('Ops!, officina inválida', 400);
     const getMessage = await prisma.payMessages.findUnique({
       where: { id },
       include: {
@@ -172,12 +177,17 @@ class PayMailServices {
     if (!getMessage)
       throw new AppError('No se pudo encontrar datos del mensaje', 404);
     //---------------------------------------------------------------------
-    const isUserOnOffice = getMessage.officeId
+    const isUserOnOffice = officeId
       ? await prisma.userToOffice.findUnique({
           where: {
-            usersId_officeId: {
-              usersId: dataUser.id,
-              officeId: getMessage.officeId,
+            usersId_officeId: { usersId: dataUser.id, officeId },
+          },
+          select: {
+            office: {
+              select: {
+                name: true,
+                users: { where: { isOfficeManager: true } },
+              },
             },
           },
         })
@@ -195,15 +205,25 @@ class PayMailServices {
         'job',
       ]);
       const userSession = { ...userSessionData, profile };
+      const managerUser = isUserOnOffice.office.users[0];
+      if (!managerUser)
+        throw new AppError('Error, gerente de oficina no encontrado', 404);
+      const manager = getMessage.users.find(
+        ({ userId }) => userId === managerUser.usersId
+      );
+      if (!manager)
+        throw new AppError('Error, gerente de oficina inexistente', 404);
+      const keys = ['role', 'type', 'userInit', 'status'];
+      const dataManager = lodash.pick(manager, keys);
+      const parseUsers = getMessage.users.filter(
+        ({ userId }) => userId !== dataUser.id
+      );
       const userWithOffice = {
-        userInit: false,
+        ...dataManager,
         userId: dataUser.id,
-        type: 'RECEIVER',
-        role: 'MAIN',
-        status: true,
         user: userSession,
       };
-      users = [...getMessage.users, userWithOffice];
+      users = [...parseUsers, userWithOffice];
     } else {
       users = [...getMessage.users];
     }
