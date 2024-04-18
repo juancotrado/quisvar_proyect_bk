@@ -15,11 +15,15 @@ import { Request } from 'express';
 class PayMailControllers {
   public showMessages: ControllerFunction = async (req, res, next) => {
     try {
-      const { skip: _skip, ...params } = req.query as ParametersPayMail;
+      const {
+        skip: _skip,
+        officeId: _officeId,
+        ...params
+      } = req.query as ParametersPayMail;
       const userInfo: UserType = res.locals.userInfo;
-      const offset = parseInt(`${_skip}`);
-      const skip = !isNaN(offset) ? offset : undefined;
-      const newParams = { skip, ...params };
+      const skip = (_skip && +_skip) ?? undefined;
+      const officeId = _officeId && +_officeId;
+      const newParams = { skip, ...params, officeId };
       const query = await PayMailServices.getByUser(userInfo, newParams);
       res.status(200).json(query);
     } catch (error) {
@@ -30,11 +34,15 @@ class PayMailControllers {
 
   public showHoldingMessages: ControllerFunction = async (req, res, next) => {
     try {
-      const { skip: _skip, ...params } = req.query as ParametersPayMail;
-      const offset = parseInt(`${_skip}`);
-      const skip = !isNaN(offset) ? offset : undefined;
+      const {
+        skip: _skip,
+        officeId: _officeId,
+        ...params
+      } = req.query as ParametersPayMail;
       const onHolding = !req.query.onHolding || req.query.onHolding === 'true';
-      const newParams = { skip, ...params, onHolding };
+      const skip = (_skip && +_skip) ?? undefined;
+      const officeId = _officeId && +_officeId;
+      const newParams = { skip, officeId, ...params, onHolding };
       const query = await PayMailServices.onHolding(newParams);
       res.status(200).json(query);
     } catch (error) {

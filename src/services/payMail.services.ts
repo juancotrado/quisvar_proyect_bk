@@ -26,9 +26,11 @@ class PayMailServices {
     skip,
     officeId,
     onHolding,
+    typeMessage,
+    status,
   }: ParametersPayMail) {
     const mailList = await prisma.payMessages.findMany({
-      where: { officeId, onHolding },
+      where: { officeId, onHolding, status, type: typeMessage },
       skip,
       take: 30,
       orderBy: { updatedAt: 'desc' },
