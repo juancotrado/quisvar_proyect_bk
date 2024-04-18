@@ -14,6 +14,13 @@ class DutyMembersServices {
         dutyId: id,
       },
     });
+    await prisma.dutyTasks.create({
+      data: {
+        name: '',
+        percentage: 0,
+        dutyMemberId: member.id,
+      },
+    });
     return member;
   }
   static async delete(id: DutyMembers['id']) {

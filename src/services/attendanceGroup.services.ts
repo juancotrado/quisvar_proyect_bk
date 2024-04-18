@@ -116,6 +116,9 @@ class AttendanceGroupService {
               include: {
                 task: true,
               },
+              orderBy: {
+                id: 'asc',
+              },
             },
           },
         },
