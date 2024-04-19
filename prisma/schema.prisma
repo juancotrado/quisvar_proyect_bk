@@ -447,20 +447,21 @@ model Consortium {
 // }
 
 model Companies {
-  id          Int                     @id @default(autoincrement())
-  name        String
-  ruc         String                  @unique @db.VarChar(11)
-  manager     String
-  address     String
-  departure   String
-  inscription DateTime?
-  activities  DateTime?
-  SEE         DateTime?
-  CCI         String                  @unique
-  description String?
-  img         String?
-  consortium  ConsortiumOnCompanies[]
-  contracts   Contratc[]
+  id            Int                     @id @default(autoincrement())
+  name          String
+  ruc           String                  @unique @db.VarChar(11)
+  manager       String
+  address       String
+  departure     String
+  orderQuantity Int                     @default(0)
+  inscription   DateTime?
+  activities    DateTime?
+  SEE           DateTime?
+  CCI           String                  @unique
+  description   String?
+  img           String?
+  consortium    ConsortiumOnCompanies[]
+  contracts     Contratc[]
 }
 
 model ConsortiumOnCompanies {

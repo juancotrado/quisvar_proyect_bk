@@ -605,13 +605,22 @@ class PayMailServices {
   static async done(
     id: PayMessages['id'],
     senderId: number,
-    paymentPdfData: string
+    {
+      paymentPdfData,
+      companyId,
+      ordenNumber,
+    }: { paymentPdfData: string; ordenNumber: number; companyId: number }
   ) {
     if (!id) throw new AppError('Ops, ID invalido', 400);
     if (!senderId) throw new AppError('Ingrese Destinatario', 400);
     const done = await prisma.payMessages.update({
       where: { id },
       data: { status: 'FINALIZADO', paymentPdfData },
+    });
+    const quantityOrder = await prisma.companies.update({
+      where: { id: companyId },
+      data: { orderQuantity: ordenNumber + 1 },
+      select: { orderQuantity: true },
     });
     //------------------------------------------------------------------
     await prisma.payMail.updateMany({
@@ -627,7 +636,7 @@ class PayMailServices {
       where: { userInit: true },
       data: { type: 'RECEIVER', role: 'MAIN' },
     });
-    return done;
+    return { ...done, quantityOrder };
   }
 
   static async updateStatus(

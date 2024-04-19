@@ -99,7 +99,17 @@ class UsersServices {
       include: {
         profile: true,
         offices: {
-          select: { officeId: true, office: { select: { name: true } } },
+          select: {
+            officeId: true,
+            office: {
+              select: {
+                name: true,
+                _count: {
+                  select: { users: { where: { isOfficeManager: true } } },
+                },
+              },
+            },
+          },
         },
       },
     });
@@ -107,10 +117,13 @@ class UsersServices {
     const isAccessReception = !!findUser.offices.find(
       ({ officeId }) => officeId === 1
     );
-
+    const offices = findUser.offices.filter(
+      ({ office, officeId }) => office._count.users && officeId !== 1
+    );
     const role = await RoleService.findGeneral(findUser.roleId!);
     return {
       ...findUser,
+      offices,
       isAccessReception,
       role,
       profile: {

@@ -181,13 +181,13 @@ class PayMailControllers {
   public doneMessage: ControllerFunction = async (req, res, next) => {
     try {
       const { id: senderId }: UserType = res.locals.userInfo;
-      const { paymentPdfData } = req.body;
+      const { paymentPdfData, companyId, ordenNumber } = req.body;
       const { id: messageId } = req.params;
-      const query = await PayMailServices.done(
-        +messageId,
-        senderId,
-        paymentPdfData
-      );
+      const query = await PayMailServices.done(+messageId, senderId, {
+        paymentPdfData,
+        companyId,
+        ordenNumber,
+      });
       res.status(201).json(query);
     } catch (error) {
       next(error);

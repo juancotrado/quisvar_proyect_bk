@@ -18,9 +18,7 @@ class CompaniesServices {
   }
   static async getCompanies() {
     const companies = await prisma.companies.findMany({
-      orderBy: {
-        name: 'desc',
-      },
+      orderBy: { name: 'desc' },
     });
     return companies;
   }
