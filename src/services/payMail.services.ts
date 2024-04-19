@@ -499,16 +499,12 @@ class PayMailServices {
     const historyOfficesIds = existOffice
       ? undefined
       : [...listOfficeIds, officeId];
-    await prisma.payMessages.update({
-      where: { id },
-      data: { officeId, historyOfficesIds },
-    });
     //---------------------------------------------------------------------------
     await prisma.payMessages.update({
       where: { id: getSender.id },
       data: {
         officeId,
-        historyOfficesIds: [officeId],
+        historyOfficesIds,
         positionSeal: positionSeal + 1,
       },
     });
