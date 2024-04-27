@@ -21,5 +21,20 @@ class DutyMembersControllers {
       next(error);
     }
   };
+  public getWeekTask: ControllerFunction = async (req, res, next) => {
+    try {
+      const { groupId } = req.params;
+      const { CUI, date } = req.query;
+      const query = await DutyMembersServices.getWeekTask(
+        CUI as string,
+        +groupId,
+        date as string
+      );
+      res.status(200).json(query);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
 }
 export default new DutyMembersControllers();

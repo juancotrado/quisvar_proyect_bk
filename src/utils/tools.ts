@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Levels, SubTasks, TaskRole } from '@prisma/client';
+import { DutyTasks, Levels, SubTasks, TaskRole } from '@prisma/client';
 import {
   DegreeList,
   DegreeTypes,
@@ -584,4 +584,92 @@ export const isQueryNumber = (value: string | undefined | null) => {
   if (!value) return undefined;
   if (!regex.test(value)) return 0;
   return +value;
+};
+export const getDaysOfWeekInRange = (dateString: string) => {
+  const daysOfWeek = [
+    'Lunes',
+    'Martes',
+    'Miércoles',
+    'Jueves',
+    'Viernes',
+    'Sábado',
+    'Domingo',
+  ];
+  const date = new Date(dateString);
+  const dayOfWeekIndex = date.getDay();
+  const startDate = new Date(date);
+  startDate.setDate(startDate.getDate() - dayOfWeekIndex);
+  const daysOfWeekArray = [];
+
+  for (let i = 0; i < 7; i++) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() + i - 1);
+    daysOfWeekArray.push({
+      day: daysOfWeek[currentDate.getDay()],
+      date: currentDate.toISOString().split('T')[0],
+    });
+  }
+
+  return daysOfWeekArray;
+};
+interface Member {
+  id: number;
+  position: string | null;
+  fullName: string;
+  feedBack: string | null;
+  feedBackDate: string | null;
+  dailyDuty: string | null;
+  dailyDutyDate: string | null;
+  attendance: string;
+  dutyId: number;
+  task: DutyTasks[];
+}
+interface Duty {
+  id: number;
+  CUI: string;
+  project: string;
+  shortName: string | null;
+  titleMeeting: string | null;
+  dutyGroup: string | null;
+  dutyGroupDate: string | null;
+  listId: number;
+  createdAt: Date;
+  members: Member[];
+}
+interface Weekday {
+  day: string;
+  date: string;
+}
+export const TransformWeekDuty = (weekdays: Weekday[], data: Duty[]) => {
+  const result = [];
+  console.log(data);
+  for (let i = 0; i < weekdays.length; i++) {
+    const dayData = weekdays[i];
+    const dayDate = new Date(dayData.date);
+
+    const filteredData = data.filter(item => {
+      const itemDate = new Date(item.createdAt);
+      itemDate.setUTCHours(itemDate.getUTCHours() - 5);
+      return (
+        itemDate.toISOString().split('T')[0] ===
+        dayDate.toISOString().split('T')[0]
+      );
+    });
+
+    const membersMap = new Map();
+    filteredData.forEach(item => {
+      item.members.forEach(member => {
+        const { fullName, task } = member;
+        const existingMember = membersMap.get(fullName);
+        if (existingMember) {
+          existingMember.tasks.push(...task);
+        } else {
+          membersMap.set(fullName, { fullName, tasks: [...task] });
+        }
+      });
+    });
+    const members = Array.from(membersMap.values());
+    result.push({ day: dayData.day, date: dayData.date, members });
+  }
+  return result;
 };

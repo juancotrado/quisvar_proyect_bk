@@ -12,6 +12,7 @@ class DutyMembersRoutes {
 
     this.router.use(role.RoleHandler(['MOD'], 'grupos'));
     this.router.post('/:id', DutyMembersControllers.createDutyMember);
+    this.router.get('/week/:groupId', DutyMembersControllers.getWeekTask);
     this.router.delete('/:id', DutyMembersControllers.deleteDutyMember);
   }
 }
