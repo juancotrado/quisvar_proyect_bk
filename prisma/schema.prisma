@@ -558,6 +558,7 @@ model Licenses {
   usersId   Int
   reason    String?
   feedback  String?
+  type      LicenseType?
   status    LicensesStatus @default(PROCESO)
   fine      ListDetails?
   startDate DateTime
@@ -883,4 +884,8 @@ enum ContractType {
   CONTRATO
   ORDEN_DE_SERVICIO
   CONTRATACION_DIRECTA
+}
+enum LicenseType {
+  PERMISO
+  SALIDA
 }

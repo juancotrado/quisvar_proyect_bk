@@ -24,6 +24,7 @@ class LicenseServices {
       data: {
         usersId: data.usersId,
         reason: data.reason,
+        type: data.type,
         startDate: startOfDay,
         untilDate: endOfDay,
       },
@@ -60,6 +61,7 @@ class LicenseServices {
       data: usersWithoutActiveLicenses.map(user => ({
         usersId: user.id,
         reason: data.reason,
+        type: 'PERMISO',
         status: 'ACEPTADO',
         startDate: startOfDay,
         untilDate: endOfDay,
