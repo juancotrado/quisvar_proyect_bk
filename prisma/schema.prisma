@@ -810,6 +810,7 @@ enum ListDetails {
   GRAVE
   MUY_GRAVE
   PERMISO
+  SALIDA
 }
 
 enum LicensesStatus {
