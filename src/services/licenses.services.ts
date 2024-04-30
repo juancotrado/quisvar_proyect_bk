@@ -118,12 +118,22 @@ class LicenseServices {
   }
 
   static async getLicenceById() {
-    const licenses = await prisma.licenses.groupBy({
-      by: ['usersId'],
+    // const licenses = await prisma.licenses.groupBy({
+    //   by: ['usersId'],
+    //   where: {
+    //     status: 'ACTIVO',
+    //   },
+    // });
+    const licenses = await prisma.licenses.findMany({
       where: {
         status: 'ACTIVO',
       },
+      select: {
+        usersId: true,
+        type: true,
+      },
     });
+    // console.log(licensesx)
     const usersActive = await prisma.users.groupBy({
       by: ['id'],
       where: {
@@ -135,7 +145,7 @@ class LicenseServices {
       .map(item => ({ usersId: item.id, status: 'PUNTUAL' }));
 
     const mainData = [
-      ...licenses.map(item => ({ ...item, status: 'PERMISO' })),
+      ...licenses.map(item => ({ usersId: item.usersId, status: item.type })),
       ...updatedData,
     ];
     return { licenses, mainData };
