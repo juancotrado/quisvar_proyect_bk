@@ -195,26 +195,22 @@ class StageServices {
         },
       },
     });
-    const mod = await prisma.groupOnUsers.findMany({
-      where: {
-        groupId: findStage?.group?.id,
-        mod: true,
-      },
+    if (!findStage)
+      throw new AppError('No se pudo encontrar el informe .', 404);
+    const mod = await prisma.groupOnUsers.findFirst({
+      where: { groupId: findStage.group?.id, mod: true },
       select: {
         users: Queries.selectProfileUserForStage,
       },
     });
-    if (!findStage)
-      throw new AppError('No se pudo encontrar el informe .', 404);
     const { project } = findStage;
     const { createdAt, cui, department, district, projectName, province } =
       project.contract;
     let moderatorName = 'Aun no asignado';
-    if (mod[0].users.profile) {
-      const { firstName, lastName } = mod[0].users.profile;
+    if (mod && mod.users && mod.users.profile) {
+      const { firstName, lastName } = mod.users.profile;
       moderatorName = `${firstName} ${lastName}`;
     }
-
     return {
       initialDate: createdAt,
       cui,

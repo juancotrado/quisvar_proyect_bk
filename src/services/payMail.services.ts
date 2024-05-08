@@ -6,7 +6,7 @@ import {
   ParametersPayMail,
   PickPayMail,
   PickPayMessageReply,
-  PickSealMessage,
+  PickSealPayMessage,
   ReceiverT,
   ReceiverTypePick,
 } from 'types/types';
@@ -421,7 +421,7 @@ class PayMailServices {
       observations,
       to,
     }: // ...data
-    PickSealMessage,
+    PickSealPayMessage,
     files: Pick<FileMessagePick, 'name' | 'path'>[],
     senderId: number
   ) {

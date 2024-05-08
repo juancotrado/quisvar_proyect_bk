@@ -5,7 +5,7 @@ import {
   ParametersPayMail,
   PickPayMail,
   PickPayMessageReply,
-  PickSealMessage,
+  PickSealPayMessage,
 } from 'types/types';
 import { existsSync, mkdirSync, renameSync } from 'fs';
 import { PayMessages } from '@prisma/client';
@@ -109,7 +109,7 @@ class PayMailControllers {
     try {
       const { body } = req;
       const { id: senderId }: UserType = res.locals.userInfo;
-      const data = JSON.parse(body.data) as PickSealMessage;
+      const data = JSON.parse(body.data) as PickSealPayMessage;
       // const data = body as PickSealMessage;
       const files = this.requestFiles(req, `public/mail/${senderId}`);
       const result = await PayMailServices.updateDataWithSeal(

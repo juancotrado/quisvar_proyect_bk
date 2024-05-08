@@ -207,13 +207,16 @@ export interface ParametersMail {
   skip?: number;
   limit?: number;
   type?: Mail['type'];
+  officeId?: Messages['officeId'];
   typeMessage?: Messages['type'];
   status?: Messages['status'];
   assignedAt?: 'asc' | 'desc';
+  onHolding?: boolean;
 }
 export interface PickMail extends Messages {
   senderId: Users['id'];
   receiverId: Users['id'];
+  officeId: Office['id'];
   idMessageReply?: number;
   idMessageResend?: number;
   secondaryReceiver: { userId: number }[];
@@ -232,9 +235,15 @@ export interface ReceiverTypePick {
   role: PayMail['role'];
   status: PayMail['status'];
 }
+export interface ReceiverTypeMailPick {
+  userId: number;
+  role: Mail['role'];
+  status: Mail['status'];
+}
 export interface PickMessageReply extends MessageHistory {
   // type?: Mail['type'];
   senderId: Users['id'];
+  officeId?: Messages['officeId'];
   receiverId: Users['id'];
   status?: Messages['status'];
   messageId: Messages['id'];
@@ -248,11 +257,21 @@ export interface PickPayMessageReply extends MessageHistory {
   paymessageId: PayMessages['id'];
 }
 
-export interface PickSealMessage {
+export interface PickSealPayMessage {
   title: string;
   header: string;
   officeId: number;
   paymessageId: number;
+  observations?: string;
+  title: string;
+  numberPage?: number;
+  to: string;
+}
+export interface PickSealMessage {
+  title: string;
+  header: string;
+  officeId: number;
+  messageId: number;
   observations?: string;
   title: string;
   numberPage?: number;

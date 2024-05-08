@@ -642,6 +642,8 @@ model Messages {
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
   officeId      Int?
+  historyOfficesIds Int[]
+  positionSeal      Int              @default(1)
   office        Office?          @relation(fields: [officeId], references: [id])
   onHolding     Boolean          @default(true)
   onHoldingDate DateTime?
