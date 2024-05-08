@@ -272,6 +272,8 @@ class MailServices {
           description,
           type,
           category,
+          onHolding: false,
+          onHoldingDate: new Date(),
           users: {
             createMany: {
               data: [
