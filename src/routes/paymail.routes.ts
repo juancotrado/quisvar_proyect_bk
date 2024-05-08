@@ -28,6 +28,11 @@ class PayMailRoutes implements InitialRouter {
     this.setUpRouter();
   }
 
+  private readonly optionMulter = [
+    { name: 'mainProcedure', maxCount: 1 },
+    { name: 'fileMail' },
+  ];
+
   protected setUpRouter(): void {
     this.router.use(authenticateHandler);
     // this.router.use(role.employee);
@@ -39,19 +44,13 @@ class PayMailRoutes implements InitialRouter {
     this.router.get('/imbox/quantity', quantityFiles);
     this.router.post(
       '/',
-      uploads.fileMail.fields([
-        { name: 'mainProcedure', maxCount: 1 },
-        { name: 'fileMail' },
-      ]),
+      uploads.fileMail.fields(this.optionMulter),
       createMessage
     );
     this.router.put('/holding', updateHoldingStage);
     this.router.put(
       '/:id',
-      uploads.fileMail.fields([
-        { name: 'mainProcedure' },
-        { name: 'fileMail' },
-      ]),
+      uploads.fileMail.fields(this.optionMulter),
       updateMessage
     );
     this.router.patch(

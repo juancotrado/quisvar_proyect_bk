@@ -47,7 +47,7 @@ class MailServices {
   }
 
   public static async getByUser(
-    userId: Users['id'],
+    { id: userId }: UserType,
     category: Messages['category'],
     { skip, type, status, typeMessage, officeId }: ParametersMail
   ) {

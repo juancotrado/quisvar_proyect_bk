@@ -2,17 +2,20 @@ import { Router } from 'express';
 import { MailControllers } from '../controllers';
 import authenticateHandler from '../middlewares/auth.middleware';
 
-import { role, uploads } from '../middlewares';
+import { uploads } from '../middlewares';
 import { verifyAccessMail } from '../middlewares/mail.middleware';
 const {
-  createMessage,
-  showMessage,
   showMessages,
+  showMessage,
   archivedMessage,
+  createMessage,
   createReplyMessage,
+  createSeal,
   doneMessage,
   quantityFiles,
   updateMessage,
+  showHoldingMessages,
+  updateHoldingStage,
 } = new MailControllers();
 class MailRoutes {
   public router: Router;
@@ -20,23 +23,44 @@ class MailRoutes {
     this.router = Router();
     this.setUpRouter();
   }
+
+  private readonly optionMulter = [
+    { name: 'mainProcedure', maxCount: 1 },
+    { name: 'fileMail' },
+  ];
+
   protected setUpRouter(): void {
     this.router.use(authenticateHandler);
     this.router.get('/imbox/quantity', quantityFiles);
     this.router.use(verifyAccessMail(['USER', 'MOD']));
     this.router.get('/', showMessages);
+    this.router.get('/holding', showHoldingMessages);
     this.router.get('/:id', showMessage);
+    this.router.post(
+      '/',
+      uploads.fileMail.fields(this.optionMulter),
+      createMessage
+    );
+    this.router.put('/holding', updateHoldingStage);
+    this.router.put(
+      '/:id',
+      uploads.fileMail.fields(this.optionMulter),
+      updateMessage
+    );
+    //MOD ROLE
     this.router.use(verifyAccessMail(['MOD']));
-    this.router.get('/imbox/quantity', quantityFiles);
-    this.router.post('/', uploads.fileMail.array('fileMail'), createMessage);
-    this.router.put('/:id', uploads.fileMail.array('fileMail'), updateMessage);
+    this.router.patch('/archived/:id', archivedMessage);
+    this.router.patch('/done/:id', doneMessage);
     this.router.post(
       '/:id/reply',
-      uploads.fileMail.array('fileMail'),
+      uploads.fileMail.fields(this.optionMulter),
       createReplyMessage
     );
-    this.router.patch('/:id/archived', archivedMessage);
-    this.router.patch('/:id/done', doneMessage);
+    this.router.post(
+      '/reply-seal',
+      uploads.fileMail.fields(this.optionMulter),
+      createSeal
+    );
   }
 }
 const { router } = new MailRoutes();

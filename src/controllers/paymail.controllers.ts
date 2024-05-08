@@ -91,8 +91,7 @@ class PayMailControllers {
     try {
       const { status } = req.query as ParametersPayMail;
       const { body } = req;
-      const userInfo: UserType = res.locals.userInfo;
-      const senderId = userInfo.id;
+      const { id: senderId }: UserType = res.locals.userInfo;
       const files = this.requestFiles(req, `public/mail/${senderId}`);
       const data = JSON.parse(body.data) as PickPayMessageReply;
       const query = await PayMailServices.createReply(
@@ -126,13 +125,12 @@ class PayMailControllers {
   public updateMessage: ControllerFunction = async (req, res, next) => {
     try {
       const { id: senderId }: UserType = res.locals.userInfo;
-      const { id } = req.params;
-      const _messageId = parseInt(id);
+      const { id: messageId } = req.params;
       const files = this.requestFiles(req, `public/mail/${senderId}`, true);
       const { body } = req;
       const data = JSON.parse(body.data) as PickPayMail;
       const query = await PayMailServices.updateMessage(
-        _messageId,
+        +messageId,
         { ...data, senderId },
         files
       );
