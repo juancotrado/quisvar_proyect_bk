@@ -377,7 +377,7 @@ class MailServices {
         },
       },
     });
-    if (getSender?.office?.id === officeId)
+    if (getSender?.office && getSender?.office?.id === officeId)
       throw new AppError('No puedes mandar a la misma oficina', 500);
     //---------------------------------------------------------------------------
     const newReceiver = getOffice ? getOffice.users[0].usersId : receiverId;

@@ -92,6 +92,7 @@ class BasicServices {
       typeIndex: root ? root.typeItem : null,
     };
   }
+
   static async create({
     name,
     stagesId,

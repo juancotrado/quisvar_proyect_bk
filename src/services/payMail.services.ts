@@ -352,7 +352,7 @@ class PayMailServices {
       },
     });
 
-    if (getSender?.office?.id === officeId)
+    if (getSender?.office && getSender?.office?.id === officeId)
       throw new AppError('No puedes mandar a la misma oficina', 500);
     //---------------------------------------------------------------------------
 
@@ -469,7 +469,7 @@ class PayMailServices {
       throw new AppError('Error, no existe oficina oficina', 500);
     if (!getOffice || !getOffice.users)
       throw new AppError('Error, no existe oficina oficina', 500);
-    if (getSender.office?.id === officeId)
+    if (getSender?.office && getSender.office?.id === officeId)
       throw new AppError('No puedes mandar a la misma oficina', 500);
     //---------------------------------------------------------------------------
     const newReceiver = getOffice.users[0].usersId;

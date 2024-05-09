@@ -15,8 +15,6 @@ import MailServices from '../services/mail.services';
 import { isQueryNumber } from '../utils/tools';
 
 export class MailControllers {
-  private attempt = `${new Date().getTime()}`;
-
   public showMessages: ControllerFunction = async (req, res, next) => {
     try {
       const {
