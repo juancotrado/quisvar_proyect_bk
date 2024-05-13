@@ -9,6 +9,7 @@ import path, { extname } from 'path';
 import { UserType } from '../middlewares/auth.middleware';
 import { PickSealMessage } from 'types/types';
 import { PayMailServices } from '../services';
+import MailServices from '../services/mail.services';
 class PDFGenerateController {
   private headers(filename: string) {
     return {
@@ -56,6 +57,55 @@ class PDFGenerateController {
       >;
       //----------------------------------------------------------------
       const findMessage = await PayMailServices.getMessageShort(+id);
+      //----------------------------------------------------------------
+      const { name, path } = findMessage.files[0];
+      const destinityFile = path + '/' + name;
+      // const url = req.query.url as string;
+      let originalName: string;
+      let Buffer: Buffer | string;
+      if (destinityFile) {
+        const name = req.query.fileName as string;
+        Buffer = destinityFile;
+        originalName = name || '';
+      } else {
+        if (!req.file) throw new AppError('archivo inexistente', 500);
+        const { buffer, originalname } = req.file as Express.Multer.File;
+        Buffer = buffer;
+        originalName = originalname;
+      }
+      //----------------------------------------------------------------
+      const quantitySeal = data.numberPage ? +data.numberPage : 0;
+      const positionSeal = findMessage.positionSeal;
+      const dateSeal = new Date().toISOString().split('T')[0];
+      const parseDateSeal = dateSeal.split('-').reverse().join('-');
+      const newFile = await GenerateFiles.coverFirma(Buffer, undefined, {
+        date: parseDateSeal,
+        numberPage: quantitySeal,
+        pos: positionSeal,
+        to: data.to,
+        observation: data.observations,
+        title: findMessage.office?.name,
+      });
+      const fileTemp = tmp.fileSync({ postfix: '.pdf' });
+      const options = this.headers(originalName);
+      writeFileSync(fileTemp.name, newFile);
+      res.download(fileTemp.name, `convert_${originalName}`, options, error => {
+        if (!error) fileTemp.removeCallback();
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  public pagesInSealMail: ControllerFunction = async (req, res, next) => {
+    try {
+      const { body } = req;
+      const { id } = req.params;
+      const data = JSON.parse(body.data) as Omit<
+        PickSealMessage,
+        'paymessageId' | 'messageId'
+      >;
+      //----------------------------------------------------------------
+      const findMessage = await MailServices.getMessageShort(+id);
       //----------------------------------------------------------------
       const { name, path } = findMessage.files[0];
       const destinityFile = path + '/' + name;
