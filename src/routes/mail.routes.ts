@@ -47,10 +47,6 @@ class MailRoutes {
       uploads.fileMail.fields(this.optionMulter),
       updateMessage
     );
-    //MOD ROLE
-    this.router.use(verifyAccessMail(['MOD']));
-    this.router.patch('/archived/:id', archivedMessage);
-    this.router.patch('/done/:id', doneMessage);
     this.router.post(
       '/:id/reply',
       uploads.fileMail.fields(this.optionMulter),
@@ -61,6 +57,10 @@ class MailRoutes {
       uploads.fileMail.fields(this.optionMulter),
       createSeal
     );
+    //MOD ROLE
+    this.router.use(verifyAccessMail(['MOD']));
+    this.router.patch('/archived/:id', archivedMessage);
+    this.router.patch('/done/:id', doneMessage);
   }
 }
 const { router } = new MailRoutes();
