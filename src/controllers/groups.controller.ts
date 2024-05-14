@@ -15,6 +15,19 @@ export const createGroup = async (
     next(error);
   }
 };
+export const editOrder = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = req;
+    const query = await GroupServices.editOrder(body);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 // export const deleteMod = async (
 //   req: Request,
 //   res: Response,

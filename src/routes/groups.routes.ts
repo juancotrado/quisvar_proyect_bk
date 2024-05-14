@@ -11,6 +11,7 @@ import {
   deleteRelation,
   findProjects,
   getUserTask,
+  editOrder,
   // deleteMod,
 } from '../controllers';
 import { _admin_role } from '../middlewares/role.middleware';
@@ -21,6 +22,7 @@ router.get('/all', getAll);
 //Admin role
 router.use(_admin_role);
 router.post('/', createGroup);
+router.put('/order', editOrder);
 router.get('/:id', getById);
 router.get('/task/:id/:contractId', getUserTask);
 router.patch('/:id', updateGroup);

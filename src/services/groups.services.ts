@@ -1,5 +1,8 @@
 import AppError from '../utils/appError';
 import { Contratc, Group, GroupOnUsers, prisma } from '../utils/prisma.server';
+type order = {
+  id: number;
+};
 class GroupServices {
   // GROUPS
   static async create(data: Group) {
@@ -17,6 +20,18 @@ class GroupServices {
   //   });
   //   return groups;
   // }
+  static async editOrder(data: order[]) {
+    if (!data) throw new AppError(`Oops!, algo salio mal`, 400);
+    data.map(async ({ id }, idx) => {
+      return await prisma.group.update({
+        where: { id },
+        data: {
+          gNumber: idx + 1,
+        },
+      });
+    });
+    return 'Updated';
+  }
   static async getAll() {
     const groups = await prisma.group.findMany({
       select: {

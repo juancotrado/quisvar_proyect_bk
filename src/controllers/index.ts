@@ -170,6 +170,7 @@ import {
   updateRelation,
   deleteRelation,
   getUserTask,
+  editOrder,
   // deleteMod,
 } from './groups.controller';
 // User Controllers
@@ -335,6 +336,7 @@ export {
 //Groups Controller
 export {
   createGroup,
+  editOrder,
   getAll,
   getById,
   updateGroup,
