@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 class ProfessionService {
   get professions(): Profession[] {
-    const json_profession = readFileSync('json/professions.json', 'utf-8');
+    const json_profession = readFileSync('jsonData/professions.json', 'utf-8');
     const professions = JSON.parse(json_profession);
     return professions;
   }
@@ -35,7 +35,7 @@ class ProfessionService {
     const professions = this.professions;
     professions.push(newProfession);
     const json_profession = JSON.stringify(professions, null, 3);
-    writeFileSync('json/professions.json', json_profession, 'utf-8');
+    writeFileSync('jsonData/professions.json', json_profession, 'utf-8');
     return newProfession;
   }
 
@@ -43,7 +43,7 @@ class ProfessionService {
     const professions = this.professions;
     const filterProfession = professions.filter(({ value }) => value !== id);
     const json_profession = JSON.stringify(filterProfession);
-    writeFileSync('json/professions.json', json_profession, 'utf-8');
+    writeFileSync('jsonData/professions.json', json_profession, 'utf-8');
     return this.professions;
   }
 
@@ -55,7 +55,7 @@ class ProfessionService {
         : profession
     );
     const json_profession = JSON.stringify(updateProfession, null, 3);
-    writeFileSync('json/professions.json', json_profession, 'utf-8');
+    writeFileSync('jsonData/professions.json', json_profession, 'utf-8');
     return updateProfession;
   }
 }
