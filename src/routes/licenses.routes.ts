@@ -24,14 +24,14 @@ router.use(_employee_role);
 router.get('/employee/:id', getLicensesEmployee);
 router.get('/fee/:id', getLicensesFee);
 router.post('/', createLicense);
-router.post('/free', createFreeForAll);
 router.patch('/:id', updateLicense);
-router.patch('/approve/:id', approveLicense);
 router.patch('/checkout/:id', updateCheckOut);
 router.get('/active', activeLicenses);
 router.delete('/:id', deleteLicense);
 //ADMIN ROLE
 router.use(_admin_role);
+router.post('/free', createFreeForAll);
+router.patch('/approve/:id', approveLicense);
 // router.use(role.RoleHandler('licencias', 'MOD'));
 router.get('/', getLicenseById);
 router.get('/status', getLicensesByStatus);

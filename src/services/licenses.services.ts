@@ -63,6 +63,7 @@ class LicenseServices {
         reason: data.reason,
         type: 'PERMISO',
         status: 'ACEPTADO',
+        supervisorId: data.supervisorId,
         startDate: startOfDay,
         untilDate: endOfDay,
       })),
@@ -89,7 +90,7 @@ class LicenseServices {
   }
   static async updateApprove(
     id: Licenses['id'],
-    { feedback, status }: Licenses
+    { feedback, status, supervisorId }: Licenses
   ) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const updateList = await prisma.licenses.update({
@@ -97,6 +98,7 @@ class LicenseServices {
       data: {
         feedback,
         status,
+        supervisorId,
       },
     });
     return updateList;

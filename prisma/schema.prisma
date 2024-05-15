@@ -554,17 +554,18 @@ model List {
 }
 
 model Licenses {
-  id        Int            @id @default(autoincrement())
-  usersId   Int
-  reason    String?
-  feedback  String?
-  type      LicenseType?
-  status    LicensesStatus @default(PROCESO)
-  fine      ListDetails?
-  startDate DateTime
-  checkout  DateTime?
-  untilDate DateTime
-  createdAt DateTime       @default(now())
+  id           Int            @id @default(autoincrement())
+  usersId      Int
+  supervisorId Int?
+  reason       String?
+  feedback     String?
+  type         LicenseType?
+  status       LicensesStatus @default(PROCESO)
+  fine         ListDetails?
+  startDate    DateTime
+  checkout     DateTime?
+  untilDate    DateTime
+  createdAt    DateTime       @default(now())
 }
 
 model ListOnUsers {
@@ -629,24 +630,24 @@ model PayMessages {
 }
 
 model Messages {
-  id            Int              @id @default(autoincrement())
-  title         String
-  category      MessageCategory
-  header        String
-  description   String?
-  status        MessageStatus    @default(PENDIENTE)
-  type          MessageType      @default(INFORME)
-  files         FilesMessage[]
-  users         Mail[]
-  history       MessageHistory[]
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  officeId      Int?
+  id                Int              @id @default(autoincrement())
+  title             String
+  category          MessageCategory
+  header            String
+  description       String?
+  status            MessageStatus    @default(PENDIENTE)
+  type              MessageType      @default(INFORME)
+  files             FilesMessage[]
+  users             Mail[]
+  history           MessageHistory[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  officeId          Int?
   historyOfficesIds Int[]
   positionSeal      Int              @default(1)
-  office        Office?          @relation(fields: [officeId], references: [id])
-  onHolding     Boolean          @default(true)
-  onHoldingDate DateTime?
+  office            Office?          @relation(fields: [officeId], references: [id])
+  onHolding         Boolean          @default(true)
+  onHoldingDate     DateTime?
 }
 
 model MessageHistory {
@@ -887,6 +888,7 @@ enum ContractType {
   ORDEN_DE_SERVICIO
   CONTRATACION_DIRECTA
 }
+
 enum LicenseType {
   PERMISO
   SALIDA
