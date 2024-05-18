@@ -23,12 +23,11 @@ class MailServices {
   public static async onHolding({
     skip,
     officeId,
-    onHolding,
     typeMessage,
     status,
   }: ParametersMail) {
     const mailList = await prisma.messages.findMany({
-      where: { officeId, onHolding, status, type: typeMessage },
+      where: { officeId, status, type: typeMessage, category: 'DIRECT' },
       skip,
       take: 30,
       orderBy: { updatedAt: 'desc' },
@@ -312,6 +311,7 @@ class MailServices {
         description,
         type,
         category,
+        officeId,
         historyOfficesIds,
         users: {
           createMany: {

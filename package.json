@@ -50,6 +50,7 @@
     "socket.io": "^4.6.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
+    "swagger-ui-watcher": "^2.1.14",
     "tmp": "^0.2.3",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.1",
