@@ -13,7 +13,7 @@ import {
   // UserRole,
   Users,
 } from '@prisma/client';
-
+import type { Request } from 'express';
 type MenuPointPick = Pick<MenuPoints, 'id' | 'menuId' | 'typeRol'> & {
   subMenuPoints: Pick<SubMenuPoints, 'id' | 'menuId' | 'typeRol'>[];
 };
@@ -90,3 +90,61 @@ export interface userHash {
   // role: UserRole;
   profile: Pick<Profiles, 'firstName' | 'lastName' | 'dni' | 'phone'> | null;
 }
+
+interface Quera {
+  robert?: string;
+}
+
+export const formatQueryParamss = <T extends Quera>(
+  query: Request['query']
+) => {
+  const listQuery = Object.keys(query);
+  const list: Partial<T> = {};
+  listQuery.forEach(key => {
+    let item: T[keyof T] = query[key] as T[keyof T];
+    if (typeof item === 'string') {
+      item = !isNaN(+item)
+        ? (Number(item) as T[keyof T])
+        : item.toLowerCase() === 'true'
+        ? (true as T[keyof T])
+        : item.toLowerCase() === 'false'
+        ? (false as T[keyof T])
+        : item;
+    }
+    list[key as keyof T] = item;
+  });
+  return list as T;
+};
+
+export const _parseQueries = <T = Record<string, unknown>>(
+  query: Request['query']
+): T => {
+  const listQuery = Object.keys(query);
+  const parseQueries = listQuery.reduce((acc, key) => {
+    let item = query[key] as T[keyof T];
+    if (typeof item === 'string') {
+      item = !isNaN(+item)
+        ? (Number(item) as T[keyof T])
+        : item.toLowerCase() === 'true'
+        ? (true as T[keyof T])
+        : item.toLowerCase() === 'false'
+        ? (false as T[keyof T])
+        : item;
+    }
+    acc[key] = item;
+    return acc;
+  }, {} as Record<string, unknown>);
+  return parseQueries as T;
+};
+
+export const parseQueries = <K>(query: Request['query']) => {
+  const parseQueriesArr = Object.entries(query).map(([key, value]) => [
+    key,
+    value
+      ? value.toString().toLowerCase() === 'true' ||
+        value.toString().toLowerCase() === 'false' ||
+        (!isNaN(+value) ? +value : value)
+      : value,
+  ]);
+  return Object.fromEntries(parseQueriesArr) as K;
+};
