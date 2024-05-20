@@ -16,6 +16,7 @@ const {
   updateMessage,
   showHoldingMessages,
   updateHoldingStage,
+  archivedList,
 } = new MailControllers();
 class MailRoutes {
   public router: Router;
@@ -59,6 +60,7 @@ class MailRoutes {
     );
     //MOD ROLE
     this.router.use(verifyAccessMail(['MOD']));
+    this.router.patch('/archived/list', archivedList);
     this.router.patch('/archived/:id', archivedMessage);
     this.router.patch('/done/:id', doneMessage);
   }

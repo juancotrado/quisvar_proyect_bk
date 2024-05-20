@@ -1,4 +1,3 @@
-import { PayMailServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
 import AppError from '../utils/appError';
 import {
@@ -13,21 +12,17 @@ import { Request } from 'express';
 import { ControllerFunction } from 'types/patterns';
 import MailServices from '../services/mail.services';
 import { isQueryNumber } from '../utils/tools';
+import { parseQueries } from '../utils/format.server';
 
 export class MailControllers {
   public showMessages: ControllerFunction = async (req, res, next) => {
     try {
-      const {
-        skip: _skip,
-        officeId: _officeId,
-        ...params
-      } = req.query as ParametersMail;
-      const category = req.query.category as CategoryMailType;
+      const params = parseQueries<ParametersMail>(req.query);
+      const { category } = parseQueries<{ category: CategoryMailType }>(
+        req.query
+      );
       const userInfo: UserType = res.locals.userInfo;
-      const skip = (_skip && +_skip) ?? undefined;
-      const officeId = _officeId && +_officeId;
-      const newParams = { skip, ...params, officeId };
-      const query = await MailServices.getByUser(userInfo, category, newParams);
+      const query = await MailServices.getByUser(userInfo, category, params);
       res.status(200).json(query);
     } catch (error) {
       next(error);
@@ -36,16 +31,8 @@ export class MailControllers {
 
   public showHoldingMessages: ControllerFunction = async (req, res, next) => {
     try {
-      const {
-        skip: _skip,
-        officeId: _officeId,
-        ...params
-      } = req.query as ParametersMail;
-      const onHolding = !req.query.onHolding || req.query.onHolding === 'true';
-      const skip = (_skip && +_skip) ?? undefined;
-      const officeId = _officeId && +_officeId;
-      const newParams = { skip, officeId, ...params, onHolding };
-      const query = await MailServices.onHolding(newParams);
+      const params = parseQueries<ParametersMail>(req.query);
+      const query = await MailServices.onHolding(params);
       res.status(200).json(query);
     } catch (error) {
       next(error);
@@ -177,7 +164,17 @@ export class MailControllers {
     try {
       const { id: senderId }: UserType = res.locals.userInfo;
       const { id: messageId } = req.params;
-      const query = await PayMailServices.archived(+messageId, senderId);
+      const query = await MailServices.archived(+messageId, senderId);
+      res.status(201).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public archivedList: ControllerFunction = async (req, res, next) => {
+    try {
+      const { body } = req;
+      const query = await MailServices.archivedList(body);
       res.status(201).json(query);
     } catch (error) {
       next(error);

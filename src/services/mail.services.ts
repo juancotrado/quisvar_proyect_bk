@@ -21,19 +21,24 @@ type UpdateMessage = Pick<
 >;
 class MailServices {
   public static async onHolding({
-    skip,
+    offset: skip,
+    limit: take,
     officeId,
     typeMessage,
     status,
   }: ParametersMail) {
+    const total = await prisma.messages.count({
+      where: { officeId, status, type: typeMessage, category: 'DIRECT' },
+    });
     const mailList = await prisma.messages.findMany({
       where: { officeId, status, type: typeMessage, category: 'DIRECT' },
       skip,
-      take: 30,
+      take,
       orderBy: { updatedAt: 'desc' },
       ...Queries.PayMail().selectMessage('MAIN'),
     });
-    return mailList;
+    const mail = { total, mailList };
+    return mail;
   }
 
   public static async changeHoldingStatus(ids: number[]) {
@@ -48,7 +53,14 @@ class MailServices {
   public static async getByUser(
     { id: userId }: UserType,
     category: Messages['category'],
-    { skip, type, status, typeMessage, officeId }: ParametersMail
+    {
+      offset: skip,
+      type,
+      status,
+      typeMessage,
+      officeId,
+      limit: take,
+    }: ParametersMail
   ) {
     const onHolding = type === 'SENDER' ? undefined : false;
     //----------------------------------------------------------------
@@ -84,7 +96,7 @@ class MailServices {
       },
       orderBy: { message: { updatedAt: 'desc' } },
       skip,
-      take: 20,
+      take,
       select: {
         messageId: true,
         status: true,
@@ -601,6 +613,25 @@ class MailServices {
       data: { type: 'SENDER' },
     });
     return archived;
+  }
+
+  static async archivedList({ ids }: { ids: Messages['id'][] }) {
+    const updateList = ids.map(id => {
+      const archived = prisma.messages.update({
+        where: { id },
+        data: {
+          status: 'ARCHIVADO',
+          users: {
+            updateMany: {
+              where: { messageId: id },
+              data: { type: 'RECEIVER', status: false },
+            },
+          },
+        },
+      });
+      return archived;
+    });
+    return await prisma.$transaction(updateList);
   }
 
   public static readonly dataDone: ReceiverT = {

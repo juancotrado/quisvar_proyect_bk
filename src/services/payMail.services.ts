@@ -23,20 +23,24 @@ class PayMailServices {
   }
 
   public static async onHolding({
-    skip,
+    offset: skip,
     officeId,
-    onHolding,
+    limit: take,
     typeMessage,
     status,
   }: ParametersPayMail) {
+    const total = await prisma.payMessages.count({
+      where: { officeId, status, type: typeMessage },
+    });
     const mailList = await prisma.payMessages.findMany({
-      where: { officeId, onHolding, status, type: typeMessage },
+      where: { officeId, status, type: typeMessage },
       skip,
-      take: 30,
+      take,
       orderBy: { updatedAt: 'desc' },
       ...Queries.PayMail().selectMessage('MAIN'),
     });
-    return mailList;
+    const mail = { total, mailList };
+    return mail;
   }
 
   public static async changeHoldingStatus(ids: number[]) {
@@ -50,7 +54,14 @@ class PayMailServices {
 
   public static async getByUser(
     { id: userId }: UserType,
-    { skip, type, status, typeMessage, officeId }: ParametersPayMail
+    {
+      type,
+      status,
+      typeMessage,
+      officeId,
+      offset: skip,
+      limit: take,
+    }: ParametersPayMail
   ) {
     const onHolding = type === 'SENDER' ? undefined : false;
     //----------------------------------------------------------------
@@ -85,7 +96,7 @@ class PayMailServices {
       },
       skip,
       orderBy: { paymessage: { updatedAt: 'desc' } },
-      take: 20,
+      take,
       select: {
         paymessageId: true,
         status: true,
@@ -596,6 +607,25 @@ class PayMailServices {
     });
     //------------------------------------------------------------------
     return archived;
+  }
+
+  static async archivedList({ ids }: { ids: PayMessages['id'][] }) {
+    const updateList = ids.map(id => {
+      const archived = prisma.messages.update({
+        where: { id },
+        data: {
+          status: 'ARCHIVADO',
+          users: {
+            updateMany: {
+              where: { messageId: id },
+              data: { type: 'RECEIVER', status: false },
+            },
+          },
+        },
+      });
+      return archived;
+    });
+    return await prisma.$transaction(updateList);
   }
 
   static async done(

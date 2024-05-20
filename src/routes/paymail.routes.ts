@@ -17,6 +17,7 @@ const {
   updateMessage,
   showHoldingMessages,
   updateHoldingStage,
+  archivedList,
 } = PayMailControllers;
 
 class PayMailRoutes implements InitialRouter {
@@ -60,6 +61,7 @@ class PayMailRoutes implements InitialRouter {
     );
     //MOD ROLE
     // router.use(role.RoleHandler('MOD', 'tramites', 'tramite-de-pago'));
+    this.router.patch('/archived/list', archivedList);
     this.router.patch('/archived/:id', archivedMessage);
     this.router.patch('/done/:id', doneMessage);
     this.router.delete('/voucher/:id', declineVoucher);

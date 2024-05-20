@@ -125,14 +125,14 @@ export interface GetFilterLevels extends Levels {
   subTasks?: SubTaskFilter[];
 }
 export interface GetFilterBasicLevels extends BasicLevels {
-  subTasks?: BasicTasks[];
+  subTasks?: BasicTaskFilter[];
 }
 export interface GetFolderBasicLevels extends BasicLevels {
-  subTasks?: BasicTaskFolder[];
+  subTasks: BasicTaskFolder[];
 }
 
 export interface BasicTaskFolder extends BasicTasks {
-  files?: BasicFiles[];
+  files: BasicFiles[];
 }
 
 export interface FolderLevels {
@@ -152,6 +152,17 @@ export type TypeIdsList = number | TypeIdsList[];
 export interface GetDuplicateLevels extends Levels {
   subTasks?: SubTaskFiles[];
   next?: GetDuplicateLevels[];
+}
+export interface GetDuplicateBasicLevels extends BasicLevels {
+  subTasks?: BasicTaskFiles[];
+  next?: GetDuplicateBasicLevels[];
+}
+
+export interface GeneratePathAtributtes {
+  rootId: number;
+  rootLevel: number;
+  item: string;
+  path: string;
 }
 export interface SubTaskFilter extends SubTasks {
   users: {
@@ -175,7 +186,7 @@ export interface BasicTaskFilter extends BasicTasks {
   users: {
     percentage: number;
     userId: number;
-    user: {
+    user?: {
       id: number;
       profile: {
         firstName: string;
@@ -191,9 +202,12 @@ export interface BasicTaskFilter extends BasicTasks {
 export interface SubTaskFiles extends SubTasks {
   files: Files[];
 }
+export interface BasicTaskFiles extends BasicTasks {
+  files: Files[];
+}
 export type FilesProps = { [fieldname: string]: Express.Multer.File[] };
 export interface ParametersPayMail {
-  skip?: number;
+  offset?: number;
   limit?: number;
   type?: PayMail['type'];
   officeId?: PayMessages['officeId'];
@@ -204,7 +218,7 @@ export interface ParametersPayMail {
   onHolding?: boolean;
 }
 export interface ParametersMail {
-  skip?: number;
+  offset?: number;
   limit?: number;
   type?: Mail['type'];
   officeId?: Messages['officeId'];
@@ -412,4 +426,20 @@ export interface ProfileByRoleType {
   subTypeRol?: SubMenuPoints['typeRol'];
   menuId?: number;
   includeSelf: boolean;
+}
+export interface OptionsBasicFilters {
+  status?: BasicTasks['status'];
+  equal?: boolean;
+  type?: BasicFiles['type'];
+  includeFiles?: boolean;
+  includeUsers?: boolean;
+  endsWith?: string;
+}
+
+export interface percentageTaskFilter extends BasicTaskFilter {
+  percentage: number;
+  spending: number;
+  balance: number;
+  price: number;
+  listUsers: usersCount[];
 }

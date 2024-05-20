@@ -162,7 +162,7 @@ paths:
   /stages/{id}:
     get:
       tags:
-        - stages
+        - Stages
       summary: Show stages
       parameters:
         - name: id
@@ -204,10 +204,34 @@ paths:
             application/json:
               example:
                 error: No se pudo encontrar la etapa
+  /stages/basics/{id}:
+    get:
+      tags:
+        - Stages
+        - Basic levels
+      summary: Ver Niveles de Basicos por ID de Etapa
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+        - $ref: '#/components/parameters/typeCostFilter'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: Error en operación
+          content:
+            application/json:
+              example:
+                error: Error en operación
   /stages/details/{id}:
     get:
       tags:
-        - stages
+        - Stages
       summary: Show stages details
       parameters:
         - name: id
@@ -356,8 +380,8 @@ paths:
   /basiclevels:
     post:
       tags:
-        - basiclevels
-      summary: create level
+        - Basic levels
+      summary: Crear Nivel
       description: crear niveles
       security:
         - bearerAuth: []
@@ -383,7 +407,8 @@ paths:
   /basiclevels/{id}:
     get:
       tags:
-        - basiclevels
+        - Basic levels
+      summary: Ver Niveles por ID de nivel
       parameters:
         - $ref: '#/components/parameters/levelId'
       security:
@@ -403,7 +428,7 @@ paths:
                 error: No se pudo crear el mensaje
     post:
       tags:
-        - basiclevels
+        - Basic levels
       summary: Añadir niveles upper or lower
       parameters:
         - $ref: '#/components/parameters/levelId'
@@ -431,7 +456,7 @@ paths:
                 error: No se pudo crear el mensaje
     put:
       tags:
-        - basiclevels
+        - Basic levels
       summary: Actualizar nivel
       parameters:
         - $ref: '#/components/parameters/levelId'
@@ -458,7 +483,7 @@ paths:
                 error: No se pudo crear el mensaje
     delete:
       tags:
-        - basiclevels
+        - Basic levels
       summary: Eliminar nivel
       parameters:
         - $ref: '#/components/parameters/levelId'
@@ -477,6 +502,34 @@ paths:
             application/json:
               example:
                 error: No se pudo crear el mensaje
+  /duplicates/basic-level/{id}:
+    post:
+      tags:
+        - Basic levels
+      summary: Duplicar nivel
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DuplicatesRequestBody'
+      responses:
+        '201':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Operación exitosa
+        '404':
+          description: No se pudo crear la tarea
+          content:
+            application/json:
+              example:
+                error: No se pudo crear la tarea
   /basictasks:
     post:
       tags:
@@ -570,6 +623,62 @@ paths:
           description: Contrato creado exitosamente
         '400':
           description: Datos no válidos
+  /download/basic-level/{id}:
+    get:
+      tags:
+        - Downloads
+        - Basic levels
+      summary: Descargar Nivel por ID de nivel
+      description: Descargar comprimido de archivos por nivel
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+        - $ref: '#/components/parameters/downloadIncludeFiles'
+        - $ref: '#/components/parameters/downloadEqual'
+        - $ref: '#/components/parameters/downloadCreateFiles'
+        - $ref: '#/components/parameters/downloadEndsWith'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: Error en Operacion
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el mensaje
+  /download/basic-stage/{id}:
+    get:
+      tags:
+        - Downloads
+        - Basic levels
+      summary: Descargar Nivel por ID de etapa
+      description: Descargar comprimido de archivos por nivel
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+        - $ref: '#/components/parameters/downloadIncludeFiles'
+        - $ref: '#/components/parameters/downloadEqual'
+        - $ref: '#/components/parameters/downloadCreateFiles'
+        - $ref: '#/components/parameters/downloadEndsWith'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: No se pudo crear el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el mensaje
   /paymail/holding:
     get:
       tags:
@@ -579,7 +688,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/onHolding'
         - $ref: '#/components/parameters/officeIdQuery'
-        - $ref: '#/components/parameters/skip'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/limit'
       security:
         - bearerAuth: []
       responses:
@@ -1383,19 +1493,25 @@ components:
     onHolding:
       name: onHolding
       in: query
-      description: tramites que estan en mesa de partes
+      description: Tramites que estan en mesa de partes
       schema:
         type: boolean
     officeIdQuery:
       name: officeId
       in: query
-      description: tramites filtrados por oficina
+      description: Tramites filtrados por oficina
       schema:
         type: number
-    skip:
-      name: skip
+    limit:
+      name: limit
       in: query
-      description: saltos de registros
+      description: Cantidad de registros
+      schema:
+        type: number
+    offset:
+      name: offset
+      in: query
+      description: Saltos de registros
       schema:
         type: number
     includeSelf:
@@ -1421,6 +1537,36 @@ components:
       name: subTypeRol
       in: query
       description: Puede Usar <b>["MEMBER","USER","MOD","VIEWER"]</b>
+      schema:
+        type: string
+    typeCostFilter:
+      name: typecost
+      in: query
+      description: Tipo de Pago, puede usar <b> [professional, bachelor, intern, graduate]</b>
+      schema:
+        type: string
+        example: bachelor
+    downloadIncludeFiles:
+      name: includeFiles
+      in: query
+      schema:
+        type: boolean
+      example: true
+    downloadEqual:
+      name: equal
+      in: query
+      schema:
+        type: boolean
+    downloadCreateFiles:
+      name: createFiles
+      in: query
+      example: true
+      schema:
+        type: boolean
+    downloadEndsWith:
+      name: endsWith
+      in: query
+      example: .pdf
       schema:
         type: string
   schemas:
@@ -1800,5 +1946,5 @@ components:
       type: object
       properties:
         ids:
-          type: array
+          type: string
           example: [1, 2, 3]
