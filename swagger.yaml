@@ -679,6 +679,32 @@ paths:
             application/json:
               example:
                 error: No se pudo crear el mensaje
+  /paymail:
+    get:
+      tags:
+        - paymail
+      summary: show mail
+      description: Ver tramites en mesa de partes
+      parameters:
+        - $ref: '#/components/parameters/officeIdQuery'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/typeUserMail'
+        - $ref: '#/components/parameters/limit'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: No se pudo crear el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el mensaje
   /paymail/holding:
     get:
       tags:
@@ -1496,6 +1522,13 @@ components:
       description: Tramites que estan en mesa de partes
       schema:
         type: boolean
+    typeUserMail:
+      name: type
+      in: query
+      description: Emisor o Receptor <b>[SENDER, RECEIVER]</b>
+      schema:
+        type: string
+        example: SENDER
     officeIdQuery:
       name: officeId
       in: query
