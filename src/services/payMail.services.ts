@@ -611,13 +611,13 @@ class PayMailServices {
 
   static async archivedList({ ids }: { ids: PayMessages['id'][] }) {
     const updateList = ids.map(id => {
-      const archived = prisma.messages.update({
+      const archived = prisma.payMessages.update({
         where: { id },
         data: {
           status: 'ARCHIVADO',
           users: {
             updateMany: {
-              where: { messageId: id },
+              where: { paymessageId: id },
               data: { type: 'RECEIVER', status: false },
             },
           },
