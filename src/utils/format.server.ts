@@ -141,9 +141,13 @@ export const parseQueries = <K>(query: Request['query']) => {
   const parseQueriesArr = Object.entries(query).map(([key, value]) => [
     key,
     value
-      ? value.toString().toLowerCase() === 'true' ||
-        value.toString().toLowerCase() === 'false' ||
-        (!isNaN(+value) ? +value : value)
+      ? value.toString().toLowerCase() === 'true'
+        ? true
+        : value.toString().toLowerCase() === 'false'
+        ? false
+        : !isNaN(+value)
+        ? +value
+        : value
       : value,
   ]);
   return Object.fromEntries(parseQueriesArr) as K;
