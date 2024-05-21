@@ -28,12 +28,13 @@ class PayMailServices {
     limit: take,
     typeMessage,
     status,
+    onHolding,
   }: ParametersPayMail) {
     const total = await prisma.payMessages.count({
-      where: { officeId, status, type: typeMessage },
+      where: { officeId, status, type: typeMessage, onHolding },
     });
     const mailList = await prisma.payMessages.findMany({
-      where: { officeId, status, type: typeMessage },
+      where: { officeId, status, type: typeMessage, onHolding },
       skip,
       take,
       orderBy: { updatedAt: 'desc' },

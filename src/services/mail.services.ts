@@ -25,13 +25,26 @@ class MailServices {
     limit: take,
     officeId,
     typeMessage,
+    onHolding,
     status,
   }: ParametersMail) {
     const total = await prisma.messages.count({
-      where: { officeId, status, type: typeMessage, category: 'DIRECT' },
+      where: {
+        officeId,
+        status,
+        type: typeMessage,
+        onHolding,
+        category: 'DIRECT',
+      },
     });
     const mailList = await prisma.messages.findMany({
-      where: { officeId, status, type: typeMessage, category: 'DIRECT' },
+      where: {
+        officeId,
+        status,
+        type: typeMessage,
+        onHolding,
+        category: 'DIRECT',
+      },
       skip,
       take,
       orderBy: { updatedAt: 'desc' },
