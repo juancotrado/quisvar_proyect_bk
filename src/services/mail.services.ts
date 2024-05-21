@@ -123,7 +123,7 @@ class MailServices {
         },
       },
     });
-    return { total, mail: parseList };
+    return { total, mailList: parseList };
   }
 
   static async getMessageShort(id: Messages['id']) {

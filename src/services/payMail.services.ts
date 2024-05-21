@@ -83,7 +83,7 @@ class PayMailServices {
       : undefined;
     //----------------------------------------------------------------
     const newUser = officeId ? managerOffice?.users[0].usersId : userId;
-    const mail = await prisma.payMail.findMany({
+    const mailList = await prisma.payMail.findMany({
       where: {
         userId: newUser,
         type,
@@ -105,7 +105,7 @@ class PayMailServices {
         paymessage: Queries.PayMail().selectMessage('MAIN'),
       },
     });
-    const parseList = mail.map(({ paymessage, ...data }) => {
+    const parseList = mailList.map(({ paymessage, ...data }) => {
       const userInit = paymessage.users.find(user => user.userInit);
       const _message = { ...paymessage, userInit };
       return { ...data, paymessage: _message };
@@ -122,7 +122,7 @@ class PayMailServices {
         },
       },
     });
-    return { total, mail: parseList };
+    return { total, mailList: parseList };
   }
 
   static async getMessageShort(id: PayMessages['id']) {
