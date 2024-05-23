@@ -10,12 +10,13 @@ import { UserType } from '../middlewares/auth.middleware';
 import { PickSealMessage } from 'types/types';
 import { PayMailServices } from '../services';
 import MailServices from '../services/mail.services';
+import { ContentType } from './download.controller';
 class PDFGenerateController {
-  private headers(filename: string) {
+  private headers(filename: string, type: keyof typeof ContentType) {
     return {
       headers: {
-        'Content-Disposition': `attachment; filename=convert_${filename}`,
-        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename=${filename}`,
+        'Content-Type': ContentType[type],
       },
     };
   }
@@ -37,7 +38,7 @@ class PDFGenerateController {
       }
       const newFile = await GenerateFiles.coverTwoPage(Buffer);
       const fileTemp = tmp.fileSync({ postfix: '.pdf' });
-      const options = this.headers(originalName);
+      const options = this.headers(originalName, 'PDF');
       writeFileSync(fileTemp.name, newFile);
       res.download(fileTemp.name, `convert_${originalName}`, options, error => {
         if (!error) fileTemp.removeCallback();
@@ -87,7 +88,7 @@ class PDFGenerateController {
         title: findMessage.office?.name,
       });
       const fileTemp = tmp.fileSync({ postfix: '.pdf' });
-      const options = this.headers(originalName);
+      const options = this.headers(originalName, 'PDF');
       writeFileSync(fileTemp.name, newFile);
       res.download(fileTemp.name, `convert_${originalName}`, options, error => {
         if (!error) fileTemp.removeCallback();
@@ -136,7 +137,7 @@ class PDFGenerateController {
         title: findMessage.office?.name,
       });
       const fileTemp = tmp.fileSync({ postfix: '.pdf' });
-      const options = this.headers(originalName);
+      const options = this.headers(originalName, 'PDF');
       writeFileSync(fileTemp.name, newFile);
       res.download(fileTemp.name, `convert_${originalName}`, options, error => {
         if (!error) fileTemp.removeCallback();
@@ -150,7 +151,7 @@ class PDFGenerateController {
     try {
       if (!req.file) throw new AppError('archivo inexistente', 500);
       const { buffer, originalname } = req.file as Express.Multer.File;
-      const options = this.headers(originalname);
+      const options = this.headers(originalname, 'PDF');
       // outputPath: 'compress_cp/file_with_logo.pdf',
       const newFile = await GenerateFiles.cover(buffer, { brand: 'dhyrium' });
       const fileTemp = tmp.fileSync({ postfix: '.pdf' });
@@ -192,7 +193,6 @@ class PDFGenerateController {
       });
       res.status(201).json({ message: 'Firma encriptada con exito' });
     } catch (error) {
-      console.log(error);
       next(error);
     }
   };
