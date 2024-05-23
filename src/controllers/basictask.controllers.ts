@@ -1,5 +1,7 @@
 import { ControllerFunction } from 'types/patterns';
 import { BasicTasksServices } from '../services';
+import { parseQueries } from '../utils/format.server';
+import { BasicTaskFiles } from 'types/types';
 
 class BasicTaskControllers {
   public static find: ControllerFunction = async (req, res, next) => {
@@ -65,6 +67,41 @@ class BasicTaskControllers {
     }
   };
 
+  public static updateStatusSubTask: ControllerFunction = async (
+    req,
+    res,
+    next
+  ) => {
+    try {
+      const { id: taskId } = req.params;
+      const { body } = req;
+      interface ga {
+        status: BasicTaskFiles['status'] | 'REMOVEALL';
+      }
+
+      const { status } = parseQueries<ga>(req.query);
+      console.log(status);
+      // const userInfo: UserType = res.locals.userInfo;
+      const task = await BasicTasksServices.updateStatusByUser(
+        +taskId,
+        {
+          id: 12,
+        },
+        { status }
+      );
+      // const project = await StageServices.find(+stageId);
+      // res.status(200).json({
+      //   task,
+      //   project: {
+      //     ...project,
+      //     stagesId: stageId,
+      //   },
+      // });
+      res.json(task);
+    } catch (error) {
+      next(error);
+    }
+  };
   // public static create: ControllerFunction = async (req, res, next) => {
   //   try {
   //     //

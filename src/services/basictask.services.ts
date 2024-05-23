@@ -1,7 +1,6 @@
-import { BasicTasks } from '@prisma/client';
+import { BasicTasks, Users } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-import lodash from 'lodash';
 
 class BasicTasksServices {
   public static async find(id: BasicTasks['id']) {
@@ -83,6 +82,37 @@ class BasicTasksServices {
     return { subTaskDelete, updateList };
   }
 
+  public static async updateStatus(
+    subtaskId: BasicTasks['id'],
+    { status }: { status: BasicTasks['status'] | 'REMOVEALL' }
+  ) {}
+
+  public static async updateStatusByUser(
+    subtaskId: BasicTasks['id'],
+    { id: userId }: { id: number },
+    { status }: { status: BasicTasks['status'] | 'REMOVEALL' }
+  ) {
+    if (!subtaskId) throw new AppError('Oops!,ID invalido', 400);
+    const findTask = await this.find(subtaskId);
+    // const updateTaskStatus = await prisma.basicTasks.update({
+    //   where: { id: subtaskId },
+    //   data: { status },
+    //   // include: Queries.includeSubtask,
+    // });
+    const subtaskId_userId = { subtaskId, userId };
+    const users =
+      (status === 'UNRESOLVED' && { delete: { subtaskId_userId } }) ||
+      (status === 'PROCESS' && { create: { userId } }) ||
+      (status === 'REMOVEALL' && { deleteMany: { subtaskId } }) ||
+      undefined;
+
+    // await prisma.subTasks.update({
+    //   where: { id: subtaskId },
+    //   data: { users },
+    // });
+    return { findTask, users };
+  }
+
   public static async findDuplicate(
     name: string,
     id: number,
@@ -112,14 +142,12 @@ class BasicTasksServices {
     list: { id: number; index: number }[],
     quantity: number = -1
   ) {
-    const updateListPerLevel = await Promise.all(
-      list.map(async ({ id, index }) => {
-        const data = { index: index + quantity };
-        const update = await prisma.basicTasks.update({ where: { id }, data });
-        return update.id;
-      })
-    );
-    return updateListPerLevel;
+    const updateListPerLevel = list.map(({ id, index }) => {
+      const data = { index: index + quantity };
+      const update = prisma.basicTasks.update({ where: { id }, data });
+      return update;
+    });
+    return prisma.$transaction(updateListPerLevel);
   }
 }
 export default BasicTasksServices;

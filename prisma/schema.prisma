@@ -24,7 +24,8 @@ model Users {
   address               String?
   profile               Profiles?
   project               Projects[]
-  subTasks              TaskOnUsers[]
+  subTasks              BasicTaskOnUsers[]
+  basicTasks            TaskOnUsers[]
   Levels                Levels[]
   list                  ListOnUsers[]
   stages                Stages[]
@@ -34,6 +35,7 @@ model Users {
   feedbacks             UsersOnFeedbacks[]
   equipment             Equipment?
   groups                GroupOnUsers[]
+  basicLevels           BasicLevels[]
   // moderatorOfGroup      Group[]
   // Attendance            AttendanceGroup[]
   roleId                Int?
@@ -292,15 +294,14 @@ model BasicLevels {
   name         String
   level        Int          @default(0)
   rootLevel    Int
+  levelList    Int[]
+  cover        Boolean      @default(false)
   typeItem     TypeItem     @default(NUM)
   rootTypeItem TypeItem     @default(NUM)
-  isProject    Boolean      @default(false)
-  isArea       Boolean      @default(false)
-  isInclude    Boolean      @default(false)
   stagesId     Int
-  userId       Int?
   rootId       Int
   subTasks     BasicTasks[]
+  users        Users[]
   // user         Users?     @relation(fields: [userId], references: [id])
   stages       Stages       @relation(fields: [stagesId], references: [id], onDelete: Cascade)
 }
@@ -318,6 +319,20 @@ model TaskOnUsers {
   updatedAt  DateTime @updatedAt
 
   @@id([subtaskId, userId])
+}
+
+model BasicTaskOnUsers {
+  taskId     Int
+  userId     Int
+  status     Boolean    @default(false)
+  percentage Int        @default(0)
+  // untilDate  DateTime @default(now())
+  task       BasicTasks @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user       Users      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignedAt DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@id([taskId, userId])
 }
 
 model SubTasks {
@@ -341,19 +356,19 @@ model SubTasks {
 }
 
 model BasicTasks {
-  id        Int          @id @default(autoincrement())
-  status    TaskRole     @default(UNRESOLVED)
+  id        Int                @id @default(autoincrement())
+  status    TaskRole           @default(UNRESOLVED)
   name      String
   index     Int
-  typeItem  TypeItem     @default(NUM)
+  typeItem  TypeItem           @default(NUM)
   days      Float
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
   levels_Id Int
   files     BasicFiles[]
-  Levels    BasicLevels  @relation(fields: [levels_Id], references: [id], onDelete: Cascade)
+  Levels    BasicLevels        @relation(fields: [levels_Id], references: [id], onDelete: Cascade)
   // feedBacks   Feedback[]
-  // users       TaskOnUsers[]
+  users     BasicTaskOnUsers[]
 }
 
 model Feedback {

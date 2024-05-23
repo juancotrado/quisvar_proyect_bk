@@ -8,7 +8,7 @@ export { default as filesRouter } from './files.routes';
 export { default as reportsRouter } from './reports.routes';
 export { default as feedbacksRouter } from './feedbacks.routes';
 export { default as duplicatesRouter } from './duplicates.routes';
-export { default as archiverRouter } from './archiver.routes';
+export { default as downloadRouter } from './download.routes';
 export { default as stagesRouter } from './stages.routes';
 export { default as sectorRouter } from './sector.routes';
 export { default as typeSpecialityRouter } from './typeSpecialities.routes';
