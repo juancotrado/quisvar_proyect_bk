@@ -88,8 +88,36 @@ export interface Level {
   stagesId: number;
   userId: null;
   days: number;
+
   // details: Details;
   nextLevel?: Level[];
+}
+export interface LevelBasic extends BasicLevels {
+  item: string;
+  spending: number;
+  balance: number;
+  percentage: number;
+  total: number;
+  price: number;
+  days: number;
+  listUsers: usersCount[];
+  nextLevel?: LevelBasic[];
+  subTasks?: any[];
+}
+export interface LevelInfoDetails {
+  spending: number;
+  balance: number;
+  percentage: number;
+  total: number;
+  price: number;
+  days: number;
+}
+export interface GetBasicLevelStage
+  extends GetFilterBasicLevels,
+    LevelInfoDetails {
+  item: string;
+  listUsers: usersCount[];
+  nextLevel?: GetBasicLevelStage[];
 }
 
 export interface Details {
@@ -133,6 +161,19 @@ export interface GetFolderBasicLevels extends BasicLevels {
 
 export interface BasicTaskFolder extends BasicTasks {
   files: BasicFiles[];
+}
+
+export interface GetListBasicsByStage extends BasicLevels {
+  spending: number;
+  balance: number;
+  price: number;
+  days: number;
+  percentage: number;
+  item: string;
+  total: number;
+  subTasks: BasicTasks[];
+  listUsers: usersCount[];
+  // nextLevel?: GetListBasicsByStage[];
 }
 
 export interface FolderLevels {

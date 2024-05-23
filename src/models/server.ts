@@ -16,7 +16,7 @@ import {
   reportsRouter,
   feedbacksRouter,
   duplicatesRouter,
-  archiverRouter,
+  downloadRouter,
   stagesRouter,
   typeSpecialityRouter,
   sectorRouter,
@@ -81,7 +81,7 @@ class Server {
     reports: `/${process.env.ROUTE}/reports`,
     feedbacks: `/${process.env.ROUTE}/feedbacks`,
     duplicates: `/${process.env.ROUTE}/duplicates`,
-    archiver: `/${process.env.ROUTE}/archiver`,
+    download: `/${process.env.ROUTE}/download`,
     stages: `/${process.env.ROUTE}/stages`,
     typespecialities: `/${process.env.ROUTE}/typespecialities`,
     sector: `/${process.env.ROUTE}/sector`,
@@ -201,7 +201,7 @@ class Server {
     this.app.use(this.path.reports, reportsRouter);
     this.app.use(this.path.feedbacks, feedbacksRouter);
     this.app.use(this.path.duplicates, duplicatesRouter);
-    this.app.use(this.path.archiver, archiverRouter);
+    this.app.use(this.path.download, downloadRouter);
     this.app.use(this.path.stages, stagesRouter);
     this.app.use(this.path.typespecialities, typeSpecialityRouter);
     this.app.use(this.path.sector, sectorRouter);

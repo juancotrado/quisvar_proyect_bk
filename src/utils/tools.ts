@@ -1,10 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { DutyTasks, Levels, SubTasks, TaskRole } from '@prisma/client';
 import {
+  BasicTasks,
+  DutyTasks,
+  Levels,
+  SubTasks,
+  TaskRole,
+} from '@prisma/client';
+import {
+  BasicTaskFilter,
   DegreeList,
   DegreeTypes,
+  GetBasicLevelStage,
   GetFilterLevels,
   Level,
+  LevelBasic,
   ListCostType,
   ObjectAny,
   ObjectNumber,
@@ -19,6 +28,7 @@ import AppError from './appError';
 import { PathServices } from '../services';
 import { existsSync } from 'fs';
 import bcrypt from 'bcryptjs';
+import lodash from 'lodash';
 
 export const URL_HOST = `http://${process.env.HOST}:${process.env.PORT}`;
 
@@ -131,6 +141,104 @@ export const percentageSubTasks = (
   });
 };
 
+const pricePerUser = (users: usersCount[], priceTask?: ListCostType) => {
+  const newCost = users.map(user => {
+    if (!priceTask || !priceTask[user.degree as keyof ListCostType])
+      return { total: 0 };
+    const total = calculateCost(
+      user.percentage,
+      priceTask[user.degree as keyof ListCostType]
+    );
+    return { total };
+  });
+  return newCost;
+};
+
+const detailsPerUser = (list: number[], users: BasicTaskFilter['users']) => {
+  const listUsers: usersCount[] = list.reduce(
+    (acc: typeof listUsers, userId) => {
+      const existingItem = acc.find(item => item.userId === userId);
+      if (existingItem) {
+        existingItem.count++;
+      } else {
+        const findUser = users.find(u => u.userId === userId);
+        const firstName = findUser?.user?.profile?.firstName;
+        const lastName = findUser?.user?.profile?.lastName;
+        const dni = findUser?.user?.profile?.dni;
+        const degree = findUser?.user?.profile?.degree || undefined;
+        const profileInfo = { userId, firstName, lastName, dni, degree };
+        const percentage = findUser?.percentage || 0;
+        acc.push({ count: 1, percentage, ...profileInfo });
+      }
+      return acc;
+    },
+    []
+  );
+  return listUsers;
+};
+export const dataWithLevel = {
+  spending: 0,
+  balance: 0,
+  price: 0,
+  days: 0,
+  listUsers: [] as usersCount[],
+  percentage: 0,
+  total: 0,
+  // subTasks: [] as percentageTaskFilter[],
+};
+
+export const percentageBasicTasks = (
+  listSubtask: BasicTaskFilter[],
+  item: string,
+  priceTask?: ListCostType
+) => {
+  const subtasks = listSubtask.map(({ users, ...subtask }) => {
+    const findItem = numberToConvert(subtask.index, subtask.typeItem);
+    const newItem = item + (item ? '.' : '') + findItem;
+    const percentage = sumValues(users, 'percentage');
+    const listUsers = detailsPerUser(lodash.map(users, 'userId'), users);
+    //----------------------------- Calculate - Cost-----------------------
+    const newCost = pricePerUser(listUsers, priceTask);
+    const totalCostPerUser = sumValues(newCost, 'total');
+    const price =
+      (totalCostPerUser && totalCostPerUser * subtask.days) ||
+      (priceTask?.cost && priceTask.cost * subtask.days) ||
+      0;
+    const spending = subtask.status === 'DONE' ? price : 0;
+    const balance = +price - +spending;
+    return {
+      item: newItem,
+      percentage,
+      spending,
+      balance,
+      listUsers,
+      // users,
+      ...subtask,
+      price,
+    };
+  });
+  const price = sumValues(subtasks, 'price');
+  const days = sumValues(subtasks, 'days');
+  const spending = sumValues(subtasks, 'spending');
+  const percentage = sumValues(subtasks, 'percentage');
+  const total = subtasks.length;
+  //---------------------------------------------------------------------
+  const list = subtasks.map(({ listUsers }) => listUsers).flat(2);
+  const balance = roundTwoDecimail(price - spending);
+  const listUsers = list.reduce(
+    (acc: typeof list, { count, userId, ...data }) => {
+      const exist = acc.findIndex(u => u.userId === userId);
+      exist >= 0
+        ? (acc[exist].count += count)
+        : acc.push({ userId, count, ...data });
+      return acc;
+    },
+    []
+  );
+  const info = { price, days, spending, percentage, total, balance };
+  return { ...info, subTasks: subtasks, listUsers };
+};
+
 export const getDetailsSubtask = (listSubtask: PickSubtask[], list?: any[]) => {
   const UNRESOLVED = quantityTaskByStatus(listSubtask, 'UNRESOLVED', list);
   const PROCESS = quantityTaskByStatus(listSubtask, 'PROCESS', list);
@@ -206,11 +314,27 @@ export const calculateAndUpdateDataByLevel = (levels: Level[]) => {
     // );
     // level.details.DONE = calculateSumTotal(level, 'details', 'DONE');
     // level.details.TOTAL = calculateSumTotal(level, 'details', 'TOTAL');
+    level.percentage =
+      calculateSumTotal(level, 'percentage') / level.total || 0;
     if (level.nextLevel && level.nextLevel.length > 0) {
-      const _percentage =
-        calculateSumTotal(level, 'percentage') / level.nextLevel.length;
-      level.percentage = Math.round(_percentage * 100) / 100;
       calculateAndUpdateDataByLevel(level.nextLevel);
+    }
+  });
+  return levels;
+};
+
+export const calculateDataByBasicLevel = (levels: LevelBasic[]) => {
+  levels.forEach(level => {
+    level.balance = calculateBasicSumTotal(level, 'balance');
+    level.spending = calculateBasicSumTotal(level, 'spending');
+    level.price = calculateBasicSumTotal(level, 'price');
+    level.days = calculateBasicSumTotal(level, 'days');
+    level.total = calculateBasicSumTotal(level, 'total');
+    level.listUsers = calculateQuantityUser2(level, 'listUsers');
+    level.percentage =
+      calculateBasicSumTotal(level, 'percentage') / level.total || 0;
+    if (level.nextLevel && level.nextLevel.length > 0) {
+      calculateDataByBasicLevel(level.nextLevel);
     }
   });
   return levels;
@@ -230,6 +354,20 @@ const calculateSumTotal = (
   }
   return roundTwoDecimail(sumaBalance);
 };
+
+export const calculateBasicSumTotal = (
+  level: LevelBasic,
+  type: keyof LevelBasic
+) => {
+  let sumaBalance = level[type] as number;
+  if (level.nextLevel && level.nextLevel.length > 0) {
+    for (const subLevel of level.nextLevel) {
+      sumaBalance += calculateBasicSumTotal(subLevel, type);
+    }
+  }
+  return roundTwoDecimail(sumaBalance);
+};
+
 const calculateQuantityUser = (level: Level, type: keyof Level) => {
   let sumListUsers = level[type] as usersCount[];
   if (level.nextLevel && level.nextLevel.length > 0) {
@@ -239,7 +377,31 @@ const calculateQuantityUser = (level: Level, type: keyof Level) => {
     const listUsers = list.reduce(
       (acc: typeof list, { count, userId, ...data }) => {
         const exist = acc.findIndex(u => u.userId === userId);
-        exist > 0
+        exist >= 0
+          ? (acc[exist].count += count)
+          : acc.push({ userId, count, ...data });
+        return acc;
+      },
+      []
+    );
+    return listUsers;
+  }
+  return sumListUsers;
+};
+
+export const calculateQuantityUser2 = (
+  level: LevelBasic,
+  type: keyof LevelBasic
+) => {
+  let sumListUsers = level[type] as usersCount[];
+  if (level.nextLevel && level.nextLevel.length > 0) {
+    const list: typeof level.listUsers = level.nextLevel
+      .map(l => calculateQuantityUser2(l, type))
+      .flat(2);
+    const listUsers = list.reduce(
+      (acc: typeof list, { count, userId, ...data }) => {
+        const exist = acc.findIndex(u => u.userId === userId);
+        exist >= 0
           ? (acc[exist].count += count)
           : acc.push({ userId, count, ...data });
         return acc;
@@ -393,6 +555,29 @@ export const sumPriceByStage = (
   const balance = price - spending;
   const details = sumSubtaksByStage(list);
   return { days, price, spending, balance, details };
+};
+
+// subTasks?: BasicTasks[];
+
+export const sumPriceByStageBasic = (
+  list: (GetBasicLevelStage & { subTasks?: BasicTasks[] })[]
+) => {
+  const totalvalues = list.map(level => {
+    if (level.subTasks) {
+      const price = sumValues(level.subTasks, 'price');
+      const days = sumValues(level.subTasks, 'days');
+      const spending = sumValues(level.subTasks, 'spending');
+      const balance = price - spending;
+      return { price, spending, balance, days };
+    }
+    return { price: 0, spending: 0, balance: 0, days: 0 };
+  });
+  const price = sumValues(totalvalues, 'price');
+  const days = sumValues(totalvalues, 'days');
+  const spending = sumValues(totalvalues, 'spending');
+  const balance = price - spending;
+  // const details = sumSubtaksByStage(list);
+  return { days, price, spending, balance };
 };
 
 export const convertToRoman = (number: number) => {

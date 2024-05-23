@@ -1,24 +1,44 @@
-import { createWriteStream } from 'fs';
-import archiver from 'archiver';
+import { createWriteStream, rmSync } from 'fs';
+import archiver, { ArchiverOptions } from 'archiver';
 
-export const archiverFolder = (folderPath: string, zipFilePath: string) => {
+interface Options extends ArchiverOptions {
+  removeDir: boolean;
+}
+export const archiverFolder = (
+  sourceDir: string,
+  outputFilePath: string,
+  props?: Options
+) => {
   return new Promise((resolve, reject) => {
-    const output = createWriteStream(zipFilePath);
+    const output = createWriteStream(outputFilePath);
     const archive = archiver('zip', {
       zlib: { level: 1 },
-    });
-
-    output.on('close', () => {
-      resolve('¡Carpeta comprimida exitosamente!');
+      ...props,
     });
 
     archive.on('error', err => {
       reject(err);
     });
 
-    archive.directory(folderPath, false);
+    archive.on('warning', err => {
+      reject(err);
+    });
 
+    output.on('close', () => {
+      console.log(archive.pointer() + ' total bytes');
+      resolve(outputFilePath);
+    });
+
+    output.on('finish', () => {
+      try {
+        if (props?.removeDir) rmSync(sourceDir, { recursive: true });
+        console.log('end drainer');
+      } catch (error) {
+        reject(error);
+      }
+    });
     archive.pipe(output);
+    archive.directory(sourceDir, false);
     archive.finalize();
   });
 };
