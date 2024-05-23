@@ -10,6 +10,7 @@ router.use(_employee_role);
 router.get('/details/:id', StagesControllers.details);
 router.get('/', StagesControllers.showList);
 router.get('/:id', StagesControllers.show);
+router.get('/basics/:id', StagesControllers.showBasics);
 router.get('/report/:id', StagesControllers.showReport);
 //MOD ROLE
 router.use(_mod_role);

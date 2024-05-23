@@ -64,7 +64,38 @@ class StagesControllers {
       next(error);
     }
   }
+
+  public static async showBasics(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id: stageId } = req.params;
+      const status = req.query.status as SubTasks['status'];
+      const typecost = req.query.typecost as TypeCost;
+      const query = await StageServices.findBasics(+stageId, status, typecost);
+      return res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   public static async showReport(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params;
+      const query = await StageServices.findReport(+id);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public static async showBasicReport(
     req: Request,
     res: Response,
     next: NextFunction

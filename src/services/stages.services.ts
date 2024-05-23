@@ -2,18 +2,36 @@ import AppError from '../utils/appError';
 import { Projects, Stages, SubTasks, prisma } from '../utils/prisma.server';
 import {
   calculateAndUpdateDataByLevel,
+  calculateDataByBasicLevel,
+  dataWithLevel,
   round2Decimal,
-  sumPriceByStage,
-  sumValues,
 } from '../utils/tools';
 import LevelsServices from './levels.services';
 import { existsSync } from 'fs';
 import Queries from '../utils/queries';
 import PathServices from './paths.services';
-import { ListCostType, StageUpdate, TypeCost, usersCount } from 'types/types';
+import {
+  Level,
+  LevelBasic,
+  ListCostType,
+  StageUpdate,
+  TypeCost,
+} from 'types/types';
+import BasicLevelServices from './basiclevels.services';
 
 class StageServices {
   public static estadia = 1000;
+  private static calculatePrice(
+    { cost = 0, ...data }: ListCostType,
+    typeCost?: keyof typeof data
+  ) {
+    if (typeCost && Object.keys(data).includes(typeCost)) {
+      const newCost = round2Decimal(data[typeCost] + this.estadia);
+      return { cost: newCost, ...data };
+    }
+    return { cost, ...data };
+  }
+
   public static async findMany(projectId: Projects['id']) {
     const findStages = await prisma.stages.findMany({
       where: { projectId },
@@ -72,16 +90,7 @@ class StageServices {
     });
     if (!findStage)
       throw new AppError('Oops!,No se pudo encontrar la etapa', 400);
-    const {
-      name,
-      project,
-      rootTypeItem,
-      isProject,
-      bachelorCost,
-      professionalCost,
-      graduateCost,
-      internCost,
-    } = findStage;
+    const { project, rootTypeItem, group } = findStage;
     const projectName = project.name;
     const getList = await prisma.levels.findMany({
       where: { stagesId: id },
@@ -104,70 +113,78 @@ class StageServices {
       },
     });
     //------------------------- Value cost per degree ----------------------
-    const valueCost = () => {
-      const listCost: ListCostType = {
-        cost: 0,
-        bachelor: round2Decimal(bachelorCost + this.estadia),
-        professional: round2Decimal(professionalCost + this.estadia),
-        graduate: round2Decimal(professionalCost + this.estadia),
-        intern: round2Decimal(professionalCost + this.estadia),
-      };
-      if (typeCost === 'bachelor')
-        return {
-          ...listCost,
-          cost: round2Decimal(bachelorCost + this.estadia),
-        };
-      if (typeCost === 'professional')
-        return {
-          ...listCost,
-          cost: round2Decimal(professionalCost + this.estadia),
-        };
-      if (typeCost === 'graduate')
-        return {
-          ...listCost,
-          cost: round2Decimal(graduateCost + this.estadia),
-        };
-      if (typeCost === 'intern')
-        return {
-          ...listCost,
-          cost: round2Decimal(internCost + this.estadia),
-        };
-      return { ...listCost, cost: undefined };
-    };
-    //--------------------------------------------------------------------
-    const list = LevelsServices.findList(getList, 0, 0, valueCost());
-    const nextLevel = calculateAndUpdateDataByLevel(list);
-    const total = sumValues(nextLevel, 'total');
-    const balance = sumValues(nextLevel, 'balance');
-    const price = sumValues(nextLevel, 'price');
-    const spending = sumValues(nextLevel, 'spending');
-    const _percentage = sumValues(nextLevel, 'percentage') / nextLevel.length;
-    const lists = nextLevel.map(l => l.listUsers).flat(2);
-    const listUsers: usersCount[] = lists.reduce(
-      (acc: typeof list, { count, userId, ...data }) => {
-        const exist = acc.findIndex(u => u.userId === userId);
-        exist > 0
-          ? (acc[exist].count += count)
-          : acc.push({ userId, count, ...data });
-        return acc;
-      },
-      []
+    const {
+      bachelorCost: bachelor,
+      professionalCost: professional,
+      graduateCost: graduate,
+      internCost: intern,
+    } = findStage;
+    const valueCost = this.calculatePrice(
+      { bachelor, graduate, intern, professional },
+      typeCost
     );
-    const percentage = Math.round(_percentage * 100) / 100;
-    const totalValues = sumPriceByStage(getList);
+    //--------------------------------------------------------------------
+    const list = LevelsServices.findList(getList, 0, 0, valueCost);
+    const parseData = {
+      nextLevel: list,
+      ...dataWithLevel,
+    } as Level;
+    const nextLevel = calculateAndUpdateDataByLevel([parseData]);
     return {
+      // id,
+      // name,
+      // isProject,
+      group,
+      projectName,
+      rootTypeItem,
+      ...nextLevel[0],
+    };
+  }
+
+  public static async findBasics(
+    id: Stages['id'],
+    status?: SubTasks['status'],
+    typeCost?: TypeCost
+  ) {
+    if (!id) throw new AppError('Oops!, ID invalido', 400);
+    const findStage = await prisma.stages.findUnique({
+      where: { id },
+      include: {
+        group: { select: { id: true } },
+        project: { select: { name: true } },
+      },
+    });
+    if (!findStage)
+      throw new AppError('Oops!,No se pudo encontrar la etapa', 400);
+    const { name, project, rootTypeItem } = findStage;
+    const projectName = project.name;
+    const getList = await BasicLevelServices.getList(id, 'stage', {
+      includeUsers: true,
+      status,
+    });
+    //------------------------- Value cost per degree ----------------------
+    const {
+      bachelorCost: bachelor,
+      professionalCost: professional,
+      graduateCost: graduate,
+      internCost: intern,
+    } = findStage;
+    const valueCost = this.calculatePrice(
+      { bachelor, graduate, intern, professional },
+      typeCost
+    );
+    const list = BasicLevelServices.findList(getList.data, 0, 0, '', valueCost);
+    const parseData = {
+      nextLevel: list,
+      ...dataWithLevel,
+    } as LevelBasic;
+    const nextLevel = calculateDataByBasicLevel([parseData]);
+    return {
+      ...nextLevel[0],
       id,
       name,
       projectName,
-      percentage,
-      total,
-      isProject,
       rootTypeItem,
-      ...totalValues,
-      balance,
-      price,
-      listUsers,
-      spending,
       nextLevel,
     };
   }
