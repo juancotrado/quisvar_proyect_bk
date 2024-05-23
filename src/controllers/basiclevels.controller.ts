@@ -13,7 +13,7 @@ class BasicLevelsController {
     }
   };
 
-  public static findByStage: ControllerFunction = async (req, res, next) => {
+  public static findById: ControllerFunction = async (req, res, next) => {
     try {
       const { id: stageId } = req.params;
       const query = await BasicLevelServices.find(+stageId);

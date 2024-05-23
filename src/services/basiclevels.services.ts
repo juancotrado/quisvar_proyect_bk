@@ -1,75 +1,125 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { BasicFiles, BasicLevels, BasicTasks } from '@prisma/client';
 import lodash from 'lodash';
-import { numberToConvert } from '../utils/tools';
+import {
+  calculateBasicSumTotal,
+  dataWithLevel,
+  numberToConvert,
+  percentageBasicTasks,
+} from '../utils/tools';
 import {
   DuplicateLevel,
   FolderBasicLevelList,
   FolderLevels,
+  GeneratePathAtributtes,
   GetFilterBasicLevels,
   GetFolderBasicLevels,
+  ListCostType,
   MergePDFBasicFiles,
   ObjectNumber,
+  OptionsBasicFilters,
   TypeIdsList,
 } from 'types/types';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
-import {
-  copyFileSync,
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  rmSync,
-  rmdirSync,
-  statSync,
-  unlinkSync,
-} from 'fs';
+import { copyFileSync, mkdirSync } from 'fs';
 import GenerateFiles from '../utils/generateFile';
+import Queries from '../utils/queries';
 
 class BasicLevelServices {
-  static async find(id: BasicLevels['id'], status?: BasicTasks['status']) {
-    // const list = await this.mergePDFs(id, { status, typeFile: 'pdf' });
+  public static async getList(
+    id: BasicLevels['id'],
+    typeId: 'stage' | 'level' = 'level',
+    {
+      status,
+      type,
+      equal,
+      endsWith,
+      includeFiles = false,
+      includeUsers = true,
+    }: OptionsBasicFilters
+  ) {
+    if (!id) throw new AppError('Opps, ID invalido', 400);
+    //---------------------------- filter_items ------------------------------
+    const name = equal ? { endsWith } : { not: { endsWith } };
+    const files = includeFiles ? { files: { where: { type, name } } } : {};
+    const users = includeUsers
+      ? {
+          users: {
+            select: {
+              userId: true,
+              percentage: true,
+              user: Queries.selectProfileUser,
+            },
+          },
+        }
+      : {};
+    //------------------------------------------------------------------------
+    let findStage = null;
+    if (typeId === 'level') {
+      findStage = await prisma.basicLevels.findUnique({
+        where: { id },
+        include: {
+          subTasks: {
+            where: { status },
+            orderBy: { index: 'asc' },
+            include: {
+              ...files,
+              ...users,
+            },
+          },
+        },
+      });
+    }
+    if (typeId === 'level' && !findStage)
+      throw new AppError('Opps, nivel inexistente', 400);
+    //---------------------------- filter_items ------------------------------
+    const level = findStage ? { gt: findStage.level } : {};
+    const stagesId = typeId === 'level' ? findStage?.stagesId : id;
+    //------------------------------------------------------------------------
     const getBasicList = await prisma.basicLevels.findMany({
-      where: { stagesId: id },
+      where: { stagesId, level },
       orderBy: { index: 'asc' },
       include: {
         subTasks: {
           where: { status },
-          include: {
-            files: true,
-          },
+          include: { ...files, ...users },
           orderBy: { index: 'asc' },
         },
       },
     });
-    const list = this.findList(getBasicList, 0, 0, '');
-    // const list = this.folderlist(
-    //   getBasicList,
-    //   {
-    //     _item: '',
-    //     _path: 'compress_cp/test',
-    //     _rootId: 0,
-    //     _rootLevel: 0,
-    //   },
-    //   true
-    // );
+    const aux: typeof getBasicList = findStage ? [findStage] : [];
+    const info = {
+      rootId: findStage?.rootId ?? 0,
+      rootLevel: findStage?.rootLevel ?? 0,
+    };
+    return { info, data: [...aux, ...getBasicList] };
+  }
+
+  public static async find(
+    id: BasicLevels['id'],
+    status?: BasicTasks['status']
+  ) {
+    const getBasicList = await this.getList(id, 'level', { status });
+    const { rootId, rootLevel } = getBasicList.info;
+    const list = this.findList(getBasicList.data, rootId, rootLevel, '');
     return list;
   }
 
-  static async create({
+  public static async create({
     name,
     stagesId,
     rootId,
-    userId,
+    // userId,
     typeItem,
   }: BasicLevels) {
     //------------------------ Set new item ---------------------------
     const { quantity } = await this.duplicate(rootId, stagesId, name, 'ROOT');
     const index = quantity + 1;
-    const { rootLevel } = await this.findRoot(rootId);
-    // const { ootItem, rootLevel, project, include, area } = root;
+    const { rootLevel, levelList: list } = await this.findRoot(rootId);
     const stages = { connect: { id: stagesId } };
     const level = rootLevel + 1;
+    const levelList = [...(list ? list : []), rootId];
     const _values = {
       rootId,
       name,
@@ -78,12 +128,13 @@ class BasicLevelServices {
       stages,
       level,
       typeItem,
+      levelList,
     };
     const newLevel = await prisma.basicLevels.create({ data: _values });
     return newLevel;
   }
 
-  static async update(
+  public static async update(
     id: BasicLevels['id'],
     { name, userId = null }: BasicLevels
   ) {
@@ -98,33 +149,7 @@ class BasicLevelServices {
     return updateLevel;
   }
 
-  static async addToUpperorLower(
-    id: BasicLevels['id'],
-    { name, userId }: BasicLevels,
-    typeGte: 'upper' | 'lower'
-  ) {
-    if (!id || !typeGte) throw new AppError('Oops!,ID invalido', 400);
-    //--------------------------- Find level ------------------------------------
-    const findLevel = await prisma.basicLevels.findUnique({ where: { id } });
-    if (!findLevel)
-      throw new AppError('No se pudieron encontrar el nivel', 404);
-    const { index: _index, stagesId, rootId, level } = findLevel;
-    const index = typeGte === 'upper' ? { gte: _index } : { gt: _index };
-    //-----------------------------------------------------------------
-    const filterLevelList = await prisma.basicLevels.groupBy({
-      by: ['id', 'index'],
-      where: { stagesId, rootId, level, index },
-      orderBy: { index: 'asc' },
-    });
-    const filterData = lodash.omit(findLevel, ['id', 'name', 'userId']);
-    const parseIndex = typeGte === 'upper' ? _index : _index + 1;
-    const data = { ...filterData, name, userId: null, index: parseIndex };
-    const newLevel = await prisma.basicLevels.create({ data });
-    const updateLevels = await this.listByUpdate(filterLevelList, 1);
-    return { newLevel, updateLevels };
-  }
-
-  static async delete(id: BasicLevels['id']) {
+  public static async delete(id: BasicLevels['id']) {
     if (!id) throw new AppError('Oops!, ID invalido', 400);
     const findLevel = await prisma.basicLevels.findUnique({ where: { id } });
     if (!findLevel)
@@ -149,12 +174,42 @@ class BasicLevelServices {
     return { deleteLevels, updateLevels, deleteLevel };
   }
 
-  static findList(
+  public static async addToUpperorLower(
+    id: BasicLevels['id'],
+    {
+      name,
+    }: // userId
+    BasicLevels,
+    typeGte: 'upper' | 'lower'
+  ) {
+    if (!id || !typeGte) throw new AppError('Oops!,ID invalido', 400);
+    //--------------------------- Find level ------------------------------------
+    const findLevel = await prisma.basicLevels.findUnique({ where: { id } });
+    if (!findLevel)
+      throw new AppError('No se pudieron encontrar el nivel', 404);
+    const { index: _index, stagesId, rootId, level, levelList } = findLevel;
+    const index = typeGte === 'upper' ? { gte: _index } : { gt: _index };
+    //-----------------------------------------------------------------
+    const filterLevelList = await prisma.basicLevels.groupBy({
+      by: ['id', 'index'],
+      where: { stagesId, rootId, level, index },
+      orderBy: { index: 'asc' },
+    });
+    const filterData = lodash.omit(findLevel, ['id', 'name', 'userId']);
+    const parseIndex = typeGte === 'upper' ? _index : _index + 1;
+    const aux = { ...filterData, userId: null, index: parseIndex };
+    const data = { ...aux, name, levelList };
+    const newLevel = await prisma.basicLevels.create({ data });
+    const updateLevels = await this.listByUpdate(filterLevelList, 1);
+    return { newLevel, updateLevels };
+  }
+
+  public static findList(
     array: GetFilterBasicLevels[],
     _rootId: number,
     _rootLevel: number,
-    _item: string
-    // listCost?: ListCostType
+    _item: string,
+    listCost?: ListCostType
   ) {
     const findList = array.filter(
       ({ rootId, rootLevel }) => rootId === _rootId && rootLevel === _rootLevel
@@ -162,38 +217,52 @@ class BasicLevelServices {
     const list = array.filter(value => !findList.includes(value));
     if (!findList.length) return [];
     const newList = findList.map(({ subTasks, ...value }) => {
+      //-----------------------------------------------------------
       const findItem = numberToConvert(value.index, value.typeItem);
       const item = _item + (_item ? '.' : '') + findItem;
-      let data;
+      //-----------------------------------------------------------
+      let data: any = { item, ...dataWithLevel, ...value };
       if (subTasks && subTasks.length) {
-        const subtasks = subTasks.map(({ index, typeItem, ...value }) => {
-          const findItem = numberToConvert(index, typeItem);
-          const newItem = item + (item ? '.' : '') + findItem;
-          return { item: newItem, index, typeItem, ...value };
-        });
-        data = { subTasks: subtasks };
+        const { subTasks: subtasks, ...info } = percentageBasicTasks(
+          subTasks,
+          item,
+          listCost
+        );
+        data = { item, ...value, ...info, subTasks: subtasks };
       }
       const nextLevel: typeof findList = this.findList(
         list,
         value.id,
         value.level,
-        item
+        item,
+        listCost
       );
-      if (!nextLevel.length) return { ...value, item, ...data };
-      return { ...value, item, ...data, nextLevel };
+      if (!nextLevel.length) return data;
+      return { ...data, nextLevel };
     });
+    // newList.forEach(level => {
+    //   level.total = calculateBasicSumTotal(level, 'total');
+    //   level.percentage = calculateBasicSumTotal(level, 'percentage');
+    //   console.log({
+    //     sum_percentage: level.percentage,
+    //     percentage: isNaN(level.percentage / level.total)
+    //       ? 0
+    //       : level.percentage / level.total,
+    //     total: level.total,
+    //     item: level.item,
+    //   });
+    // });
     return newList;
-    // const nextLevel = this.findList(list,)
   }
 
-  static folderlist(
+  public static async folderlist(
     array: GetFolderBasicLevels[],
     {
-      _rootId,
-      _rootLevel,
-      _item,
-      _path,
-    }: { _rootId: number; _rootLevel: number; _item: string; _path: string },
+      rootId: _rootId,
+      rootLevel: _rootLevel,
+      item: _item,
+      path: _path,
+    }: GeneratePathAtributtes,
     createfiles: boolean = false
   ) {
     const findList = array.filter(
@@ -202,81 +271,83 @@ class BasicLevelServices {
     const list = array.filter(value => !findList.includes(value));
     if (!findList.length) return [];
     const newList = findList.map(
-      ({ id, index, level, typeItem, name, subTasks }) => {
+      async ({ id, index, level, typeItem, name, subTasks }) => {
+        //------------------------- item_definition -------------------------------------
         const findItem = numberToConvert(index, typeItem);
         const item = _item + (_item ? '.' : '') + findItem;
-        const newPath = item + '.' + name;
-        const path = _path + '/' + newPath;
-        if (createfiles && !existsSync(path))
-          mkdirSync(path, { recursive: true });
-        const subtasks = subTasks?.map(
-          ({ index, name, typeItem, id, files: _files }) => {
+        const path = _path + '/' + item + '.' + name;
+        //--------------------------------------------------------------
+        const subtaskPromise = subTasks.map(
+          async ({ index, name, typeItem, id, files: _files }) => {
             const findItem = numberToConvert(index, typeItem);
-            const newItem = item + (item ? '.' : '') + findItem;
-            const newName = newItem + '.' + name;
-            const _path = path + '/' + newName;
-            //------------------------- Count files per task ------------------------------------------
-            const countExt =
-              _files?.reduce((acc: ObjectNumber, value) => {
-                const ext = value.name.split('.').at(-1) || '';
-                acc[ext] = (acc[ext] || 0) + 1;
-                return acc;
-              }, {}) || {};
-            //-------------------------------------------------------------------
+            const taskItem = item + (item ? '.' : '') + findItem;
+            const taskName = taskItem + '.' + name;
+            const taskPath = path + '/' + taskItem;
+            //--------------- Count files per task ------------------------------
+            const countExt = this.fileCounter(_files);
             const files =
-              _files?.map(({ dir, name: nameFile, id, type }) => {
+              _files.map(({ dir, name: nameFile, id, type }) => {
                 const oldPath = dir + '/' + nameFile;
+                const newPath = path + '/' + nameFile;
                 if (type === 'UPLOADS') {
                   const ext = nameFile.split('.').at(-1) || '';
                   countExt[ext] -= 1;
                   const pivot = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
-                  const newFileName = newName + pivot + '.' + ext;
+                  const newFileName = taskName + pivot + '.' + ext;
                   const newPath = path + '/' + newFileName;
                   return { id, oldPath, newPath };
                 }
-                const newPath = path + '/' + nameFile;
                 return { id, oldPath, newPath };
               }) || [];
-            if (createfiles)
-              files.forEach(({ newPath, oldPath }) =>
-                copyFileSync(oldPath, newPath)
-              );
-            return { id, index, name: newName, path: _path, files };
+            //----------------------------ne---------------------------------------
+            if (createfiles) {
+              await new Promise(resolve => {
+                mkdirSync(path, { recursive: true });
+                files.forEach(file => copyFileSync(file.oldPath, file.newPath));
+                resolve(path);
+              });
+            }
+            return { id, index, name: taskName, path: taskPath, files };
           }
         );
-        const next: FolderLevels[] = this.folderlist(list, {
-          _rootId: id,
-          _rootLevel: level,
-          _item: item,
-          _path: path,
-        });
+        const subtasks = await Promise.all(subtaskPromise);
+        if (createfiles && !subTasks.length)
+          await new Promise(resolve => {
+            mkdirSync(path, { recursive: true });
+            resolve(path);
+          });
+        const nextLevel = {
+          rootId: id,
+          rootLevel: level,
+          item: item,
+          path: path,
+        };
+        const next: FolderLevels[] = await this.folderlist(
+          list,
+          nextLevel,
+          createfiles
+        );
         const data = { id, index, path, subtasks };
         if (!next.length) return data;
         return { ...data, next };
       }
     );
-    return newList;
+    return await Promise.all(newList);
   }
 
-  static async listByUpdate(
+  public static async listByUpdate(
     list: { id: number; index: number }[],
     quantity: number = -1
   ) {
-    const updateListPerLevel = await Promise.all(
-      list.map(async ({ id, index }) => {
-        const data = { index: index + quantity };
-        const update = await prisma.basicLevels.update({ where: { id }, data });
-        return update.id;
-      })
-    );
-    return updateListPerLevel;
+    const updateListPerLevel = list.map(({ id, index }) => {
+      const data = { index: index + quantity };
+      const update = prisma.basicLevels.update({ where: { id }, data });
+      return update;
+    });
+    return prisma.$transaction(updateListPerLevel);
   }
 
-  // static valueBasic: FolderBasicLevelList[] = JSON.parse(
-  //   readFileSync('compress_cp/values_basic.json', 'utf-8')
-  // );
-
-  static async mergePDFs(
+  public static async mergePDFs(
     id: BasicLevels['id'],
     { status, typeFile = 'all' }: MergePDFBasicFiles
   ) {
@@ -299,33 +370,33 @@ class BasicLevelServices {
       },
     });
     const list = this.folderlist(getBasicList, {
-      _rootId: 0,
-      _rootLevel: 0,
-      _item: '',
-      _path: 'compress_cp/basic',
+      rootId: 0,
+      rootLevel: 0,
+      item: '',
+      path: 'compress_cp/basic',
     });
-
-    const parseFiles = list.map(file => file as FolderBasicLevelList);
-    if (typeFile === 'pdf') {
-      mkdirSync('compress_cp/filemerge', { recursive: true });
-      await this.parsingPathMerge(parseFiles);
-      const patito2 = readdirSync('compress_cp/filemerge');
-      const patito3 = patito2.map(value => 'compress_cp/filemerge/' + value);
-      console.log(patito3);
-      await GenerateFiles.merge(patito3, 'compress_cp/mergetask.pdf');
-      // const sizeMerge = statSync('compress_cp/mergetask.pdf').size;
-      // console.log(sizeMerge);
-      setTimeout(() => {
-        rmSync('compress_cp/filemerge', { recursive: true });
-      }, 4000);
-    }
+    list;
+    // const parseFiles = list.map(file => file as FolderBasicLevelList);
+    // if (typeFile === 'pdf') {
+    //   mkdirSync('compress_cp/filemerge', { recursive: true });
+    //   await this.parsingPathMerge(parseFiles);
+    //   const patito2 = readdirSync('compress_cp/filemerge');
+    //   const patito3 = patito2.map(value => 'compress_cp/filemerge/' + value);
+    //   console.log(patito3);
+    //   await GenerateFiles.merge(patito3, 'compress_cp/mergetask.pdf');
+    //   // const sizeMerge = statSync('compress_cp/mergetask.pdf').size;
+    //   // console.log(sizeMerge);
+    //   setTimeout(() => {
+    //     rmSync('compress_cp/filemerge', { recursive: true });
+    //   }, 4000);
+    // }
 
     return this.listFilter;
   }
 
-  static listFilter: { name: string; files: string[] }[] = [];
+  public static listFilter: { name: string; files: string[] }[] = [];
 
-  static async parsingPathMerge(list: FolderBasicLevelList[]) {
+  public static async parsingPathMerge(list: FolderBasicLevelList[]) {
     list?.forEach(async ({ subtasks, next }) => {
       if (subtasks && subtasks.length) {
         subtasks.forEach(async value => {
@@ -340,7 +411,7 @@ class BasicLevelServices {
     });
   }
 
-  static async listByDelete(rootId: BasicLevels['rootId']) {
+  private static async listByDelete(rootId: BasicLevels['rootId']) {
     if (!rootId) throw new AppError('Oops!, ID invalido', 400);
     const findIds = await prisma.basicLevels.groupBy({
       by: ['id', 'index'],
@@ -357,19 +428,14 @@ class BasicLevelServices {
     return list;
   }
 
-  static async findRoot(id: number) {
+  private static async findRoot(id: number) {
     const root = await prisma.basicLevels.findUnique({ where: { id } });
-    return {
-      stagesId: root ? root.stagesId : 0,
-      rootLevel: root ? root.level : 0,
-      project: root ? root.isProject : false,
-      area: root ? root.isArea : false,
-      include: root ? root.isInclude : false,
-      typeIndex: root ? root.typeItem : null,
-    };
+    if (!root) return { stagesId: 0, rootLevel: 0, typeIndex: null };
+    const { stagesId, level: rootLevel, typeItem: typeIndex, levelList } = root;
+    return { stagesId, rootLevel, typeIndex, levelList };
   }
 
-  static async duplicate(
+  public static async duplicate(
     id: number,
     stageId: number,
     name: string,
@@ -393,6 +459,19 @@ class BasicLevelServices {
     const duplicated = list.some(l => l.name.includes(name));
     return { duplicated, rootId, quantity: list.length };
   }
+
+  private static fileCounter(files: BasicFiles[]) {
+    const countExt =
+      files?.reduce((acc: ObjectNumber, value) => {
+        const ext = value.name.split('.').at(-1) || '';
+        acc[ext] = (acc[ext] || 0) + 1;
+        return acc;
+      }, {}) || {};
+    return countExt;
+  }
 }
 
 export default BasicLevelServices;
+function calculateSumTotal(): any {
+  throw new Error('Function not implemented.');
+}
