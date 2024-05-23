@@ -6,13 +6,17 @@ import {
   _mod_role,
 } from '../middlewares/role.middleware';
 import {
+  DuplicateControllers,
   duplicateLevels,
   duplicateProject,
   duplicateStages,
   duplicateSubtask,
 } from '../controllers';
 
+const { basicLevels } = new DuplicateControllers();
+
 const router = Router();
+router.post('/basic-level/:id', basicLevels);
 router.use(authenticateHandler);
 //EMPLOYEE ROLE
 router.use(_employee_role);

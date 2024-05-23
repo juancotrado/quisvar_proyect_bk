@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { DuplicatesServices } from '../services';
+import { ControllerFunction } from 'types/patterns';
 
 export const duplicateProject = async (
   req: Request,
@@ -64,6 +65,22 @@ export const duplicateLevels = async (
     next(error);
   }
 };
+
+class DuplicateControllers {
+  public basicLevels: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id: levels_Id } = req.params;
+      const { name } = req.body;
+      const result = await DuplicatesServices.basicLevel(+levels_Id, name);
+      res.status(201).json(result);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+}
+
+export default DuplicateControllers;
 
 export const duplicateSubtask = async (
   req: Request,

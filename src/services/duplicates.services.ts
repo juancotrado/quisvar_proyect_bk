@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { copyFileSync, mkdirSync } from 'fs';
+import { copyFileSync, existsSync, mkdirSync } from 'fs';
 import AppError from '../utils/appError';
 import {
+  BasicLevels,
   Contratc,
   Files,
   Levels,
@@ -11,7 +12,12 @@ import {
   prisma,
 } from '../utils/prisma.server';
 import PathServices from './paths.services';
-import { GetDuplicateLevels, SubTaskFiles } from 'types/types';
+import {
+  BasicTaskFiles,
+  GetDuplicateBasicLevels,
+  GetDuplicateLevels,
+  SubTaskFiles,
+} from 'types/types';
 import {
   getPathProject,
   getPathStage,
@@ -22,6 +28,8 @@ import {
 import LevelsServices from './levels.services';
 import SubTasksServices from './subtasks.services';
 import StageServices from './stages.services';
+import BasicLevelServices from './basiclevels.services';
+import lodash from 'lodash';
 
 class DuplicatesServices {
   static async project(
@@ -166,6 +174,54 @@ class DuplicatesServices {
     };
   }
 
+  static async basicLevel(lvlId: Levels['id'], name: string) {
+    if (!lvlId) throw new AppError('Oops!, ID invalido', 400);
+    const rootLevel = await prisma.basicLevels.findUnique({
+      where: { id: lvlId },
+      include: {
+        subTasks: { include: { files: { where: { type: 'MODEL' } } } },
+      },
+    });
+    if (!rootLevel) throw new AppError('No se pudó encontrar nivel', 400);
+    const duplicate = await BasicLevelServices.duplicate(lvlId, 0, name, 'ID');
+    const { quantity, duplicated } = duplicate;
+    if (duplicated) throw new AppError('Ya se registro el nombre', 400);
+    const { stagesId, level } = rootLevel;
+    const { subTasks, ...otherProps } = lodash.omit(rootLevel, ['id', 'name']);
+    //--------------------------create_level---------------------------------------
+    const data = { ...otherProps, name, index: quantity + 1 };
+    const newLevel = await prisma.basicLevels.create({ data });
+    //----------------------------get_levels---------------------------------------
+    const getList = await prisma.basicLevels.findMany({
+      where: { stagesId, level: { gt: level } },
+      orderBy: { index: 'asc' },
+      include: {
+        subTasks: { include: { files: { where: { type: 'MODEL' } } } },
+      },
+    });
+    //-------------------------duplicate_subtasks---------------------------------
+    const _subtasks = newLevel
+      ? await this.listBasictask(subTasks, newLevel)
+      : [];
+    const nextLevel = this.getBasicList(
+      getList,
+      lvlId,
+      level,
+      newLevel.stagesId
+    );
+    const createDuplicate = await this.createBasicLevel(
+      nextLevel,
+      newLevel.id,
+      newLevel.levelList,
+      ''
+    );
+    return {
+      ...data,
+      subTasks: _subtasks,
+      createDuplicate,
+    };
+  }
+
   static async subTask(_id: SubTasks['id'], name: string) {
     const verify = await SubTasksServices.findDuplicate(name, _id, 'ID');
     const { duplicated, quantity } = verify;
@@ -288,6 +344,77 @@ class DuplicatesServices {
     return await Promise.all(newSubTaks);
   }
 
+  static async listBasictask(
+    list: BasicTaskFiles[],
+    { id: rootId }: BasicLevels,
+    stagePath?: string
+  ) {
+    const newSubTaks = list.map(({ id, files, ...subtask }) => {
+      const { levels_Id, createdAt, updatedAt, ...data } = subtask;
+      //--------------------------set_new_files----------------------------
+      const hash = new Date().getTime();
+      const newFiles = files.map(file => {
+        const name = hash + '$$' + file.name.split('$$')[1];
+        const data = lodash.pick(file, ['type', 'dir']);
+        const src = file.dir + '/' + file.name;
+        if (existsSync(src)) copyFileSync(src, file.dir + '/' + name);
+        return { ...data, name };
+      });
+      return prisma.basicTasks.create({
+        data: {
+          ...data,
+          status: 'UNRESOLVED',
+          levels_Id: rootId,
+          files: { createMany: { data: newFiles } },
+        },
+        include: { files: true },
+      });
+    });
+    return await prisma.$transaction(newSubTaks);
+  }
+
+  static async createBasicLevel(
+    array: GetDuplicateBasicLevels[],
+    mainId: number,
+    history: number[],
+    stagePath?: string
+  ) {
+    const levelList = [...history, mainId];
+    const createList = array.map(({ ...level }) => {
+      const data = lodash.omit(level, [
+        'id',
+        'next',
+        'subTasks',
+        'rootId',
+        'levelList',
+      ]);
+      return prisma.basicLevels.create({
+        data: { ...data, rootId: mainId, levelList },
+      });
+    });
+    const getNewList = await prisma.$transaction(createList);
+    //---------------------------create_file---------------------------------------
+    const list = array.map(async ({ id, next, subTasks, ...level }) => {
+      const newLevel = getNewList.find(data => data.index === level.index)!;
+      //-------------------------duplicate_subtasks---------------------------------
+      const _subTasks =
+        newLevel && subTasks
+          ? await this.listBasictask(subTasks, newLevel, stagePath)
+          : [];
+      // //----------------------------------------------------------------------------
+      if (!next) return { ...level, id, subTasks: _subTasks };
+      type Next = GetDuplicateBasicLevels[];
+      const _next: Next = await this.createBasicLevel(
+        next,
+        newLevel.id,
+        levelList,
+        stagePath
+      );
+      return { ...level, id, subTasks, next: _next };
+    });
+    return Promise.all(list);
+  }
+
   static async createLevel(
     array: GetDuplicateLevels[],
     mainId: number,
@@ -321,6 +448,34 @@ class DuplicatesServices {
       return { ...level, id, subTasks, next: _next };
     });
     return Promise.all(list);
+  }
+
+  static getBasicList(
+    array: GetDuplicateBasicLevels[],
+    _rootId: number,
+    _rootLevel: number,
+    _stageId?: number
+  ) {
+    const findList = array.filter(
+      ({ rootId, rootLevel }) => rootId === _rootId && rootLevel === _rootLevel
+    );
+    const list = array.filter(value => !findList.includes(value));
+    if (!findList.length) return [];
+    const newList = findList.map(({ subTasks, stagesId: stgId, ...value }) => {
+      const stagesId = _stageId ?? stgId;
+      let data;
+      if (subTasks && subTasks.length) data = { subTasks };
+      const props = { ...value, stagesId };
+      const next: typeof findList = this.getBasicList(
+        list,
+        value.id,
+        value.level,
+        stagesId
+      );
+      if (!next.length) return { ...props, ...data };
+      return { ...props, ...data, next };
+    });
+    return newList;
   }
 
   static getList(
