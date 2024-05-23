@@ -90,6 +90,131 @@ class SubTasksServices {
     return newSubTask;
   }
 
+  public static async addToUper(
+    id: SubTasks['id'],
+    { name, days, description }: UpperAddSubtask,
+    typeGte: 'upper' | 'lower'
+  ) {
+    if (!id || !typeGte) throw new AppError('Oops!,ID invalido', 400);
+    //------------------------------------------------------------------
+    const findSubTaskLower = await prisma.subTasks.findUnique({
+      where: { id },
+      include: { Levels: { select: { item: true, id: true } } },
+    });
+    if (!findSubTaskLower) throw new AppError('No existe la tarea', 400);
+    const { levels_Id, index, Levels, item, typeItem } = findSubTaskLower;
+
+    const data = {
+      item,
+      name,
+      days,
+      levels_Id,
+      typeItem,
+      description,
+    };
+    //------------------------------------------------------------------
+    let newSubTask;
+    if (typeGte === 'lower') {
+      const { rootItem } = getRootItem(item);
+      const newItem = rootItem + '.' + numberToConvert(index + 1, typeItem);
+      newSubTask = await prisma.subTasks.create({
+        data: { ...data, typeItem, index: index + 1, item: newItem },
+        include: { users: { select: { user: Queries.selectProfileUser } } },
+      });
+    } else {
+      newSubTask = await prisma.subTasks.create({
+        data: { ...data, typeItem, index },
+        include: { users: { select: { user: Queries.selectProfileUser } } },
+      });
+    }
+    const newPath = await PathServices.level(Levels.id);
+    const newEditables = newPath.replace('projects', 'editables');
+    //------------------------------------------------------------------
+    const typeFilter = typeGte === 'upper' ? { gte: index } : { gt: index };
+    //------------------------------------------------------------------
+    const list = await prisma.subTasks.findMany({
+      where: {
+        levels_Id,
+        index: typeFilter,
+        id: { not: newSubTask.id },
+      },
+      orderBy: { index: 'asc' },
+      include: {
+        files: {
+          where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] },
+          select: { id: true, dir: true, name: true, type: true },
+        },
+      },
+    });
+
+    const aux = typeGte === 'lower' ? 2 : 1;
+    const updateBlock = await this.updateBlock(
+      list,
+      Levels.item,
+      newPath,
+      newEditables,
+      index + aux
+    );
+    return [...updateBlock];
+  }
+
+  public static async update(
+    id: SubTasks['id'],
+    {
+      days,
+      description,
+      name,
+      price,
+    }: Pick<SubTasks, 'name' | 'days' | 'price' | 'description'>
+  ) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const updateTask = await prisma.subTasks.update({
+      where: { id },
+      data: {
+        days,
+        description,
+        name,
+        price,
+      },
+      include: {
+        users: { select: { user: Queries.selectProfileUser } },
+      },
+    });
+    return updateTask;
+  }
+
+  public static async delete(id: SubTasks['id']) {
+    if (!id) throw new AppError('Oops!,ID invalido', 400);
+    const subTaskDelete = await prisma.subTasks.delete({
+      where: { id },
+      include: { Levels: { select: { item: true, id: true } } },
+    });
+    const { levels_Id, index, Levels } = subTaskDelete;
+    const newPath = await PathServices.level(Levels.id);
+    const newEditables = newPath.replace('projects', 'editables');
+    const list = await prisma.subTasks.findMany({
+      where: {
+        levels_Id,
+        index: { gte: index },
+      },
+      orderBy: { index: 'asc' },
+      include: {
+        files: {
+          where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] },
+          select: { id: true, dir: true, name: true, type: true },
+        },
+      },
+    });
+    const updateBlock = await this.updateBlock(
+      list,
+      Levels.item,
+      newPath,
+      newEditables,
+      index
+    );
+    return { ...subTaskDelete, tasks: updateBlock };
+  }
+
   public static async assigned(
     subtaskId: SubTasks['id'],
     userId: Users['id'],
@@ -132,31 +257,6 @@ class SubTasksServices {
       });
     }
     throw new AppError('Oops!, Necesitamos un status para esta consulta', 400);
-  }
-
-  public static async update(
-    id: SubTasks['id'],
-    {
-      days,
-      description,
-      name,
-      price,
-    }: Pick<SubTasks, 'name' | 'days' | 'price' | 'description'>
-  ) {
-    if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const updateTask = await prisma.subTasks.update({
-      where: { id },
-      data: {
-        days,
-        description,
-        name,
-        price,
-      },
-      include: {
-        users: { select: { user: Queries.selectProfileUser } },
-      },
-    });
-    return updateTask;
   }
 
   public static async resetStatus(id: SubTasks['id']) {
@@ -349,106 +449,6 @@ class SubTasksServices {
       })
     );
     return subTasks;
-  }
-
-  public static async addToUper(
-    id: SubTasks['id'],
-    { name, days, description }: UpperAddSubtask,
-    typeGte: 'upper' | 'lower'
-  ) {
-    if (!id || !typeGte) throw new AppError('Oops!,ID invalido', 400);
-    //------------------------------------------------------------------
-    const findSubTaskLower = await prisma.subTasks.findUnique({
-      where: { id },
-      include: { Levels: { select: { item: true, id: true } } },
-    });
-    if (!findSubTaskLower) throw new AppError('No existe la tarea', 400);
-    const { levels_Id, index, Levels, item, typeItem } = findSubTaskLower;
-
-    const data = {
-      item,
-      name,
-      days,
-      levels_Id,
-      typeItem,
-      description,
-    };
-    //------------------------------------------------------------------
-    let newSubTask;
-    if (typeGte === 'lower') {
-      const { rootItem } = getRootItem(item);
-      const newItem = rootItem + '.' + numberToConvert(index + 1, typeItem);
-      newSubTask = await prisma.subTasks.create({
-        data: { ...data, typeItem, index: index + 1, item: newItem },
-        include: { users: { select: { user: Queries.selectProfileUser } } },
-      });
-    } else {
-      newSubTask = await prisma.subTasks.create({
-        data: { ...data, typeItem, index },
-        include: { users: { select: { user: Queries.selectProfileUser } } },
-      });
-    }
-    const newPath = await PathServices.level(Levels.id);
-    const newEditables = newPath.replace('projects', 'editables');
-    //------------------------------------------------------------------
-    const typeFilter = typeGte === 'upper' ? { gte: index } : { gt: index };
-    //------------------------------------------------------------------
-    const list = await prisma.subTasks.findMany({
-      where: {
-        levels_Id,
-        index: typeFilter,
-        id: { not: newSubTask.id },
-      },
-      orderBy: { index: 'asc' },
-      include: {
-        files: {
-          where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] },
-          select: { id: true, dir: true, name: true, type: true },
-        },
-      },
-    });
-
-    const aux = typeGte === 'lower' ? 2 : 1;
-    const updateBlock = await this.updateBlock(
-      list,
-      Levels.item,
-      newPath,
-      newEditables,
-      index + aux
-    );
-    return [...updateBlock];
-  }
-
-  public static async delete(id: SubTasks['id']) {
-    if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const subTaskDelete = await prisma.subTasks.delete({
-      where: { id },
-      include: { Levels: { select: { item: true, id: true } } },
-    });
-    const { levels_Id, index, Levels } = subTaskDelete;
-    const newPath = await PathServices.level(Levels.id);
-    const newEditables = newPath.replace('projects', 'editables');
-    const list = await prisma.subTasks.findMany({
-      where: {
-        levels_Id,
-        index: { gte: index },
-      },
-      orderBy: { index: 'asc' },
-      include: {
-        files: {
-          where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] },
-          select: { id: true, dir: true, name: true, type: true },
-        },
-      },
-    });
-    const updateBlock = await this.updateBlock(
-      list,
-      Levels.item,
-      newPath,
-      newEditables,
-      index
-    );
-    return { ...subTaskDelete, tasks: updateBlock };
   }
 
   public static async updatePercentage(

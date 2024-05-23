@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Levels, Stages, SubTasks } from '@prisma/client';
+import { BasicLevels, Levels, Stages, SubTasks } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
 import { parsePath, renameDir } from '../utils/fileSystem';
@@ -497,13 +497,13 @@ class LevelsServices {
         const price = sumValues(subtasks, 'price');
         const days = sumValues(subtasks, 'days');
         const spending = sumValues(subtasks, 'spending');
-        const percentage = sumValues(subtasks, 'percentage') / subTasks.length;
+        const percentage = sumValues(subtasks, 'percentage');
         //---------------------------------------------------------------------
         const list = subtasks.map(({ listUsers }) => listUsers).flat(2);
         const listUsers = list.reduce(
           (acc: typeof list, { count, userId, ...data }) => {
             const exist = acc.findIndex(u => u.userId === userId);
-            exist > 0
+            exist >= 0
               ? (acc[exist].count += count)
               : acc.push({ userId, count, ...data });
             return acc;
