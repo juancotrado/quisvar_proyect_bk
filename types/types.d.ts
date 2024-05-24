@@ -102,7 +102,7 @@ export interface LevelBasic extends BasicLevels {
   days: number;
   listUsers: usersCount[];
   nextLevel?: LevelBasic[];
-  subTasks?: any[];
+  subTasks?: unknown[];
 }
 export interface LevelInfoDetails {
   spending: number;
@@ -179,6 +179,12 @@ export interface GetListBasicsByStage extends BasicLevels {
 export interface FolderLevels {
   id: number;
   index: number;
+  name: string;
+}
+export interface MergeLevels {
+  id: number;
+  name: string;
+  cover: boolean;
 }
 
 export interface BasicFilesForm {
@@ -250,6 +256,7 @@ export type FilesProps = { [fieldname: string]: Express.Multer.File[] };
 export interface ParametersPayMail {
   offset?: number;
   limit?: number;
+  page?: number;
   type?: PayMail['type'];
   officeId?: PayMessages['officeId'];
   // status?: boolean;
@@ -261,6 +268,7 @@ export interface ParametersPayMail {
 export interface ParametersMail {
   offset?: number;
   limit?: number;
+  page?: number;
   type?: Mail['type'];
   officeId?: Messages['officeId'];
   typeMessage?: Messages['type'];
@@ -475,6 +483,23 @@ export interface OptionsBasicFilters {
   includeFiles?: boolean;
   includeUsers?: boolean;
   endsWith?: string;
+}
+
+export interface OptionsMergePdfs {
+  createFiles?: boolean;
+  createCover?: boolean;
+}
+
+export interface BasicLevelAttributes extends OptionsBasicFilters {
+  sourceDir: string;
+  itemLevel?: string;
+  createFiles?: boolean;
+}
+export interface MergePdfLevelAttributes
+  extends OptionsBasicFilters,
+    OptionsMergePdfs {
+  sourceDir: string;
+  itemLevel?: string;
 }
 
 export interface percentageTaskFilter extends BasicTaskFilter {

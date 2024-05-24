@@ -20,12 +20,21 @@ type UpdateMessage = Pick<
   'senderId' | 'receiverId' | 'header' | 'description' | 'title'
 >;
 class MailServices {
+  private static getPage({ limit, offset, page }: ParametersMail) {
+    if (offset !== undefined) return offset;
+    if (!offset && page === undefined) return undefined;
+    const numberPage = limit && page && limit * page;
+    const newPage = numberPage ? numberPage + 1 : numberPage;
+    return newPage;
+  }
+
   public static async onHolding({
-    offset: skip,
+    offset,
     limit: take,
     officeId,
     typeMessage,
     onHolding,
+    page,
     status,
   }: ParametersMail) {
     const total = await prisma.messages.count({
@@ -37,6 +46,7 @@ class MailServices {
         category: 'DIRECT',
       },
     });
+    const skip = this.getPage({ offset, page, limit: take });
     const mailList = await prisma.messages.findMany({
       where: {
         officeId,
@@ -67,12 +77,13 @@ class MailServices {
     { id: userId }: UserType,
     category: Messages['category'],
     {
-      offset: skip,
+      offset,
       type,
       status,
       typeMessage,
       officeId,
       limit: take,
+      page,
     }: ParametersMail
   ) {
     const onHolding = type === 'SENDER' ? undefined : false;
@@ -95,6 +106,7 @@ class MailServices {
       : undefined;
     //----------------------------------------------------------------
     const newUser = officeId ? managerOffice?.users[0].usersId : userId;
+    const skip = this.getPage({ offset, page, limit: take });
     const mail = await prisma.mail.findMany({
       where: {
         userId: newUser,

@@ -22,10 +22,19 @@ class PayMailServices {
     return undefined;
   }
 
+  private static getPage({ limit, offset, page }: ParametersPayMail) {
+    if (offset !== undefined) return offset;
+    if (!offset && page === undefined) return undefined;
+    const numberPage = limit && page && limit * page;
+    const newPage = numberPage ? numberPage + 1 : numberPage;
+    return newPage;
+  }
+
   public static async onHolding({
-    offset: skip,
+    offset,
     officeId,
     limit: take,
+    page,
     typeMessage,
     status,
     onHolding,
@@ -33,6 +42,7 @@ class PayMailServices {
     const total = await prisma.payMessages.count({
       where: { officeId, status, type: typeMessage, onHolding },
     });
+    const skip = this.getPage({ offset, page, limit: take });
     const mailList = await prisma.payMessages.findMany({
       where: { officeId, status, type: typeMessage, onHolding },
       skip,
@@ -60,8 +70,9 @@ class PayMailServices {
       status,
       typeMessage,
       officeId,
-      offset: skip,
+      offset,
       limit: take,
+      page,
     }: ParametersPayMail
   ) {
     const onHolding = type === 'SENDER' ? undefined : false;
@@ -84,6 +95,7 @@ class PayMailServices {
       : undefined;
     //----------------------------------------------------------------
     const newUser = officeId ? managerOffice?.users[0].usersId : userId;
+    const skip = this.getPage({ offset, page, limit: take });
     const mailList = await prisma.payMail.findMany({
       where: {
         userId: newUser,
