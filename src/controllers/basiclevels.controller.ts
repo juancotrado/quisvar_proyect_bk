@@ -36,7 +36,27 @@ class BasicLevelsController {
       );
       res.status(201).json(query);
     } catch (error) {
-      console.log(error);
+      next(error);
+    }
+  };
+
+  public static updateCover: ControllerFunction = async (req, res, next) => {
+    try {
+      const { body } = req;
+      // const { id: subtask_id } = req.params;
+      const query = await BasicLevelServices.addCoverList(body);
+      res.status(201).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public static updateDays: ControllerFunction = async (req, res, next) => {
+    try {
+      const { body } = req;
+      const query = await BasicLevelServices.updateDaysPerId(body);
+      res.status(201).json(query);
+    } catch (error) {
       next(error);
     }
   };

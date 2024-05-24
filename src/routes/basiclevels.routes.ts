@@ -6,6 +6,7 @@ const {
   upperOrLower,
   delete: deleteStage,
   findById,
+  updateCover,
 } = BasicLevelsController;
 
 class BasicLevelsRouter {
@@ -20,6 +21,8 @@ class BasicLevelsRouter {
     this.router.get('/:id', findById);
     this.router.post('/:id', upperOrLower);
     this.router.put('/:id', update);
+    this.router.patch('/updates-covers', updateCover);
+    this.router.patch('/updates-days', updateCover);
     this.router.delete('/:id', deleteStage);
   }
 }

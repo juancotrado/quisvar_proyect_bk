@@ -2,7 +2,6 @@
 import { BasicFiles, BasicLevels, BasicTasks } from '@prisma/client';
 import lodash from 'lodash';
 import {
-  calculateBasicSumTotal,
   dataWithLevel,
   numberToConvert,
   percentageBasicTasks,
@@ -15,9 +14,11 @@ import {
   GetFilterBasicLevels,
   GetFolderBasicLevels,
   ListCostType,
+  MergeLevels,
   MergePDFBasicFiles,
   ObjectNumber,
   OptionsBasicFilters,
+  OptionsMergePdfs,
   TypeIdsList,
 } from 'types/types';
 import { prisma } from '../utils/prisma.server';
@@ -204,6 +205,24 @@ class BasicLevelServices {
     return { newLevel, updateLevels };
   }
 
+  public static async addCoverList(
+    levels: { id: BasicLevels['id']; cover: boolean }[]
+  ) {
+    const updateList = levels.map(({ id, cover }) => {
+      return prisma.basicLevels.update({ where: { id }, data: { cover } });
+    });
+    return await prisma.$transaction(updateList);
+  }
+
+  public static async updateDaysPerId(
+    levels: { id: BasicLevels['id']; days: number }[]
+  ) {
+    const updateList = levels.map(({ id, days }) => {
+      return prisma.basicTasks.update({ where: { id }, data: { days } });
+    });
+    return await prisma.$transaction(updateList);
+  }
+
   public static findList(
     array: GetFilterBasicLevels[],
     _rootId: number,
@@ -240,18 +259,6 @@ class BasicLevelServices {
       if (!nextLevel.length) return data;
       return { ...data, nextLevel };
     });
-    // newList.forEach(level => {
-    //   level.total = calculateBasicSumTotal(level, 'total');
-    //   level.percentage = calculateBasicSumTotal(level, 'percentage');
-    //   console.log({
-    //     sum_percentage: level.percentage,
-    //     percentage: isNaN(level.percentage / level.total)
-    //       ? 0
-    //       : level.percentage / level.total,
-    //     total: level.total,
-    //     item: level.item,
-    //   });
-    // });
     return newList;
   }
 
@@ -263,7 +270,7 @@ class BasicLevelServices {
       item: _item,
       path: _path,
     }: GeneratePathAtributtes,
-    createfiles: boolean = false
+    createFiles: boolean
   ) {
     const findList = array.filter(
       ({ rootId, rootLevel }) => rootId === _rootId && rootLevel === _rootLevel
@@ -271,67 +278,113 @@ class BasicLevelServices {
     const list = array.filter(value => !findList.includes(value));
     if (!findList.length) return [];
     const newList = findList.map(
-      async ({ id, index, level, typeItem, name, subTasks }) => {
-        //------------------------- item_definition -------------------------------------
-        const findItem = numberToConvert(index, typeItem);
-        const item = _item + (_item ? '.' : '') + findItem;
-        const path = _path + '/' + item + '.' + name;
+      async ({ subTasks, id: rootId, level: rootLevel, ...values }) => {
+        const { item, path, name } = this.getItemAndPath(_item, _path, values);
         //--------------------------------------------------------------
-        const subtaskPromise = subTasks.map(
-          async ({ index, name, typeItem, id, files: _files }) => {
-            const findItem = numberToConvert(index, typeItem);
-            const taskItem = item + (item ? '.' : '') + findItem;
-            const taskName = taskItem + '.' + name;
-            const taskPath = path + '/' + taskItem;
-            //--------------- Count files per task ------------------------------
-            const countExt = this.fileCounter(_files);
-            const files =
-              _files.map(({ dir, name: nameFile, id, type }) => {
-                const oldPath = dir + '/' + nameFile;
-                const newPath = path + '/' + nameFile;
-                if (type === 'UPLOADS') {
-                  const ext = nameFile.split('.').at(-1) || '';
-                  countExt[ext] -= 1;
-                  const pivot = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
-                  const newFileName = taskName + pivot + '.' + ext;
-                  const newPath = path + '/' + newFileName;
-                  return { id, oldPath, newPath };
-                }
-                return { id, oldPath, newPath };
-              }) || [];
-            //----------------------------ne---------------------------------------
-            if (createfiles) {
-              await new Promise(resolve => {
-                mkdirSync(path, { recursive: true });
-                files.forEach(file => copyFileSync(file.oldPath, file.newPath));
-                resolve(path);
+        const subtaskPromise = subTasks.map(async task => {
+          const {
+            name,
+            item: i,
+            path: taskPath,
+          } = this.getItemAndPath(item, path, task);
+          const files = this.getRenameFiles(task.files, path, name, i);
+          if (createFiles) {
+            await new Promise(resolve => {
+              mkdirSync(path, { recursive: true });
+              files.forEach(file => {
+                copyFileSync(file.oldPath, file.newPath);
               });
-            }
-            return { id, index, name: taskName, path: taskPath, files };
+              resolve(path);
+            });
           }
-        );
+          return {
+            id: task.id,
+            index: task.index,
+            name,
+            path: taskPath,
+            files,
+          };
+        });
         const subtasks = await Promise.all(subtaskPromise);
-        if (createfiles && !subTasks.length)
+        if (createFiles && !subTasks.length)
           await new Promise(resolve => {
             mkdirSync(path, { recursive: true });
             resolve(path);
           });
         const nextLevel = {
-          rootId: id,
-          rootLevel: level,
+          rootId,
+          rootLevel,
           item: item,
           path: path,
         };
         const next: FolderLevels[] = await this.folderlist(
           list,
           nextLevel,
-          createfiles
+          createFiles
         );
-        const data = { id, index, path, subtasks };
+        const data = { id: rootId, index: values.index, name, path, subtasks };
         if (!next.length) return data;
         return { ...data, next };
       }
     );
+    return await Promise.all(newList);
+  }
+
+  public static async mergePDFList(
+    array: GetFolderBasicLevels[],
+    outputPath: string,
+    atributtes: GeneratePathAtributtes,
+    { createFiles, createCover }: OptionsMergePdfs
+  ) {
+    const { rootId: _rootId, rootLevel: _rootLevel } = atributtes;
+    const { item: _item, path: _path } = atributtes;
+    //------------------------------------------------------------------------------------
+    const findList = array.filter(
+      ({ rootId, rootLevel }) => rootId === _rootId && rootLevel === _rootLevel
+    );
+    const list = array.filter(value => !findList.includes(value));
+    if (!findList.length) return [];
+    const newList = findList.map(
+      async ({ subTasks, id: rootId, level: rootLevel, cover, ...values }) => {
+        //------------------------- item_definition -------------------------------------
+        const { item, path, name } = this.getItemAndPath(
+          _item,
+          _path,
+          values,
+          cover
+        );
+        const getFiles = subTasks.map(task => {
+          const { name, item: i } = this.getItemAndPath(item, path, task);
+          return this.getRenameFiles(task.files, outputPath, name, i);
+        });
+        const files = getFiles.flat();
+        if (createFiles) {
+          await new Promise(resolve => {
+            files.forEach(file => {
+              copyFileSync(file.oldPath, file.newPath);
+            });
+            resolve(path);
+          });
+        }
+        if (cover && createCover) {
+          await new Promise(resolve => {
+            const outPut = outputPath + '/' + name + '.pdf';
+            resolve(GenerateFiles.coverV2(name, outPut, { fontSize: 40 }));
+          });
+        }
+        const nextData = { rootId, rootLevel, item, path };
+        const next: MergeLevels[] = await this.mergePDFList(
+          list,
+          outputPath,
+          nextData,
+          { createFiles, createCover }
+        );
+        const data = { id: rootId, name, cover, files };
+        if (!next.length) return data;
+        return { ...data, next };
+      }
+    );
+
     return await Promise.all(newList);
   }
 
@@ -369,13 +422,14 @@ class BasicLevelServices {
         },
       },
     });
-    const list = this.folderlist(getBasicList, {
-      rootId: 0,
-      rootLevel: 0,
-      item: '',
-      path: 'compress_cp/basic',
-    });
-    list;
+    getBasicList;
+    // const list = this.folderlist(getBasicList, {
+    //   rootId: 0,
+    //   rootLevel: 0,
+    //   item: '',
+    //   path: 'compress_cp/basic',
+    // });
+    // list;
     // const parseFiles = list.map(file => file as FolderBasicLevelList);
     // if (typeFile === 'pdf') {
     //   mkdirSync('compress_cp/filemerge', { recursive: true });
@@ -408,6 +462,43 @@ class BasicLevelServices {
         });
       }
       await this.parsingPathMerge(next);
+    });
+  }
+
+  private static getItemAndPath(
+    rootItem: string,
+    rootPath: string,
+    { index, typeItem, name }: Pick<BasicLevels, 'index' | 'typeItem' | 'name'>,
+    coverName: boolean = false
+  ) {
+    const findItem = numberToConvert(index, typeItem);
+    const item = rootItem + (rootItem ? '.' : '') + findItem;
+    const parseName = item + (coverName ? '. ' : '. ') + name;
+    const path = rootPath + '/' + item + '. ' + name;
+    return { item, path, name: parseName };
+  }
+
+  private static getRenameFiles(
+    files: BasicFiles[],
+    rootPath: string,
+    rootName: string,
+    rootItem?: string
+  ) {
+    const countExt = this.fileCounter(files);
+    return files.map(({ dir, name: filename, id, type }) => {
+      const oldPath = dir + '/' + filename;
+      const originalName = filename.split('$$').at(-1) || filename;
+      const _rootItem = rootItem ? rootItem + '. ' : '.';
+      const newPath = rootPath + '/' + _rootItem + originalName;
+      if (type === 'UPLOADS') {
+        const ext = filename.split('.').at(-1) || '';
+        countExt[ext] -= 1;
+        const pivot = countExt[ext] >= 1 ? ` (${countExt[ext]})` : '';
+        const newFileName = rootName + pivot + '.' + ext;
+        const newPath = rootPath + '/' + newFileName;
+        return { id, oldPath, newPath };
+      }
+      return { id, oldPath, newPath };
     });
   }
 
@@ -472,6 +563,3 @@ class BasicLevelServices {
 }
 
 export default BasicLevelServices;
-function calculateSumTotal(): any {
-  throw new Error('Function not implemented.');
-}
