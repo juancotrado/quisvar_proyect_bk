@@ -48,6 +48,21 @@ class PDFGenerateController {
     }
   };
 
+  public pageWithCoverV2: ControllerFunction = async (req, res, next) => {
+    try {
+      const { title, filename } = req.body;
+      const newFile = await GenerateFiles.coverV2(title, undefined, {});
+      const fileTemp = tmp.fileSync({ postfix: '.pdf' });
+      const options = this.headers(filename, 'PDF');
+      writeFileSync(fileTemp.name, newFile);
+      res.download(fileTemp.name, filename, options, error => {
+        if (!error) fileTemp.removeCallback();
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public pagesInSeal: ControllerFunction = async (req, res, next) => {
     try {
       const { body } = req;

@@ -25,14 +25,14 @@ export const archiverFolder = (
     });
 
     output.on('close', () => {
-      console.log(archive.pointer() + ' total bytes');
+      const size = archive.pointer() / (1024 * 1024);
+      console.log(size.toFixed(2), 'total Megabytes');
       resolve(outputFilePath);
     });
 
     output.on('finish', () => {
       try {
         if (props?.removeDir) rmSync(sourceDir, { recursive: true });
-        console.log('end drainer');
       } catch (error) {
         reject(error);
       }

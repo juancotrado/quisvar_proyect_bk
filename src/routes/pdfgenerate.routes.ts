@@ -3,8 +3,13 @@ import { PDFGenerateController } from '../controllers';
 import tmp from 'tmp';
 import { uploads } from '../middlewares';
 
-const { pagesInPage, pagesInCover, pagesInSeal, pagesInSealMail } =
-  new PDFGenerateController();
+const {
+  pagesInPage,
+  pagesInCover,
+  pagesInSeal,
+  pagesInSealMail,
+  pageWithCoverV2,
+} = new PDFGenerateController();
 class PDFGenerateRouter {
   public router: Router;
   constructor() {
@@ -17,6 +22,7 @@ class PDFGenerateRouter {
     this.router.use(uploads.PDF_Files.single('file'));
     this.router.post('/two-pages', pagesInPage);
     this.router.post('/cover', pagesInCover);
+    this.router.post('/coverV2', pageWithCoverV2);
     this.router.post('/seal-paymessage/:id', pagesInSeal);
     this.router.post('/seal-message/:id', pagesInSealMail);
   }

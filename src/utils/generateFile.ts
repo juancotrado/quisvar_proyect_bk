@@ -1,11 +1,83 @@
 import { createWriteStream, readFileSync, writeFileSync } from 'fs';
 import PDFDocumentKit from 'pdfkit';
 import AppError from './appError';
-import { PDFDocument, PDFFont, PDFPage, StandardFonts, rgb } from 'pdf-lib';
+import {
+  PDFDocument,
+  PDFFont,
+  PDFPage,
+  StandardFonts,
+  rgb,
+  PageSizes,
+} from 'pdf-lib';
 import { configurationSealPDF } from 'types/types';
 import path from 'path';
+
+interface CoverV2Options {
+  margin?: number;
+  fontSize?: number;
+  sizePage?: keyof typeof PageSizes;
+}
+
 class GenerateFiles {
-  static cover2(text: string, outputPath: string, imagePath: string) {
+  public static async coverV2(
+    // filePath: string | Buffer,
+    text: string,
+    outputPath: string | undefined,
+    options: CoverV2Options
+  ) {
+    // const pdfBytes: Buffer =
+    //   typeof filePath !== 'string' ? filePath : readFileSync(filePath);
+    const { fontSize = 50, margin = 20, sizePage = 'A4' } = options;
+    const newPdfGenerate = await PDFDocument.create();
+    const pageSize = PageSizes[sizePage];
+    const newPage = newPdfGenerate.addPage(pageSize);
+
+    //-------------------------------------------------------------------------
+    const font = await newPdfGenerate.embedFont(StandardFonts.HelveticaBold);
+    const size = fontSize;
+    const { width, height } = newPage.getSize();
+    const maxWidth = width - margin;
+    const color = rgb(0, 0, 0);
+    const words = text.split(' ');
+    const usableWidth = width - 2 * margin;
+    const usableHeight = height - 2 * margin;
+    //-------------------------------------------------------------------------
+    let lines = [];
+    let currentLine = '';
+
+    for (let word of words) {
+      let testLine = currentLine ? currentLine + ' ' + word : word;
+      let testWidth = font.widthOfTextAtSize(testLine, fontSize);
+      if (testWidth < usableWidth) {
+        currentLine = testLine;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    lines.push(currentLine);
+
+    const totalTextHeight = lines.length * (fontSize + 5);
+    let y = height - margin - (usableHeight - totalTextHeight) / 2;
+
+    for (let line of lines) {
+      let lineWidth = font.widthOfTextAtSize(line, fontSize);
+      let x = margin + (usableWidth - lineWidth) / 2;
+      newPage.drawText(line, { x, y, size, font, maxWidth, color });
+      y -= fontSize + 5;
+    }
+
+    const modifiedPdfBytes = await newPdfGenerate.save();
+    if (outputPath && outputPath.length > 0)
+      writeFileSync(outputPath, modifiedPdfBytes);
+    return modifiedPdfBytes;
+  }
+
+  public static coverInLevel(
+    text: string,
+    outputPath: string,
+    imagePath: string
+  ) {
     const margin = 10;
     const doc = new PDFDocumentKit({ margin });
     //--------------------------------------------------------------------------
@@ -25,7 +97,7 @@ class GenerateFiles {
     });
   }
 
-  static async cover(
+  public static async cover(
     filePath: string | Buffer,
     {
       imagePath,
@@ -79,7 +151,10 @@ class GenerateFiles {
     return pdfWithBytes;
   }
 
-  static async coverTwoPage(filePath: string | Buffer, outputPath?: string) {
+  public static async coverTwoPage(
+    filePath: string | Buffer,
+    outputPath?: string
+  ) {
     const pdfBytes: Buffer =
       typeof filePath !== 'string' ? filePath : readFileSync(filePath);
     const originalPDF = await PDFDocument.load(pdfBytes);
@@ -105,7 +180,7 @@ class GenerateFiles {
     return pdfWithBytes;
   }
 
-  static async coverFirma(
+  public static async coverFirma(
     filePath: string | Buffer,
     outputPath: string | undefined,
     { pos, ...data }: Omit<configurationSealPDF, 'x' | 'y'> & { pos: number } // imagePath: string
@@ -148,27 +223,30 @@ class GenerateFiles {
     return modifiedPdfBytes;
   }
 
-  static async merge(pdfPaths: string[], outputPath: string) {
+  public static async merge(pdfPaths: string[], outputPath: string) {
     const mergedDoc = await PDFDocument.create();
-    await Promise.all(
-      pdfPaths.map(async pdfPath => {
-        const pdfBytes = readFileSync(pdfPath);
-        const pdfDoc = await PDFDocument.load(pdfBytes);
-        const pages = await mergedDoc.copyPages(
-          pdfDoc,
-          pdfDoc.getPageIndices()
-        );
-        pages.forEach(page => {
-          mergedDoc.addPage(page);
-        });
-      })
-    );
+    const batchSize = 10;
+    const loadPages = async (pdfPath: string) => {
+      const pdfBytes = readFileSync(pdfPath);
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+      const pages = await mergedDoc.copyPages(pdfDoc, pdfDoc.getPageIndices());
+      pages.forEach(page => {
+        mergedDoc.addPage(page);
+      });
+    };
+
+    for (let i = 0; i < pdfPaths.length; i += batchSize) {
+      const batch = pdfPaths.slice(i, i + batchSize);
+      const tasks = batch.map(async pdfPath => await loadPages(pdfPath));
+      await Promise.all(tasks);
+    }
+
     const mergedBytes = await mergedDoc.save();
     writeFileSync(outputPath, mergedBytes);
     return outputPath;
   }
 
-  static async drawSeil(
+  public static async drawSeil(
     page: PDFPage,
     font: PDFFont,
     { x, y, date, to, observation, numberPage, title }: configurationSealPDF
