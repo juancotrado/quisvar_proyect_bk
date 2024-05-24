@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import DownloadController from '../controllers/download.controller';
 
-const { basicLevel } = new DownloadController('level');
-const { basicLevel: basicStage } = new DownloadController('stage');
+const { basicLevel, firstRoute, redirect } = new DownloadController('level');
+const { basicLevel: basicStage, mergePdfLevel: mergeStage } =
+  new DownloadController('stage');
 
 class BasicLevelsRouter {
   public router: Router;
@@ -14,7 +15,10 @@ class BasicLevelsRouter {
 
   private setUpRoutes() {
     this.router.get('/basic-level/:id', basicLevel);
+    this.router.get('/first-route', firstRoute);
+    this.router.get('/redirect/:uuid', redirect);
     this.router.get('/basic-stage/:id', basicStage);
+    this.router.get('/merge-basic-stage/:id', mergeStage);
   }
 }
 

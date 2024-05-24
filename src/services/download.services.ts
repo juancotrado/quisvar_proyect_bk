@@ -1,13 +1,7 @@
 import { existsSync, mkdirSync } from 'fs';
 import AppError from '../utils/appError';
 import BasicLevelServices from './basiclevels.services';
-import { OptionsBasicFilters } from 'types/types';
-
-interface BasicLevelAttributes extends OptionsBasicFilters {
-  sourceDir: string;
-  itemLevel?: string;
-  createFiles?: boolean;
-}
+import { BasicLevelAttributes, MergePdfLevelAttributes } from 'types/types';
 
 class DowloadServices {
   public static async basicLevel(
@@ -30,6 +24,29 @@ class DowloadServices {
       createFiles
     );
     return listWithPaths;
+  }
+
+  public static async mergePdfLevel(
+    id: number,
+    type: 'level' | 'stage',
+    { createCover, createFiles, ...options }: MergePdfLevelAttributes
+  ) {
+    if (!id) throw new AppError('Oops!, ID incorrecto', 500);
+    const { sourceDir, itemLevel: item = '' } = options;
+    const splitOptions = { endsWith: '.pdf', equal: true, includeFiles: true };
+    const getList = await BasicLevelServices.getList(id, type, {
+      ...options,
+      ...splitOptions,
+    });
+    if (!existsSync(sourceDir)) mkdirSync(sourceDir, { recursive: true });
+    const attributes = { item, path: sourceDir, ...getList.info };
+    const listWithPaths = await BasicLevelServices.mergePDFList(
+      getList.data,
+      sourceDir,
+      attributes,
+      { createFiles, createCover }
+    );
+    return { listWithPaths, sourceDir };
   }
 }
 export default DowloadServices;
