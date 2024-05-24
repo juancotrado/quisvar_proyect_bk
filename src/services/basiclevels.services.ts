@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { BasicFiles, BasicLevels, BasicTasks } from '@prisma/client';
-import lodash from 'lodash';
 import {
   dataWithLevel,
   numberToConvert,
@@ -135,14 +134,12 @@ class BasicLevelServices {
     return newLevel;
   }
 
-  public static async update(
-    id: BasicLevels['id'],
-    { name, userId = null }: BasicLevels
-  ) {
+  public static async update(id: BasicLevels['id'], { name }: BasicLevels) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
     const { duplicated } = await this.duplicate(id, 0, name, 'ID');
     if (duplicated) throw new AppError('Error al crear, Nombre existente', 404);
-    const data = !duplicated ? { name } : userId ? { userId } : {};
+    // const data = !duplicated ? { name } : userId ? { userId } : {};
+    const data = !duplicated ? { name } : {};
     const updateLevel = await prisma.basicLevels.update({
       where: { id },
       data,
@@ -196,9 +193,11 @@ class BasicLevelServices {
       where: { stagesId, rootId, level, index },
       orderBy: { index: 'asc' },
     });
-    const filterData = lodash.omit(findLevel, ['id', 'name', 'userId']);
+    // const filterData = lodash.omit(findLevel, ['id', 'name']);
+    const { id: _id, name: _name, ...filterData } = findLevel;
     const parseIndex = typeGte === 'upper' ? _index : _index + 1;
-    const aux = { ...filterData, userId: null, index: parseIndex };
+    const aux = { ...filterData, index: parseIndex };
+    // const aux = { ...filterData, userId: null, index: parseIndex };
     const data = { ...aux, name, levelList };
     const newLevel = await prisma.basicLevels.create({ data });
     const updateLevels = await this.listByUpdate(filterLevelList, 1);
