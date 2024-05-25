@@ -439,6 +439,7 @@ export interface UpperAddSubtask {
 export type CategoryMailType = 'GLOBAL' | 'DIRECT';
 
 export type ReceiverT = Pick<Mail, 'type' | 'role' | 'status'>;
+export type ReceiverT2 = Pick<Mail, 'role' | 'status'>;
 
 export interface MergePDFBasicFiles {
   status?: BasicTasks['status'];

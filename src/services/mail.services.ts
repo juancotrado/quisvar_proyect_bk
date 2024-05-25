@@ -7,6 +7,7 @@ import {
   PickMessageReply,
   PickSealMessage,
   ReceiverT,
+  ReceiverT2,
   ReceiverTypeMailPick,
 } from 'types/types';
 import Queries from '../utils/queries';
@@ -659,8 +660,8 @@ class MailServices {
     return await prisma.$transaction(updateList);
   }
 
-  public static readonly dataDone: ReceiverT = {
-    type: 'RECEIVER',
+  public static readonly dataDone: ReceiverT2 = {
+    // type: 'RECEIVER',
     role: 'SECONDARY',
     status: false,
   };
