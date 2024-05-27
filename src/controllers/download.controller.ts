@@ -185,8 +185,8 @@ class DownloadController {
       const finalPath = rootPath + parsePath;
       const routeService = 'http://127.0.0.1:5000/pdf/merge2';
       const service = routeService + '?input_folder=' + finalPath;
-      res.json(service);
-      //res.redirect(service);
+      //res.json(service);
+      res.redirect(service);
     } catch (error) {
       next(error);
     }
@@ -209,7 +209,6 @@ class DownloadController {
       const routeService = 'http://127.0.0.1:5000/descargar_carpeta';
       const service =
         routeService + '?type=' + type + '&input_folder=' + finalPath;
-      console.log(service);
       res.redirect(service);
     } catch (error) {
       next(error);
