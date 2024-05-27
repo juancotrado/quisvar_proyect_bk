@@ -501,7 +501,7 @@ model AreaSpecialty {
 
 model AreaSpecialtyNameList {
   id                Int             @id @default(autoincrement())
-  specialtyName     String
+  specialtyName     AreaSpecialtyToSpecialty[]
   areaSpecialtyName AreaSpecialty[]
   specialistId      Int
   specialist        Specialists     @relation(fields: [specialistId], references: [id], onDelete: Cascade)
@@ -510,6 +510,15 @@ model AreaSpecialtyNameList {
 model ListSpecialties {
   id   Int    @id @default(autoincrement())
   name String @unique
+  areaSpecialties   AreaSpecialtyToSpecialty[]
+}
+model AreaSpecialtyToSpecialty {
+  areaSpecialtyId   Int
+  listSpecialtyId   Int
+  areaSpecialty     AreaSpecialtyNameList    @relation(fields: [areaSpecialtyId], references: [id], onDelete: Cascade)
+  listSpecialty     ListSpecialties          @relation(fields: [listSpecialtyId], references: [id], onDelete: Cascade)
+  
+  @@id([areaSpecialtyId, listSpecialtyId]) 
 }
 
 model Specialists {
