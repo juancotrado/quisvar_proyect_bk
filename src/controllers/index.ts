@@ -127,8 +127,8 @@ import {
   createAreaSpecialtyList,
   deleteAreaSpecialtyList,
   getAreaSpecialtyList,
-  getAllSpecialistBySpeciality,
-  updateAreaSpecialtyList,
+  // getAllSpecialistBySpeciality,
+  // updateAreaSpecialtyList,
 } from './areaSpecialtyList.controller';
 import {
   createTrainingSpecialtyList,
@@ -297,8 +297,8 @@ export {
 export {
   createAreaSpecialtyList,
   getAreaSpecialtyList,
-  getAllSpecialistBySpeciality,
-  updateAreaSpecialtyList,
+  // getAllSpecialistBySpeciality,
+  // updateAreaSpecialtyList,
   deleteAreaSpecialtyList,
 };
 //Training Specialty Controllers

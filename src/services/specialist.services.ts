@@ -44,24 +44,12 @@ class SpecialistServices {
         firstName: true,
         lastName: true,
         career: true,
-        CIP: true,
+        tuition: true,
         dni: true,
         email: true,
-        agreement: true,
-        cv: true,
-        // projects: {
-        //   include: {
-        //     specialist: {
-        //       include: {
-        //         projects: {
-        //           select: {
-
-        //           }
-        //         }
-        //       }
-        //     }
-        //   },
-        // },
+        agreementFile: true,
+        cvFile: true,
+        inscription: true,
       },
     });
     return specialist;

@@ -500,46 +500,41 @@ model AreaSpecialty {
 }
 
 model AreaSpecialtyNameList {
-  id                Int                        @id @default(autoincrement())
-  specialtyName     AreaSpecialtyToSpecialty[]
+  id                Int             @id @default(autoincrement())
+  specialtyName     Int
   areaSpecialtyName AreaSpecialty[]
   specialistId      Int
-  specialist        Specialists                @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+  specialist        Specialists     @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+  listSpecialities  ListSpecialties @relation(fields: [specialtyName], references: [id], onDelete: Cascade)
 }
 
 model ListSpecialties {
-  id              Int                        @id @default(autoincrement())
-  name            String                     @unique
-  areaSpecialties AreaSpecialtyToSpecialty[]
-  contracts       ContractSpecialties[]
-}
-
-model AreaSpecialtyToSpecialty {
-  areaSpecialtyId Int
-  listSpecialtyId Int
-  areaSpecialty   AreaSpecialtyNameList @relation(fields: [areaSpecialtyId], references: [id], onDelete: Cascade)
-  listSpecialty   ListSpecialties       @relation(fields: [listSpecialtyId], references: [id], onDelete: Cascade)
-
-  @@id([areaSpecialtyId, listSpecialtyId])
+  id                Int                     @id @default(autoincrement())
+  name              String                  @unique
+  // areaSpecialties AreaSpecialtyToSpecialty[]
+  contracts         ContractSpecialties[]
+  AreaSpecialtyList AreaSpecialtyNameList[]
 }
 
 model Specialists {
-  id        Int                          @id @default(autoincrement())
-  dni       String                       @unique @db.VarChar(8)
-  firstName String
-  lastName  String
-  phone     String
-  career    String
-  degree    String
-  agreement String?
-  cv        String?
-  area      AreaSpecialtyNameList[]
-  training  TrainingSpecialistNameList[]
-  price     String
-  CIP       String
-  email     String
-  projects  ProjectSpecialist[]
-  contracts ContractSpecialties[]
+  id              Int                          @id @default(autoincrement())
+  dni             String                       @unique @db.VarChar(8)
+  firstName       String
+  lastName        String
+  phone           String
+  career          String
+  degree          String
+  agreementFile   String?
+  cvFile          String?
+  area            AreaSpecialtyNameList[]
+  training        TrainingSpecialistNameList[]
+  price           String
+  tuition         TypeTuition
+  inscriptionDate DateTime                     @default(now())
+  inscription     String
+  email           String
+  projects        ProjectSpecialist[]
+  contracts       ContractSpecialties[]
 }
 
 model ContractSpecialties {
@@ -909,6 +904,12 @@ enum TypeItem {
   ABC
   ROM
   NUM
+}
+
+enum TypeTuition {
+  CIP
+  CAP
+  CCP
 }
 
 enum MessageCategory {
