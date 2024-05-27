@@ -131,7 +131,7 @@ class Server {
   }
 
   middlewares() {
-    this.app.use(cors());
+    this.app.use(cors({ exposedHeaders: ['File-Name'] }));
     this.app.use('/projects', express.static('uploads/projects'));
     this.app.use('/index', express.static('index'));
     this.app.use('/models', express.static('uploads/models'));
