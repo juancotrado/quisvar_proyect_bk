@@ -11,11 +11,19 @@ class AreaSpecialtyListServices {
     id: ListSpecialties['id']
   ) {
     if (!data || !id) throw new AppError(`Datos incorrectos`, 400);
-
-    const newAreaName = await prisma.areaSpecialtyNameList.create({
-      data,
+    const exist = await prisma.areaSpecialtyNameList.findFirst({
+      where: {
+        specialtyName: id,
+        specialistId: data.specialistId,
+      },
     });
-
+    if (exist) throw new AppError(`Especialidad ya existe`, 400);
+    const newAreaName = await prisma.areaSpecialtyNameList.create({
+      data: {
+        ...data,
+        specialtyName: id,
+      },
+    });
     return newAreaName;
   }
   static async getAreaSpecialtyList(
@@ -26,6 +34,11 @@ class AreaSpecialtyListServices {
       select: {
         id: true,
         areaSpecialtyName: true,
+        listSpecialities: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
     return areas;

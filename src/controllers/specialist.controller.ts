@@ -15,11 +15,13 @@ export const createSpecialist = async (
     const { body } = req;
     const query = await SpecialistServices.createSpecialist({
       ...body,
-      cv: fileCv[0].filename,
-      agreement: fileAgreement[0].filename,
+      inscriptionDate: new Date(body.inscriptionDate),
+      cvFile: fileCv[0].filename,
+      agreementFile: fileAgreement[0].filename,
     });
     res.status(201).json(query);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
