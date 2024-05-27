@@ -23,6 +23,8 @@ class DowloadServices {
       attributes,
       createFiles
     );
+    if (!listWithPaths.length)
+      throw new AppError('Error, no se encontraron archivos', 404);
     return listWithPaths;
   }
 
@@ -46,6 +48,8 @@ class DowloadServices {
       attributes,
       { createFiles, createCover }
     );
+    if (!listWithPaths.length)
+      throw new AppError('Error, no se encontraron archivos', 404);
     return { listWithPaths, sourceDir };
   }
 }

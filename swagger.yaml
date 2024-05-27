@@ -865,6 +865,34 @@ paths:
             application/json:
               example:
                 error: No se pudo crear el mensaje
+  /download/merge-basic-level/{id}:
+    get:
+      tags:
+        - Downloads
+        - Basic levels
+      summary: Descargar documentos pdf unidos por level (basicos)
+      description: Descargar documentos pdf unidos por level (basicos)
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+        # - $ref: '#/components/parameters/downloadIncludeFiles'
+        - $ref: '#/components/parameters/downloadCreateFiles'
+        - $ref: '#/components/parameters/typeFile'
+        - $ref: '#/components/parameters/downloadCreateCover'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: No se pudo crear el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el mensaje
   /paymail:
     get:
       tags:

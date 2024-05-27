@@ -46,6 +46,7 @@ class DownloadController {
     const list = {
       'Content-Disposition': `attachment; filename=${filename}`,
       'Content-Type': ContentType[type],
+      'File-Name': filename,
     };
     Object.keys(list).forEach(header => {
       res.setHeader(header, list[header as keyof typeof list]);
@@ -141,7 +142,7 @@ class DownloadController {
         if (err) throw new Error();
         const filename = path.basename(outputFilePath);
         const fileStream = createReadStream(outputFilePath);
-        this.headers(res, { filename, type: 'OctetStream' });
+        this.headers(res, { filename, type: 'PDF' });
         fileStream.pipe(res);
         res.on('finish', () => {
           const size = statSync(outputFilePath).size / (1024 * 1024);
