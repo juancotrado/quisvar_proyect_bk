@@ -131,13 +131,14 @@ class StageServices {
     } as Level;
     const nextLevel = calculateAndUpdateDataByLevel([parseData]);
     return {
-      // id,
+      //id,
       // name,
       // isProject,
       group,
       projectName,
       rootTypeItem,
       ...nextLevel[0],
+      id,
     };
   }
 

@@ -8,6 +8,8 @@ const {
   mergePdfLevel,
   mergePdfLevel2,
   compressPdf,
+  compressPdfStage,
+  mergePdfStage,
 } = new DownloadController('level');
 const { basicLevel: basicStage, mergePdfLevel: mergeStage } =
   new DownloadController('stage');
@@ -29,6 +31,8 @@ class BasicLevelsRouter {
     this.router.get('/merge-basic-level/:id', mergePdfLevel);
     this.router.get('/merge-pdf-levels/:id', mergePdfLevel2);
     this.router.get('/compress-pdfs/:id', compressPdf);
+    this.router.get('/stage-compress-pdfs/:id', compressPdfStage);
+    this.router.get('/merge-pdf-stage/:id', mergePdfStage);
   }
 }
 
