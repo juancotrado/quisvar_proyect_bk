@@ -90,7 +90,7 @@ class StageServices {
     });
     if (!findStage)
       throw new AppError('Oops!,No se pudo encontrar la etapa', 400);
-    const { project, rootTypeItem, group } = findStage;
+    const { project, rootTypeItem, group, name } = findStage;
     const projectName = project.name;
     const getList = await prisma.levels.findMany({
       where: { stagesId: id },
@@ -131,13 +131,15 @@ class StageServices {
     } as Level;
     const nextLevel = calculateAndUpdateDataByLevel([parseData]);
     return {
-      // id,
+      //id,
       // name,
       // isProject,
       group,
       projectName,
       rootTypeItem,
       ...nextLevel[0],
+      id,
+      name,
     };
   }
 

@@ -1,10 +1,11 @@
 import { Response } from 'express';
-import { DowloadServices } from '../services';
+import { DowloadServices, PathServices } from '../services';
 import { archiverFolder } from '../utils/archiver';
 import {
   access,
   constants,
   createReadStream,
+  existsSync,
   readdirSync,
   rmSync,
   statSync,
@@ -12,7 +13,7 @@ import {
 import { ControllerFunction } from 'types/patterns';
 import AppError from '../utils/appError';
 import path from 'path';
-import { parseQueries } from '../utils/format.server';
+import { _parseQueries, parseQueries } from '../utils/format.server';
 import { OptionsBasicFilters, OptionsMergePdfs } from 'types/types';
 import GenerateFiles from '../utils/generateFile';
 import { v4 as uuidv4 } from 'uuid';
@@ -149,6 +150,90 @@ class DownloadController {
           rmSync(outputFilePath);
         });
       });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public mergePdfLevel2: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const _path = await PathServices.level(+id);
+      if (!existsSync(_path)) {
+        throw new AppError('No se encontró la ruta', 404);
+      }
+      const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      const parsePath = _path.slice(1);
+      const finalPath = rootPath + parsePath;
+      const routeService = 'http://127.0.0.1:5000/pdf/merge2';
+      const service = routeService + '?input_folder=' + finalPath;
+      res.redirect(service);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public mergePdfStage: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const _path = await PathServices.stage(+id, 'UPLOADS');
+      if (!existsSync(_path)) {
+        throw new AppError('No se encontró la ruta', 404);
+      }
+      const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      const parsePath = _path.slice(1);
+      const finalPath = rootPath + parsePath;
+      const routeService = 'http://127.0.0.1:5000/pdf/merge2';
+      const service = routeService + '?input_folder=' + finalPath;
+      //res.json(service);
+      res.redirect(service);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public compressPdf: ControllerFunction = async (req, res, next) => {
+    try {
+      interface TypeCompress {
+        type: 'pdf' | 'nopdf' | 'all';
+      }
+      const { id } = req.params;
+      const { type } = parseQueries<TypeCompress>(req.query);
+      const _path = await PathServices.level(+id);
+      if (!existsSync(_path)) {
+        throw new AppError('No se encontró la ruta', 404);
+      }
+      const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      const parsePath = _path.slice(1);
+      const finalPath = rootPath + parsePath;
+      const routeService = 'http://127.0.0.1:5000/descargar_carpeta';
+      const service =
+        routeService + '?type=' + type + '&input_folder=' + finalPath;
+      res.redirect(service);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public compressPdfStage: ControllerFunction = async (req, res, next) => {
+    try {
+      interface TypeCompress {
+        type: 'pdf' | 'nopdf' | 'all';
+      }
+      const { id } = req.params;
+      const { type } = parseQueries<TypeCompress>(req.query);
+      const _path = await PathServices.stage(+id, 'UPLOADS');
+      if (!existsSync(_path)) {
+        throw new AppError('No se encontró la ruta', 404);
+      }
+      const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      const parsePath = _path.slice(1);
+      const finalPath = rootPath + parsePath;
+      const routeService = 'http://127.0.0.1:5000/descargar_carpeta';
+      const service =
+        routeService + '?type=' + type + '&input_folder=' + finalPath;
+      //res.json(service);
+      res.redirect(service);
     } catch (error) {
       next(error);
     }
