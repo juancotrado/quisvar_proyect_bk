@@ -513,7 +513,7 @@ model ListSpecialties {
   name              String                  @unique
   // areaSpecialties AreaSpecialtyToSpecialty[]
   contracts         ContractSpecialties[]
-  AreaSpecialtyList AreaSpecialtyNameList[]
+  areaSpecialtyList AreaSpecialtyNameList[]
 }
 
 model Specialists {
@@ -545,6 +545,7 @@ model ContractSpecialties {
   listSpecialtiesId Int
   specialists       Specialists?    @relation(fields: [specialistsId], references: [id])
   specialistsId     Int?
+  createdAt         DateTime        @default(now())
 }
 
 model ProjectSpecialist {
