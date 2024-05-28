@@ -69,6 +69,64 @@ class ContractController {
       next(error);
     }
   }
+  public static async createSpeciality(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { listSpecialtiesId, contratcId } = req.body;
+      const result = await ContractServices.createSpeciality(
+        contratcId,
+        listSpecialtiesId
+      );
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+  public static async addSpecialist(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { contractSpecialtiesId, specialistsId } = req.body;
+      const result = await ContractServices.addSpecialist(
+        contractSpecialtiesId,
+        specialistsId
+      );
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+  public static async deleteSpecialty(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params;
+      const result = await ContractServices.deleteSpecialty(+id);
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+  public static async getSpecialities(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params;
+      const result = await ContractServices.getSpecialities(+id);
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 
   public static async updateContract(
     req: Request,
