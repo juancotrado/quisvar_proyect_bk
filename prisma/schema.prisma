@@ -9,13 +9,13 @@ datasource db {
 }
 
 model Users {
-  id                    Int                @id @default(autoincrement())
-  status                Boolean            @default(false)
+  id                    Int                     @id @default(autoincrement())
+  status                Boolean                 @default(false)
   // role                  UserRole           @default(EMPLOYEE)
   password              String
-  email                 String             @unique
-  createdAt             DateTime           @default(now())
-  updatedAt             DateTime           @updatedAt
+  email                 String                  @unique
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
   contract              String?
   cv                    String?
   declaration           String?
@@ -24,7 +24,7 @@ model Users {
   address               String?
   profile               Profiles?
   project               Projects[]
-  subTasks              BasicTaskOnUsers[]
+  // subTasks              BasicTaskOnUsers[]
   basicTasks            TaskOnUsers[]
   Levels                Levels[]
   list                  ListOnUsers[]
@@ -33,15 +33,17 @@ model Users {
   paymessage            PayMail[]
   messageReply          MessageHistory[]
   feedbacks             UsersOnFeedbacks[]
+  feedbacksBasic        BasicUsersOnFeedbacks[]
   equipment             Equipment?
   groups                GroupOnUsers[]
   basicLevels           BasicLevels[]
   // moderatorOfGroup      Group[]
   // Attendance            AttendanceGroup[]
   roleId                Int?
-  role                  Role?              @relation(fields: [roleId], references: [id])
+  role                  Role?                   @relation(fields: [roleId], references: [id])
   verificationUser      VerificationUser?
   offices               UserToOffice[]
+  basicTaskH            BasicTaskOnUsers[]
 }
 
 model VerificationUser {
@@ -322,17 +324,17 @@ model TaskOnUsers {
 }
 
 model BasicTaskOnUsers {
-  taskId     Int
-  userId     Int
-  status     Boolean    @default(false)
-  percentage Int        @default(0)
-  // untilDate  DateTime @default(now())
-  task       BasicTasks @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  user       Users      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  assignedAt DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-
-  @@id([taskId, userId])
+  id                Int        @id @default(autoincrement())
+  taskId            Int
+  status            Boolean    @default(false)
+  userId            Int
+  percentage        Int        @default(0)
+  percentagePayment Int        @default(0)
+  assignedAt        DateTime   @default(now())
+  finishedAt        DateTime?
+  updatedAt         DateTime   @updatedAt
+  task              BasicTasks @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user              Users      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model SubTasks {
@@ -367,7 +369,8 @@ model BasicTasks {
   levels_Id Int
   files     BasicFiles[]
   Levels    BasicLevels        @relation(fields: [levels_Id], references: [id], onDelete: Cascade)
-  // feedBacks   Feedback[]
+  feedBacks BasicFeedback[]
+  // users     BasicTaskOnUsers[]
   users     BasicTaskOnUsers[]
 }
 
@@ -384,6 +387,19 @@ model Feedback {
   users      UsersOnFeedbacks[]
 }
 
+model BasicFeedback {
+  id         Int                     @id @default(autoincrement())
+  comment    String?
+  status     Boolean                 @default(false)
+  createdAt  DateTime                @default(now())
+  updatedAt  DateTime                @updatedAt
+  percentage Int                     @default(0)
+  subTasksId Int
+  subTasks   BasicTasks              @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
+  files      BasicFiles[]
+  users      BasicUsersOnFeedbacks[]
+}
+
 model UsersOnFeedbacks {
   userId     Int
   feedbackId Int
@@ -391,6 +407,17 @@ model UsersOnFeedbacks {
   user       Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userMain   Boolean  @default(false)
   assignedAt DateTime @default(now())
+
+  @@id([userId, feedbackId])
+}
+
+model BasicUsersOnFeedbacks {
+  userId     Int
+  feedbackId Int
+  feedback   BasicFeedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  user       Users         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userMain   Boolean       @default(false)
+  assignedAt DateTime      @default(now())
 
   @@id([userId, feedbackId])
 }
@@ -409,16 +436,18 @@ model Files {
 }
 
 model BasicFiles {
-  id         Int        @id @default(autoincrement())
-  name       String
-  userId     Int?
-  dir        String?
-  type       FileTypes
-  subTasksId Int
-  feedbackId Int?
-  assignedAt DateTime   @default(now())
+  id              Int            @id @default(autoincrement())
+  name            String
+  userId          Int?
+  dir             String?
+  type            FileTypes
+  subTasksId      Int
+  feedbackId      Int?
+  assignedAt      DateTime       @default(now())
   // feedback   Feedback? @relation(fields: [feedbackId], references: [id])
-  subTasks   BasicTasks @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
+  subTasks        BasicTasks     @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
+  BasicFeedback   BasicFeedback? @relation(fields: [basicFeedbackId], references: [id])
+  basicFeedbackId Int?
 }
 
 model PersonBussiness {
