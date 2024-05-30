@@ -33,6 +33,7 @@ export enum ContentType {
   MP4 = 'video/mp4',
   PDF = 'application/pdf',
 }
+const python_url = process.env.PYTHON_SERVER;
 class DownloadController {
   private type: 'stage' | 'level' = 'level';
   private outPutPath: string = 'download/';
@@ -162,10 +163,11 @@ class DownloadController {
       if (!existsSync(_path)) {
         throw new AppError('No se encontró la ruta', 404);
       }
-      const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      //const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      const rootPath = 'E:/server project/quisvar_proyect_bk';
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
-      const routeService = 'http://127.0.0.1:5000/pdf/merge2';
+      const routeService = python_url + '/pdf/merge2';
       const service = routeService + '?input_folder=' + finalPath;
       res.redirect(service);
     } catch (error) {
@@ -180,10 +182,11 @@ class DownloadController {
       if (!existsSync(_path)) {
         throw new AppError('No se encontró la ruta', 404);
       }
-      const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      //const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      const rootPath = 'E:/server project/quisvar_proyect_bk';
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
-      const routeService = 'http://127.0.0.1:5000/pdf/merge2';
+      const routeService = python_url + '/pdf/merge2';
       const service = routeService + '?input_folder=' + finalPath;
       //res.json(service);
       res.redirect(service);
@@ -203,10 +206,11 @@ class DownloadController {
       if (!existsSync(_path)) {
         throw new AppError('No se encontró la ruta', 404);
       }
-      const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      //const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      const rootPath = 'E:/server project/quisvar_proyect_bk';
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
-      const routeService = 'http://127.0.0.1:5000/descargar_carpeta';
+      const routeService = python_url + '/descargar_carpeta';
       const service =
         routeService + '?type=' + type + '&input_folder=' + finalPath;
       res.redirect(service);
@@ -226,10 +230,11 @@ class DownloadController {
       if (!existsSync(_path)) {
         throw new AppError('No se encontró la ruta', 404);
       }
-      const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      //const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      const rootPath = 'E:/server project/quisvar_proyect_bk';
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
-      const routeService = 'http://127.0.0.1:5000/descargar_carpeta';
+      const routeService = python_url + '/descargar_carpeta';
       const service =
         routeService + '?type=' + type + '&input_folder=' + finalPath;
       //res.json(service);
