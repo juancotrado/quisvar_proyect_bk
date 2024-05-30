@@ -685,6 +685,7 @@ model PayMessages {
   updatedAt         DateTime         @updatedAt
   office            Office?          @relation(fields: [officeId], references: [id])
   officeId          Int?
+  beforeOffice      String?
   historyOfficesIds Int[]
   positionSeal      Int              @default(1)
   onHolding         Boolean          @default(true)
@@ -705,6 +706,7 @@ model Messages {
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
   officeId          Int?
+  beforeOffice      String?
   historyOfficesIds Int[]
   positionSeal      Int              @default(1)
   office            Office?          @relation(fields: [officeId], references: [id])

@@ -293,7 +293,7 @@ class Queries {
 }
 
 class PayMailQueries {
-  public selectMessage(role: Mail['role'], type?: Mail['type']) {
+  public selectMessage(role?: Mail['role'], type?: Mail['type']) {
     return {
       select: {
         id: true,

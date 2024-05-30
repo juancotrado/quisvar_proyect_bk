@@ -115,7 +115,7 @@ class PayMailServices {
         status: true,
         type: true,
         userInit: true,
-        paymessage: Queries.PayMail().selectMessage('MAIN'),
+        paymessage: Queries.PayMail().selectMessage(),
       },
     });
     const parseList = mailList.map(({ paymessage, ...data }) => {
@@ -366,6 +366,7 @@ class PayMailServices {
         office: {
           select: {
             id: true,
+            name: true,
             users: {
               where: { isOfficeManager: true },
               select: { usersId: true },
@@ -395,6 +396,7 @@ class PayMailServices {
         where: { id },
         data: {
           officeId,
+          beforeOffice: getSender?.office?.name,
           historyOfficesIds,
         },
       });
@@ -529,6 +531,7 @@ class PayMailServices {
       data: {
         officeId,
         historyOfficesIds,
+        beforeOffice: getSender?.office?.name,
         positionSeal: positionSeal + 1,
       },
     });

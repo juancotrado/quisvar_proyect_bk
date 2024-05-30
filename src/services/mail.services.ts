@@ -128,7 +128,7 @@ class MailServices {
         status: true,
         type: true,
         userInit: true,
-        message: Queries.PayMail().selectMessage('MAIN'),
+        message: Queries.PayMail().selectMessage(),
       },
     });
     const parseList = mail.map(({ message, ...data }) => {
@@ -346,7 +346,7 @@ class MailServices {
       data: {
         title,
         header,
-        description,
+        description: '',
         type,
         category,
         officeId,
@@ -379,7 +379,12 @@ class MailServices {
       ...data
     }: Omit<
       PickMessageReply,
-      'messageId' | 'paymessageId' | 'createdAt' | 'id' | 'userId'
+      | 'messageId'
+      | 'paymessageId'
+      | 'createdAt'
+      | 'id'
+      | 'userId'
+      | 'description'
     >,
     files: Pick<FileMessagePick, 'name' | 'path'>[]
   ) {
@@ -406,6 +411,7 @@ class MailServices {
         office: {
           select: {
             id: true,
+            name: true,
             users: {
               where: { isOfficeManager: true },
               select: { usersId: true },
@@ -433,6 +439,7 @@ class MailServices {
         where: { id },
         data: {
           officeId,
+          beforeOffice: getSender?.office?.name,
           historyOfficesIds,
         },
       });
@@ -509,6 +516,7 @@ class MailServices {
           orderBy: { attempt: 'desc' },
           take: 1,
         },
+        officeId: true,
         office: {
           select: {
             id: true,
@@ -564,6 +572,7 @@ class MailServices {
       data: {
         officeId,
         historyOfficesIds,
+        beforeOffice: getSender?.office?.name,
         positionSeal: positionSeal + 1,
       },
     });
@@ -678,6 +687,7 @@ class MailServices {
         },
       },
     });
+    console.log(done);
     return done;
   }
 
