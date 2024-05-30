@@ -16,6 +16,7 @@ class OfficeServices {
         include: { _count: { select: { users: true } } },
       });
     const getListOffice = await prisma.office.findMany({
+      where: { name: { not: 'MESA DE PARTES' } },
       include: {
         users: {
           where: {

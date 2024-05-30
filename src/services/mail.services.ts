@@ -260,7 +260,7 @@ class MailServices {
     } else {
       users = [...getMessage.users];
     }
-    const initialSender = users.find(({ userInit }) => userInit);
+    const initialSender = getMessage.users.find(({ userInit }) => userInit);
     return { ...getMessage, initialSender, users };
   }
 
@@ -390,6 +390,7 @@ class MailServices {
   ) {
     const receiv: ReceiverT = { type: 'RECEIVER', role: 'MAIN', status: true };
     //-------------------------- Set New Office ---------------------------------
+    console.log({ officeId });
     const getOffice = officeId
       ? await prisma.office.findUnique({
           where: { id: officeId },
@@ -456,9 +457,9 @@ class MailServices {
       });
     } else {
       await prisma.mail.upsert({
-        where: { userId_messageId: { messageId: id, userId: receiverId } },
+        where: { userId_messageId: { messageId: id, userId: newReceiver } },
         update: { ...receiv },
-        create: { messageId: id, userId: receiverId, ...receiv },
+        create: { messageId: id, userId: newReceiver, ...receiv },
       });
     }
     //------------------------------------------------------------------
@@ -687,7 +688,6 @@ class MailServices {
         },
       },
     });
-    console.log(done);
     return done;
   }
 
