@@ -59,6 +59,7 @@ import { setAdmin } from '../utils/tools';
 import path from 'path';
 import { docs } from '../middlewares';
 import { env } from 'process';
+import { exec } from 'child_process';
 // import GenerateFiles from '../utils/generateFile';
 // import { exec } from 'child_process';
 
@@ -162,30 +163,19 @@ class Server {
   //ms-word:ofe|u|http://localhost:8081/file-user/cv%20%2015-03-2024.docx
   // ms-word:ofe|u|http://localhost:8081/api-docs/file-user/cv%20%2015-03-2024.docx
   conectionCron() {
-    const time = new TimerCron('00 20 * * *');
-    // GenerateFiles.coverFirma(
-    //   'compress_cp/servicio.pdf',
-    //   'compress_cp/servicio_firma.pdf',
-    //   {
-    //     pos: 10,
-    //     title: 'Gerencia General',
-    //     numberPage: 123,
-    //     to: 'Diego Adolfo Romani Cotohuanca Puerquisimo Diego ',
-    //     date: '2024/11/12',
-    //     observation:
-    //       'Se encontraron nuevas irregularidades en el documento presentado sin folio',
-    //   }
-    // );
-    // new ZipUtil()
+    const time = new TimerCron('30 6 * * *');
     time.crontimer(() => {
-      // exec('ls', (error, stdout, stderr) => {
-      //   if (error) {
-      //     console.error(`exec error: ${error}`);
-      //     return;
-      //   }
-      //   console.log(`stdout: ${stdout}`);
-      //   console.error(`stderr: ${stderr}`);
-      // });
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Aca habia un backup pero en prod');
+      } else {
+        exec('start backup.bat', (error, stdout, _stderr) => {
+          if (error) {
+            console.log(pc.bgRed(`stderr: ${error}`));
+            return;
+          }
+          console.log(pc.bgGreen(`${stdout}: backup_creado`));
+        });
+      }
     });
   }
   conectionWebSockect() {
