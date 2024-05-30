@@ -375,7 +375,7 @@ export interface usersCount {
   lastName?: string;
   count: number;
   dni?: string;
-  degree?: string;
+  degree?: string | null;
   percentage: number;
 }
 
