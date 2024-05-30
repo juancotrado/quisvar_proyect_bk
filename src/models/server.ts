@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import { prisma } from '../utils/prisma.server';
 import { Server as WebSocketServer } from 'socket.io';
 import http from 'http';
+import pc from 'picocolors';
 
 import {
   userRouter,
@@ -133,6 +134,7 @@ class Server {
   middlewares() {
     this.app.use(cors({ exposedHeaders: ['File-Name'] }));
     this.app.use('/projects', express.static('uploads/projects'));
+    this.app.use('/uploads', express.static('uploads'));
     this.app.use('/index', express.static('index'));
     this.app.use('/models', express.static('uploads/models'));
     this.app.use('/editables', express.static('uploads/editables'));
@@ -245,8 +247,12 @@ class Server {
       if (this.PORT && this.HOST) {
         prisma;
         const server = `http://${this.HOST}:${this.PORT}`;
-        console.log(`🚀 Server deployed at: ${server}`);
-        console.log(`📝 View docs at: ${server}/api-docs`);
+        console.log(
+          pc.green(`🚀 Server deployed at: ${pc.magenta(pc.bold(server))}`)
+        );
+        console.log(
+          pc.green(`📝 View docs at: ${pc.yellow(`${server}/api-docs`)}`)
+        );
         await setAdmin();
       } else {
         console.log('No se pudo conectar al servidor 😥');

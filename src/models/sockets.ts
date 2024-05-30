@@ -1,6 +1,7 @@
 import { SubTasks } from '@prisma/client';
 import { Server as WebSocketServer } from 'socket.io';
 import { Level } from 'types/types';
+import pc from 'picocolors';
 // import { TasksServices } from '../services';
 interface DataProjectAndTask {
   project: Level;
@@ -18,7 +19,7 @@ class Sockets {
   }
   socketEvents() {
     this.io.on('connection', socket => {
-      console.log('Connect user with id ==>', socket.id);
+      console.log(pc.cyan('Connect user with id ==>'), pc.blue(socket.id));
 
       socket.on('join', room => {
         console.log('room:', room);
