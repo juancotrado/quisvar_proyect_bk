@@ -127,8 +127,20 @@ Backend made with TS, Express and Prisma
    docker cp "container_name_or_id":/backup.sql "root_directory"/backup_$(date +"%Y%m%d_%H%M%S").sql
    ```
 
+4. Restore backup on custom directory:
+
+   - Insert database password after use command
+
+   ```bash
+   psql -U "user_db" -d "name_db" -f "root_backup"/backup.sql -W
+   ```
+
 ### Other Commands
 
 ```bash
 docker-compose down
+```
+
+```bash
+docker-compose restart
 ```
