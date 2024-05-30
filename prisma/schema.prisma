@@ -770,6 +770,7 @@ model Contratc {
   cui              String
   name             String
   contractNumber   String                @default("")
+  municipality     String                @default("")
   observations     String                @default("")
   projectName      String
   department       String

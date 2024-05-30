@@ -395,6 +395,7 @@ export type ContractForm = Pick<
   | 'projectShortName'
   | 'companyId'
   | 'consortiumId'
+  | 'municipality'
 >;
 
 export type TypeCost = 'bachelor' | 'professional' | 'intern' | 'graduate';

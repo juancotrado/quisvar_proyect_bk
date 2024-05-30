@@ -110,6 +110,7 @@ import {
   getSpecialist,
   getSpecialistByDNI,
   getSpecialistById,
+  updateSpecialist,
 } from './specialist.controller';
 import {
   createAreaSpecialty,
@@ -285,6 +286,7 @@ export {
   getSpecialist,
   getSpecialistByDNI,
   getSpecialistById,
+  updateSpecialist,
 };
 //Area Specialty Controllers
 export {

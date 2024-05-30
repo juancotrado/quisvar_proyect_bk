@@ -217,6 +217,7 @@ class Queries {
       cui: true,
       amount: true,
       department: true,
+      municipality: true,
       difficulty: true,
       district: true,
       id: true,
