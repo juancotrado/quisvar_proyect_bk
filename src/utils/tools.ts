@@ -155,27 +155,27 @@ const pricePerUser = (users: usersCount[], priceTask?: ListCostType) => {
 };
 
 const detailsPerUser = (list: number[], users: BasicTaskFilter['users']) => {
-  const listUsers: usersCount[] = list.reduce(
-    (acc: typeof listUsers, userId) => {
-      const existingItem = acc.find(item => item.userId === userId);
-      if (existingItem) {
-        existingItem.count++;
-      } else {
-        const findUser = users.find(u => u.userId === userId);
-        const firstName = findUser?.user?.profile?.firstName;
-        const lastName = findUser?.user?.profile?.lastName;
-        const dni = findUser?.user?.profile?.dni;
-        const degree = findUser?.user?.profile?.degree || undefined;
-        const profileInfo = { userId, firstName, lastName, dni, degree };
-        const percentage = findUser?.percentage || 0;
-        acc.push({ count: 1, percentage, ...profileInfo });
-      }
-      return acc;
-    },
-    []
-  );
-  return listUsers;
+  const listUser: usersCount[] = users.reduce((acc: typeof listUser, user) => {
+    const findUser = acc.find(u => u.userId === user.userId);
+    if (findUser) {
+      findUser.count++;
+      findUser.percentage += user.percentage;
+    } else {
+      const percentage = user.percentage || 0;
+      const userId = user.userId;
+      const gaaa = lodash.pick(user.user?.profile, [
+        'firstName',
+        'lastName',
+        'dni',
+        'degree',
+      ]);
+      acc.push({ count: 0, percentage, userId, ...gaaa });
+    }
+    return acc;
+  }, []);
+  return listUser;
 };
+
 export const dataWithLevel = {
   spending: 0,
   balance: 0,
@@ -226,11 +226,14 @@ export const percentageBasicTasks = (
   const list = subtasks.map(({ listUsers }) => listUsers).flat(2);
   const balance = roundTwoDecimail(price - spending);
   const listUsers = list.reduce(
-    (acc: typeof list, { count, userId, ...data }) => {
+    (acc: typeof list, { count, userId, percentage, ...data }) => {
       const exist = acc.findIndex(u => u.userId === userId);
-      exist >= 0
-        ? (acc[exist].count += count)
-        : acc.push({ userId, count, ...data });
+      if (exist >= 0) {
+        acc[exist].percentage += percentage;
+        acc[exist].count += count;
+      } else {
+        acc.push({ userId, count, percentage, ...data });
+      }
       return acc;
     },
     []
@@ -827,7 +830,6 @@ interface Weekday {
 }
 export const TransformWeekDuty = (weekdays: Weekday[], data: Duty[]) => {
   const result = [];
-  console.log(data);
   for (let i = 0; i < weekdays.length; i++) {
     const dayData = weekdays[i];
     const dayDate = new Date(dayData.date);
