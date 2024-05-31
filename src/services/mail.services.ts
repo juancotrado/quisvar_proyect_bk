@@ -471,14 +471,14 @@ class MailServices {
             users: {
               updateMany: {
                 where: { type: 'SENDER' },
-                data: { status: false },
+                data: { status: false, role: 'SECONDARY' },
               },
             },
           },
         }),
         prisma.mail.update({
           where: { userId_messageId: { messageId: id, userId: newSender } },
-          data: { type: 'SENDER', status: true, role: 'SECONDARY' },
+          data: { type: 'SENDER', status: true },
         }),
         prisma.messageHistory.create({
           data: {
