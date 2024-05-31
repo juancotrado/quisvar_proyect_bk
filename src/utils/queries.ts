@@ -306,6 +306,7 @@ class PayMailQueries {
         onHolding: true,
         historyOfficesIds: true,
         office: true,
+        beforeOffice: true,
         onHoldingDate: true,
         users: {
           where: { type, role },

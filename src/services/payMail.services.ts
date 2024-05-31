@@ -48,7 +48,7 @@ class PayMailServices {
       skip,
       take,
       orderBy: { updatedAt: 'desc' },
-      ...Queries.PayMail().selectMessage('MAIN'),
+      ...Queries.PayMail().selectMessage(),
     });
     const mail = { total, mailList };
     return mail;
@@ -404,37 +404,51 @@ class PayMailServices {
     //---------------------------------------------------------------------------
     if (!newReceiver || !newSender)
       throw new AppError('Ingrese Destinatario', 400);
-    if (status === 'RECHAZADO') {
-      await prisma.payMail.update({
-        where: {
-          userId_paymessageId: { paymessageId: id, userId: newReceiver },
-        },
-        data: { ...receiv },
-      });
-    } else {
-      await prisma.payMail.upsert({
-        where: {
-          userId_paymessageId: { paymessageId: id, userId: newReceiver },
-        },
-        update: { ...receiv },
-        create: { paymessageId: id, userId: newReceiver, ...receiv },
-      });
-    }
-    //------------------------------------------------------------------
-    await prisma.payMail.update({
-      where: { userId_paymessageId: { paymessageId: id, userId: newSender } },
-      data: { type: 'SENDER', status: false },
-    });
-    await prisma.payMessages.update({ where: { id }, data: { status } });
-    const createForward = await prisma.messageHistory.create({
-      data: {
-        title,
-        header,
-        user: { connect: { id: senderId } },
-        paymessage: { connect: { id } },
-        files: { createMany: { data: files } },
-      },
-    });
+    const createForward = await prisma
+      .$transaction([
+        status === 'RECHAZADO'
+          ? prisma.payMail.update({
+              where: {
+                userId_paymessageId: { paymessageId: id, userId: newReceiver },
+              },
+              data: { ...receiv },
+            })
+          : prisma.payMail.upsert({
+              where: {
+                userId_paymessageId: { paymessageId: id, userId: newReceiver },
+              },
+              update: { ...receiv },
+              create: { paymessageId: id, userId: newReceiver, ...receiv },
+            }),
+        prisma.payMessages.update({
+          where: { id },
+          data: {
+            status,
+            users: {
+              updateMany: {
+                where: { type: 'SENDER' },
+                data: { status: false, role: 'SECONDARY' },
+              },
+            },
+          },
+        }),
+        prisma.payMail.update({
+          where: {
+            userId_paymessageId: { paymessageId: id, userId: newSender },
+          },
+          data: { type: 'SENDER', status: false },
+        }),
+        prisma.messageHistory.create({
+          data: {
+            title,
+            header,
+            user: { connect: { id: senderId } },
+            paymessage: { connect: { id } },
+            files: { createMany: { data: files } },
+          },
+        }),
+      ])
+      .then(res => res[3]);
     return createForward;
   }
 
@@ -508,17 +522,19 @@ class PayMailServices {
       : getSender.office?.quantity + 1;
     const positionSeal = getSender.positionSeal;
     //---------------------------------------------------------------------------
-    await prisma.payMail.upsert({
-      where: {
-        userId_paymessageId: { paymessageId: id, userId: newReceiver },
-      },
-      update: { ...receiv },
-      create: { paymessageId: id, userId: newReceiver, ...receiv },
-    });
-    await prisma.payMail.update({
-      where: { userId_paymessageId: { paymessageId: id, userId: newSender } },
-      data: { type: 'SENDER', status: false },
-    });
+    await prisma.$transaction([
+      prisma.payMail.upsert({
+        where: {
+          userId_paymessageId: { paymessageId: id, userId: newReceiver },
+        },
+        update: { ...receiv },
+        create: { paymessageId: id, userId: newReceiver, ...receiv },
+      }),
+      prisma.payMail.update({
+        where: { userId_paymessageId: { paymessageId: id, userId: newSender } },
+        data: { type: 'SENDER', status: false },
+      }),
+    ]);
     //-------------------------------------------------------------------
     const { historyOfficesIds: listOfficeIds } = getSender;
     const existOffice = listOfficeIds.find(id => id === officeId);
@@ -526,19 +542,7 @@ class PayMailServices {
       ? undefined
       : [...listOfficeIds, officeId];
     //---------------------------------------------------------------------------
-    await prisma.payMessages.update({
-      where: { id: getSender.id },
-      data: {
-        officeId,
-        historyOfficesIds,
-        beforeOffice: getSender?.office?.name,
-        positionSeal: positionSeal + 1,
-      },
-    });
-    await prisma.office.update({
-      where: { id: getSender.office.id },
-      data: { quantity: quantitySeal + 1 },
-    });
+
     //-------------------------------------------------------------------
     const { name, path } = getSender.files[0];
     const destinityFile = path + '/' + name;
@@ -554,15 +558,32 @@ class PayMailServices {
       numberPage: numberPage ? numberPage : quantitySeal,
     });
     //-------------------------------------------------------------------
-    const createForward = await prisma.messageHistory.create({
-      data: {
-        title: title,
-        header: '(proveido)/' + getSender.office.name,
-        user: { connect: { id: senderId } },
-        paymessage: { connect: { id } },
-        files: { createMany: { data: files } },
-      },
-    });
+    const createForward = await prisma
+      .$transaction([
+        prisma.payMessages.update({
+          where: { id: getSender.id },
+          data: {
+            officeId,
+            historyOfficesIds,
+            beforeOffice: getSender?.office?.name,
+            positionSeal: positionSeal + 1,
+          },
+        }),
+        prisma.office.update({
+          where: { id: getSender.office.id },
+          data: { quantity: quantitySeal + 1 },
+        }),
+        prisma.messageHistory.create({
+          data: {
+            title: title,
+            header: '(proveido)/' + getSender.office.name,
+            user: { connect: { id: senderId } },
+            paymessage: { connect: { id } },
+            files: { createMany: { data: files } },
+          },
+        }),
+      ])
+      .then(res => res[2]);
     return createForward;
   }
 

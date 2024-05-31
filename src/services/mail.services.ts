@@ -59,7 +59,7 @@ class MailServices {
       skip,
       take,
       orderBy: { updatedAt: 'desc' },
-      ...Queries.PayMail().selectMessage('MAIN'),
+      ...Queries.PayMail().selectMessage(),
     });
     const mail = { total, mailList };
     return mail;
@@ -447,8 +447,7 @@ class MailServices {
     //---------------------------------------------------------------------------
     if (!newReceiver || !newSender)
       throw new AppError('Ingrese Destinatario', 400);
-    let createForward;
-    await prisma
+    const createForward = await prisma
       .$transaction([
         status === 'RECHAZADO'
           ? prisma.mail.update({
@@ -489,9 +488,7 @@ class MailServices {
           },
         }),
       ])
-      .then(res => {
-        createForward = res[3];
-      });
+      .then(res => res[3]);
     return createForward;
   }
 
@@ -617,15 +614,32 @@ class MailServices {
       numberPage: numberPage ? numberPage : quantitySeal,
     });
     //-------------------------------------------------------------------
-    const createForward = await prisma.messageHistory.create({
-      data: {
-        title: title,
-        header: '(proveido)/' + getSender.office.name,
-        user: { connect: { id: senderId } },
-        message: { connect: { id } },
-        files: { createMany: { data: files } },
-      },
-    });
+    const createForward = await prisma
+      .$transaction([
+        prisma.messages.update({
+          where: { id: getSender.id },
+          data: {
+            officeId,
+            historyOfficesIds,
+            beforeOffice: getSender?.office?.name,
+            positionSeal: positionSeal + 1,
+          },
+        }),
+        prisma.office.update({
+          where: { id: getSender.office.id },
+          data: { quantity: quantitySeal + 1 },
+        }),
+        prisma.messageHistory.create({
+          data: {
+            title: title,
+            header: '(proveido)/' + getSender.office.name,
+            user: { connect: { id: senderId } },
+            message: { connect: { id } },
+            files: { createMany: { data: files } },
+          },
+        }),
+      ])
+      .then(res => res[2]);
     return createForward;
   }
 
