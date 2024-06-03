@@ -6,6 +6,7 @@ import {
   getCompaniesById,
   getCompany,
   updateCompaniesById,
+  updateCompanieInvoiceById,
 } from '../controllers';
 import { _admin_role } from '../middlewares/role.middleware';
 import { uploads } from '../middlewares';
@@ -15,6 +16,8 @@ router.use(authenticateHandler);
 router.use(_admin_role);
 router.get('/', getCompany);
 router.get('/information/:id', getCompaniesById);
+router.patch('/:id', updateCompaniesById);
+router.put('/:id/invoice', updateCompanieInvoiceById);
 router.patch('/:id', updateCompaniesById);
 router.post('/', uploads.companies.fields([{ name: 'img' }]), createCompany);
 //COMPANIES IMG

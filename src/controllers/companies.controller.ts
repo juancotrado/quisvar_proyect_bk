@@ -95,4 +95,18 @@ export const updateCompaniesById = async (
     next(error);
   }
 };
+export const updateCompanieInvoiceById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const body = { ...req.body, id: +id };
+    const query = await CompaniesServices.updateCompanieInvoiceById(body);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
 //COMPANIES IMG

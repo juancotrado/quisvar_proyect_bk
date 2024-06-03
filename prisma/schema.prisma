@@ -498,6 +498,9 @@ model Companies {
   address       String
   departure     String
   orderQuantity Int                     @default(0)
+  color         String                  @default("#00B0F0")
+  phone         String                  @default("957 415 743")
+  email         String                  @default("sschilisrl_106@gmail.com")
   inscription   DateTime?
   activities    DateTime?
   SEE           DateTime?

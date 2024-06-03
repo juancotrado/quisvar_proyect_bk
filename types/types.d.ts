@@ -18,6 +18,7 @@ import {
   Office,
   SubMenuPoints,
   MenuPoints,
+  Companies,
 } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 
@@ -35,6 +36,10 @@ export type PickSubtask = Pick<
   SubTasks,
   'id' | 'name' | 'item' | 'description' | 'price' | 'status'
 > & { users: User[] };
+export type PickCompanyInvoice = Pick<
+  Companies,
+  'id' | 'color' | 'phone' | 'email'
+>;
 
 export type StageParse = {
   name: string;

@@ -103,6 +103,7 @@ import CompanyController, {
   createCompany,
   getCompaniesById,
   getCompany,
+  updateCompanieInvoiceById,
   updateCompaniesById,
 } from './companies.controller';
 import {
@@ -279,6 +280,7 @@ export {
   getCompaniesById,
   updateCompaniesById,
   CompanyController,
+  updateCompanieInvoiceById,
 };
 //Specialists Controllers
 export {
