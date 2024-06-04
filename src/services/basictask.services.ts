@@ -1,17 +1,41 @@
-import { BasicTasks, Users } from '@prisma/client';
+import { BasicTasks } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
+import { numberToConvert } from '../utils/tools';
+import Queries from '../utils/queries';
 
 class BasicTasksServices {
   public static async find(id: BasicTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
+
     const findSubTask = await prisma.basicTasks.findUnique({
       where: { id },
-      // include: Queries.includeBasictask,
+      include: Queries.includeBasictask,
     });
     if (!findSubTask) throw new AppError('No se pudo encontrar la tares ', 404);
-    return findSubTask;
+    const { Levels, ...task } = findSubTask;
+    const members = Levels.stages.group?.groups.map(g => g.users.id);
+    const itemAndMob = await this.getItemMods([...Levels.levelList, Levels.id]);
+    return { ...task, ...itemAndMob, members };
   }
+
+  private static async getItemMods(list: number[]) {
+    const getLevels = await prisma.basicLevels.findMany({
+      where: { id: { in: list } },
+      orderBy: { level: 'asc' },
+      select: { index: true, typeItem: true, users: { select: { id: true } } },
+    });
+    let item: string = '';
+    let mods: number[] = [];
+    getLevels.forEach(({ typeItem, index, users }) => {
+      item = item + numberToConvert(index, typeItem) + '.';
+      mods = [...mods, ...users.map(({ id }) => id)];
+    });
+    mods = Array.from(new Set(mods));
+    return { item, mods };
+  }
+
+  private static findItemRoot() {}
 
   public static async create({ name, days, levels_Id }: BasicTasks) {
     const isDuplicated = await this.findDuplicate(name, levels_Id, 'ROOT');
