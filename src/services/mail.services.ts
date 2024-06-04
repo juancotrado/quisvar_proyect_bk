@@ -25,8 +25,8 @@ class MailServices {
     if (offset !== undefined) return offset;
     if (!offset && page === undefined) return undefined;
     const numberPage = limit && page && limit * page;
-    const newPage = numberPage ? numberPage + 1 : numberPage;
-    return newPage;
+    // const newPage = numberPage ? numberPage : numberPage;
+    return numberPage;
   }
 
   public static async onHolding({
@@ -48,6 +48,7 @@ class MailServices {
       },
     });
     const skip = this.getPage({ offset, page, limit: take });
+    console.log({ skip, offset, page, take });
     const mailList = await prisma.messages.findMany({
       where: {
         officeId,
