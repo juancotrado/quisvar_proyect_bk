@@ -291,7 +291,7 @@ class DuplicatesServices {
       list,
       Levels.item,
       newPath,
-      newEditables,
+      // newEditables,
       index + 2
     );
     //--------------------------------------------------------------

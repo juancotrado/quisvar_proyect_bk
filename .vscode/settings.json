@@ -1,3 +1,16 @@
 {
-  "conventionalCommits.scopes": ["Groups"]
+  "conventionalCommits.scopes": [
+    "groups",
+    "mail",
+    "documentation",
+    "formats",
+    "basic-task",
+    "download",
+    "duplicate",
+    "basic-level",
+    "stages",
+    "level",
+    "pdf",
+    "schema"
+  ]
 }
