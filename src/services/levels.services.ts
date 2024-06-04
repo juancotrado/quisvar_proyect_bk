@@ -315,7 +315,7 @@ class LevelsServices {
             item: true,
             typeItem: true,
             files: {
-              where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] },
+              where: { type: 'UPLOADS' },
               select: { id: true, dir: true, name: true, type: true },
             },
           },
@@ -325,6 +325,7 @@ class LevelsServices {
     });
 
     //-----------------------update_some_levels----------------------------------
+    await this.deleteBlock(stagesId, getInfoLevel._item, getInfoLevel.level);
     const updateList = await this.updateBlock(
       getList,
       rootLevel,
@@ -335,7 +336,6 @@ class LevelsServices {
     );
     // //-------------------------return_delete_dir---------------------------------
     const result = await Promise.all(updateList).then(async () => {
-      await this.deleteBlock(stagesId, getInfoLevel._item, getInfoLevel.level);
       return deleteDir;
     });
     return result;
