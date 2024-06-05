@@ -1,7 +1,13 @@
 // import AppError from '../utils/appError';
 import AppError from '../utils/appError';
 import { Duty, DutyMembers, Group, prisma } from '../utils/prisma.server';
-import { TransformWeekDuty, getDaysOfWeekInRange } from '../utils/tools';
+import Queries from '../utils/queries';
+import {
+  SubTasksType,
+  TransformWeekDuty,
+  TransformWeekReport,
+  getDaysOfWeekInRange,
+} from '../utils/tools';
 
 class DutyMembersServices {
   static async create(id: DutyMembers['dutyId']) {
@@ -35,7 +41,7 @@ class DutyMembersServices {
       where: {
         CUI,
         groupList: {
-          groupId,
+          groupId: groupId || undefined,
         },
         createdAt: {
           gte: new Date(days[0].date),
@@ -51,6 +57,56 @@ class DutyMembersServices {
       },
     });
     const transform = TransformWeekDuty(days, member);
+    return transform;
+  }
+  static async getWeekReport(
+    CUI: Duty['CUI'],
+    groupId: Group['id'],
+    date: string
+  ) {
+    // if (!groupId || !CUI) throw new AppError(`Oops!, algo salio mal`, 400);
+    const days = getDaysOfWeekInRange(date);
+    const member = await prisma.subTasks.findMany({
+      where: {
+        Levels: {
+          stages: {
+            groupId: groupId || undefined,
+          },
+        },
+        createdAt: {
+          gte: new Date(days[0].date),
+          lte: new Date(days[6].date),
+        },
+      },
+      include: {
+        users: {
+          // where: {
+          //   status: true,
+          // },
+          orderBy: {
+            assignedAt: 'desc',
+          },
+          take: 1,
+          select: {
+            user: Queries.selectProfileShort,
+          },
+        },
+        Levels: {
+          select: {
+            stages: {
+              include: {
+                project: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    const transform = TransformWeekReport(days, member as SubTasksType[]);
     return transform;
   }
   static async delete(id: DutyMembers['id']) {

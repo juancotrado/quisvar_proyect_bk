@@ -3,8 +3,12 @@ import {
   BasicTasks,
   DutyTasks,
   Levels,
+  Profiles,
+  Projects,
+  Stages,
   SubTasks,
   TaskRole,
+  Users,
 } from '@prisma/client';
 import {
   BasicTaskFilter,
@@ -21,6 +25,7 @@ import {
   ProjectDir,
   SubTaskFilter,
   UpdateLevelBlock,
+  User,
   usersCount,
 } from 'types/types';
 import { prisma } from './prisma.server';
@@ -857,6 +862,56 @@ export const TransformWeekDuty = (weekdays: Weekday[], data: Duty[]) => {
     });
     const members = Array.from(membersMap.values());
     result.push({ day: dayData.day, date: dayData.date, members });
+  }
+  return result;
+};
+interface StagesType extends Stages {
+  project: Projects;
+}
+interface LevelsType extends Levels {
+  stages: StagesType;
+}
+interface UserType extends User {
+  profile: Profiles;
+}
+export interface SubTasksType extends SubTasks {
+  Levels: LevelsType;
+  users: UserType[];
+}
+export const TransformWeekReport = (
+  weekdays: Weekday[],
+  data: SubTasksType[]
+) => {
+  const result = [];
+  for (let i = 0; i < weekdays.length; i++) {
+    const dayData = weekdays[i];
+    const dayDate = new Date(dayData.date);
+
+    const filteredData = data.filter(item => {
+      const itemDate = new Date(item.createdAt);
+      itemDate.setUTCHours(itemDate.getUTCHours() - 5);
+      return (
+        itemDate.toISOString().split('T')[0] ===
+        dayDate.toISOString().split('T')[0]
+      );
+    });
+    //console.log(filteredData)
+    const membersMap = new Map();
+    filteredData.forEach(item => {
+      const { name, status, updatedAt, days, users, Levels, id } = item;
+      membersMap.set(name, {
+        name,
+        status,
+        updatedAt,
+        days,
+        user: users.length > 0 ? users[0].user.profile : null,
+        stage: Levels.stages.name,
+        project: Levels.stages.project.name,
+        subTask: id,
+      });
+    });
+    const members = Array.from(membersMap.values());
+    result.push({ day: dayData.day, date: dayData.date, tasks: members });
   }
   return result;
 };
