@@ -88,6 +88,7 @@ class DuplicatesServices {
       select: {
         projectId: true,
         name: true,
+        rootTypeItem: true,
         levels: {
           orderBy: { item: 'asc' },
           include: {
@@ -100,7 +101,11 @@ class DuplicatesServices {
       throw new AppError('Oops!,no se pudo encontrar el nivel', 400);
     //----------------------------create_stage--------------------------------------
     const createStage = await prisma.stages.create({
-      data: { name, projectId: projectId ? projectId : getStage.projectId },
+      data: {
+        name,
+        projectId: projectId ? projectId : getStage.projectId,
+        rootTypeItem: getStage.rootTypeItem,
+      },
     });
     const { id: stageId } = createStage;
     //----------------------------create_files--------------------------------------

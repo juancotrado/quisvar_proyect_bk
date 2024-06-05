@@ -26,8 +26,8 @@ class PayMailServices {
     if (offset !== undefined) return offset;
     if (!offset && page === undefined) return undefined;
     const numberPage = limit && page && limit * page;
-    const newPage = numberPage ? numberPage + 1 : numberPage;
-    return newPage;
+    // const newPage = numberPage ? numberPage + 1 : numberPage;
+    return numberPage;
   }
 
   public static async onHolding({
