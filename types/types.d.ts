@@ -58,6 +58,9 @@ export type User = {
     } | null;
   };
 };
+export type CatchAsync = <T>(
+  handler: Function
+) => (...args: T[]) => Promise<void>;
 
 export type TypeTables =
   | 'indexTasks'

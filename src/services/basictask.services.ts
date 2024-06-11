@@ -48,7 +48,7 @@ class BasicTasksServices {
 
   public static async addToUpperorLower(
     id: BasicTasks['id'],
-    { name, days }: BasicTasks,
+    { name, days }: Pick<BasicTasks, 'days' | 'name'>,
     typeGte: 'upper' | 'lower'
   ) {
     if (!id || !typeGte) throw new AppError('Oops!,ID invalido', 400);
