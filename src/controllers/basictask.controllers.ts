@@ -39,7 +39,6 @@ class BasicTaskControllers {
       );
       res.status(201).json(query);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   };
@@ -80,7 +79,7 @@ class BasicTaskControllers {
       }
 
       const { status } = parseQueries<ga>(req.query);
-      console.log(status);
+      console.log(status, body);
       // const userInfo: UserType = res.locals.userInfo;
       const task = await BasicTasksServices.updateStatusByUser(
         +taskId,
