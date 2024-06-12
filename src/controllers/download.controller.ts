@@ -155,7 +155,7 @@ class DownloadController {
       next(error);
     }
   };
-
+  private python_route = process.env.PYTHON_SERVER;
   public mergePdfLevel2: ControllerFunction = async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -166,7 +166,8 @@ class DownloadController {
       const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
-      const routeService = 'http://127.0.0.1:5000/pdf/merge2';
+
+      const routeService = this.python_route + '/pdf/merge2';
       const service = routeService + '?input_folder=' + finalPath;
       res.redirect(service);
     } catch (error) {
@@ -184,7 +185,8 @@ class DownloadController {
       const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
-      const routeService = 'http://127.0.0.1:5000/pdf/merge2';
+
+      const routeService = this.python_route + '/pdf/merge2';
       const service = routeService + '?input_folder=' + finalPath;
       //res.json(service);
       res.redirect(service);
@@ -207,7 +209,7 @@ class DownloadController {
       const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
-      const routeService = 'http://127.0.0.1:5000/descargar_carpeta';
+      const routeService = this.python_route + '/descargar_carpeta';
       const service =
         routeService + '?type=' + type + '&input_folder=' + finalPath;
       res.redirect(service);
@@ -230,7 +232,7 @@ class DownloadController {
       const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
-      const routeService = 'http://127.0.0.1:5000/descargar_carpeta';
+      const routeService = this.python_route + '/descargar_carpeta';
       const service =
         routeService + '?type=' + type + '&input_folder=' + finalPath;
       //res.json(service);
