@@ -77,6 +77,20 @@ const basicSocketCotroller = (
       )
     );
     socket.on(
+      'client:update-cover-basic',
+      catchAsyncSocket(
+        async (
+          data: { id: number; cover: boolean }[],
+          stageId: number,
+          callback: Function
+        ) => {
+          await BasicLevelServices.addCoverList(data);
+          await emitStage(stageId);
+          callback();
+        }
+      )
+    );
+    socket.on(
       'client:duplicates-level',
       catchAsyncSocket(
         async (levelId: number, name: string, callback: Function) => {
@@ -92,6 +106,20 @@ const basicSocketCotroller = (
       catchAsyncSocket(
         async ({ stageId, ...body }: TaskStage, callback: Function) => {
           await BasicTasksServices.create(body);
+          await emitStage(stageId);
+          callback();
+        }
+      )
+    );
+    socket.on(
+      'client:update-task-days-basic',
+      catchAsyncSocket(
+        async (
+          data: { id: number; days: number }[],
+          stageId: number,
+          callback: Function
+        ) => {
+          await BasicLevelServices.updateDaysPerId(data);
           await emitStage(stageId);
           callback();
         }

@@ -2,6 +2,7 @@ import { Socket, Server as WebSocketServer } from 'socket.io';
 import { CatchAsync } from 'types/types';
 import {
   DuplicatesServices,
+  LevelsServices,
   StageServices,
   SubTasksServices,
 } from '../../services';
@@ -19,6 +20,21 @@ const budgetSocketCotroller = (
     io?.to(`project-${stageId}`).emit('server:budget-load-stage', query);
   };
   if (!catchAsyncSocket) return;
+
+  socket.on(
+    'client:update-task-days-budget',
+    catchAsyncSocket(
+      async (
+        data: { id: number; days: number }[],
+        stageId: number,
+        callback: Function
+      ) => {
+        await LevelsServices.updateDaysPerId(data);
+        await emitStage(stageId);
+        callback();
+      }
+    )
+  );
   socket.on(
     'client:add-task-budget',
     catchAsyncSocket(
