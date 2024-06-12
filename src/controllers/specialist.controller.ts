@@ -78,3 +78,16 @@ export const getSpecialistById = async (
     next(error);
   }
 };
+export const deleteSpecialist = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const query = await SpecialistServices.deleteSpecialist(+id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
