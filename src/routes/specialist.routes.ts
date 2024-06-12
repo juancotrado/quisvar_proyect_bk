@@ -2,6 +2,7 @@ import { Router } from 'express';
 import authenticateHandler from '../middlewares/auth.middleware';
 import {
   createSpecialist,
+  deleteSpecialist,
   getSpecialist,
   getSpecialistByDNI,
   getSpecialistById,
@@ -24,4 +25,5 @@ router.post(
   ]),
   createSpecialist
 );
+router.delete('/delete/:id', deleteSpecialist);
 export default router;

@@ -69,5 +69,12 @@ class SpecialistServices {
     });
     return specialist;
   }
+  static async deleteSpecialist(id: Specialists['id']) {
+    if (!id) throw new AppError(`Ups, ocurrio un error`, 400);
+    await prisma.specialists.delete({
+      where: { id },
+    });
+    return 'deleted';
+  }
 }
 export default SpecialistServices;

@@ -112,6 +112,7 @@ import {
   getSpecialistByDNI,
   getSpecialistById,
   updateSpecialist,
+  deleteSpecialist,
 } from './specialist.controller';
 import {
   createAreaSpecialty,
@@ -289,6 +290,7 @@ export {
   getSpecialistByDNI,
   getSpecialistById,
   updateSpecialist,
+  deleteSpecialist,
 };
 //Area Specialty Controllers
 export {
