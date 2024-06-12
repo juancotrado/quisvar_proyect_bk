@@ -8,7 +8,6 @@ import {
   Stages,
   SubTasks,
   TaskRole,
-  Users,
 } from '@prisma/client';
 import {
   BasicTaskFilter,
@@ -791,12 +790,14 @@ export const getDaysOfWeekInRange = (dateString: string) => {
   const date = new Date(dateString);
   const dayOfWeekIndex = date.getDay();
   const startDate = new Date(date);
-  startDate.setDate(startDate.getDate() - dayOfWeekIndex);
+  startDate.setDate(
+    startDate.getDate() -
+      (dayOfWeekIndex < 6 ? Math.abs(-dayOfWeekIndex - 1) : 0)
+  );
   const daysOfWeekArray = [];
-
   for (let i = 0; i < 7; i++) {
     const currentDate = new Date(startDate);
-    currentDate.setDate(startDate.getDate() + i - 1);
+    currentDate.setDate(startDate.getDate() + i);
     daysOfWeekArray.push({
       day: daysOfWeek[currentDate.getDay()],
       date: currentDate.toISOString().split('T')[0],
