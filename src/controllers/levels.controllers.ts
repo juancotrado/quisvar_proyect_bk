@@ -40,6 +40,16 @@ class LevelsControllers {
       next(error);
     }
   };
+
+  public static updateDays: ControllerFunction = async (req, res, next) => {
+    try {
+      const { body } = req;
+      const query = await LevelsServices.updateDaysPerId(body);
+      res.status(201).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default LevelsControllers;

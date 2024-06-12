@@ -469,6 +469,15 @@ class LevelsServices {
     return result;
   }
 
+  public static async updateDaysPerId(
+    levels: { id: BasicLevels['id']; days: number }[]
+  ) {
+    const updateList = levels.map(({ id, days }) => {
+      return prisma.subTasks.update({ where: { id }, data: { days } });
+    });
+    return await prisma.$transaction(updateList);
+  }
+
   static findList(
     array: GetFilterLevels[],
     _rootId: number,
