@@ -103,6 +103,7 @@ import CompanyController, {
   createCompany,
   getCompaniesById,
   getCompany,
+  updateCompanieInvoiceById,
   updateCompaniesById,
 } from './companies.controller';
 import {
@@ -110,6 +111,8 @@ import {
   getSpecialist,
   getSpecialistByDNI,
   getSpecialistById,
+  updateSpecialist,
+  deleteSpecialist,
 } from './specialist.controller';
 import {
   createAreaSpecialty,
@@ -127,8 +130,8 @@ import {
   createAreaSpecialtyList,
   deleteAreaSpecialtyList,
   getAreaSpecialtyList,
-  getAllSpecialistBySpeciality,
-  updateAreaSpecialtyList,
+  // getAllSpecialistBySpeciality,
+  // updateAreaSpecialtyList,
 } from './areaSpecialtyList.controller';
 import {
   createTrainingSpecialtyList,
@@ -278,6 +281,7 @@ export {
   getCompaniesById,
   updateCompaniesById,
   CompanyController,
+  updateCompanieInvoiceById,
 };
 //Specialists Controllers
 export {
@@ -285,6 +289,8 @@ export {
   getSpecialist,
   getSpecialistByDNI,
   getSpecialistById,
+  updateSpecialist,
+  deleteSpecialist,
 };
 //Area Specialty Controllers
 export {
@@ -297,8 +303,8 @@ export {
 export {
   createAreaSpecialtyList,
   getAreaSpecialtyList,
-  getAllSpecialistBySpeciality,
-  updateAreaSpecialtyList,
+  // getAllSpecialistBySpeciality,
+  // updateAreaSpecialtyList,
   deleteAreaSpecialtyList,
 };
 //Training Specialty Controllers

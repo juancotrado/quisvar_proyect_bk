@@ -11,17 +11,17 @@ import AppError from '../utils/appError';
 
 const model = _materialPath;
 const review = _reviewPath;
-const editables = _editablePath;
+// const editables = _editablePath;
 
 const createFolders = () => {
   const project = existsSync(`uploads/projects`);
   const model = existsSync(`uploads/models`);
   const review = existsSync(`uploads/reviews`);
-  const editables = existsSync(`uploads/editables`);
+  // const editables = existsSync(`uploads/editables`);
   if (!project) mkdirSync(`uploads/projects`);
   if (!model) mkdirSync(`uploads/models`);
   if (!review) mkdirSync(`uploads/reviews`);
-  if (!editables) mkdirSync(`uploads/editables`);
+  // if (!editables) mkdirSync(`uploads/editables`);
 };
 
 export const showProjects = async (
@@ -47,7 +47,6 @@ export const showProject = async (
     const userSession = res.locals.userInfo;
     const project_id = parseInt(id);
     const query = await ProjectsServices.find(project_id, +userSession.id);
-
     res.status(200).json(query);
   } catch (error) {
     next(error);
@@ -68,7 +67,7 @@ export const createProject = async (
     mkdirSync(path);
     mkdirSync(`${model}/${projectName}`);
     mkdirSync(`${review}/${projectName}`);
-    mkdirSync(`${editables}/${projectName}`);
+    // mkdirSync(`${editables}/${projectName}`);
     res.status(201).json(query);
   } catch (error) {
     next(error);
@@ -120,7 +119,7 @@ export const deleteProject = async (
     rmSync(path, { recursive: true });
     rmSync(`${model}/${projectId}`, { recursive: true });
     rmSync(`${review}/${projectId}`, { recursive: true });
-    rmSync(`${editables}/${projectId}`, { recursive: true });
+    // rmSync(`${editables}/${projectId}`, { recursive: true });
     res.status(204).json({ name, path, ...query });
   } catch (error) {
     next(error);

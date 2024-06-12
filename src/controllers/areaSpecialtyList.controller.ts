@@ -32,38 +32,38 @@ export const getAreaSpecialtyList = async (
     next(error);
   }
 };
-export const getAllSpecialistBySpeciality = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const query = await AreaSpecialtyListServices.getAllSpecialistBySpeciality(
-      +id
-    );
-    res.status(200).json(query);
-  } catch (error) {
-    next(error);
-  }
-};
-export const updateAreaSpecialtyList = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { id } = req.params;
-    const { specialtyName } = req.body;
-    const query = await AreaSpecialtyListServices.updateAreaSpecialtyList(
-      +id,
-      specialtyName
-    );
-    res.status(200).json(query);
-  } catch (error) {
-    next(error);
-  }
-};
+// export const getAllSpecialistBySpeciality = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const { id } = req.params;
+//     const query = await AreaSpecialtyListServices.getAllSpecialistBySpeciality(
+//       +id
+//     );
+//     res.status(200).json(query);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+// export const updateAreaSpecialtyList = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const { id } = req.params;
+//     const { specialtyName } = req.body;
+//     const query = await AreaSpecialtyListServices.updateAreaSpecialtyList(
+//       +id,
+//       specialtyName
+//     );
+//     res.status(200).json(query);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 export const deleteAreaSpecialtyList = async (
   req: Request,
   res: Response,

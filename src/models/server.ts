@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import { prisma } from '../utils/prisma.server';
 import { Server as WebSocketServer } from 'socket.io';
 import http from 'http';
+import pc from 'picocolors';
 
 import {
   userRouter,
@@ -58,6 +59,7 @@ import { setAdmin } from '../utils/tools';
 import path from 'path';
 import { docs } from '../middlewares';
 import { env } from 'process';
+import { exec } from 'child_process';
 // import GenerateFiles from '../utils/generateFile';
 // import { exec } from 'child_process';
 
@@ -133,6 +135,7 @@ class Server {
   middlewares() {
     this.app.use(cors({ exposedHeaders: ['File-Name'] }));
     this.app.use('/projects', express.static('uploads/projects'));
+    this.app.use('/uploads', express.static('uploads'));
     this.app.use('/index', express.static('index'));
     this.app.use('/models', express.static('uploads/models'));
     this.app.use('/editables', express.static('uploads/editables'));
@@ -160,30 +163,19 @@ class Server {
   //ms-word:ofe|u|http://localhost:8081/file-user/cv%20%2015-03-2024.docx
   // ms-word:ofe|u|http://localhost:8081/api-docs/file-user/cv%20%2015-03-2024.docx
   conectionCron() {
-    const time = new TimerCron('00 20 * * *');
-    // GenerateFiles.coverFirma(
-    //   'compress_cp/servicio.pdf',
-    //   'compress_cp/servicio_firma.pdf',
-    //   {
-    //     pos: 10,
-    //     title: 'Gerencia General',
-    //     numberPage: 123,
-    //     to: 'Diego Adolfo Romani Cotohuanca Puerquisimo Diego ',
-    //     date: '2024/11/12',
-    //     observation:
-    //       'Se encontraron nuevas irregularidades en el documento presentado sin folio',
-    //   }
-    // );
-    // new ZipUtil()
+    const time = new TimerCron('30 6 * * *');
     time.crontimer(() => {
-      // exec('ls', (error, stdout, stderr) => {
-      //   if (error) {
-      //     console.error(`exec error: ${error}`);
-      //     return;
-      //   }
-      //   console.log(`stdout: ${stdout}`);
-      //   console.error(`stderr: ${stderr}`);
-      // });
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Aca habia un backup pero en prod');
+      } else {
+        exec('start backup.bat', (error, stdout, _stderr) => {
+          if (error) {
+            console.log(pc.bgRed(`stderr: ${error}`));
+            return;
+          }
+          console.log(pc.bgGreen(`${stdout}: backup_creado`));
+        });
+      }
     });
   }
   conectionWebSockect() {
@@ -245,8 +237,12 @@ class Server {
       if (this.PORT && this.HOST) {
         prisma;
         const server = `http://${this.HOST}:${this.PORT}`;
-        console.log(`🚀 Server deployed at: ${server}`);
-        console.log(`📝 View docs at: ${server}/api-docs`);
+        console.log(
+          pc.green(`🚀 Server deployed at: ${pc.magenta(pc.bold(server))}`)
+        );
+        console.log(
+          pc.green(`📝 View docs at: ${pc.yellow(`${server}/api-docs`)}`)
+        );
         await setAdmin();
       } else {
         console.log('No se pudo conectar al servidor 😥');

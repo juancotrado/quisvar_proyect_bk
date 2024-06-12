@@ -13,7 +13,6 @@ import { TypeCost } from 'types/types';
 const dir = _dirPath;
 const model = _materialPath;
 const review = _reviewPath;
-const editables = _editablePath;
 
 const createfiles = (list: string[], rootPath: string) => {
   list.forEach(path => mkdirSync(`${path}/${rootPath}`));
@@ -115,7 +114,7 @@ class StagesControllers {
       const { project, ...query } = await StageServices.create(body);
       const { id } = project;
       const path = id + '/' + query.id;
-      if (query) createfiles([model, dir, review, editables], path);
+      if (query) createfiles([model, dir, review], path);
       return res.status(200).json(query);
     } catch (error) {
       next(error);
@@ -160,7 +159,7 @@ class StagesControllers {
       const _stage_id = parseInt(id);
       const { project, ...query } = await StageServices.delete(_stage_id);
       const path = project.id + '/' + query.id;
-      if (query) deleteFiles([model, dir, review, editables], path);
+      if (query) deleteFiles([model, dir, review], path);
       res.status(200).json(query);
     } catch (error) {
       next(error);

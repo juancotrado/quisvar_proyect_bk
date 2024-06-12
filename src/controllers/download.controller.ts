@@ -33,7 +33,6 @@ export enum ContentType {
   MP4 = 'video/mp4',
   PDF = 'application/pdf',
 }
-const python_url = process.env.PYTHON_SERVER;
 class DownloadController {
   private type: 'stage' | 'level' = 'level';
   private outPutPath: string = 'download/';
@@ -156,7 +155,7 @@ class DownloadController {
       next(error);
     }
   };
-
+  private python_route = process.env.PYTHON_SERVER;
   public mergePdfLevel2: ControllerFunction = async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -168,7 +167,8 @@ class DownloadController {
       const rootPath = 'E:/server project/quisvar_proyect_bk';
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
-      const routeService = python_url + '/pdf/merge2';
+
+      const routeService = this.python_route + '/pdf/merge2';
       const service = routeService + '?input_folder=' + finalPath;
       res.redirect(service);
     } catch (error) {
@@ -187,7 +187,8 @@ class DownloadController {
       const rootPath = 'E:/server project/quisvar_proyect_bk';
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
-      const routeService = python_url + '/pdf/merge2';
+
+      const routeService = this.python_route + '/pdf/merge2';
       const service = routeService + '?input_folder=' + finalPath;
       //res.json(service);
       res.redirect(service);
@@ -211,7 +212,7 @@ class DownloadController {
       const rootPath = 'E:/server project/quisvar_proyect_bk';
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
-      const routeService = python_url + '/descargar_carpeta';
+      const routeService = this.python_route + '/descargar_carpeta';
       const service =
         routeService + '?type=' + type + '&input_folder=' + finalPath;
       res.redirect(service);
@@ -235,7 +236,7 @@ class DownloadController {
       const rootPath = 'E:/server project/quisvar_proyect_bk';
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
-      const routeService = python_url + '/descargar_carpeta';
+      const routeService = this.python_route + '/descargar_carpeta';
       const service =
         routeService + '?type=' + type + '&input_folder=' + finalPath;
       //res.json(service);

@@ -59,7 +59,7 @@ class ProfileServices {
         },
         offices: officeData
           ? {
-              deleteMany: { usersId: id },
+              deleteMany: { usersId: id, isOfficeManager: false },
               createMany: { data: officeData, skipDuplicates: true },
             }
           : {},

@@ -58,12 +58,12 @@ class DuplicatesServices {
     const { id: projectId } = createNewProject;
     //----------------------------create_files--------------------------------------
     const path = await getPathProject(projectId, 'UPLOADS');
-    const editablePath = toEditablesFiles(path);
+    // const editablePath = toEditablesFiles(path);
     const modelPath = toEditablesFiles(path, 'MODEL');
     const reviewPath = toEditablesFiles(path, 'REVIEW');
     mkdirSync(modelPath, { recursive: true });
     mkdirSync(reviewPath, { recursive: true });
-    mkdirSync(editablePath, { recursive: true });
+    // mkdirSync(editablePath, { recursive: true });
     mkdirSync(path, { recursive: true });
     //------------------------------------------------------------------------------
     const newStages = stages.map(async ({ id, name }) => {
@@ -88,6 +88,7 @@ class DuplicatesServices {
       select: {
         projectId: true,
         name: true,
+        rootTypeItem: true,
         levels: {
           orderBy: { item: 'asc' },
           include: {
@@ -100,7 +101,11 @@ class DuplicatesServices {
       throw new AppError('Oops!,no se pudo encontrar el nivel', 400);
     //----------------------------create_stage--------------------------------------
     const createStage = await prisma.stages.create({
-      data: { name, projectId: projectId ? projectId : getStage.projectId },
+      data: {
+        name,
+        projectId: projectId ? projectId : getStage.projectId,
+        rootTypeItem: getStage.rootTypeItem,
+      },
     });
     const { id: stageId } = createStage;
     //----------------------------create_files--------------------------------------
@@ -110,7 +115,7 @@ class DuplicatesServices {
     const reviewPath = toEditablesFiles(path, 'REVIEW');
     mkdirSync(modelPath, { recursive: true });
     mkdirSync(reviewPath, { recursive: true });
-    mkdirSync(editablePath, { recursive: true });
+    // mkdirSync(editablePath, { recursive: true });
     mkdirSync(path, { recursive: true });
     //------------------------------------------------------------------------------
     const nextLevel = this.getList(getStage.levels, 0, 0, '', 'ABC', stageId);
@@ -146,7 +151,7 @@ class DuplicatesServices {
     const path = await PathServices.level(newLevel.id);
     const editablePath = toEditablesFiles(path);
     mkdirSync(path, { recursive: true });
-    mkdirSync(editablePath, { recursive: true });
+    // mkdirSync(editablePath, { recursive: true });
     //----------------------------get_levels---------------------------------------
     const getList = await prisma.levels.findMany({
       where: { stagesId, level: { gt: level } },
@@ -291,7 +296,7 @@ class DuplicatesServices {
       list,
       Levels.item,
       newPath,
-      newEditables,
+      // newEditables,
       index + 2
     );
     //--------------------------------------------------------------
@@ -426,10 +431,10 @@ class DuplicatesServices {
       const newLevel = await prisma.levels.create({ data });
       //---------------------------create_file---------------------------------------
       const path = rootPath + '/' + newLevel.item + newLevel.name;
-      const editablePath = toEditablesFiles(path);
+      // const editablePath = toEditablesFiles(path);
       if (newLevel) {
         mkdirSync(path, { recursive: true });
-        mkdirSync(editablePath, { recursive: true });
+        // mkdirSync(editablePath, { recursive: true });
       }
       //-------------------------duplicate_subtasks---------------------------------
       const _subtasks =

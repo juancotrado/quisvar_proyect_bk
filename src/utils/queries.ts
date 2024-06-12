@@ -91,39 +91,54 @@ class Queries {
   static includeBasictask = {
     Levels: {
       select: {
-        userId: true,
+        id: true,
+        levelList: true,
         stages: {
           select: {
             group: {
               select: {
-                id: true,
-                name: true,
-                groups: {
-                  select: { users: Queries.selectProfileUserForStage },
-                },
+                groups: { select: { users: { select: { id: true } } } },
               },
             },
           },
         },
       },
     },
-    // feedBacks: {
-    //   include: {
-    //     users: { include: { user: this.selectProfileUser } },
-    //     files: true,
-    //   },
-    // },
-    files: true,
-    // users: {
-    //   select: {
-    //     percentage: true,
-    //     assignedAt: true,
-    //     untilDate: true,
-    //     status: true,
-    //     user: this.selectProfileUser,
-    //   },
-    // },
+    feedBacks: {
+      include: {
+        users: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                profile: {
+                  select: { firstName: true, lastName: true, dni: true },
+                },
+              },
+            },
+          },
+        },
+        files: true,
+      },
+    },
+    users: {
+      select: {
+        percentage: true,
+        assignedAt: true,
+        status: true,
+        user: {
+          select: {
+            id: true,
+            profile: {
+              select: { firstName: true, lastName: true, dni: true },
+            },
+          },
+        },
+      },
+    },
+    files: { select: { id: true, dir: true, name: true } },
   };
+
   static selectSpecialist = {
     select: {
       career: true,
@@ -202,6 +217,7 @@ class Queries {
       cui: true,
       amount: true,
       department: true,
+      municipality: true,
       difficulty: true,
       district: true,
       id: true,
@@ -277,7 +293,7 @@ class Queries {
 }
 
 class PayMailQueries {
-  public selectMessage(role: Mail['role'], type?: Mail['type']) {
+  public selectMessage(role?: Mail['role'], type?: Mail['type']) {
     return {
       select: {
         id: true,
@@ -290,6 +306,7 @@ class PayMailQueries {
         onHolding: true,
         historyOfficesIds: true,
         office: true,
+        beforeOffice: true,
         onHoldingDate: true,
         users: {
           where: { type, role },

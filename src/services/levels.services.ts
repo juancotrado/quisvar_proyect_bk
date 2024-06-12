@@ -215,10 +215,10 @@ class LevelsServices {
     }
     //--------------------------- Create Folder Levels ------------------------------------
     const path = await PathServices.level(newLevel.id);
-    const editablePath = path.replace('projects', 'editables');
+    // const editablePath = path.replace('projects', 'editables');
     if (newLevel) {
       mkdirSync(path);
-      mkdirSync(editablePath);
+      // mkdirSync(editablePath);
     }
     //-----------------------------------------------------------------------------------
     const typeFilter =
@@ -315,7 +315,7 @@ class LevelsServices {
             item: true,
             typeItem: true,
             files: {
-              where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] },
+              where: { type: 'UPLOADS' },
               select: { id: true, dir: true, name: true, type: true },
             },
           },
@@ -325,6 +325,7 @@ class LevelsServices {
     });
 
     //-----------------------update_some_levels----------------------------------
+    await this.deleteBlock(stagesId, getInfoLevel._item, getInfoLevel.level);
     const updateList = await this.updateBlock(
       getList,
       rootLevel,
@@ -335,7 +336,6 @@ class LevelsServices {
     );
     // //-------------------------return_delete_dir---------------------------------
     const result = await Promise.all(updateList).then(async () => {
-      await this.deleteBlock(stagesId, getInfoLevel._item, getInfoLevel.level);
       return deleteDir;
     });
     return result;
@@ -403,10 +403,10 @@ class LevelsServices {
         //------------------------------get_paths---------------------------------------
         const oldPath = rootPath + parsePath(item, name);
         const newPath = rootPath + parsePath(updateLevel.item, name);
-        const oldEditable = oldPath.replace('projects', 'editables');
-        const newEditable = newPath.replace('projects', 'editables');
+        // const oldEditable = oldPath.replace('projects', 'editables');
+        // const newEditable = newPath.replace('projects', 'editables');
         renameDir(oldPath, newPath);
-        renameDir(oldEditable, newEditable);
+        // renameDir(oldEditable, newEditable);
         //-------------------------------------------------------------------------------
         const subTasks = await Promise.all(
           subtasks.map(async ({ item: _item, files: _files, ...subtask }) => {
@@ -438,12 +438,12 @@ class LevelsServices {
                   })
                   .then(() => {
                     renameSync(`${newPath}/${n}`, `${newPath}/${name}`);
-                    if (['pdf', 'PDF'].includes(ext) && newEditable) {
-                      renameSync(
-                        `${newEditable}/${n}`,
-                        `${newEditable}/${name}`
-                      );
-                    }
+                    // if (['pdf', 'PDF'].includes(ext) && newEditable) {
+                    //   renameSync(
+                    //     `${newEditable}/${n}`,
+                    //     `${newEditable}/${name}`
+                    //   );
+                    // }
                   });
                 return { dir, name, ...file };
               })
@@ -467,6 +467,15 @@ class LevelsServices {
     );
     const result = Promise.all(newList);
     return result;
+  }
+
+  public static async updateDaysPerId(
+    levels: { id: BasicLevels['id']; days: number }[]
+  ) {
+    const updateList = levels.map(({ id, days }) => {
+      return prisma.subTasks.update({ where: { id }, data: { days } });
+    });
+    return await prisma.$transaction(updateList);
   }
 
   static findList(

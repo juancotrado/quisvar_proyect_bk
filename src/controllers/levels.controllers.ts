@@ -40,6 +40,16 @@ class LevelsControllers {
       next(error);
     }
   };
+
+  public static updateDays: ControllerFunction = async (req, res, next) => {
+    try {
+      const { body } = req;
+      const query = await LevelsServices.updateDaysPerId(body);
+      res.status(201).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export default LevelsControllers;
@@ -53,10 +63,10 @@ export const createLevel = async (
     const { body } = req;
     const query = await LevelsServices.create(body);
     const path = await PathServices.level(query.id);
-    const editablePath = path.replace('projects', 'editables');
+    // const editablePath = path.replace('projects', 'editables');
     if (query) {
       mkdirSync(path);
-      mkdirSync(editablePath);
+      // mkdirSync(editablePath);
     }
     res.status(201).json(query);
   } catch (error) {
@@ -76,11 +86,11 @@ export const updateLevel = async (
     const { oldPath, ...query } = await LevelsServices.update(_task_id, body);
     if (query && query.item && query.name) {
       const newPath = setNewPath(oldPath, query.item + query.name);
-      const oldEditable = oldPath.replace('projects', 'editables');
-      const newEditable = newPath.replace('projects', 'editables');
+      // const oldEditable = oldPath.replace('projects', 'editables');
+      // const newEditable = newPath.replace('projects', 'editables');
       // mv(oldPath, newPath, err => console.log(err));
       renameDir(oldPath, newPath);
-      renameDir(oldEditable, newEditable);
+      // renameDir(oldEditable, newEditable);
     }
     res.status(200).json(query);
   } catch (error) {
@@ -120,10 +130,10 @@ export const deleteLevel = async (
     const { id } = req.params;
     const _task_id = parseInt(id);
     const query = await LevelsServices.delete(_task_id);
-    const editables = query.replace('projects', 'editables');
+    // const editables = query.replace('projects', 'editables');
     if (query) {
       rmSync(query, { recursive: true });
-      rmSync(editables, { recursive: true });
+      // rmSync(editables, { recursive: true });
     }
     res.status(200).json(query);
   } catch (error) {

@@ -3,6 +3,9 @@ import {
   BasicTasks,
   DutyTasks,
   Levels,
+  Profiles,
+  Projects,
+  Stages,
   SubTasks,
   TaskRole,
 } from '@prisma/client';
@@ -21,6 +24,7 @@ import {
   ProjectDir,
   SubTaskFilter,
   UpdateLevelBlock,
+  User,
   usersCount,
 } from 'types/types';
 import { prisma } from './prisma.server';
@@ -155,27 +159,27 @@ const pricePerUser = (users: usersCount[], priceTask?: ListCostType) => {
 };
 
 const detailsPerUser = (list: number[], users: BasicTaskFilter['users']) => {
-  const listUsers: usersCount[] = list.reduce(
-    (acc: typeof listUsers, userId) => {
-      const existingItem = acc.find(item => item.userId === userId);
-      if (existingItem) {
-        existingItem.count++;
-      } else {
-        const findUser = users.find(u => u.userId === userId);
-        const firstName = findUser?.user?.profile?.firstName;
-        const lastName = findUser?.user?.profile?.lastName;
-        const dni = findUser?.user?.profile?.dni;
-        const degree = findUser?.user?.profile?.degree || undefined;
-        const profileInfo = { userId, firstName, lastName, dni, degree };
-        const percentage = findUser?.percentage || 0;
-        acc.push({ count: 1, percentage, ...profileInfo });
-      }
-      return acc;
-    },
-    []
-  );
-  return listUsers;
+  const listUser: usersCount[] = users.reduce((acc: typeof listUser, user) => {
+    const findUser = acc.find(u => u.userId === user.userId);
+    if (findUser) {
+      findUser.count++;
+      findUser.percentage += user.percentage;
+    } else {
+      const percentage = user.percentage || 0;
+      const userId = user.userId;
+      const gaaa = lodash.pick(user.user?.profile, [
+        'firstName',
+        'lastName',
+        'dni',
+        'degree',
+      ]);
+      acc.push({ count: 0, percentage, userId, ...gaaa });
+    }
+    return acc;
+  }, []);
+  return listUser;
 };
+
 export const dataWithLevel = {
   spending: 0,
   balance: 0,
@@ -226,11 +230,14 @@ export const percentageBasicTasks = (
   const list = subtasks.map(({ listUsers }) => listUsers).flat(2);
   const balance = roundTwoDecimail(price - spending);
   const listUsers = list.reduce(
-    (acc: typeof list, { count, userId, ...data }) => {
+    (acc: typeof list, { count, userId, percentage, ...data }) => {
       const exist = acc.findIndex(u => u.userId === userId);
-      exist >= 0
-        ? (acc[exist].count += count)
-        : acc.push({ userId, count, ...data });
+      if (exist >= 0) {
+        acc[exist].percentage += percentage;
+        acc[exist].count += count;
+      } else {
+        acc.push({ userId, count, percentage, ...data });
+      }
       return acc;
     },
     []
@@ -783,12 +790,14 @@ export const getDaysOfWeekInRange = (dateString: string) => {
   const date = new Date(dateString);
   const dayOfWeekIndex = date.getDay();
   const startDate = new Date(date);
-  startDate.setDate(startDate.getDate() - dayOfWeekIndex);
+  startDate.setDate(
+    startDate.getDate() -
+      (dayOfWeekIndex < 6 ? Math.abs(-dayOfWeekIndex - 1) : 0)
+  );
   const daysOfWeekArray = [];
-
   for (let i = 0; i < 7; i++) {
     const currentDate = new Date(startDate);
-    currentDate.setDate(startDate.getDate() + i - 1);
+    currentDate.setDate(startDate.getDate() + i);
     daysOfWeekArray.push({
       day: daysOfWeek[currentDate.getDay()],
       date: currentDate.toISOString().split('T')[0],
@@ -827,7 +836,6 @@ interface Weekday {
 }
 export const TransformWeekDuty = (weekdays: Weekday[], data: Duty[]) => {
   const result = [];
-  console.log(data);
   for (let i = 0; i < weekdays.length; i++) {
     const dayData = weekdays[i];
     const dayDate = new Date(dayData.date);
@@ -855,6 +863,56 @@ export const TransformWeekDuty = (weekdays: Weekday[], data: Duty[]) => {
     });
     const members = Array.from(membersMap.values());
     result.push({ day: dayData.day, date: dayData.date, members });
+  }
+  return result;
+};
+interface StagesType extends Stages {
+  project: Projects;
+}
+interface LevelsType extends Levels {
+  stages: StagesType;
+}
+interface UserType extends User {
+  profile: Profiles;
+}
+export interface SubTasksType extends SubTasks {
+  Levels: LevelsType;
+  users: UserType[];
+}
+export const TransformWeekReport = (
+  weekdays: Weekday[],
+  data: SubTasksType[]
+) => {
+  const result = [];
+  for (let i = 0; i < weekdays.length; i++) {
+    const dayData = weekdays[i];
+    const dayDate = new Date(dayData.date);
+
+    const filteredData = data.filter(item => {
+      const itemDate = new Date(item.createdAt);
+      itemDate.setUTCHours(itemDate.getUTCHours() - 5);
+      return (
+        itemDate.toISOString().split('T')[0] ===
+        dayDate.toISOString().split('T')[0]
+      );
+    });
+    //console.log(filteredData)
+    const membersMap = new Map();
+    filteredData.forEach(item => {
+      const { name, status, updatedAt, days, users, Levels, id } = item;
+      membersMap.set(name, {
+        name,
+        status,
+        updatedAt,
+        days,
+        user: users.length > 0 ? users[0].user.profile : null,
+        stage: Levels.stages.name,
+        project: Levels.stages.project.name,
+        subTask: id,
+      });
+    });
+    const members = Array.from(membersMap.values());
+    result.push({ day: dayData.day, date: dayData.date, tasks: members });
   }
   return result;
 };

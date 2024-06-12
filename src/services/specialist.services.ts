@@ -21,6 +21,17 @@ class SpecialistServices {
     });
     return specialist;
   }
+  static async updateSpecialist(data: Specialists, id: Specialists['id']) {
+    if (!data) throw new AppError(`No hay datos`, 400);
+    const newSpecialist = await prisma.specialists.update({
+      where: { id },
+      data: {
+        ...data,
+        inscriptionDate: new Date(data.inscriptionDate),
+      },
+    });
+    return newSpecialist;
+  }
   static async getSpecialistByDNI(dni: Specialists['dni']) {
     const specialist = await prisma.specialists.findMany({
       where: {
@@ -41,30 +52,29 @@ class SpecialistServices {
     const specialist = await prisma.specialists.findFirst({
       where: { id },
       select: {
+        id: true,
         firstName: true,
         lastName: true,
         career: true,
-        CIP: true,
+        tuition: true,
+        degree: true,
         dni: true,
         email: true,
-        agreement: true,
-        cv: true,
-        // projects: {
-        //   include: {
-        //     specialist: {
-        //       include: {
-        //         projects: {
-        //           select: {
-
-        //           }
-        //         }
-        //       }
-        //     }
-        //   },
-        // },
+        agreementFile: true,
+        cvFile: true,
+        inscription: true,
+        inscriptionDate: true,
+        phone: true,
       },
     });
     return specialist;
+  }
+  static async deleteSpecialist(id: Specialists['id']) {
+    if (!id) throw new AppError(`Ups, ocurrio un error`, 400);
+    await prisma.specialists.delete({
+      where: { id },
+    });
+    return 'deleted';
   }
 }
 export default SpecialistServices;

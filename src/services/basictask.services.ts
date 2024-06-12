@@ -1,33 +1,54 @@
-import { BasicTasks, Users } from '@prisma/client';
+import { BasicTasks } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import AppError from '../utils/appError';
+import { numberToConvert } from '../utils/tools';
+import Queries from '../utils/queries';
 
 class BasicTasksServices {
   public static async find(id: BasicTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
+
     const findSubTask = await prisma.basicTasks.findUnique({
       where: { id },
-      // include: Queries.includeBasictask,
+      include: Queries.includeBasictask,
     });
     if (!findSubTask) throw new AppError('No se pudo encontrar la tares ', 404);
-    return findSubTask;
+    const { Levels, ...task } = findSubTask;
+    const members = Levels.stages.group?.groups.map(g => g.users.id);
+    const itemAndMob = await this.getItemMods([...Levels.levelList, Levels.id]);
+    return { ...task, ...itemAndMob, members };
   }
+
+  private static async getItemMods(list: number[]) {
+    const getLevels = await prisma.basicLevels.findMany({
+      where: { id: { in: list } },
+      orderBy: { level: 'asc' },
+      select: { index: true, typeItem: true, users: { select: { id: true } } },
+    });
+    let item: string = '';
+    let mods: number[] = [];
+    getLevels.forEach(({ typeItem, index, users }) => {
+      item = item + numberToConvert(index, typeItem) + '.';
+      mods = [...mods, ...users.map(({ id }) => id)];
+    });
+    mods = Array.from(new Set(mods));
+    return { item, mods };
+  }
+
+  private static findItemRoot() {}
 
   public static async create({ name, days, levels_Id }: BasicTasks) {
     const isDuplicated = await this.findDuplicate(name, levels_Id, 'ROOT');
     const { duplicated, quantity, typeItem } = isDuplicated;
     if (duplicated) throw new AppError('Error, Nombre existente', 404);
     const data = { name, days, levels_Id, index: quantity + 1, typeItem };
-    const newTask = await prisma.basicTasks.create({
-      data,
-      // include: { users: { select: { user: Queries.selectProfileUser } } },
-    });
+    const newTask = await prisma.basicTasks.create({ data });
     return newTask;
   }
 
   public static async addToUpperorLower(
     id: BasicTasks['id'],
-    { name, days }: BasicTasks,
+    { name, days }: Pick<BasicTasks, 'days' | 'name'>,
     typeGte: 'upper' | 'lower'
   ) {
     if (!id || !typeGte) throw new AppError('Oops!,ID invalido', 400);
@@ -36,7 +57,6 @@ class BasicTasksServices {
     if (!findLevel)
       throw new AppError('No se pudieron encontrar el nivel', 404);
     const { index: _index, levels_Id, typeItem } = findLevel;
-
     const index = typeGte === 'upper' ? { gte: _index } : { gt: _index };
     const filterTaskList = await prisma.basicTasks.groupBy({
       by: ['id', 'index'],
@@ -58,34 +78,28 @@ class BasicTasksServices {
     const updateTask = await prisma.basicTasks.update({
       where: { id },
       data: { days, name },
-      // include: {
-      //   users: { select: { user: Queries.selectProfileUser } },
-      // },
     });
     return updateTask;
   }
 
   public static async delete(id: BasicTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-    const subTaskDelete = await prisma.basicTasks.findUnique({
+    const subTaskDelete = await prisma.basicTasks.delete({
       where: { id },
-      select: { levels_Id: true },
+      select: { index: true, levels_Id: true },
     });
     if (!subTaskDelete) throw new AppError('Oops!,ID invalido', 400);
     const filterTaskList = await prisma.basicTasks.groupBy({
       by: ['id', 'index'],
-      where: { levels_Id: subTaskDelete.levels_Id },
+      where: {
+        levels_Id: subTaskDelete.levels_Id,
+        index: { gt: subTaskDelete.index },
+      },
       orderBy: { index: 'asc' },
     });
-
-    const updateList = await this.listByUpdate(filterTaskList, 0);
+    const updateList = await this.listByUpdate(filterTaskList);
     return { subTaskDelete, updateList };
   }
-
-  public static async updateStatus(
-    subtaskId: BasicTasks['id'],
-    { status }: { status: BasicTasks['status'] | 'REMOVEALL' }
-  ) {}
 
   public static async updateStatusByUser(
     subtaskId: BasicTasks['id'],

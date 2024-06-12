@@ -22,3 +22,6 @@ networks:
   default:
     external:
       name: proxynet
+volumes:
+  share_proyects:
+    external: true

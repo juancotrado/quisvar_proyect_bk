@@ -2,7 +2,10 @@ import { ContractForm } from 'types/types';
 import {
   Companies,
   Consortium,
+  ContractSpecialties,
   Contratc,
+  ListSpecialties,
+  Specialists,
   prisma,
 } from '../utils/prisma.server';
 import AppError from '../utils/appError';
@@ -52,6 +55,125 @@ class ContractServices {
     if (!showContract)
       throw new AppError('No existe información del contrato', 404);
     return showContract;
+  }
+  public static async createSpeciality(
+    contratcId: Contratc['id'],
+    listSpecialtiesId: ListSpecialties['id']
+  ) {
+    if (!contratcId || !listSpecialtiesId)
+      throw new AppError('Opps, id Invalida', 400);
+    const contracSpecialties = await prisma.contractSpecialties.create({
+      data: {
+        contratcId,
+        listSpecialtiesId,
+      },
+      select: {
+        id: true,
+        listSpecialties: {
+          include: {
+            areaSpecialtyList: {
+              select: {
+                specialist: true,
+              },
+            },
+          },
+        },
+        contratcId: true,
+        specialists: true,
+      },
+    });
+
+    const { listSpecialties } = contracSpecialties;
+    const users = listSpecialties.areaSpecialtyList.map(areaSpecialty => {
+      const { specialist } = areaSpecialty;
+      return {
+        label: specialist.firstName + ' ' + specialist.lastName,
+        value: String(specialist.id),
+        ...specialist,
+      };
+    });
+    return {
+      ...contracSpecialties,
+      listSpecialties: {
+        id: listSpecialties.id,
+        name: listSpecialties.name,
+        users: users,
+      },
+    };
+  }
+  public static async deleteSpecialty(
+    contractSpecialtiesId: ContractSpecialties['id']
+  ) {
+    if (!contractSpecialtiesId) throw new AppError('Opps, id Invalida', 400);
+    const deleteContractSpecialties = await prisma.contractSpecialties.delete({
+      where: {
+        id: contractSpecialtiesId,
+      },
+    });
+
+    return deleteContractSpecialties;
+  }
+  public static async addSpecialist(
+    contractSpecialtiesId: ContractSpecialties['id'],
+    specialistsId: Specialists['id']
+  ) {
+    if (!contractSpecialtiesId || !specialistsId)
+      throw new AppError('Opps, id Invalida', 400);
+    const updateContracSpecialties = await prisma.contractSpecialties.update({
+      where: {
+        id: contractSpecialtiesId,
+      },
+      data: {
+        specialistsId,
+      },
+    });
+
+    return updateContracSpecialties;
+  }
+  public static async getSpecialities(contratcId: Contratc['id']) {
+    if (!contratcId) throw new AppError('Opps, id Invalida', 400);
+    const contracSpecialties = await prisma.contractSpecialties.findMany({
+      select: {
+        contratcId: true,
+        id: true,
+        listSpecialties: {
+          include: {
+            areaSpecialtyList: {
+              select: {
+                specialist: true,
+              },
+            },
+          },
+        },
+        specialists: true,
+      },
+      where: {
+        contratcId,
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+    const contracSpecialtiesTransform = contracSpecialties.map(contract => {
+      const { listSpecialties, specialists, id, contratcId } = contract;
+      const users = listSpecialties.areaSpecialtyList.map(areaSpecialty => {
+        const { specialist } = areaSpecialty;
+        return {
+          label: specialist.firstName + ' ' + specialist.lastName,
+          value: String(specialist.id),
+          ...specialist,
+        };
+      });
+      return {
+        id,
+        contratcId,
+        listSpecialties: {
+          id: listSpecialties.id,
+          name: listSpecialties.name,
+          users: users,
+        },
+        specialists: specialists,
+      };
+    });
+    return contracSpecialtiesTransform;
   }
 
   public static async create(data: ContractForm) {

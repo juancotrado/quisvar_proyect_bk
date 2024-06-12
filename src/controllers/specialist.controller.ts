@@ -11,15 +11,17 @@ export const createSpecialist = async (
   try {
     if (!req.files)
       throw new AppError('Oops!, no se pudo subir los archivos', 400);
-    const { fileAgreement, fileCv } = req.files as FilesProps;
+    const { agreementFile, fileCv } = req.files as FilesProps;
     const { body } = req;
     const query = await SpecialistServices.createSpecialist({
       ...body,
-      cv: fileCv[0].filename,
-      agreement: fileAgreement[0].filename,
+      inscriptionDate: new Date(body.inscriptionDate),
+      cvFile: fileCv ? fileCv[0].filename : null,
+      agreementFile: agreementFile ? agreementFile[0].filename : null,
     });
     res.status(201).json(query);
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
@@ -32,6 +34,21 @@ export const getSpecialist = async (
     const query = await SpecialistServices.getSpecialist();
     res.status(200).json(query);
   } catch (error) {
+    next(error);
+  }
+};
+export const updateSpecialist = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { body } = req;
+    const { id } = req.params;
+    const query = await SpecialistServices.updateSpecialist(body, +id);
+    res.status(200).json(query);
+  } catch (error) {
+    console.log(error);
     next(error);
   }
 };
@@ -56,6 +73,19 @@ export const getSpecialistById = async (
   try {
     const { id } = req.params;
     const query = await SpecialistServices.getSpecialistById(+id);
+    res.status(200).json(query);
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteSpecialist = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const query = await SpecialistServices.deleteSpecialist(+id);
     res.status(200).json(query);
   } catch (error) {
     next(error);

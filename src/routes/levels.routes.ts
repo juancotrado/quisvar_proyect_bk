@@ -14,7 +14,7 @@ import {
   // _admin_role,
   _mod_role,
 } from '../middlewares/role.middleware';
-const { addToUp } = LevelsControllers;
+const { addToUp, updateDays } = LevelsControllers;
 const router = Router();
 
 router.post('/:id', addToUp);
@@ -29,6 +29,8 @@ router.get('/:id', showLevel);
 router.use(_mod_role);
 router.put('/:id', updateLevel);
 router.patch('/:id', updateTypeItem);
+// router.patch('/updates-covers', updateCover);
+router.patch('/updates-days', updateDays);
 router.post('/', createLevel);
 router.delete('/:id', deleteLevel);
 export default router;

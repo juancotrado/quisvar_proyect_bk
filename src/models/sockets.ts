@@ -1,7 +1,14 @@
 import { SubTasks } from '@prisma/client';
-import { Server as WebSocketServer } from 'socket.io';
-import { Level } from 'types/types';
-// import { TasksServices } from '../services';
+import { Server as WebSocketServer, Socket } from 'socket.io';
+import { CatchAsync, Level } from 'types/types';
+import pc from 'picocolors';
+import { authSocket } from '../socket/middlewares';
+import {
+  basicSocketCotroller,
+  budgetSocketCotroller,
+} from '../socket/controllers';
+import AppError from '../utils/appError';
+
 interface DataProjectAndTask {
   project: Level;
   task: SubTasks;
@@ -16,9 +23,17 @@ class Sockets {
     const room = subTask.levels_Id;
     return room;
   }
+
   socketEvents() {
+    this.io.use(authSocket);
     this.io.on('connection', socket => {
-      console.log('Connect user with id ==>', socket.id);
+      const { user } = socket.data;
+      socket.join(user.id);
+      console.log(
+        pc.cyan('User'),
+        pc.blue(user.profile.firstName),
+        pc.cyan('connected successfully')
+      );
 
       socket.on('join', room => {
         console.log('room:', room);
@@ -30,6 +45,31 @@ class Sockets {
         socket.leave(room);
       });
 
+      const handleSocketController = (
+        controller: (
+          socket: Socket,
+          io: WebSocketServer,
+          catchAsyncSocket?: CatchAsync
+        ) => void
+      ) => {
+        const catchAsyncSocket = <T>(handler: Function) => {
+          return async (...args: T[]) => {
+            try {
+              await handler(...args);
+            } catch (error) {
+              if (error instanceof AppError)
+                socket.emit('server:error', error.message);
+            }
+          };
+        };
+        controller(socket, this.io, catchAsyncSocket);
+      };
+
+      //controllers
+      handleSocketController(basicSocketCotroller);
+      handleSocketController(budgetSocketCotroller);
+
+      //other
       socket.on('client:update-projectAndTask', (data: DataProjectAndTask) => {
         const { project, task } = data;
         this.io.to(`task-${task.id}`).emit('server:update-subTask', task);
@@ -65,7 +105,8 @@ class Sockets {
       });
 
       socket.on('disconnect', () => {
-        console.log('User disconected ==>', socket.id);
+        console.log('User disconected ==>', user.profile.firstName);
+        socket.leave(user.id);
       });
     });
   }

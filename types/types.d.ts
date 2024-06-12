@@ -18,6 +18,7 @@ import {
   Office,
   SubMenuPoints,
   MenuPoints,
+  Companies,
 } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 
@@ -35,6 +36,10 @@ export type PickSubtask = Pick<
   SubTasks,
   'id' | 'name' | 'item' | 'description' | 'price' | 'status'
 > & { users: User[] };
+export type PickCompanyInvoice = Pick<
+  Companies,
+  'id' | 'color' | 'phone' | 'email'
+>;
 
 export type StageParse = {
   name: string;
@@ -53,6 +58,9 @@ export type User = {
     } | null;
   };
 };
+export type CatchAsync = <T>(
+  handler: Function
+) => (...args: T[]) => Promise<void>;
 
 export type TypeTables =
   | 'indexTasks'
@@ -375,7 +383,7 @@ export interface usersCount {
   lastName?: string;
   count: number;
   dni?: string;
-  degree?: string;
+  degree?: string | null;
   percentage: number;
 }
 
@@ -395,6 +403,7 @@ export type ContractForm = Pick<
   | 'projectShortName'
   | 'companyId'
   | 'consortiumId'
+  | 'municipality'
 >;
 
 export type TypeCost = 'bachelor' | 'professional' | 'intern' | 'graduate';

@@ -15,6 +15,10 @@ class ContractRoutes {
     this.router.get('/', ContractController.showContracts);
     this.router.get('/:id', ContractController.showContract);
     this.router.post('/', ContractController.createContract);
+    this.router.post('/specialties', ContractController.createSpeciality);
+    this.router.put('/specialties', ContractController.addSpecialist);
+    this.router.delete('/specialties/:id', ContractController.deleteSpecialty);
+    this.router.get('/:id/specialties', ContractController.getSpecialities);
     this.router.post(
       '/:id/files',
       uploads.contractFile.single('fileContract'),

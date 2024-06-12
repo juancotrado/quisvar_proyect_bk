@@ -128,7 +128,7 @@ class SubTasksServices {
       });
     }
     const newPath = await PathServices.level(Levels.id);
-    const newEditables = newPath.replace('projects', 'editables');
+    // const newEditables = newPath.replace('projects', 'editables');
     //------------------------------------------------------------------
     const typeFilter = typeGte === 'upper' ? { gte: index } : { gt: index };
     //------------------------------------------------------------------
@@ -152,7 +152,7 @@ class SubTasksServices {
       list,
       Levels.item,
       newPath,
-      newEditables,
+      // newEditables,
       index + aux
     );
     return [...updateBlock];
@@ -191,7 +191,7 @@ class SubTasksServices {
     });
     const { levels_Id, index, Levels } = subTaskDelete;
     const newPath = await PathServices.level(Levels.id);
-    const newEditables = newPath.replace('projects', 'editables');
+    // const newEditables = newPath.replace('projects', 'editables');
     const list = await prisma.subTasks.findMany({
       where: {
         levels_Id,
@@ -209,7 +209,7 @@ class SubTasksServices {
       list,
       Levels.item,
       newPath,
-      newEditables,
+      // newEditables,
       index
     );
     return { ...subTaskDelete, tasks: updateBlock };
@@ -347,7 +347,7 @@ class SubTasksServices {
       //--------------------------------paths----------------------------
       const path = await PathServices.subTask(id, 'UPLOADS');
       const reviewPath = path.replace('projects', 'reviews');
-      const editablesPath = path.replace('projects', 'editables');
+      // const editablesPath = path.replace('projects', 'editables');
       const dir = reviewPath.split('/').slice(0, 5).join('/');
       //------------------------------------------------------------------
       const filesList = filesId ? filesId : [];
@@ -377,15 +377,15 @@ class SubTasksServices {
         });
         //----------------------------------------------------------------
         renameSync(`${dir}/${file.name}`, `${path}/${_name}`);
-        if (['pdf', 'PDF'].includes(ext!)) {
-          //--------------------------------------------------------------
-          // await prisma.files.update({
-          //   where: { id: file.id },
-          //   data: { type: 'EDITABLES', name: _name, dir: editablesPath },
-          // });
-          copyFileSync(`${path}/${_name}`, `${editablesPath}/${_name}`);
-          //--------------------------------------------------------------
-        }
+        // if (['pdf', 'PDF'].includes(ext!)) {
+        //   //--------------------------------------------------------------
+        //   // await prisma.files.update({
+        //   //   where: { id: file.id },
+        //   //   data: { type: 'EDITABLES', name: _name, dir: editablesPath },
+        //   // });
+        //   copyFileSync(`${path}/${_name}`, `${editablesPath}/${_name}`);
+        //   //--------------------------------------------------------------
+        // }
       });
       await Promise.all(_files);
       return SubTasksServices.find(id);
@@ -397,7 +397,7 @@ class SubTasksServices {
     subtasks: UpdateLevelBlock['subTasks'],
     rootItem: string,
     newPath: string,
-    newEditable: string,
+    // newEditable: string,
     previusIndex?: number
   ) {
     const subTasks = await Promise.all(
@@ -436,9 +436,9 @@ class SubTasksServices {
               })
               .then(() => {
                 renameSync(`${newPath}/${n}`, `${newPath}/${name}`);
-                if (['pdf', 'PDF'].includes(ext) && newEditable) {
-                  renameSync(`${newEditable}/${n}`, `${newEditable}/${name}`);
-                }
+                // if (['pdf', 'PDF'].includes(ext) && newEditable) {
+                //   renameSync(`${newEditable}/${n}`, `${newEditable}/${name}`);
+                // }
               });
             return { dir, name, ...file };
           })

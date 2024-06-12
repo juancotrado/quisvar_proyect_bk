@@ -158,7 +158,7 @@ class StageServices {
     });
     if (!findStage)
       throw new AppError('Oops!,No se pudo encontrar la etapa', 400);
-    const { name, project, rootTypeItem } = findStage;
+    const { name, project, rootTypeItem, group } = findStage;
     const projectName = project.name;
     const getList = await BasicLevelServices.getList(id, 'stage', {
       includeUsers: true,
@@ -186,8 +186,9 @@ class StageServices {
       id,
       name,
       projectName,
+      group,
       rootTypeItem,
-      nextLevel,
+      // nextLevel,
     };
   }
 

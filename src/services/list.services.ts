@@ -114,7 +114,7 @@ class ListServices {
       //   role: { in: ['SUPER_ADMIN', 'ADMIN'] },
       //   status: true,
       // },
-      where: { role: { hierarchy: { in: [1, 2] } } },
+      where: { role: { hierarchy: { in: [1, 2] } }, status: true },
       // orderBy: { profile: { lastName: 'asc' } },
 
       orderBy: { createdAt: 'asc' },
@@ -165,21 +165,10 @@ class ListServices {
       },
     });
     const listEmploye = await prisma.users.findMany({
-      // where: {
-      //   role: {
-      //     in: [
-      //       'ASSISTANT',
-      //       'ASSISTANT_ADMINISTRATIVE',
-      //       'SUPER_MOD',
-      //       'MOD',
-      //       'EMPLOYEE',
-      //     ],
-      //   },
-      //   status: true,
-      // },
       where: {
         role: { hierarchy: { gte: 3 } },
         id: { notIn: [4, 5, 3] },
+        status: true,
       },
       orderBy:
         // {

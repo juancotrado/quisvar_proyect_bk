@@ -25,8 +25,8 @@ class MailServices {
     if (offset !== undefined) return offset;
     if (!offset && page === undefined) return undefined;
     const numberPage = limit && page && limit * page;
-    const newPage = numberPage ? numberPage + 1 : numberPage;
-    return newPage;
+    // const newPage = numberPage ? numberPage : numberPage;
+    return numberPage;
   }
 
   public static async onHolding({
@@ -48,6 +48,7 @@ class MailServices {
       },
     });
     const skip = this.getPage({ offset, page, limit: take });
+    console.log({ skip, offset, page, take });
     const mailList = await prisma.messages.findMany({
       where: {
         officeId,
@@ -59,7 +60,7 @@ class MailServices {
       skip,
       take,
       orderBy: { updatedAt: 'desc' },
-      ...Queries.PayMail().selectMessage('MAIN'),
+      ...Queries.PayMail().selectMessage(),
     });
     const mail = { total, mailList };
     return mail;
@@ -128,7 +129,7 @@ class MailServices {
         status: true,
         type: true,
         userInit: true,
-        message: Queries.PayMail().selectMessage('MAIN'),
+        message: Queries.PayMail().selectMessage(),
       },
     });
     const parseList = mail.map(({ message, ...data }) => {
@@ -260,7 +261,7 @@ class MailServices {
     } else {
       users = [...getMessage.users];
     }
-    const initialSender = users.find(({ userInit }) => userInit);
+    const initialSender = getMessage.users.find(({ userInit }) => userInit);
     return { ...getMessage, initialSender, users };
   }
 
@@ -346,7 +347,7 @@ class MailServices {
       data: {
         title,
         header,
-        description,
+        description: '',
         type,
         category,
         officeId,
@@ -379,7 +380,12 @@ class MailServices {
       ...data
     }: Omit<
       PickMessageReply,
-      'messageId' | 'paymessageId' | 'createdAt' | 'id' | 'userId'
+      | 'messageId'
+      | 'paymessageId'
+      | 'createdAt'
+      | 'id'
+      | 'userId'
+      | 'description'
     >,
     files: Pick<FileMessagePick, 'name' | 'path'>[]
   ) {
@@ -406,6 +412,7 @@ class MailServices {
         office: {
           select: {
             id: true,
+            name: true,
             users: {
               where: { isOfficeManager: true },
               select: { usersId: true },
@@ -433,6 +440,7 @@ class MailServices {
         where: { id },
         data: {
           officeId,
+          beforeOffice: getSender?.office?.name,
           historyOfficesIds,
         },
       });
@@ -440,34 +448,48 @@ class MailServices {
     //---------------------------------------------------------------------------
     if (!newReceiver || !newSender)
       throw new AppError('Ingrese Destinatario', 400);
-    if (status === 'RECHAZADO') {
-      await prisma.mail.update({
-        where: {
-          userId_messageId: { messageId: id, userId: newReceiver },
-        },
-        data: { ...receiv },
-      });
-    } else {
-      await prisma.mail.upsert({
-        where: { userId_messageId: { messageId: id, userId: receiverId } },
-        update: { ...receiv },
-        create: { messageId: id, userId: receiverId, ...receiv },
-      });
-    }
-    //------------------------------------------------------------------
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: newSender } },
-      data: { type: 'SENDER', status: false },
-    });
-    await prisma.messages.update({ where: { id }, data: { status } });
-    const createForward = await prisma.messageHistory.create({
-      data: {
-        ...data,
-        user: { connect: { id: senderId } },
-        message: { connect: { id } },
-        files: { createMany: { data: files } },
-      },
-    });
+    const createForward = await prisma
+      .$transaction([
+        status === 'RECHAZADO'
+          ? prisma.mail.update({
+              where: {
+                userId_messageId: { messageId: id, userId: newReceiver },
+              },
+              data: { ...receiv },
+            })
+          : prisma.mail.upsert({
+              where: {
+                userId_messageId: { messageId: id, userId: newReceiver },
+              },
+              update: { ...receiv },
+              create: { messageId: id, userId: newReceiver, ...receiv },
+            }),
+        prisma.messages.update({
+          where: { id },
+          data: {
+            status,
+            users: {
+              updateMany: {
+                where: { type: 'SENDER' },
+                data: { status: false, role: 'SECONDARY' },
+              },
+            },
+          },
+        }),
+        prisma.mail.update({
+          where: { userId_messageId: { messageId: id, userId: newSender } },
+          data: { type: 'SENDER', status: true },
+        }),
+        prisma.messageHistory.create({
+          data: {
+            ...data,
+            user: { connect: { id: senderId } },
+            message: { connect: { id } },
+            files: { createMany: { data: files } },
+          },
+        }),
+      ])
+      .then(res => res[3]);
     return createForward;
   }
 
@@ -509,6 +531,7 @@ class MailServices {
           orderBy: { attempt: 'desc' },
           take: 1,
         },
+        officeId: true,
         office: {
           select: {
             id: true,
@@ -541,17 +564,20 @@ class MailServices {
       : getSender.office?.quantity + 1;
     const positionSeal = getSender.positionSeal;
     //---------------------------------------------------------------------------
-    await prisma.mail.upsert({
-      where: {
-        userId_messageId: { messageId: id, userId: newReceiver },
-      },
-      update: { ...receiv },
-      create: { messageId: id, userId: newReceiver, ...receiv },
-    });
-    await prisma.mail.update({
-      where: { userId_messageId: { messageId: id, userId: newSender } },
-      data: { type: 'SENDER', status: false },
-    });
+    await prisma.$transaction([
+      prisma.mail.upsert({
+        where: {
+          userId_messageId: { messageId: id, userId: newReceiver },
+        },
+        update: { ...receiv },
+        create: { messageId: id, userId: newReceiver, ...receiv },
+      }),
+      prisma.mail.update({
+        where: { userId_messageId: { messageId: id, userId: newSender } },
+        data: { type: 'SENDER', status: false },
+      }),
+    ]);
+
     //-------------------------------------------------------------------
     const { historyOfficesIds: listOfficeIds } = getSender;
     const existOffice = listOfficeIds.find(id => id === officeId);
@@ -559,18 +585,21 @@ class MailServices {
       ? undefined
       : [...listOfficeIds, officeId];
     //---------------------------------------------------------------------------
-    await prisma.messages.update({
-      where: { id: getSender.id },
-      data: {
-        officeId,
-        historyOfficesIds,
-        positionSeal: positionSeal + 1,
-      },
-    });
-    await prisma.office.update({
-      where: { id: getSender.office.id },
-      data: { quantity: quantitySeal + 1 },
-    });
+    await prisma.$transaction([
+      prisma.messages.update({
+        where: { id: getSender.id },
+        data: {
+          officeId,
+          historyOfficesIds,
+          beforeOffice: getSender?.office?.name,
+          positionSeal: positionSeal + 1,
+        },
+      }),
+      prisma.office.update({
+        where: { id: getSender.office.id },
+        data: { quantity: quantitySeal + 1 },
+      }),
+    ]);
     //-------------------------------------------------------------------
     const { name, path } = getSender.files[0];
     const destinityFile = path + '/' + name;
@@ -586,15 +615,32 @@ class MailServices {
       numberPage: numberPage ? numberPage : quantitySeal,
     });
     //-------------------------------------------------------------------
-    const createForward = await prisma.messageHistory.create({
-      data: {
-        title: title,
-        header: '(proveido)/' + getSender.office.name,
-        user: { connect: { id: senderId } },
-        message: { connect: { id } },
-        files: { createMany: { data: files } },
-      },
-    });
+    const createForward = await prisma
+      .$transaction([
+        prisma.messages.update({
+          where: { id: getSender.id },
+          data: {
+            officeId,
+            historyOfficesIds,
+            beforeOffice: getSender?.office?.name,
+            positionSeal: positionSeal + 1,
+          },
+        }),
+        prisma.office.update({
+          where: { id: getSender.office.id },
+          data: { quantity: quantitySeal + 1 },
+        }),
+        prisma.messageHistory.create({
+          data: {
+            title: title,
+            header: '(proveido)/' + getSender.office.name,
+            user: { connect: { id: senderId } },
+            message: { connect: { id } },
+            files: { createMany: { data: files } },
+          },
+        }),
+      ])
+      .then(res => res[2]);
     return createForward;
   }
 
