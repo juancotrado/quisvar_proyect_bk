@@ -160,6 +160,7 @@ class BasicLevelServices {
         level: findLevel.level,
         index: { gt: findLevel.index },
       },
+      orderBy: { index: 'asc' },
     });
 
     const dropList = await this.listByDelete(findLevel.id);
@@ -391,7 +392,11 @@ class BasicLevelServices {
     list: { id: number; index: number }[],
     quantity: number = -1
   ) {
+    // let count: number = 0;
+    // let aux: number;
     const updateListPerLevel = list.map(({ id, index }) => {
+      // if (aux === index) count += 1;
+      // aux = index;
       const data = { index: index + quantity };
       const update = prisma.basicLevels.update({ where: { id }, data });
       return update;

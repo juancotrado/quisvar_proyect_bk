@@ -6,6 +6,7 @@ const {
   delete: deleteTask,
   update,
   updateStatusSubTask,
+  upperOrLower,
 } = BasicTaskControllers;
 
 class BasicLevelsRouter {
@@ -19,7 +20,7 @@ class BasicLevelsRouter {
     this.router.get('/:id', find);
     this.router.post('/', create);
     this.router.get('/status/:id', updateStatusSubTask);
-    // this.router.post('/:id', upperOrLower);
+    this.router.post('/:id', upperOrLower);
     this.router.put('/:id', update);
     this.router.delete('/:id', deleteTask);
   }

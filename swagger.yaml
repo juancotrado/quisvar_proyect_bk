@@ -689,7 +689,8 @@ paths:
   /basictasks:
     post:
       tags:
-        - basictasks
+        - Basictasks
+      summary: Crear tarea en basicos
       requestBody:
         required: true
         content:
@@ -712,7 +713,57 @@ paths:
   /basictasks/{id}:
     get:
       tags:
-        - basictasks
+        - Basictasks
+      summary: Obtener tarea en basicos
+      parameters:
+        - $ref: '#/components/parameters/subtaskId'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: No se pudo crear el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el mensaje
+    post:
+      tags:
+        - Basictasks
+      summary: Añadir niveles upper or lower
+      parameters:
+        - $ref: '#/components/parameters/levelId'
+        - $ref: '#/components/parameters/typeUpperorLower'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUpperOrLower'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              example:
+                message: Trámite creado exitosamente
+        '404':
+          description: No se pudo crear el mensaje
+          content:
+            application/json:
+              example:
+                error: No se pudo crear el mensaje
+    delete:
+      tags:
+        - Basictasks
+      summary: Eliminar tarea en basicos
       parameters:
         - $ref: '#/components/parameters/subtaskId'
       security:
@@ -733,7 +784,7 @@ paths:
   /files/basics/{id}:
     post:
       tags:
-        - basictasks
+        - Basictasks
       summary: Add new files on basics
       parameters:
         - $ref: '#/components/parameters/subtaskId'
@@ -755,7 +806,7 @@ paths:
           description: Datos no válidos
     delete:
       tags:
-        - basictasks
+        - Basictasks
       summary: Add new files
       parameters:
         - name: id
@@ -789,6 +840,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/levelId'
         - $ref: '#/components/parameters/downloadIncludeFiles'
+        - $ref: '#/components/parameters/typeFile'
         - $ref: '#/components/parameters/downloadEqual'
         - $ref: '#/components/parameters/downloadCreateFiles'
         - $ref: '#/components/parameters/downloadEndsWith'
@@ -816,7 +868,6 @@ paths:
       description: Descargar comprimido de archivos por nivel
       parameters:
         - $ref: '#/components/parameters/levelId'
-
         - $ref: '#/components/parameters/downloadIncludeFiles'
         - $ref: '#/components/parameters/typeFile'
         - $ref: '#/components/parameters/downloadEqual'
@@ -1701,15 +1752,15 @@ components:
     typeFileTask:
       name: status
       in: query
-      description: 'Usar <b>[MODEL,REVIEW,UPLOADS,EDITABLES]</b>'
-      example: MODEL
+      description: 'Usar <b>[MODEL,UPLOADS,EDITABLES]</b>'
+      example: UPLOADS
       schema:
         type: string
     typeFile:
       name: type
       in: query
-      description: 'Usar <b>[MODEL,REVIEW,UPLOADS,EDITABLES]</b>'
-      example: MODEL
+      description: 'Usar <b>[MODEL,UPLOADS,EDITABLES]</b>'
+      example: UPLOADS
       schema:
         type: string
     levelId:
