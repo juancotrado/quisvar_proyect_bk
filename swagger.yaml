@@ -323,7 +323,7 @@ paths:
     patch:
       tags:
         - Levels
-      summary: Actualizar dias en tareas por lista
+      summary: Actualizar caratulas en niveles
       # parameters:
       #   - $ref: '#/components/parameters/levelId'
       requestBody:
@@ -362,8 +362,9 @@ paths:
     patch:
       tags:
         - Levels
-      summary: Actualizar caratulas en niveles
-      # parameters:
+      summary:
+        Actualizar dias en tareas por lista
+        # parameters:
       #   - $ref: '#/components/parameters/levelId'
       requestBody:
         required: true
@@ -584,7 +585,7 @@ paths:
     patch:
       tags:
         - Basic levels
-      summary: Actualizar dias en tareas por lista
+      summary: Actualizar caratulas en niveles
       # parameters:
       #   - $ref: '#/components/parameters/levelId'
       requestBody:
@@ -623,7 +624,7 @@ paths:
     patch:
       tags:
         - Basic levels
-      summary: Actualizar caratulas en niveles
+      summary: Actualizar dias en tareas por lista
       # parameters:
       #   - $ref: '#/components/parameters/levelId'
       requestBody:
