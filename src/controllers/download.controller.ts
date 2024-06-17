@@ -163,7 +163,8 @@ class DownloadController {
       if (!existsSync(_path)) {
         throw new AppError('No se encontró la ruta', 404);
       }
-      const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      //const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      const rootPath = 'E:/server project/quisvar_proyect_bk';
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
 
@@ -182,7 +183,8 @@ class DownloadController {
       if (!existsSync(_path)) {
         throw new AppError('No se encontró la ruta', 404);
       }
-      const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      //const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      const rootPath = 'E:/server project/quisvar_proyect_bk';
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
 
@@ -206,7 +208,8 @@ class DownloadController {
       if (!existsSync(_path)) {
         throw new AppError('No se encontró la ruta', 404);
       }
-      const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      //const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      const rootPath = 'E:/server project/quisvar_proyect_bk';
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
       const routeService = this.python_route + '/descargar_carpeta';
@@ -229,7 +232,8 @@ class DownloadController {
       if (!existsSync(_path)) {
         throw new AppError('No se encontró la ruta', 404);
       }
-      const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      //const rootPath = path.resolve(__dirname, '../..').replaceAll('\\', '/');
+      const rootPath = 'E:/server project/quisvar_proyect_bk';
       const parsePath = _path.slice(1);
       const finalPath = rootPath + parsePath;
       const routeService = this.python_route + '/descargar_carpeta';
