@@ -26,6 +26,7 @@ model Users {
   project               Projects[]
   // subTasks              BasicTaskOnUsers[]
   basicTasks            TaskOnUsers[]
+  modBacsicTask         BasicTasks[]
   Levels                Levels[]
   list                  ListOnUsers[]
   stages                Stages[]
@@ -36,7 +37,7 @@ model Users {
   feedbacksBasic        BasicUsersOnFeedbacks[]
   equipment             Equipment?
   groups                GroupOnUsers[]
-  basicLevels           BasicLevels[]
+  // basicLevels           BasicLevels[]
   // moderatorOfGroup      Group[]
   // Attendance            AttendanceGroup[]
   roleId                Int?
@@ -303,7 +304,7 @@ model BasicLevels {
   stagesId     Int
   rootId       Int
   subTasks     BasicTasks[]
-  users        Users[]
+  // users        Users[]
   // user         Users?     @relation(fields: [userId], references: [id])
   stages       Stages       @relation(fields: [stagesId], references: [id], onDelete: Cascade)
 }
@@ -327,6 +328,7 @@ model BasicTaskOnUsers {
   id                Int        @id @default(autoincrement())
   taskId            Int
   status            Boolean    @default(false)
+  statusPayment     Boolean    @default(false)
   userId            Int
   percentage        Int        @default(0)
   percentagePayment Int        @default(0)
@@ -370,7 +372,7 @@ model BasicTasks {
   files     BasicFiles[]
   Levels    BasicLevels        @relation(fields: [levels_Id], references: [id], onDelete: Cascade)
   feedBacks BasicFeedback[]
-  // users     BasicTaskOnUsers[]
+  mods      Users[]
   users     BasicTaskOnUsers[]
 }
 
@@ -871,6 +873,7 @@ enum TaskRole {
   UNRESOLVED
   PROCESS
   INREVIEW
+  REVIEWED
   DENIED
   DONE
   LIQUIDATION

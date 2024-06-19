@@ -95,30 +95,9 @@ class Queries {
         levelList: true,
         stages: {
           select: {
-            group: {
-              select: {
-                groups: { select: { users: { select: { id: true } } } },
-              },
-            },
+            group: { select: { groups: { where: { mod: true }, take: 1 } } },
           },
         },
-      },
-    },
-    feedBacks: {
-      include: {
-        users: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                profile: {
-                  select: { firstName: true, lastName: true, dni: true },
-                },
-              },
-            },
-          },
-        },
-        files: true,
       },
     },
     users: {
@@ -136,7 +115,7 @@ class Queries {
         },
       },
     },
-    files: { select: { id: true, dir: true, name: true } },
+    files: { select: { id: true, dir: true, name: true, type: true } },
   };
 
   static selectSpecialist = {
