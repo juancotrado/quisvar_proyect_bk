@@ -76,7 +76,7 @@ class BasicTasksServices {
 
   public static async sort(list: { id: number; index: number }[]) {
     const sortingList = list.map(({ id, index }) => {
-      return prisma.subTasks.update({ where: { id }, data: { index } });
+      return prisma.basicTasks.update({ where: { id }, data: { index } });
     });
     return await prisma.$transaction(sortingList);
   }
