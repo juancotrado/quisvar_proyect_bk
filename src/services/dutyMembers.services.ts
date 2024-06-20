@@ -84,7 +84,7 @@ class DutyMembersServices {
           //   status: true,
           // },
           orderBy: {
-            assignedAt: 'desc',
+            assignedAt: 'asc',
           },
           take: 1,
           select: {

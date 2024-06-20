@@ -836,6 +836,13 @@ model Logs {
   query Json
 }
 
+model Asitec {
+  id          Int       @id @default(autoincrement())
+  evaluator   String?
+  lastVc      DateTime?
+  followingVc DateTime?
+}
+
 enum MenuRol {
   MOD
   MEMBER
