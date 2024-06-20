@@ -113,6 +113,7 @@ class FilesServices {
     });
     return newGeneralFile;
   }
+
   static async deleteGeneralFile(id: GeneralFiles['id']) {
     if (!id) throw new AppError('Oops!,id invalido', 400);
     const deleteGeneralFile = await prisma.generalFiles.delete({
@@ -120,6 +121,7 @@ class FilesServices {
     });
     return deleteGeneralFile;
   }
+
   static async getSubTask(id: SubTasks['id']) {
     if (!id) throw new AppError('Opps!, id invalido', 400);
     const subTask = await prisma.subTasks.findFirst({
@@ -129,6 +131,7 @@ class FilesServices {
     if (!subTask) throw new AppError(`no se pudo encontrar la subtarea`, 404);
     return subTask;
   }
+
   static async delete(id: Files['id']) {
     if (!id) throw new AppError('Opps!, id invalido', 400);
     const getFile = await prisma.files.findUnique({ where: { id } });
@@ -143,6 +146,7 @@ class FilesServices {
     fs.unlinkSync(`${path}/${getFile.name}`);
     return deleteFile;
   }
+
   static async parsePath(
     id: number,
     type: 'PROYECT' | 'AREA' | 'INDEXTASK' | 'TASK'

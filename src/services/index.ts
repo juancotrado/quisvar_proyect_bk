@@ -35,6 +35,8 @@ export { default as BasicTasksServices } from './basictask.services';
 export { default as OfficeServices } from './office.services';
 export { default as ListSpecialties } from './listSpecialties.services';
 export { default as DowloadServices } from './download.services';
+export { default as BasicTaskOnUserServices } from './basictaskOnUsers.services';
+export { default as FeedbackBasicServices } from './feedback-basic.services';
 
 export const rootPath = './uploads';
 export const indexPath = './index';

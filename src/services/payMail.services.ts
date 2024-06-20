@@ -687,8 +687,8 @@ class PayMailServices {
     });
     //------------------------------------------------------------------
     await prisma.payMail.updateMany({
-      where: { paymessageId: id },
-      data: { type: 'RECEIVER', role: 'SECONDARY', status: false },
+      where: { paymessageId: id, type: 'SENDER' },
+      data: { role: 'SECONDARY', status: false },
     });
     //------------------------------------------------------------------
     await prisma.payMail.update({
