@@ -258,7 +258,7 @@ export interface SubTaskFiles extends SubTasks {
   files: Files[];
 }
 export interface BasicTaskFiles extends BasicTasks {
-  files: Files[];
+  files: BasicFiles[];
 }
 export type FilesProps = { [fieldname: string]: Express.Multer.File[] };
 export interface ParametersPayMail {
@@ -519,3 +519,8 @@ export interface percentageTaskFilter extends BasicTaskFilter {
   price: number;
   listUsers: usersCount[];
 }
+
+export type BasicFilesParsing = Pick<
+  BasicFiles,
+  'dir' | 'name' | 'originalName' | 'subTasksId' | 'type'
+>;
