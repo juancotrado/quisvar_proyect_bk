@@ -83,6 +83,7 @@ import {
   getAllListByDate,
   getListRange,
   deleteManyList,
+  fixShitsDiego,
 } from './list.controller';
 
 import {
@@ -257,6 +258,7 @@ export {
   getAllListByDate,
   getListRange,
   deleteManyList,
+  fixShitsDiego,
 };
 
 //Licenses Controllers
@@ -372,3 +374,4 @@ export { default as PDFGenerateController } from './pdfgenerate.controller';
 export { default as OfficeControllers } from './office.controllers';
 export { default as ListSpecialtiesController } from './listSpecialties.controller';
 export { default as DuplicateControllers } from './duplicates.controllers';
+export { default as AsitecControllers } from './asitec.controller';
