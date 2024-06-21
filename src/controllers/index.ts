@@ -83,7 +83,6 @@ import {
   getAllListByDate,
   getListRange,
   deleteManyList,
-  fixShitsDiego,
 } from './list.controller';
 
 import {
@@ -258,7 +257,6 @@ export {
   getAllListByDate,
   getListRange,
   deleteManyList,
-  fixShitsDiego,
 };
 
 //Licenses Controllers

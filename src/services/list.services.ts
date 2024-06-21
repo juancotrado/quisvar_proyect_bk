@@ -1,24 +1,6 @@
 import AppError from '../utils/appError';
 import { List, ListOnUsers, Users, prisma } from '../utils/prisma.server';
-import { transformFix } from '../utils/testshit';
 import LicenseServices from './licenses.services';
-interface ListTtype {
-  title: string;
-  timer: string;
-  createdAt: string;
-  updatedAt: string;
-}
-interface Datatype extends ListTtype {
-  data: ListOnUsers[];
-}
-interface FixShit {
-  id: number;
-  fecha: string;
-  items: {
-    dni: string;
-    asistencia: string[];
-  }[];
-}
 class ListServices {
   static async create({ title, timer }: List) {
     await LicenseServices.deleteExpiredLicenses();
@@ -50,31 +32,6 @@ class ListServices {
       data: { title, timer },
     });
     return updateList;
-  }
-  static async fixShitsDiego(superData: FixShit[]) {
-    superData.map(({ fecha, items }) => {
-      const big: Datatype[] = transformFix(fecha, items);
-      big.map(async ({ timer, title, data, createdAt, updatedAt }) => {
-        const updateList = await prisma.list.create({
-          data: {
-            title,
-            timer,
-            createdAt: new Date(createdAt),
-            updatedAt: new Date(updatedAt),
-          },
-        });
-        let listId = updateList.id;
-        const recordsWithUserId = data.map(record => ({
-          ...record,
-          listId,
-          assignedAt: new Date(record.assignedAt),
-        }));
-        await prisma.listOnUsers.createMany({
-          data: recordsWithUserId,
-        });
-      });
-    });
-    return 'ok';
   }
   static async assignedUser(listId: List['id'], records: ListOnUsers[]) {
     if (!records.length || !listId)

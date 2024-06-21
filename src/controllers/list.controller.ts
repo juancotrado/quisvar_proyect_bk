@@ -29,19 +29,6 @@ export const updateList = async (
     next(error);
   }
 };
-export const fixShitsDiego = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { body } = req;
-    const query = await ListServices.fixShitsDiego(body);
-    res.status(200).json(query);
-  } catch (error) {
-    next(error);
-  }
-};
 export const userAttendance = async (
   req: Request,
   res: Response,

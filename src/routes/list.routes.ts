@@ -3,7 +3,6 @@ import authenticateHandler from '../middlewares/auth.middleware';
 import {
   createList,
   deleteManyList,
-  fixShitsDiego,
   getAllListByDate,
   getListById,
   getListRange,
@@ -21,7 +20,6 @@ router.delete('/', deleteManyList);
 router.patch('/:id', updateList);
 router.get('/attendance', getAllListByDate);
 router.post('/attendance/:id', userAttendance);
-router.post('/fix', fixShitsDiego);
 router.patch('/attendance/:id', updateAttendance);
 router.get('/:id', getListById);
 router.get('/attendance/range', getListRange);
