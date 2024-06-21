@@ -56,7 +56,12 @@ class ListServices {
       const big: Datatype[] = transformFix(fecha, items);
       big.map(async ({ timer, title, data, createdAt, updatedAt }) => {
         const updateList = await prisma.list.create({
-          data: { title, timer, createdAt, updatedAt },
+          data: {
+            title,
+            timer,
+            createdAt: new Date(createdAt),
+            updatedAt: new Date(updatedAt),
+          },
         });
         let listId = updateList.id;
         const recordsWithUserId = data.map(record => ({
