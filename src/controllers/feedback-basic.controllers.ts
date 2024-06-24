@@ -2,7 +2,7 @@ import { ControllerFunction } from 'types/patterns';
 import { FeedbackBasicServices, PathServices } from '../services';
 import { UserType } from '../middlewares/auth.middleware';
 import { BasicFiles } from '@prisma/client';
-import { BasicFilesParsing } from 'types/types';
+import { BasicFilesForm } from 'types/types';
 
 class FeedbackBasicControllers {
   public static getByTask: ControllerFunction = async (req, res, next) => {
@@ -20,14 +20,15 @@ class FeedbackBasicControllers {
       const { id: subTasksId } = req.params;
       const percentage = req.body.percentage;
       const user: UserType = res.locals.userInfo;
+      const { firstName, lastName } = user.profile;
       if (!req.files) return;
       const newFiles = req.files as Express.Multer.File[];
       const dir = await PathServices.basicTask(+subTasksId, 'REVIEW');
       const files = newFiles.map(({ filename: name, originalname }) => {
         const type: BasicFiles['type'] = 'REVIEW';
-        const originalName = originalname;
-        const data = { name, dir, originalName, type };
-        const values: BasicFilesParsing = {
+        const data = { name, dir, originalname, type };
+        const values: BasicFilesForm = {
+          author: firstName + ' ' + lastName,
           ...data,
           subTasksId: +subTasksId,
         };

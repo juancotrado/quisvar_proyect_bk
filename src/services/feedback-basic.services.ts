@@ -1,7 +1,7 @@
 import { BasicFeedback, BasicTasks } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import { UserType } from '../middlewares/auth.middleware';
-import { BasicFilesParsing } from 'types/types';
+import { BasicFilesForm } from 'types/types';
 
 class FeedbackBasicServices {
   public static async showByTask(subTasksId: BasicTasks['id']) {
@@ -15,7 +15,7 @@ class FeedbackBasicServices {
         reviewer: true,
         author: true,
         files: {
-          select: { id: true, name: true, dir: true, originalName: true },
+          select: { id: true, name: true, dir: true, originalname: true },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -29,7 +29,7 @@ class FeedbackBasicServices {
       percentage,
       files,
     }: Pick<BasicFeedback, 'subTasksId' | 'percentage'> & {
-      files: BasicFilesParsing[];
+      files: BasicFilesForm[];
     },
     { id: userId, profile }: UserType
   ) {
@@ -47,9 +47,10 @@ class FeedbackBasicServices {
           author: firstName + ' ' + lastName,
           files: { createMany: { data: files } },
         },
+        include: { files: true },
       }),
     ];
-    return await prisma.$transaction(queryList);
+    return await prisma.$transaction(queryList).then(res => res[1]);
   }
 
   public static async review(

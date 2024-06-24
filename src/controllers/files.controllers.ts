@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import {
-  BasicTasksServices,
   FilesServices,
   PathServices,
   SubTasksServices,
@@ -135,19 +134,18 @@ export const uploadBasicFiles: ControllerFunction = async (req, res, next) => {
     const { id } = req.params;
     const subTasksId = +id;
     const type = req.query.status as BasicFiles['type'];
-    const userInfo: UserType = res.locals.userInfo;
+    const { profile }: UserType = res.locals.userInfo;
+    const { firstName, lastName } = profile;
     if (!req.files) return;
     const newFiles = req.files as Express.Multer.File[];
     const dir = await PathServices.basicTask(subTasksId, type);
-    const data = newFiles.map(({ filename: name }) => {
-      const values = { dir, type, subTasksId, name };
-      return { userId: userInfo.id || null, ...values };
+    const data = newFiles.map(({ filename: name, originalname }) => {
+      const values = { dir, type, subTasksId, name, originalname };
+      return { author: firstName + ' ' + lastName, ...values };
     });
-    await FilesServices.createManyBasicFiles(data, +subTasksId);
-    const query = await BasicTasksServices.find(+subTasksId);
+    const query = await FilesServices.createManyBasicFiles(data, +subTasksId);
     res.status(201).json(query);
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };

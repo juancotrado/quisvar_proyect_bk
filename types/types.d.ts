@@ -198,9 +198,11 @@ export interface MergeLevels {
 export interface BasicFilesForm {
   dir: string;
   type: BasicFiles['type'];
+  originalname?: string;
   subTasksId: number;
   name: string;
-  userId: number | null;
+  author: string | null;
+  // userId: number | null;
 }
 
 export type TypeIdsList = number | TypeIdsList[];
@@ -519,8 +521,3 @@ export interface percentageTaskFilter extends BasicTaskFilter {
   price: number;
   listUsers: usersCount[];
 }
-
-export type BasicFilesParsing = Pick<
-  BasicFiles,
-  'dir' | 'name' | 'originalName' | 'subTasksId' | 'type'
->;

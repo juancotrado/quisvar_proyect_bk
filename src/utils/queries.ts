@@ -1,4 +1,4 @@
-import { Mail } from '@prisma/client';
+import { Files, Mail } from '@prisma/client';
 import { ProfileByRoleType } from 'types/types';
 
 class Queries {
@@ -115,7 +115,10 @@ class Queries {
         },
       },
     },
-    files: { select: { id: true, dir: true, name: true, type: true } },
+    files: {
+      where: { type: { not: 'REVIEW' as Files['type'] } },
+      select: { id: true, dir: true, name: true, type: true },
+    },
   };
 
   static selectSpecialist = {

@@ -443,7 +443,7 @@ model Files {
 model BasicFiles {
   id              Int            @id @default(autoincrement())
   name            String
-  originalName    String?
+  originalname    String?
   author          String?
   dir             String?
   type            FileTypes
@@ -888,6 +888,7 @@ enum FileTypes {
   MODEL
   UPLOADS
   REVIEW
+  EDITABLES
 }
 
 enum ListDetails {
