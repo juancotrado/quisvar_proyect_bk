@@ -46,7 +46,6 @@ class FilesServices {
   ) {
     if (!subTasksId)
       throw new AppError(`no se pudo encontrar la subtarea`, 404);
-    console.log({ data });
     const newFile = await prisma.basicFiles.createMany({ data });
     return newFile;
   }

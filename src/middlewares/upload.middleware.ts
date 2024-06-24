@@ -35,12 +35,12 @@ class StorageConfig {
     });
   }
 
-  public setUpTask(name?: string) {
+  public setUpTask(name?: string, type?: Files['type']) {
     return multer.diskStorage({
       destination: async function (req, file, callback) {
         try {
           const { id: subtaskId } = req.params;
-          const status = req.query.status as Files['type'];
+          const status = type || (req.query.status as Files['type']);
           const path = await PathServices.basicTask(+subtaskId, status);
           if (!existsSync(path)) mkdirSync(path, { recursive: true });
           callback(null, path);
@@ -103,6 +103,35 @@ const storage = multer.diskStorage({
       const _subtask_id = parseInt(id);
       const status = req.query.status as Files['type'];
       const path = await PathServices.subTask(_subtask_id, status);
+      callback(null, path);
+    } catch (error) {
+      callback(new AppError(`No se pudo encontrar la ruta`, 404), '');
+    }
+  },
+  filename: async (req, { originalname }, callback) => {
+    const ext = originalname.split('.').at(-1) || '';
+    try {
+      if (BlackList.includes(ext) || originalname.includes('$'))
+        throw new Error();
+      const uniqueSuffix = Date.now();
+      callback(null, convertToUtf8(uniqueSuffix + '$$' + originalname));
+    } catch (error) {
+      callback(
+        new AppError(`Oops! , envie archivos con extension no repetida`, 404),
+        ''
+      );
+    }
+  },
+});
+
+const storageBasic = multer.diskStorage({
+  destination: async (req, file, callback) => {
+    try {
+      const { id } = req.params;
+      const _subtask_id = parseInt(id);
+      const status = req.query.status as Files['type'];
+      const path = await PathServices.basicTask(_subtask_id, status);
+      console.log({ path });
       callback(null, path);
     } catch (error) {
       callback(new AppError(`No se pudo encontrar la ruta`, 404), '');
@@ -252,6 +281,11 @@ class Stogares extends StorageConfig {
     limits: { fileSize: MAX_SIZE },
   });
 
+  public uploadbasic: multer.Multer = multer({
+    storage: storageBasic,
+    limits: { fileSize: MAX_SIZE },
+  });
+
   public fileUser: multer.Multer = multer({
     storage: storageFileUser,
   });
@@ -264,9 +298,11 @@ class Stogares extends StorageConfig {
     storage: storageFileSpecialist,
   });
 
-  public basicFiles: multer.Multer = multer({
-    storage: this.setUpTask(),
-  });
+  public basicFiles(type?: Files['type']): multer.Multer {
+    return multer({
+      storage: this.setUpTask(undefined, type),
+    });
+  }
   public PDF_Files: multer.Multer = multer({
     storage: multer.memoryStorage(),
   });
