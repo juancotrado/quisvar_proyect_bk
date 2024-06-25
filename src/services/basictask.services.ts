@@ -14,7 +14,13 @@ class BasicTasksServices {
       include: Queries.includeBasictask,
     });
     if (!findSubTask) throw new AppError('No se pudo encontrar la tares ', 404);
-    const { Levels, files: listFiles, users: listUsers, ...task } = findSubTask;
+    const {
+      Levels,
+      files: listFiles,
+      users: listUsers,
+      feedBacks,
+      ...task
+    } = findSubTask;
     const managerGroup = Levels.stages.group?.groups[0];
     const users = listUsers.reduce<Record<string, typeof listUsers>>(
       (acc, user) => {
@@ -35,8 +41,9 @@ class BasicTasksServices {
       },
       {}
     );
+    const lastFeedback = feedBacks[0];
     const { item } = await this.getItem([...Levels.levelList, Levels.id]);
-    return { item, managerGroup, ...task, users, files };
+    return { item, managerGroup, ...task, lastFeedback, users, files };
   }
 
   public static async create({ name, days, levels_Id }: BasicTasks) {

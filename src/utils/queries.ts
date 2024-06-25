@@ -100,6 +100,12 @@ class Queries {
         },
       },
     },
+    mods: {
+      select: {
+        id: true,
+        profile: { select: { lastName: true, firstName: true } },
+      },
+    },
     users: {
       select: {
         percentage: true,
@@ -117,7 +123,28 @@ class Queries {
     },
     files: {
       where: { type: { not: 'REVIEW' as Files['type'] } },
-      select: { id: true, dir: true, name: true, type: true },
+      select: {
+        id: true,
+        dir: true,
+        name: true,
+        type: true,
+        originalname: true,
+      },
+    },
+    feedBacks: {
+      take: 1,
+      orderBy: { createdAt: 'desc' as 'asc' | 'desc' },
+      include: {
+        files: {
+          select: {
+            id: true,
+            dir: true,
+            name: true,
+            type: true,
+            originalname: true,
+          },
+        },
+      },
     },
   };
 

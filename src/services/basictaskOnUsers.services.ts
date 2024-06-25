@@ -17,6 +17,14 @@ class BasicTaskOnUserServices {
     return await prisma.$transaction(list).then(res => res[1]);
   }
 
+  public static async addMod({ taskId, userId }: UserList) {
+    const addNewMod = await prisma.basicTasks.update({
+      where: { id: taskId },
+      data: { mods: { connect: { id: userId } } },
+    });
+    return addNewMod;
+  }
+
   public static async remove(id: BasicTaskOnUsers['id']) {
     const findUser = await prisma.basicTaskOnUsers.findUnique({
       where: { id },
@@ -34,6 +42,14 @@ class BasicTaskOnUserServices {
       }),
     ];
     return await prisma.$transaction(list).then(res => res[1]);
+  }
+
+  public static async removeMod({ taskId, userId }: UserList) {
+    const removeNewMod = await prisma.basicTasks.update({
+      where: { id: taskId },
+      data: { mods: { disconnect: { id: userId } } },
+    });
+    return removeNewMod;
   }
 
   public static async updatePercentage(
