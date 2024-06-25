@@ -912,7 +912,7 @@ paths:
         - Feedbacks
       summary: Review feedbacks
       parameters:
-        - $ref: '#/components/parameters/subtaskId'
+        - $ref: '#/components/parameters/feedbackId'
       description: |-
         Ingresar Los campos requeridos para añadir un archivo
       security:
@@ -1837,6 +1837,13 @@ components:
       name: id
       in: path
       description: Ingresar id de tarea
+      required: true
+      schema:
+        type: integer
+    feedbackId:
+      name: id
+      in: path
+      description: Ingresar id del feedback
       required: true
       schema:
         type: integer

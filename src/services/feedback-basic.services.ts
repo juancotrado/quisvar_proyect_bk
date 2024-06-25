@@ -64,6 +64,7 @@ class FeedbackBasicServices {
     { id: userId, profile }: UserType
   ) {
     const { lastName, firstName } = profile;
+    // status: false  para despues para pago
     const queryList = [
       prisma.basicFeedback.update({
         where: { id },
@@ -81,10 +82,10 @@ class FeedbackBasicServices {
                   ? {
                       update: {
                         where: { id: userIdTask },
-                        data: { percentage, status: false },
+                        data: { percentage },
                       },
                     }
-                  : {},
+                  : undefined,
             },
           },
           users: {

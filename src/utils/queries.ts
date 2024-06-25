@@ -107,13 +107,16 @@ class Queries {
       },
     },
     users: {
+      where: { user: { status: true } },
       select: {
+        id: true,
         percentage: true,
         assignedAt: true,
         status: true,
         user: {
           select: {
             id: true,
+            status: true,
             profile: {
               select: { firstName: true, lastName: true, dni: true },
             },
