@@ -21,7 +21,7 @@ router.post('/', createFeedback);
 router.get('/basic-task/:id', FeedbackBasicControllers.getByTask);
 router.post(
   '/basic-task/:id',
-  uploads.basicFiles('EDITABLES').array('files'),
+  uploads.basicFiles('REVIEW').array('files'),
   FeedbackBasicControllers.create
 );
 router.patch('/basic-task/:id', FeedbackBasicControllers.review);

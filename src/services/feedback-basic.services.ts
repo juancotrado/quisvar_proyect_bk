@@ -33,7 +33,13 @@ class FeedbackBasicServices {
     },
     { id: userId, profile }: UserType
   ) {
-    const { lastName, firstName } = profile;
+    const { lastName, firstName, dni } = profile;
+    const authorData = {
+      fullname: lastName + '' + firstName,
+      lastName,
+      firstName,
+      dni,
+    };
     const queryList = [
       prisma.basicTasks.update({
         where: { id: subTasksId },
@@ -44,7 +50,7 @@ class FeedbackBasicServices {
           subTasksId,
           users: { create: { userId, userMain: true } },
           percentage,
-          author: firstName + ' ' + lastName,
+          author: JSON.stringify(authorData),
           files: { createMany: { data: files } },
         },
         include: { files: true },
@@ -63,13 +69,19 @@ class FeedbackBasicServices {
     }: BasicFeedback & { userIdTask: number },
     { id: userId, profile }: UserType
   ) {
-    const { lastName, firstName } = profile;
+    const { lastName, firstName, dni } = profile;
+    const reviewerData = {
+      fullname: lastName + '' + firstName,
+      lastName,
+      firstName,
+      dni,
+    };
     // status: false  para despues para pago
     const queryList = [
       prisma.basicFeedback.update({
         where: { id },
         data: {
-          reviewer: lastName + ' ' + firstName,
+          reviewer: JSON.stringify(reviewerData),
           type,
           comment,
           percentage,
