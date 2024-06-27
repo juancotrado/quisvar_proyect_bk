@@ -8,7 +8,6 @@ import { unlinkSync } from 'fs';
 class BasicTasksServices {
   public static async find(id: BasicTasks['id']) {
     if (!id) throw new AppError('Oops!,ID invalido', 400);
-
     const findSubTask = await prisma.basicTasks.findUnique({
       where: { id },
       include: Queries.includeBasictask,

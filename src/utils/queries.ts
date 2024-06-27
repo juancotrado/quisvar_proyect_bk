@@ -103,7 +103,7 @@ class Queries {
     mods: {
       select: {
         id: true,
-        profile: { select: { lastName: true, firstName: true } },
+        profile: { select: { lastName: true, firstName: true, dni: true } },
       },
     },
     users: {
