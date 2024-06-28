@@ -7,13 +7,7 @@ class FeedbackBasicServices {
   public static async showByTask(subTasksId: BasicTasks['id']) {
     const list = await prisma.basicFeedback.findMany({
       where: { subTasksId },
-      select: {
-        id: true,
-        comment: true,
-        createdAt: true,
-        type: true,
-        reviewer: true,
-        author: true,
+      include: {
         files: {
           select: { id: true, name: true, dir: true, originalname: true },
         },
@@ -108,8 +102,12 @@ class FeedbackBasicServices {
           },
         },
       }),
+      prisma.basicTaskOnUsers.update({
+        where: { id: userIdTask },
+        data: { finishedAt: new Date() },
+      }),
     ];
-    return await prisma.$transaction(queryList);
+    return await prisma.$transaction(queryList).then(res => res[0]);
   }
 }
 export default FeedbackBasicServices;

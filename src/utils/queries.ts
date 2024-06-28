@@ -100,12 +100,7 @@ class Queries {
         },
       },
     },
-    mods: {
-      select: {
-        id: true,
-        profile: { select: { lastName: true, firstName: true, dni: true } },
-      },
-    },
+    mods: this.selectProfileShort,
     users: {
       where: { user: { status: true } },
       select: {

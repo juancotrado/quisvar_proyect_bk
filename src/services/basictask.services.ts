@@ -45,6 +45,45 @@ class BasicTasksServices {
     return { item, managerGroup, ...task, lastFeedback, users, files };
   }
 
+  public static async findUsersAndMods(
+    id: BasicTasks['id'],
+    { users: withUsers }: { users?: boolean }
+  ) {
+    if (!id) throw new AppError('Oops, ID invalido', 400);
+    const getUsersGroup = await prisma.basicTasks.findUnique({
+      where: { id },
+      select: {
+        Levels: {
+          select: {
+            stages: {
+              select: {
+                group: {
+                  select: {
+                    groups: {
+                      select: {
+                        users: Queries.selectProfileShort,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    if (!getUsersGroup) throw new AppError('Oops, grupo no encontrado', 400);
+    const groupList = getUsersGroup.Levels.stages.group;
+    const group = groupList?.groups || [];
+    const data = { group };
+    if (!withUsers) return data;
+    const users = await prisma.users.findMany({
+      where: { status: true },
+      ...Queries.selectProfileShort,
+    });
+    return { ...data, users };
+  }
+
   public static async create({ name, days, levels_Id }: BasicTasks) {
     const isDuplicated = await this.findDuplicate(name, levels_Id, 'ROOT');
     const { duplicated, quantity, typeItem } = isDuplicated;
@@ -76,6 +115,7 @@ class BasicTasksServices {
         where: { id },
         data: { status },
       });
+      console.log(updateTask);
     }
     // if(status === "")
   }

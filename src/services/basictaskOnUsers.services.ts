@@ -1,5 +1,6 @@
 import AppError from '../utils/appError';
 import { BasicTaskOnUsers, prisma } from '../utils/prisma.server';
+import { v4 as uuidv4 } from 'uuid';
 interface UserList {
   userId: number;
   taskId: BasicTaskOnUsers['taskId'];
@@ -17,10 +18,51 @@ class BasicTaskOnUserServices {
     return await prisma.$transaction(list).then(res => res[1]);
   }
 
+  public static async authorizateUsers(ids: BasicTaskOnUsers['id'][]) {
+    if (!ids.length) throw new AppError('Oops, ID invalido', 400);
+    const updateStatusUser = await prisma.basicTaskOnUsers.updateMany({
+      where: { id: { in: ids } },
+      data: { status: false },
+    });
+    return updateStatusUser;
+  }
+
+  public static async addColaborators(
+    id: BasicTaskOnUsers['id'],
+    userList: { userId: number; percentage: number }[]
+  ) {
+    if (!id) throw new AppError('Oops, ID invalido', 400);
+    const findTask = await prisma.basicTaskOnUsers.findUnique({
+      where: { id },
+      select: {
+        percentage: true,
+        taskId: true,
+        assignedAt: true,
+        finishedAt: true,
+      },
+    });
+    if (!findTask) throw new AppError('Oops, usuario invalido', 400);
+    const totalPercentage = userList.reduce((acc, u) => acc + u.percentage, 0);
+    const { percentage, ...task } = findTask;
+    if (totalPercentage > percentage)
+      throw new AppError('Se excedio el tamaño de porcentage', 400);
+    const groupId = uuidv4();
+    const data = userList.map(user => ({
+      ...task,
+      status: false,
+      groupId,
+      ...user,
+    }));
+    const createUsers = await prisma.basicTaskOnUsers.createMany({
+      data,
+    });
+    return createUsers;
+  }
+
   public static async addMod({ taskId, userId }: UserList) {
     const addNewMod = await prisma.basicTasks.update({
       where: { id: taskId },
-      data: { mods: { connect: { id: userId } } },
+      data: { mods: { set: [], connect: { id: userId } } },
     });
     return addNewMod;
   }

@@ -22,6 +22,27 @@ class BasicTaskOnUserControllers {
     }
   };
 
+  public static addColabs: ControllerFunction = async (req, res, next) => {
+    try {
+      const { body } = req;
+      const { id } = req.params;
+      const result = await BasicTaskOnUserServices.addColaborators(+id, body);
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public static changeStatus: ControllerFunction = async (req, res, next) => {
+    try {
+      const { body } = req;
+      const result = await BasicTaskOnUserServices.authorizateUsers(body);
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public static removeUser: ControllerFunction = async (req, res, next) => {
     try {
       const { id: userIdList } = req.params;

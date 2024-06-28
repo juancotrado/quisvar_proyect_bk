@@ -4,6 +4,20 @@ import { parseQueries } from '../utils/format.server';
 import { BasicTaskFiles } from 'types/types';
 
 class BasicTaskControllers {
+  public static findUserColabs: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id: subtask_id } = req.params;
+      const queries = parseQueries<{ users?: boolean }>(req.query);
+      const query = await BasicTasksServices.findUsersAndMods(
+        +subtask_id,
+        queries
+      );
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public static find: ControllerFunction = async (req, res, next) => {
     try {
       //
