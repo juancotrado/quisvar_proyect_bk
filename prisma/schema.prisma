@@ -330,6 +330,7 @@ model BasicTaskOnUsers {
   status            Boolean    @default(false)
   statusPayment     Boolean    @default(false)
   userId            Int
+  groupId           String?
   percentage        Int        @default(0)
   percentagePayment Int        @default(0)
   assignedAt        DateTime   @default(now())
