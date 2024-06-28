@@ -817,7 +817,62 @@ paths:
           description: Operación exitosa
         '404':
           description: No se pudo crear el mensaje
-
+  /basictasks/groups-users/{id}:
+    get:
+      tags:
+        - Basictasks
+        - Users On Tasks
+      summary: Ver lista de usuarios y lista de usuarios por grupo de una tarea
+      parameters:
+        - $ref: '#/components/parameters/feedbackUserId'
+        - $ref: '#/components/parameters/withUserFilter'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+        '404':
+          description: No se pudo crear el mensaje
+  /basictasks/add-colabs/{id}:
+    post:
+      tags:
+        - Basictasks
+        - Users On Tasks
+      summary: Añadir colaboradores a una tarea
+      parameters:
+        - $ref: '#/components/parameters/feedbackUserId'
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/feedback-colabs-form'
+      responses:
+        '200':
+          description: Operación exitosa
+        '404':
+          description: No se pudo crear el mensaje
+  /basictasks/user-status:
+    put:
+      tags:
+        - Basictasks
+        - Users On Tasks
+      summary: Cambiar el estado de usuarios de una tarea
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/feedback-change-status-form'
+      responses:
+        '200':
+          description: Operación exitosa
+        '404':
+          description: No se pudo crear el mensaje
   /files/basics/{id}:
     post:
       tags:
@@ -1847,6 +1902,20 @@ components:
       required: true
       schema:
         type: integer
+    feedbackUserId:
+      name: id
+      in: path
+      description: Ingresar id del usuario en la lista feedback
+      required: true
+      schema:
+        type: integer
+    withUserFilter:
+      name: users
+      in: query
+      description: Traer consulta con o sin usuarios
+      required: false
+      schema:
+        type: boolean
     officeId:
       name: id
       in: path
@@ -2418,3 +2487,25 @@ components:
         ids:
           type: string
           example: [1, 2, 3]
+    feedback-change-status-form:
+      type: array
+      items:
+        type: number
+      example: [1, 4, 5]
+    feedback-colabs-form:
+      type: array
+      items:
+        type: object
+        required:
+          - userId
+          - percentage
+        properties:
+          id:
+            type: integer
+          percentage:
+            type: integer
+      example:
+        - userId: 1
+          percentage: 70
+        - userId: 2
+          percentage: 30
