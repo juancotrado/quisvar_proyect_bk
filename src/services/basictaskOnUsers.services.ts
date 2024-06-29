@@ -37,6 +37,7 @@ class BasicTaskOnUserServices {
       select: {
         percentage: true,
         taskId: true,
+        userId: true,
         assignedAt: true,
         finishedAt: true,
       },
@@ -67,7 +68,7 @@ class BasicTaskOnUserServices {
       }),
       prisma.basicTaskOnUsers.create({
         data: {
-          userId: findTask.taskId,
+          userId: findTask.userId,
           taskId: findTask.taskId,
           status: true,
         },
