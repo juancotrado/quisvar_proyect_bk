@@ -107,6 +107,7 @@ class Queries {
         id: true,
         percentage: true,
         assignedAt: true,
+        groupId: true,
         status: true,
         user: {
           select: {

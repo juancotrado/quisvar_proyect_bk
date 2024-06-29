@@ -65,6 +65,13 @@ class BasicTaskOnUserServices {
       prisma.basicTaskOnUsers.createMany({
         data,
       }),
+      prisma.basicTaskOnUsers.create({
+        data: {
+          userId: findTask.taskId,
+          taskId: findTask.taskId,
+          status: true,
+        },
+      }),
     ];
     const createUsers = await prisma
       .$transaction(queryList)
