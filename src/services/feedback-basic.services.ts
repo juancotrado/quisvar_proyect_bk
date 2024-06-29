@@ -29,7 +29,7 @@ class FeedbackBasicServices {
   ) {
     const { lastName, firstName, dni } = profile;
     const authorData = {
-      fullname: lastName + '' + firstName,
+      fullname: lastName + ' ' + firstName,
       lastName,
       firstName,
       dni,
@@ -65,7 +65,7 @@ class FeedbackBasicServices {
   ) {
     const { lastName, firstName, dni } = profile;
     const reviewerData = {
-      fullname: lastName + '' + firstName,
+      fullname: lastName + ' ' + firstName,
       lastName,
       firstName,
       dni,

@@ -53,9 +53,18 @@ class BasicTaskOnUserServices {
       groupId,
       ...user,
     }));
-    const createUsers = await prisma.basicTaskOnUsers.createMany({
-      data,
-    });
+    const queryList = [
+      prisma.basicTaskOnUsers.update({
+        where: { id },
+        data: { status: false, percentage: percentage - totalPercentage },
+      }),
+      prisma.basicTaskOnUsers.createMany({
+        data,
+      }),
+    ];
+    const createUsers = await prisma
+      .$transaction(queryList)
+      .then(res => res[0]);
     return createUsers;
   }
 
