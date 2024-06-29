@@ -40,9 +40,14 @@ class BasicTasksServices {
       },
       {}
     );
+    const percentage = listUsers.reduce<number>(
+      (acc, u) => acc + u.percentage,
+      0
+    );
     const lastFeedback = feedBacks[0];
     const { item } = await this.getItem([...Levels.levelList, Levels.id]);
-    return { item, managerGroup, ...task, lastFeedback, users, files };
+    const auxData = { item, percentage };
+    return { ...auxData, managerGroup, ...task, lastFeedback, users, files };
   }
 
   public static async findUsersAndMods(
