@@ -824,6 +824,7 @@ paths:
         - Users On Tasks
       summary: Ver lista de usuarios y lista de usuarios por grupo de una tarea
       parameters:
+        - $ref: '#/components/parameters/subtaskId'
         - $ref: '#/components/parameters/withUserFilter'
       security:
         - bearerAuth: []
