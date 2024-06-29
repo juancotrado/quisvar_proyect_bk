@@ -56,7 +56,11 @@ class BasicTaskOnUserServices {
     const queryList = [
       prisma.basicTaskOnUsers.update({
         where: { id },
-        data: { status: false, percentage: percentage - totalPercentage },
+        data: {
+          status: false,
+          percentage: percentage - totalPercentage,
+          groupId,
+        },
       }),
       prisma.basicTaskOnUsers.createMany({
         data,
