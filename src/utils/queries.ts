@@ -1,4 +1,4 @@
-import { Mail } from '@prisma/client';
+import { Files, Mail } from '@prisma/client';
 import { ProfileByRoleType } from 'types/types';
 
 class Queries {
@@ -95,40 +95,24 @@ class Queries {
         levelList: true,
         stages: {
           select: {
-            group: {
-              select: {
-                groups: { select: { users: { select: { id: true } } } },
-              },
-            },
+            group: { select: { groups: { where: { mod: true }, take: 1 } } },
           },
         },
       },
     },
-    feedBacks: {
-      include: {
-        users: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                profile: {
-                  select: { firstName: true, lastName: true, dni: true },
-                },
-              },
-            },
-          },
-        },
-        files: true,
-      },
-    },
+    mods: this.selectProfileShort,
     users: {
+      where: { user: { status: true } },
       select: {
+        id: true,
         percentage: true,
         assignedAt: true,
+        groupId: true,
         status: true,
         user: {
           select: {
             id: true,
+            status: true,
             profile: {
               select: { firstName: true, lastName: true, dni: true },
             },
@@ -136,7 +120,31 @@ class Queries {
         },
       },
     },
-    files: { select: { id: true, dir: true, name: true } },
+    files: {
+      where: { type: { not: 'REVIEW' as Files['type'] } },
+      select: {
+        id: true,
+        dir: true,
+        name: true,
+        type: true,
+        originalname: true,
+      },
+    },
+    feedBacks: {
+      take: 1,
+      orderBy: { createdAt: 'desc' as 'asc' | 'desc' },
+      include: {
+        files: {
+          select: {
+            id: true,
+            dir: true,
+            name: true,
+            type: true,
+            originalname: true,
+          },
+        },
+      },
+    },
   };
 
   static selectSpecialist = {

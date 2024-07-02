@@ -4,6 +4,20 @@ import { parseQueries } from '../utils/format.server';
 import { BasicTaskFiles } from 'types/types';
 
 class BasicTaskControllers {
+  public static findUserColabs: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id: subtask_id } = req.params;
+      const queries = parseQueries<{ users?: boolean }>(req.query);
+      const query = await BasicTasksServices.findUsersAndMods(
+        +subtask_id,
+        queries
+      );
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public static find: ControllerFunction = async (req, res, next) => {
     try {
       //
@@ -55,12 +69,31 @@ class BasicTaskControllers {
     }
   };
 
+  public static sortTasks: ControllerFunction = async (req, res, next) => {
+    try {
+      const { body } = req;
+      const query = await BasicTasksServices.sort(body);
+      res.status(200).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public static delete: ControllerFunction = async (req, res, next) => {
     try {
       const { id: taskId } = req.params;
       const query = await BasicTasksServices.delete(+taskId);
       res.status(200).json(query);
-      //
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public static restore: ControllerFunction = async (req, res, next) => {
+    try {
+      const { id: taskId } = req.params;
+      const query = await BasicTasksServices.restore(+taskId);
+      res.status(200).json(query);
     } catch (error) {
       next(error);
     }
@@ -101,13 +134,6 @@ class BasicTaskControllers {
       next(error);
     }
   };
-  // public static create: ControllerFunction = async (req, res, next) => {
-  //   try {
-  //     //
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // };
 }
 
 export default BasicTaskControllers;

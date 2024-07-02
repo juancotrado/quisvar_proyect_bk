@@ -372,3 +372,6 @@ export { default as PDFGenerateController } from './pdfgenerate.controller';
 export { default as OfficeControllers } from './office.controllers';
 export { default as ListSpecialtiesController } from './listSpecialties.controller';
 export { default as DuplicateControllers } from './duplicates.controllers';
+export { default as AsitecControllers } from './asitec.controller';
+export { default as FeedbackBasicControllers } from './feedback-basic.controllers';
+export { default as BasicTaskOnUserServices } from './basictaskOnUser.controllers';

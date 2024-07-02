@@ -73,7 +73,7 @@ class DutyMembersServices {
             groupId: groupId || undefined,
           },
         },
-        createdAt: {
+        updatedAt: {
           gte: new Date(days[0].date),
           lte: new Date(days[6].date),
         },
@@ -84,7 +84,7 @@ class DutyMembersServices {
           //   status: true,
           // },
           orderBy: {
-            assignedAt: 'desc',
+            assignedAt: 'asc',
           },
           take: 1,
           select: {
@@ -97,6 +97,7 @@ class DutyMembersServices {
               include: {
                 project: {
                   select: {
+                    id: true,
                     name: true,
                   },
                 },

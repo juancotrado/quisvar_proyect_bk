@@ -1,7 +1,6 @@
 import AppError from '../utils/appError';
 import { List, ListOnUsers, Users, prisma } from '../utils/prisma.server';
 import LicenseServices from './licenses.services';
-
 class ListServices {
   static async create({ title, timer }: List) {
     await LicenseServices.deleteExpiredLicenses();

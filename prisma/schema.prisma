@@ -26,6 +26,7 @@ model Users {
   project               Projects[]
   // subTasks              BasicTaskOnUsers[]
   basicTasks            TaskOnUsers[]
+  modBacsicTask         BasicTasks[]
   Levels                Levels[]
   list                  ListOnUsers[]
   stages                Stages[]
@@ -36,7 +37,7 @@ model Users {
   feedbacksBasic        BasicUsersOnFeedbacks[]
   equipment             Equipment?
   groups                GroupOnUsers[]
-  basicLevels           BasicLevels[]
+  // basicLevels           BasicLevels[]
   // moderatorOfGroup      Group[]
   // Attendance            AttendanceGroup[]
   roleId                Int?
@@ -303,7 +304,7 @@ model BasicLevels {
   stagesId     Int
   rootId       Int
   subTasks     BasicTasks[]
-  users        Users[]
+  // users        Users[]
   // user         Users?     @relation(fields: [userId], references: [id])
   stages       Stages       @relation(fields: [stagesId], references: [id], onDelete: Cascade)
 }
@@ -327,7 +328,9 @@ model BasicTaskOnUsers {
   id                Int        @id @default(autoincrement())
   taskId            Int
   status            Boolean    @default(false)
+  statusPayment     Boolean    @default(false)
   userId            Int
+  groupId           String?
   percentage        Int        @default(0)
   percentagePayment Int        @default(0)
   assignedAt        DateTime   @default(now())
@@ -370,7 +373,7 @@ model BasicTasks {
   files     BasicFiles[]
   Levels    BasicLevels        @relation(fields: [levels_Id], references: [id], onDelete: Cascade)
   feedBacks BasicFeedback[]
-  // users     BasicTaskOnUsers[]
+  mods      Users[]
   users     BasicTaskOnUsers[]
 }
 
@@ -390,6 +393,9 @@ model Feedback {
 model BasicFeedback {
   id         Int                     @id @default(autoincrement())
   comment    String?
+  author     String
+  reviewer   String?
+  type       FeedbackType            @default(HOLDING)
   status     Boolean                 @default(false)
   createdAt  DateTime                @default(now())
   updatedAt  DateTime                @updatedAt
@@ -438,16 +444,17 @@ model Files {
 model BasicFiles {
   id              Int            @id @default(autoincrement())
   name            String
-  userId          Int?
+  originalname    String?
+  author          String?
   dir             String?
   type            FileTypes
   subTasksId      Int
+  basicFeedbackId Int?
   feedbackId      Int?
   assignedAt      DateTime       @default(now())
   // feedback   Feedback? @relation(fields: [feedbackId], references: [id])
   subTasks        BasicTasks     @relation(fields: [subTasksId], references: [id], onDelete: Cascade)
   BasicFeedback   BasicFeedback? @relation(fields: [basicFeedbackId], references: [id])
-  basicFeedbackId Int?
 }
 
 model PersonBussiness {
@@ -830,6 +837,13 @@ model Logs {
   query Json
 }
 
+model Asitec {
+  id          Int       @id @default(autoincrement())
+  evaluator   String?
+  lastVc      DateTime?
+  followingVc DateTime?
+}
+
 enum MenuRol {
   MOD
   MEMBER
@@ -865,6 +879,8 @@ enum TaskRole {
   PROCESS
   INREVIEW
   DENIED
+  REVIEWED
+  APPROVED
   DONE
   LIQUIDATION
 }
@@ -920,6 +936,7 @@ enum MessageRole {
 
 enum PayMessageStatus {
   PROCESO
+  OBSERVADO
   RECHAZADO
   ARCHIVADO
   FINALIZADO
@@ -967,4 +984,10 @@ enum ContractType {
 enum LicenseType {
   PERMISO
   SALIDA
+}
+
+enum FeedbackType {
+  ACCEPTED
+  REJECTED
+  HOLDING
 }

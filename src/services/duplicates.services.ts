@@ -286,7 +286,7 @@ class DuplicatesServices {
       orderBy: { index: 'asc' },
       include: {
         files: {
-          where: { OR: [{ type: 'UPLOADS' }, { type: 'EDITABLES' }] },
+          where: { OR: [{ type: 'UPLOADS' }] },
           select: { id: true, dir: true, name: true, type: true },
         },
       },

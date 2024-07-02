@@ -8,7 +8,6 @@ import {
   PickPayMessageReply,
   PickSealPayMessage,
   ReceiverT,
-  ReceiverTypePick,
 } from 'types/types';
 import Queries from '../utils/queries';
 import AppError from '../utils/appError';
@@ -283,7 +282,6 @@ class PayMailServices {
       header,
       senderId,
       officeId,
-      receiverId,
       secondaryReceiver,
     }: PickPayMail,
     files: FileMessagePick[]
@@ -291,22 +289,20 @@ class PayMailServices {
     const typeMail: PayMail['type'] = 'SENDER';
     const role: PayMail['role'] = 'MAIN';
     const status: PayMail['status'] = true;
-    const getUserOffice = officeId
-      ? await prisma.office.findUnique({
-          where: { id: officeId },
-          select: {
-            users: {
-              where: { isOfficeManager: true },
-              select: { usersId: true },
-              take: 1,
-            },
-          },
-        })
-      : null;
-    const receiverList: ReceiverTypePick[] = getUserOffice
-      ? [{ userId: getUserOffice.users[0].usersId, role, status }]
-      : [{ userId: receiverId, role, status }];
-    const historyOfficesIds = getUserOffice ? [officeId] : [];
+    const getOffice = await prisma.office.findUnique({
+      where: { id: officeId },
+      select: {
+        users: {
+          where: { isOfficeManager: true },
+          select: { usersId: true },
+          take: 1,
+        },
+      },
+    });
+    if (!getOffice) throw new AppError('Opps, oficina inexistente', 404);
+    // const receiverList: ReceiverTypePick[] = [
+    //   { userId: getOffice.users[0].usersId, role, status },
+    // ];
     const createPayMessage = await prisma.payMessages.create({
       data: {
         title,
@@ -314,12 +310,12 @@ class PayMailServices {
         description,
         type,
         officeId,
-        historyOfficesIds,
+        historyOfficesIds: [officeId],
         users: {
           createMany: {
             data: [
               ...secondaryReceiver,
-              ...receiverList,
+              { userId: getOffice.users[0].usersId, role, status },
               { userId: senderId, role, type: typeMail, userInit: true },
             ],
             skipDuplicates: true,
@@ -331,10 +327,47 @@ class PayMailServices {
     return createPayMessage;
   }
 
+  static async decline(data: PayMessages['id'][]) {
+    const getMessages = await prisma.payMessages.findMany({
+      where: { id: { in: data } },
+      include: {
+        users: { where: { userInit: true }, take: 1 },
+        office: { select: { name: true } },
+      },
+    });
+    const updateList = getMessages.map(message => {
+      if (!message) throw new AppError('Oops no se encontro mensaje', 400);
+      return prisma.payMessages.update({
+        where: { id: message.id },
+        data: {
+          beforeOffice: 'MESA DE PARTES',
+          historyOfficesIds: [],
+          officeId: null,
+          status: 'OBSERVADO',
+          onHolding: false,
+          files: { deleteMany: { name: { startsWith: 'mp' } } },
+          users: {
+            deleteMany: { userInit: false },
+            updateMany: {
+              where: { userInit: true },
+              data: {
+                role: 'MAIN',
+                type: 'RECEIVER',
+                status: false,
+              },
+            },
+          },
+        },
+        include: { users: true },
+      });
+    });
+    const result = await prisma.$transaction(updateList);
+    return result;
+  }
+
   static async createReply(
     {
       title,
-      receiverId,
       senderId,
       header,
       status,
@@ -345,19 +378,19 @@ class PayMailServices {
   ) {
     const receiv: ReceiverT = { type: 'RECEIVER', role: 'MAIN', status: true };
     //-------------------------- Set New Office ---------------------------------
-    const getOffice = officeId
-      ? await prisma.office.findUnique({
-          where: { id: officeId },
-          select: {
-            id: true,
-            users: {
-              where: { isOfficeManager: true },
-              select: { usersId: true },
-              take: 1,
-            },
-          },
-        })
-      : null;
+    if (!officeId) throw new AppError('Opps, oficina inexistente', 404);
+    const getOffice = await prisma.office.findUnique({
+      where: { id: officeId },
+      select: {
+        id: true,
+        users: {
+          where: { isOfficeManager: true },
+          select: { usersId: true },
+          take: 1,
+        },
+      },
+    });
+    if (!getOffice) throw new AppError('Opps, oficina inexistente', 404);
     //---------------------------------------------------------------------------
     const getSender = await prisma.payMessages.findUnique({
       where: { id },
@@ -376,31 +409,19 @@ class PayMailServices {
         },
       },
     });
-
-    if (getSender?.office && getSender?.office?.id === officeId)
+    if (!getSender) throw new AppError('Opps, oficina inexistente 2', 404);
+    if (getSender.office?.id === officeId)
       throw new AppError('No puedes mandar a la misma oficina', 500);
     //---------------------------------------------------------------------------
 
-    const newReceiver = getOffice ? getOffice.users[0].usersId : receiverId;
-    const newSender = getSender?.office
-      ? getSender.office.users[0].usersId
-      : senderId;
-    if (getOffice) {
-      const existOffice = getSender?.historyOfficesIds.find(
-        id => id === getOffice.id
-      );
-      const historyOfficesIds = existOffice
-        ? undefined
-        : [...(getSender?.historyOfficesIds ?? []), getOffice.id];
-      await prisma.payMessages.update({
-        where: { id },
-        data: {
-          officeId,
-          beforeOffice: getSender?.office?.name,
-          historyOfficesIds,
-        },
-      });
-    }
+    const newReceiver = getOffice.users[0].usersId;
+    const newSender = getSender.office?.users[0].usersId;
+    const existOffice = getSender?.historyOfficesIds.find(
+      id => id === getOffice.id
+    );
+    const historyOfficesIds = existOffice
+      ? undefined
+      : [...(getSender?.historyOfficesIds ?? []), getOffice.id];
     //---------------------------------------------------------------------------
     if (!newReceiver || !newSender)
       throw new AppError('Ingrese Destinatario', 400);
@@ -424,6 +445,9 @@ class PayMailServices {
           where: { id },
           data: {
             status,
+            officeId,
+            beforeOffice: getSender?.office?.name,
+            historyOfficesIds,
             users: {
               updateMany: {
                 where: { type: 'SENDER' },
@@ -590,23 +614,60 @@ class PayMailServices {
   static async updateMessage(
     id: PayMessages['id'],
     {
-      header,
       title,
       description,
+      type,
+      header,
       senderId,
-      receiverId,
-    }: PayMessages & { senderId: number; receiverId: number },
+      officeId,
+      secondaryReceiver,
+    }: PickPayMail,
     files: FileMessagePick[]
   ) {
-    if (!receiverId || !senderId)
-      throw new AppError('Ingrese Destinatario', 400);
+    if (!officeId || !senderId) throw new AppError('Ingrese Destinatario', 400);
+    const getOffice = await prisma.office.findUnique({
+      where: { id: officeId },
+      select: {
+        users: {
+          where: { isOfficeManager: true },
+          select: { usersId: true },
+          take: 1,
+        },
+      },
+    });
+    if (!getOffice) throw new AppError('Opps, oficina inexistente', 404);
     const updateMessage = await prisma.payMessages.update({
       where: { id },
       data: {
         header,
         title,
+        officeId,
+        type,
         description,
+        onHolding: true,
+        onHoldingDate: new Date(),
         status: 'PROCESO',
+        users: {
+          updateMany: {
+            where: { userInit: true },
+            data: {
+              role: 'MAIN',
+              status: false,
+              type: 'SENDER',
+            },
+          },
+          createMany: {
+            data: [
+              ...secondaryReceiver,
+              {
+                userId: getOffice.users[0].usersId,
+                role: 'MAIN',
+                status: true,
+              },
+            ],
+            skipDuplicates: true,
+          },
+        },
         files: { createMany: { data: files } },
       },
     });
@@ -614,10 +675,6 @@ class PayMailServices {
     await prisma.payMail.update({
       where: { userId_paymessageId: { paymessageId: id, userId: senderId } },
       data: { type: 'SENDER', status: false },
-    });
-    await prisma.payMail.update({
-      where: { userId_paymessageId: { paymessageId: id, userId: receiverId } },
-      data: { type: 'RECEIVER', status: true },
     });
     //------------------------------------------------------------------
 
@@ -687,8 +744,8 @@ class PayMailServices {
     });
     //------------------------------------------------------------------
     await prisma.payMail.updateMany({
-      where: { paymessageId: id },
-      data: { type: 'RECEIVER', role: 'SECONDARY', status: false },
+      where: { paymessageId: id, type: 'SENDER' },
+      data: { role: 'SECONDARY', status: false },
     });
     //------------------------------------------------------------------
     await prisma.payMail.update({

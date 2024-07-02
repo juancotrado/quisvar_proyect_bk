@@ -198,9 +198,11 @@ export interface MergeLevels {
 export interface BasicFilesForm {
   dir: string;
   type: BasicFiles['type'];
+  originalname?: string;
   subTasksId: number;
   name: string;
-  userId: number | null;
+  author: string | null;
+  // userId: number | null;
 }
 
 export type TypeIdsList = number | TypeIdsList[];
@@ -258,7 +260,7 @@ export interface SubTaskFiles extends SubTasks {
   files: Files[];
 }
 export interface BasicTaskFiles extends BasicTasks {
-  files: Files[];
+  files: BasicFiles[];
 }
 export type FilesProps = { [fieldname: string]: Express.Multer.File[] };
 export interface ParametersPayMail {
@@ -322,7 +324,7 @@ export interface PickMessageReply extends MessageHistory {
 export interface PickPayMessageReply extends MessageHistory {
   // type?: Mail['type'];
   senderId: Users['id'];
-  officeId?: PayMessages['officeId'];
+  officeId: PayMessages['officeId'];
   receiverId: Users['id'];
   status?: PayMessages['status'];
   paymessageId: PayMessages['id'];

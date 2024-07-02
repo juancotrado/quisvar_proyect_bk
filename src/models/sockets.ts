@@ -5,9 +5,11 @@ import pc from 'picocolors';
 import { authSocket } from '../socket/middlewares';
 import {
   basicSocketCotroller,
+  basicTaskSocketCotroller,
   budgetSocketCotroller,
 } from '../socket/controllers';
 import AppError from '../utils/appError';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 interface DataProjectAndTask {
   project: Level;
@@ -57,7 +59,11 @@ class Sockets {
             try {
               await handler(...args);
             } catch (error) {
-              if (error instanceof AppError)
+              console.log('capturador de errores', error);
+              if (
+                error instanceof AppError ||
+                error instanceof PrismaClientKnownRequestError
+              )
                 socket.emit('server:error', error.message);
             }
           };
@@ -68,6 +74,7 @@ class Sockets {
       //controllers
       handleSocketController(basicSocketCotroller);
       handleSocketController(budgetSocketCotroller);
+      handleSocketController(basicTaskSocketCotroller);
 
       //other
       socket.on('client:update-projectAndTask', (data: DataProjectAndTask) => {

@@ -48,6 +48,7 @@ import {
   ProfessionRouter,
   OfficeRouter,
   ListSpecialtiesRoutes,
+  AsitecRoutes,
 } from '../routes';
 import AppError from '../utils/appError';
 import globalErrorHandler from '../middlewares/error.middleware';
@@ -114,6 +115,7 @@ class Server {
     encrypt: `/${process.env.ROUTE}/encrypt`,
     profession: `/${process.env.ROUTE}/profession`,
     listSpecialties: `/${process.env.ROUTE}/listSpecialties`,
+    asitec: `/${process.env.ROUTE}/asitec`,
   };
 
   constructor() {
@@ -223,6 +225,7 @@ class Server {
     this.app.use(this.path.encrypt, EncryptRouter);
     this.app.use(this.path.profession, ProfessionRouter);
     this.app.use(this.path.listSpecialties, ListSpecialtiesRoutes);
+    this.app.use(this.path.asitec, AsitecRoutes);
     this.app.use(docs);
     this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
       res.locals.pageNotFound = this.rootDir + '/404_page/index.html';

@@ -782,6 +782,97 @@ paths:
             application/json:
               example:
                 error: No se pudo crear el mensaje
+
+  /basictasks/add-user:
+    post:
+      tags:
+        - Basictasks
+        - Users On Tasks
+      summary: Añadir usuario a una tarea
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddedUserTask'
+      responses:
+        '200':
+          description: Operación exitosa
+        '404':
+          description: No se pudo crear el mensaje
+  /basictasks/remove-user/{id}:
+    delete:
+      tags:
+        - Basictasks
+        - Users On Tasks
+      summary: Eliminar usuario de una tarea
+      parameters:
+        - $ref: '#/components/parameters/subtaskId'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+        '404':
+          description: No se pudo crear el mensaje
+  /basictasks/groups-users/{id}:
+    get:
+      tags:
+        - Basictasks
+        - Users On Tasks
+      summary: Ver lista de usuarios y lista de usuarios por grupo de una tarea
+      parameters:
+        - $ref: '#/components/parameters/subtaskId'
+        - $ref: '#/components/parameters/withUserFilter'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación exitosa
+        '404':
+          description: No se pudo crear el mensaje
+  /basictasks/add-colabs/{id}:
+    post:
+      tags:
+        - Basictasks
+        - Users On Tasks
+      summary: Añadir colaboradores a una tarea
+      parameters:
+        - $ref: '#/components/parameters/feedbackUserId'
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/feedback-colabs-form'
+      responses:
+        '200':
+          description: Operación exitosa
+        '404':
+          description: No se pudo crear el mensaje
+  /basictasks/user-status:
+    put:
+      tags:
+        - Basictasks
+        - Users On Tasks
+      summary: Cambiar el estado de usuarios de una tarea
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/feedback-change-status-form'
+      responses:
+        '200':
+          description: Operación exitosa
+        '404':
+          description: No se pudo crear el mensaje
   /files/basics/{id}:
     post:
       tags:
@@ -829,6 +920,67 @@ paths:
       responses:
         '201':
           description: Contrato creado exitosamente
+        '400':
+          description: Datos no válidos
+  /feedbacks/basic-task/{id}:
+    get:
+      tags:
+        - Basictasks
+        - Feedbacks
+      summary: Add new files on basics
+      parameters:
+        - $ref: '#/components/parameters/subtaskId'
+      description: |-
+        Ingresar Los campos requeridos para añadir un archivo
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Operación Exitosa
+        '400':
+          description: Datos no válidos
+    post:
+      tags:
+        - Basictasks
+        - Feedbacks
+      summary: Create a new feedback
+      parameters:
+        - $ref: '#/components/parameters/subtaskId'
+      description: |-
+        Ingresar Los campos requeridos para añadir un archivo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Feedback_Files'
+      responses:
+        '201':
+          description: Operación Exitosa
+        '400':
+          description: Datos no válidos
+    patch:
+      tags:
+        - Basictasks
+        - Feedbacks
+      summary: Review feedbacks
+      parameters:
+        - $ref: '#/components/parameters/feedbackId'
+      description: |-
+        Ingresar Los campos requeridos para añadir un archivo
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Feedback_Review'
+      responses:
+        '201':
+          description: Operación Exitosa
         '400':
           description: Datos no válidos
   /download/basic-level/{id}:
@@ -1004,6 +1156,22 @@ paths:
         - paymail
       summary: edit mail
       description: Aceptar trámites
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/onHolding-paymail-form'
+      responses:
+        '200':
+          description: Operación exitosa
+  /paymail/decline:
+    put:
+      tags:
+        - paymail
+      summary: rechazar tramites
       security:
         - bearerAuth: []
       requestBody:
@@ -1743,6 +1911,27 @@ components:
       required: true
       schema:
         type: integer
+    feedbackId:
+      name: id
+      in: path
+      description: Ingresar id del feedback
+      required: true
+      schema:
+        type: integer
+    feedbackUserId:
+      name: id
+      in: path
+      description: Ingresar id del usuario en la lista feedback
+      required: true
+      schema:
+        type: integer
+    withUserFilter:
+      name: users
+      in: query
+      description: Traer consulta con o sin usuarios
+      required: false
+      schema:
+        type: boolean
     officeId:
       name: id
       in: path
@@ -1996,6 +2185,41 @@ components:
           items:
             type: string
             format: binary
+    Feedback_Files:
+      required:
+        - files
+        - percentage
+      type: object
+      properties:
+        percentage:
+          type: number
+          example: 40
+        files:
+          type: array
+          items:
+            type: string
+            format: binary
+    Feedback_Review:
+      required:
+        - percentage
+        - comment
+        - type
+        - userIdTask
+      type: object
+      properties:
+        percentage:
+          type: number
+          example: 20
+        userIdTask:
+          type: number
+          example: 2
+        comment:
+          type: string
+          example: 'johndoe Lorem'
+        type:
+          type: string
+          description: user <b>[ACCEPTED,REJECTED] </b>
+          example: 'ACCEPTED'
     CompanyImage:
       required:
         - img
@@ -2098,6 +2322,17 @@ components:
         name:
           type: string
           example: 'nombre_de_tarea_duplicada'
+    AddedUserTask:
+      required:
+        - taskId
+        - userId
+      properties:
+        taskId:
+          type: number
+          example: 1
+        userId:
+          type: number
+          example: 1
     mail_form:
       required:
         - data
@@ -2268,3 +2503,25 @@ components:
         ids:
           type: string
           example: [1, 2, 3]
+    feedback-change-status-form:
+      type: array
+      items:
+        type: number
+      example: [1, 4, 5]
+    feedback-colabs-form:
+      type: array
+      items:
+        type: object
+        required:
+          - userId
+          - percentage
+        properties:
+          id:
+            type: integer
+          percentage:
+            type: integer
+      example:
+        - userId: 1
+          percentage: 70
+        - userId: 2
+          percentage: 30

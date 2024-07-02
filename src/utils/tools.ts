@@ -884,12 +884,12 @@ export const TransformWeekReport = (
   data: SubTasksType[]
 ) => {
   const result = [];
-  for (let i = 0; i < weekdays.length; i++) {
+  for (let i = weekdays.length - 1; i >= 0; i--) {
     const dayData = weekdays[i];
     const dayDate = new Date(dayData.date);
 
     const filteredData = data.filter(item => {
-      const itemDate = new Date(item.createdAt);
+      const itemDate = new Date(item.updatedAt);
       itemDate.setUTCHours(itemDate.getUTCHours() - 5);
       return (
         itemDate.toISOString().split('T')[0] ===
@@ -898,8 +898,8 @@ export const TransformWeekReport = (
     });
     //console.log(filteredData)
     const membersMap = new Map();
-    filteredData.forEach(item => {
-      const { name, status, updatedAt, days, users, Levels, id } = item;
+    filteredData.forEach(items => {
+      const { name, status, updatedAt, days, users, Levels, id, item } = items;
       membersMap.set(name, {
         name,
         status,
@@ -907,8 +907,11 @@ export const TransformWeekReport = (
         days,
         user: users.length > 0 ? users[0].user.profile : null,
         stage: Levels.stages.name,
+        stageId: Levels.stages.id,
         project: Levels.stages.project.name,
+        projectId: Levels.stages.project.id,
         subTask: id,
+        item,
       });
     });
     const members = Array.from(membersMap.values());

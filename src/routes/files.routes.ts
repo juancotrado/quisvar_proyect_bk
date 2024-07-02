@@ -37,7 +37,7 @@ router.post('/upload/:id', uploads.upload.single('file'), uploadFile);
 router.post('/uploads/:id', uploads.upload.array('files'), uploadFiles);
 router.post(
   '/basics/:id/',
-  uploads.basicFiles.array('files'),
+  uploads.basicFiles().array('files'),
   uploadBasicFiles
 );
 router.delete('/remove/:id', deleteFile);

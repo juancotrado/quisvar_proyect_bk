@@ -66,6 +66,14 @@ class BasicLevelServices {
             include: {
               ...files,
               ...users,
+              feedBacks: {
+                select: {
+                  type: true,
+                  files: { where: { BasicFeedback: { type: 'ACCEPTED' } } },
+                },
+                take: 1,
+                orderBy: { createdAt: 'desc' },
+              },
             },
           },
         },

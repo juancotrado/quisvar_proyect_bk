@@ -3,7 +3,6 @@ import { NextFunction, Request, Response } from 'express';
 import AppError from '../utils/appError';
 import { Prisma } from '@prisma/client';
 import pc from 'picocolors';
-import { error } from 'console';
 const globalErrorHandler = (
   err: AppError,
   req: Request,
@@ -12,7 +11,10 @@ const globalErrorHandler = (
 ) => {
   err.statusCode = err.statusCode || 500;
   err.message = err.message || 'fail';
-  console.log(err);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(pc.dim(pc.bgRed(err.message)));
+    console.log(err);
+  }
   const typingError =
     err.message.length > 500
       ? 'Variables incorrectas, ingrese los campos necesarios'

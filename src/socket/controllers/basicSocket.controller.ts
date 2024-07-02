@@ -28,6 +28,14 @@ const basicSocketCotroller = (
         callback(query);
       })
     );
+    socket.on(
+      'client:load-stage',
+      catchAsyncSocket(async (stageId: number, callback?: Function) => {
+        console.log('stageId', stageId);
+        await emitStage(stageId);
+        callback?.();
+      })
+    );
 
     socket.on(
       'client:add-level',
@@ -151,12 +159,12 @@ const basicSocketCotroller = (
       catchAsyncSocket(
         async (
           { stageId, id, ...body }: TaskStage,
-          typeGte: 'upper' | 'lower',
-          callback: Function
+          typeGte: 'upper' | 'lower'
+          // callback: Function
         ) => {
           await BasicTasksServices.addToUpperorLower(+id, body, typeGte);
           await emitStage(stageId);
-          callback();
+          // callback();
         }
       )
     );
