@@ -28,6 +28,14 @@ const basicSocketCotroller = (
         callback(query);
       })
     );
+    socket.on(
+      'client:load-stage',
+      catchAsyncSocket(async (stageId: number, callback?: Function) => {
+        console.log('stageId', stageId);
+        await emitStage(stageId);
+        callback?.();
+      })
+    );
 
     socket.on(
       'client:add-level',
