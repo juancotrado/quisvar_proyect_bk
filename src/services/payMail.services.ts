@@ -344,6 +344,7 @@ class PayMailServices {
           historyOfficesIds: [],
           officeId: null,
           status: 'OBSERVADO',
+          onHolding: false,
           files: { deleteMany: { name: { startsWith: 'mp' } } },
           users: {
             deleteMany: { userInit: false },
