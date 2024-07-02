@@ -1167,6 +1167,22 @@ paths:
       responses:
         '200':
           description: Operación exitosa
+  /paymail/decline:
+    put:
+      tags:
+        - paymail
+      summary: rechazar tramites
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/onHolding-paymail-form'
+      responses:
+        '200':
+          description: Operación exitosa
   /mail:
     post:
       tags:
