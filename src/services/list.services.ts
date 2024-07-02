@@ -77,6 +77,22 @@ class ListServices {
     const _startDate = new Date(startDate).getTime();
     const startOfDay = new Date(_startDate + GMT * 5);
     const endOfDay = new Date(_startDate + GMT * 29 - 1);
+    const [year, month] = startDate.split('-').map(Number);
+    const startOfMonthUTC = new Date(Date.UTC(year, month - 1, 1, 5, 0, 0, 0));
+    const endOfMonthUTC = new Date(Date.UTC(year, month, 1, 4, 59, 59, 999));
+    const startOfMonthISO = startOfMonthUTC.toISOString();
+    const endOfMonthISO = endOfMonthUTC.toISOString();
+    const allListsInMonth = await prisma.list.findMany({
+      where: {
+        createdAt: {
+          gte: startOfMonthISO,
+          lte: endOfMonthISO,
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
     const list = await prisma.list.findMany({
       where: {
         createdAt: {
@@ -101,7 +117,15 @@ class ListServices {
         },
       },
     });
-    return list;
+    const listPosition = list.map(item => {
+      const position = allListsInMonth.findIndex(all => all.id === item.id) + 1;
+      return {
+        ...item,
+        position,
+      };
+    });
+
+    return listPosition;
   }
   static async getListRange(startDate: string, endDate: string) {
     const GMT = 60 * 60 * 1000;
