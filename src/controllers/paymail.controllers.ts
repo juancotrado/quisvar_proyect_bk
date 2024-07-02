@@ -89,6 +89,17 @@ class PayMailControllers {
     }
   };
 
+  public declineHoldingStage: ControllerFunction = async (req, res, next) => {
+    try {
+      const ids: number[] = req.body.ids;
+      console.log({ ids });
+      const query = await PayMailServices.decline(ids);
+      res.status(201).json(query);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public createSeal: ControllerFunction = async (req, res, next) => {
     try {
       const { body } = req;

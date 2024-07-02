@@ -18,6 +18,7 @@ const {
   showHoldingMessages,
   updateHoldingStage,
   archivedList,
+  declineHoldingStage,
 } = PayMailControllers;
 
 class PayMailRoutes implements InitialRouter {
@@ -49,6 +50,7 @@ class PayMailRoutes implements InitialRouter {
       createMessage
     );
     this.router.put('/holding', updateHoldingStage);
+    this.router.put('/decline', declineHoldingStage);
     this.router.put(
       '/:id',
       uploads.fileMail.fields(this.optionMulter),

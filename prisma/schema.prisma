@@ -936,6 +936,7 @@ enum MessageRole {
 
 enum PayMessageStatus {
   PROCESO
+  OBSERVADO
   RECHAZADO
   ARCHIVADO
   FINALIZADO
